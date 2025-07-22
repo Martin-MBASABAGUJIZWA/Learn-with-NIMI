@@ -171,6 +171,7 @@ export default function Header() {
                 focus:outline-none focus:ring-2 focus:ring-purple-400
               ">
                 <User className="w-5 h-5" />
+            
               </Button>
             </Link>
           </div>

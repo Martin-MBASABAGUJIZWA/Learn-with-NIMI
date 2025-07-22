@@ -4,8 +4,22 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import supabase from "@/lib/supabaseClient";
 import { Card, CardContent } from "@/components/ui/card";
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
-import { Loader2, Trophy, User, BookOpenCheck, Clock4, AlertTriangle } from "lucide-react";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+import {
+  Loader2,
+  Trophy,
+  User,
+  BookOpenCheck,
+  Clock4,
+  AlertTriangle,
+} from "lucide-react";
 
 interface MetricState {
   students: number;
@@ -15,80 +29,159 @@ interface MetricState {
   pendingSubmissions: number;
 }
 
-interface TrendData { date: string; count: number; }
-interface TopStudent { student_id: number; count: number; }
-interface Submission { id: number; student_id: number; submitted_at: string; title: string; }
+interface TrendData {
+  date: string;
+  count: number;
+}
+interface TopStudent {
+  student_id: number;
+  count: number;
+}
+interface Submission {
+  id: number;
+  student_id: number;
+  submitted_at: string;
+  title: string;
+}
+
+interface Trip {
+  id: number;
+  title: string;
+  description: string | null;
+  date: string;
+  location: string | null;
+  guide_name: string | null;
+}
 
 export default function AdminDashboard() {
   const [metrics, setMetrics] = useState<MetricState | null>(null);
   const [loginTrend, setLoginTrend] = useState<TrendData[]>([]);
   const [topStudents, setTopStudents] = useState<TopStudent[]>([]);
   const [recentSubs, setRecentSubs] = useState<Submission[]>([]);
+  const [upcomingTrips, setUpcomingTrips] = useState<Trip[]>([]);
+  const [pastTrips, setPastTrips] = useState<Trip[]>([]);
   const [statusOk, setStatusOk] = useState(true);
   const [loading, setLoading] = useState(true);
+
+  const [isAdmin, setIsAdmin] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    async function fetchDashboard() {
-      setLoading(true);
-      try {
-        const today = new Date().toISOString().split("T")[0];
+  const checkUserRole = async () => {
+    setLoading(true);
 
-        const [
-          { count: students },
-          { count: courses },
-          { count: todayLogins },
-          { count: todayMissions },
-          { count: pendingSubmissions },
-        ] = await Promise.all([
-          supabase.from("students").select("id", { count: "exact" }),
-          supabase.from("courses").select("id", { count: "exact" }),
-          supabase.from("logins").select("id", { count: "exact" }).eq("date", today),
-          supabase.from("mission_completions").select("id", { count: "exact" }).eq("date", today),
-          supabase.from("submissions").select("id", { count: "exact" }).eq("status", "pending"),
-        ]);
+    const adminId = localStorage.getItem("admin_id");
 
-        setMetrics({
-          students: students ?? 0,
-          courses: courses ?? 0,
-          todayLogins: todayLogins ?? 0,
-          todayMissions: todayMissions ?? 0,
-          pendingSubmissions: pendingSubmissions ?? 0,
-        });
-
-        const { data: trendData } = await supabase.rpc("get_login_trend");
-        setLoginTrend(trendData || []);
-
-        const { data: topData } = await supabase
-          .from("mission_completions")
-          .select("student_id, count:id", { count: "exact" })
-          .group("student_id")
-          .order("count", { ascending: false })
-          .limit(3);
-        setTopStudents(topData || []);
-
-        const { data: subsData } = await supabase
-          .from("submissions")
-          .select("id, student_id, submitted_at, title")
-          .order("submitted_at", { ascending: false })
-          .limit(5);
-        setRecentSubs(subsData || []);
-      } catch (err) {
-        console.error("Dashboard fetch error:", err);
-        setStatusOk(false);
-      } finally {
-        setLoading(false);
-      }
+    if (!adminId) {
+      router.replace("/admin/login");
+      return;
     }
 
-    fetchDashboard();
-  }, []);
+    const { data: admin, error } = await supabase
+      .from("admins")
+      .select("role")
+      .eq("id", adminId)
+      .single();
 
-  if (loading) return (
-    <div className="flex justify-center items-center h-screen">
-      <Loader2 className="animate-spin h-10 w-10 text-[#5e548e]" />
-    </div>
-  );
+    if (error || !admin || admin.role !== "admin") {
+      router.replace("/unauthorized");
+      return;
+    }
+
+    setIsAdmin(true);
+
+    await fetchDashboard();
+    await fetchTrips();
+
+    setLoading(false);
+  };
+
+  checkUserRole();
+}, [router]);
+
+
+  const fetchDashboard = async () => {
+    try {
+      const today = new Date().toISOString().split("T")[0];
+
+      const [
+        { count: students },
+        { count: courses },
+        { count: todayLogins },
+        { count: todayMissions },
+        { count: pendingSubmissions },
+      ] = await Promise.all([
+        supabase.from("students").select("id", { count: "exact" }),
+        supabase.from("courses").select("id", { count: "exact" }),
+        supabase.from("logins").select("id", { count: "exact" }).eq("date", today),
+        supabase
+          .from("mission_completions")
+          .select("id", { count: "exact" })
+          .eq("date", today),
+        supabase.from("submissions").select("id", { count: "exact" }).eq("status", "pending"),
+      ]);
+
+      setMetrics({
+        students: students ?? 0,
+        courses: courses ?? 0,
+        todayLogins: todayLogins ?? 0,
+        todayMissions: todayMissions ?? 0,
+        pendingSubmissions: pendingSubmissions ?? 0,
+      });
+
+      const { data: trendData } = await supabase.rpc("get_login_trend");
+      setLoginTrend(trendData || []);
+
+      const { data: topData } = await supabase
+        .from("mission_completions")
+        .select("student_id, count:id", { count: "exact" })
+        .group("student_id")
+        .order("count", { ascending: false })
+        .limit(3);
+      setTopStudents(topData || []);
+
+      const { data: subsData } = await supabase
+        .from("submissions")
+        .select("id, student_id, submitted_at, title")
+        .order("submitted_at", { ascending: false })
+        .limit(5);
+      setRecentSubs(subsData || []);
+
+      setStatusOk(true);
+    } catch (err) {
+      console.error("Dashboard fetch error:", err);
+      setStatusOk(false);
+    }
+  };
+
+  const fetchTrips = async () => {
+    try {
+      const today = new Date().toISOString().split("T")[0];
+      const { data: tripsData, error } = await supabase
+        .from("trips")
+        .select("*")
+        .order("date", { ascending: true });
+
+      if (error) throw error;
+
+      if (tripsData) {
+        setUpcomingTrips(tripsData.filter((t) => t.date >= today));
+        setPastTrips(tripsData.filter((t) => t.date < today));
+      }
+    } catch (err) {
+      console.error("Failed to fetch trips:", err);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Loader2 className="animate-spin h-10 w-10 text-[#5e548e]" />
+      </div>
+    );
+  }
+
+  if (!isAdmin) return null;
 
   return (
     <div className="p-6 space-y-10 bg-[#f9f7f2] min-h-screen">
@@ -127,31 +220,42 @@ export default function AdminDashboard() {
 
       {/* Metrics Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {[{
-          label: "Total Students",
-          value: metrics?.students,
-          icon: <User className="text-blue-600" />,
-        }, {
-          label: "Active Courses",
-          value: metrics?.courses,
-          icon: <BookOpenCheck className="text-green-600" />,
-        }, {
-          label: "Logins Today",
-          value: metrics?.todayLogins,
-          icon: <Clock4 className="text-indigo-600" />,
-        }, {
-          label: "Missions Done Today",
-          value: metrics?.todayMissions,
-          icon: <Trophy className="text-pink-600" />,
-        }, {
-          label: "Pending Submissions",
-          value: metrics?.pendingSubmissions,
-          icon: <AlertTriangle className="text-yellow-600" />,
-        }, {
-          label: "System Status",
-          value: statusOk ? "✅ OK" : "❌ Offline",
-          icon: statusOk ? <span className="text-green-600">🟢</span> : <span className="text-red-600">🔴</span>,
-        }].map(({ label, value, icon }) => (
+        {[
+          {
+            label: "Total Students",
+            value: metrics?.students,
+            icon: <User className="text-blue-600" />,
+          },
+          {
+            label: "Active Courses",
+            value: metrics?.courses,
+            icon: <BookOpenCheck className="text-green-600" />,
+          },
+          {
+            label: "Logins Today",
+            value: metrics?.todayLogins,
+            icon: <Clock4 className="text-indigo-600" />,
+          },
+          {
+            label: "Missions Done Today",
+            value: metrics?.todayMissions,
+            icon: <Trophy className="text-pink-600" />,
+          },
+          {
+            label: "Pending Submissions",
+            value: metrics?.pendingSubmissions,
+            icon: <AlertTriangle className="text-yellow-600" />,
+          },
+          {
+            label: "System Status",
+            value: statusOk ? "✅ OK" : "❌ Offline",
+            icon: statusOk ? (
+              <span className="text-green-600">🟢</span>
+            ) : (
+              <span className="text-red-600">🔴</span>
+            ),
+          },
+        ].map(({ label, value, icon }) => (
           <Card key={label} className="rounded-xl shadow hover:shadow-lg transition">
             <CardContent className="p-6 flex items-center justify-between">
               <div>
@@ -174,7 +278,13 @@ export default function AdminDashboard() {
             <XAxis dataKey="date" />
             <YAxis allowDecimals={false} />
             <Tooltip />
-            <Line type="monotone" dataKey="count" stroke="#5e548e" strokeWidth={3} dot={{ r: 4 }} />
+            <Line
+              type="monotone"
+              dataKey="count"
+              stroke="#5e548e"
+              strokeWidth={3}
+              dot={{ r: 4 }}
+            />
           </LineChart>
         </ResponsiveContainer>
       </div>
@@ -200,15 +310,49 @@ export default function AdminDashboard() {
           Recent Submissions 📥
         </h2>
         <ul className="space-y-3">
-          {recentSubs.map(sub => (
-            <li key={sub.id} className="flex justify-between text-sm text-gray-700">
-              <span>📄 {sub.title} — Student #{sub.student_id}</span>
+          {recentSubs.map((sub) => (
+            <li
+              key={sub.id}
+              className="flex justify-between text-sm text-gray-700"
+            >
+              <span>
+                📄 {sub.title} — Student #{sub.student_id}
+              </span>
               <span className="text-gray-400">
                 {new Date(sub.submitted_at).toLocaleString()}
               </span>
             </li>
           ))}
         </ul>
+      </div>
+
+      {/* Trips Section */}
+      <div className="bg-white p-6 rounded-xl shadow space-y-4">
+        <h2 className="text-xl font-semibold text-[#5e548e]">Upcoming Trips</h2>
+        {upcomingTrips.length === 0 ? (
+          <p className="text-gray-500">No upcoming trips.</p>
+        ) : (
+          <ul className="space-y-2">
+            {upcomingTrips.map((trip) => (
+              <li key={trip.id} className="border p-3 rounded">
+                <strong>{trip.title}</strong> — {trip.date} — {trip.location} — Guide: {trip.guide_name}
+              </li>
+            ))}
+          </ul>
+        )}
+
+        <h2 className="text-xl font-semibold text-[#5e548e] mt-6">Past Trips</h2>
+        {pastTrips.length === 0 ? (
+          <p className="text-gray-500">No past trips.</p>
+        ) : (
+          <ul className="space-y-2">
+            {pastTrips.map((trip) => (
+              <li key={trip.id} className="border p-3 rounded">
+                <strong>{trip.title}</strong> — {trip.date} — {trip.location} — Guide: {trip.guide_name}
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </div>
   );
