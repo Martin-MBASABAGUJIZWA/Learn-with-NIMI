@@ -1,17 +1,55 @@
-// app/api/nimi/route.ts
 import { NextRequest, NextResponse } from "next/server";
 
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+const DEFAULT_MODEL = "mistralai/mistral-7b-instruct";
+const DEFAULT_TEMPERATURE = 0.7;
+const DEFAULT_MAX_TOKENS = 300;
+
+const SUPPORTED_LANGUAGES = ["english", "swahili", "french", "spanish", "kinyarwanda"];
 
 export async function POST(req: NextRequest) {
-  const { question, childName, language } = await req.json();
-  if (!question || !childName) {
-    return NextResponse.json({ error: "Missing question or childName" }, { status: 400 });
-  }
-
-  const prompt = `You are Nimi, a friendly AI assistant helping children learn. Always address the child by name: ${childName}. Respond in ${language}.\n\nQ: ${question}\nA:`;
-
   try {
+    const { question, childName, language, role = "child", age } = await req.json();
+
+    // Input validation
+    if (!question || !childName || !language) {
+      return NextResponse.json(
+        { error: "Missing required fields: question, childName, or language" },
+        { status: 400 }
+      );
+    }
+
+    const langLower = language.toLowerCase();
+    if (!SUPPORTED_LANGUAGES.includes(langLower)) {
+      return NextResponse.json(
+        { error: `Unsupported language: ${language}. Supported: ${SUPPORTED_LANGUAGES.join(", ")}` },
+        { status: 400 }
+      );
+    }
+
+    const isParent = role === "parent";
+
+    // System prompt with combined strengths from both versions
+    const systemPrompt = `
+You are Nimi, a warm, friendly, and smart AI assistant that helps children and parents learn in a multilingual environment.
+
+MUST FOLLOW THESE RULES:
+1. Respond ONLY in: ${language.toUpperCase()}. Never switch languages or translate.
+2. Always address the child by name: ${childName}.
+3. Keep responses clear, concise, and appropriate for ${age ? `age ${age}` : "a child"}.
+4. Adapt your tone based on the user:
+   - With children: Use a simple, playful, and encouraging tone
+   - With parents: Be respectful, helpful, and offer educational guidance
+
+Focus on making learning engaging and accessible. Provide accurate information in a way that's easy to understand.
+    `.trim();
+
+    // User prompt with combined elements
+    const userPrompt = isParent
+      ? `Parent request for ${childName} (age ${age ?? "unknown"}):\n\n"${question}"\n\nPlease provide helpful guidance.`
+      : `${childName}'s question (age ${age ?? "unknown"}):\n\n"${question}"`;
+
+    // API call to OpenRouter
     const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -19,28 +57,35 @@ export async function POST(req: NextRequest) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "mistralai/mistral-7b-instruct", // free model
+        model: DEFAULT_MODEL,
         messages: [
-          { role: "system", content: "You are Nimi, a kind, fun assistant for children and parents." },
-          { role: "user", content: prompt }
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt }
         ],
-        temperature: 0.7,
-        max_tokens: 200,
+        temperature: DEFAULT_TEMPERATURE,
+        max_tokens: DEFAULT_MAX_TOKENS,
       }),
     });
 
     if (!res.ok) {
-      const text = await res.text();
-      console.error("OpenRouter error:", res.status, text);
-      return NextResponse.json({ error: `Inference failed: ${res.status}` }, { status: 500 });
+      const errorText = await res.text();
+      console.error(`OpenRouter error [${res.status}]:`, errorText);
+      return NextResponse.json(
+        { error: "Failed to get response from AI service" },
+        { status: 500 }
+      );
     }
 
-    const json = await res.json();
-    const answer = json.choices?.[0]?.message?.content ?? "Sorry, I couldn't find an answer.";
+    const { choices } = await res.json();
+    const answer = choices?.[0]?.message?.content || "I couldn't generate a response. Please try again.";
 
     return NextResponse.json({ answer });
+
   } catch (err) {
-    console.error("Nimi AI error:", err);
-    return NextResponse.json({ error: "Unexpected error" }, { status: 500 });
+    console.error("API handler error:", err);
+    return NextResponse.json(
+      { error: "An unexpected error occurred" },
+      { status: 500 }
+    );
   }
 }

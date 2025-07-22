@@ -287,7 +287,38 @@ export const translations: Record<Language, TranslationKeys> = {
     explorer: "Explorer",
     adventurer: "Adventurer",
     master: "Master",
-    superstar: "Superstar"
+    superstar: "Superstar",
+    feelingHappyMessage: "You’re doing great! Keep smiling!",
+    feelingGoodMessage: "Keep up the good mood!",
+    feelingNeutralMessage: "It’s okay to have an off day.",
+    feelingSadMessage: "Remember, tomorrow is a new day!",
+    feelingExcitedMessage: "Yay! Enjoy your happiness!",
+    feelingTiredMessage: "Make sure to get some rest.",
+    hearNimiReadPage: "Hear Nimi Read This Page",
+    loadingMissions: "Loading your missions...",
+    completeDayToUnlock: "Complete day {day} to unlock",
+    theme: "Theme",
+    points: "pts",
+    newReward: "New Reward!",
+  unlockedSticker: "You unlocked a special sticker!",
+  viewRewards: "View Rewards",
+  dayCompleteTitle: "Day Complete!",
+  dayCompleteMessage: "You've completed Day {day}!",
+  streakBonus: "{streak}-day streak!",
+  streakBonusMessage: "Keep it going to earn bonus points!",
+  nextReward: "Next Reward:",
+  mysteryBadge: "Mystery Badge!",
+  continueToNextDay: "Continue to Day",
+  missionCompletedCelebration: "Mission complete! {points} points earned!",
+  dayCompletedCelebration: "Day {day} completed! You earned {points} points!",
+  completionError: "Oops! Something went wrong. Please try again."
+
+
+
+
+
+
+
   
 
   },
@@ -425,7 +456,28 @@ export const translations: Record<Language, TranslationKeys> = {
     explorer: "Umuhanga",
     adventurer: "Umuhanga",
     master: "Umwuga",
-    superstar: "Nyota"
+    superstar: "Nyota",
+  feelingHappyMessage: "Uri gukora neza cyane! Komeza useke!",
+  feelingGoodMessage: "Komeza umunezero wawe mwiza!",
+  feelingNeutralMessage: "Birakwiye kugira umunsi utameze neza.",
+  feelingSadMessage: "Ibuka ko ejo ari umunsi mushya!",
+  feelingExcitedMessage: "Yay! Wishimire ibyishimo byawe!",
+  feelingTiredMessage: "Witondere kuruhuka neza.",
+  hearNimiReadPage: "Wumve Nimi asoma uru rupapuro",
+  newReward: "Igihashyo Gishya!",
+  unlockedSticker: "Wasohoye sitike y'idashyizeho!",
+  viewRewards: "Reba Ibihashyo",
+  dayCompleteTitle: "Umunsi Waranze!",
+  dayCompleteMessage: "Warangiye Umunsi {day}!",
+  streakBonus: "Iminsi {streak} ikurikirana!",
+  streakBonusMessage: "Komeza kugirango ubone amapoinzi yinyongera!",
+  nextReward: "Igihashyo Gikurikira:",
+  mysteryBadge: "Ikimenyetso Gitangaje!",
+  continueToNextDay: "Komeza ku Minsi",
+  missionCompletedCelebration: "Misiyoni yarangiye! {points} amapoinzi wabitswe!",
+  dayCompletedCelebration: "Umunsi {day} warangiye! Wabitswe {points} amapoinzi!",
+  completionError: "Oya! Habaye ikibazo. Nyamuneka gerageza nanone."
+  
 
   },
   fr: {
@@ -562,7 +614,29 @@ export const translations: Record<Language, TranslationKeys> = {
     explorer: "Explorateur",
     adventurer: "Aventurier",
     master: "Maître",
-    superstar: "Superstar"
+    superstar: "Superstar",
+  feelingHappyMessage: "Tu fais du super travail ! Continue de sourire !",
+  feelingGoodMessage: "Garde ta bonne humeur !",
+  feelingNeutralMessag: "C’est normal d’avoir un jour sans.",
+  feelingSadMessage: "Rappelle-toi, demain est un nouveau jour !",
+  feelingExcitedMessage: "Youpi ! Profite de ton bonheur !",
+  feelingTiredMessage: "Assure-toi de bien te reposer",
+  hearNimiReadPage: "Écoutez Nimi lire cette page",
+  newReward: "Nouvelle récompense !",
+  unlockedSticker: "Vous avez débloqué un autocollant spécial !",
+  viewRewards: "Voir les récompenses",
+  dayCompleteTitle: "Journée terminée !",
+  dayCompleteMessage: "Vous avez terminé le Jour {day} !",
+  streakBonus: "Série de {streak} jours !",
+  streakBonusMessage: "Continuez pour gagner des points bonus !",
+  nextReward: "Prochaine récompense :",
+  mysteryBadge: "Badge mystère !",
+  continueToNextDay: "Continuer au Jour",
+  missionCompletedCelebration: "Mission accomplie ! {points} points gagnés !",
+  dayCompletedCelebration: "Jour {day} terminé ! Vous avez gagné {points} points !",
+  completionError: "Oups ! Un problème est survenu. Veuillez réessayer."
+
+
 
   },
   es: {
@@ -699,7 +773,31 @@ export const translations: Record<Language, TranslationKeys> = {
     explorer: "Explorador",
     adventurer: "Aventurero",
     master: "Maestro",
-    superstar: "Superestrella"
+    superstar: "Superestrella",
+  feelingHappyMessage: "¡Lo estás haciendo genial! ¡Sigue sonriendo!",
+  feelingGoodMessage: "¡Mantén el buen ánimo!",
+  feelingNeutralMessage: "Está bien tener un mal día.",
+  feelingSadMessage: "Recuerda, mañana es un nuevo día.",
+  feelingExcitedMessage: "¡Yay! ¡Disfruta tu felicidad!",
+  feelingTiredMessage: "Asegúrate de descansar bien.",
+  hearNimiReadPage: "Escucha a Nimi leer esta página",
+  
+  newReward: "¡Nueva recompensa!",
+  unlockedSticker: "¡Desbloqueaste un sticker especial!",
+  viewRewards: "Ver recompensas",
+  dayCompleteTitle: "¡Día completado!",
+  dayCompleteMessage: "¡Has completado el Día {day}!",
+  streakBonus: "¡Racha de {streak} días!",
+  streakBonusMessage: "¡Sigue así para ganar puntos extra!",
+  nextReward: "Próxima recompensa:",
+  mysteryBadge: "¡Insignia misteriosa!",
+  continueToNextDay: "Continuar al Día",
+  missionCompletedCelebration: "¡Misión completada! ¡Ganaste {points} puntos!",
+  dayCompletedCelebration: "¡Día {day} completado! ¡Ganaste {points} puntos!",
+  completionError: "¡Ups! Algo salió mal. Por favor, inténtalo de nuevo."
+
+  
+
     
   },
   sw: {
@@ -836,11 +934,30 @@ export const translations: Record<Language, TranslationKeys> = {
     explorer: "Mpelelezi",
     adventurer: "Mkimbizi",
     master: "Mtaalamu",
-    superstar: "Nyota"
-  },
-  
-};
+    superstar: "Nyota",
+  feelingHappyMessage: "Unafanya vizuri sana! Endelea kujiwekea tabasamu!",
+  feelingGoodMessage: "Endelea na hali nzuri ya moyo!",
+  feelingNeutralMessage: "Ni sawa kuwa na siku mbaya kidogo.",
+  feelingSadMessage: "Kumbuka, kesho ni siku mpya!",
+  feelingExcitedMessage: "Yay! Furahia furaha yako!",
+  feelingTiredMessage: "Hakikisha unapata mapumziko ya kutosha.",
+  hearNimiReadPage: "Sikiliza Nimi akisoma ukurasa huu",
+  newReward: "Tuzo Mpya!",
+  unlockedSticker: "Umefungua stika maalum!",
+  viewRewards: "Angalia Tuzo",
+  dayCompleteTitle: "Siku Imekamilika!",
+  dayCompleteMessage: "Umekamilisha Siku {day}!",
+  streakBonus: "Mfululizo wa siku {streak}!",
+  streakBonusMessage: "Endelea kufanya hivyo kupata pointi za ziada!",
+  nextReward: "Tuzo Inayofuata:",
+  mysteryBadge: "Beji ya Misteri!",
+  continueToNextDay: "Endelea na Siku",
+  missionCompletedCelebration: "Misheni imekamilika! Umepata pointi {points}!",
+  dayCompletedCelebration: "Siku {day} imekamilika! Umepata pointi {points}!",
+  completionError: "Lo! Kitu kimeharibika. Tafadhali jaribu tena."
 
+  }
+}
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   const [language, setLanguage] = useState<Language>('en');
 

@@ -4,7 +4,8 @@ import React, { useState, useEffect, useCallback } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import BottomNavigation from "@/components/BottomNavigation";
-import FloatingStickers from "@/components/FloatingSticker";
+import supabase from "@/lib/supabaseClient";
+import { Button } from "@/components/ui/button"; // Assuming you have this
 const languages = ["English", "Kinyarwanda", "French", "Spanish", "Swahili"];
 
 const translations: Record<string, Record<string, string>> = {
@@ -17,7 +18,9 @@ const translations: Record<string, Record<string, string>> = {
     notifications: "Notifications",
     enableNotifications: "Enable Notifications",
     account: "Account",
-    comingSoon: "Manage your account details here (coming soon).",
+    login: "Login",
+    logout: "Logout",
+    loggedInAs: "Logged in as",
     toastDismiss: "Dismiss notification",
   },
   Kinyarwanda: {
@@ -29,7 +32,9 @@ const translations: Record<string, Record<string, string>> = {
     notifications: "Amatangazo",
     enableNotifications: "Emeza Amatangazo",
     account: "Konti",
-    comingSoon: "Ugenzure amakuru ya konti yawe hano (biraza vuba).",
+    login: "Injira",
+    logout: "Sohoka",
+    loggedInAs: "Winjiye nka",
     toastDismiss: "Funga itangazo",
   },
   French: {
@@ -41,7 +46,9 @@ const translations: Record<string, Record<string, string>> = {
     notifications: "Notifications",
     enableNotifications: "Activer les notifications",
     account: "Compte",
-    comingSoon: "Gérez les détails de votre compte ici (bientôt disponible).",
+    login: "Connexion",
+    logout: "Déconnexion",
+    loggedInAs: "Connecté en tant que",
     toastDismiss: "Fermer la notification",
   },
   Spanish: {
@@ -53,7 +60,9 @@ const translations: Record<string, Record<string, string>> = {
     notifications: "Notificaciones",
     enableNotifications: "Activar notificaciones",
     account: "Cuenta",
-    comingSoon: "Administre los detalles de su cuenta aquí (próximamente).",
+    login: "Iniciar sesión",
+    logout: "Cerrar sesión",
+    loggedInAs: "Conectado como",
     toastDismiss: "Cerrar notificación",
   },
   Swahili: {
@@ -65,7 +74,9 @@ const translations: Record<string, Record<string, string>> = {
     notifications: "Arifa",
     enableNotifications: "Washa arifa",
     account: "Akaunti",
-    comingSoon: "Simamia maelezo ya akaunti yako hapa (itakuja hivi karibuni).",
+    login: "Ingia",
+    logout: "Toka",
+    loggedInAs: "Umeingia kama",
     toastDismiss: "Funga taarifa",
   },
 };
@@ -87,19 +98,14 @@ function Toast({
   return (
     <div
       role="alert"
-      aria-live="assertive"
       className={`fixed bottom-6 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-xl shadow-lg font-semibold text-center text-sm max-w-sm w-full
-        transition-opacity duration-300
         ${darkMode ? "bg-gray-800 text-yellow-300" : "bg-yellow-400 text-black"}
       `}
     >
       {message}
       <button
         onClick={onClose}
-        aria-label="Dismiss notification"
-        className={`ml-4 font-bold focus:outline-none focus:ring-2 focus:ring-offset-1 rounded-full
-          ${darkMode ? "text-yellow-500 hover:text-yellow-300" : "text-black hover:text-gray-700"}
-        `}
+        className={`ml-4 font-bold ${darkMode ? "text-yellow-500" : "text-black"}`}
       >
         ✕
       </button>
@@ -112,8 +118,10 @@ export default function SettingsPage() {
   const [language, setLanguage] = useState("English");
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [user, setUser] = useState<any>(null);
 
-  // Load from localStorage on mount
+  const t = translations[language];
+
   useEffect(() => {
     const savedDark = localStorage.getItem("darkMode");
     const savedLang = localStorage.getItem("language");
@@ -122,9 +130,21 @@ export default function SettingsPage() {
     if (savedDark !== null) setDarkMode(savedDark === "true");
     if (savedLang && languages.includes(savedLang)) setLanguage(savedLang);
     if (savedNotif !== null) setNotificationsEnabled(savedNotif === "true");
+
+    // Check for current user session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
-  // Save on change
   useEffect(() => {
     localStorage.setItem("darkMode", darkMode.toString());
   }, [darkMode]);
@@ -136,8 +156,6 @@ export default function SettingsPage() {
   useEffect(() => {
     localStorage.setItem("notificationsEnabled", notificationsEnabled.toString());
   }, [notificationsEnabled]);
-
-  const t = translations[language];
 
   const toggleDarkMode = useCallback(() => {
     setDarkMode((d) => {
@@ -160,50 +178,55 @@ export default function SettingsPage() {
     });
   };
 
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      setToastMessage("Logout failed: " + error.message);
+    } else {
+      setToastMessage("✅ " + t.logout);
+    }
+  };
+
+  const handleLogin = () => {
+    window.location.href = "/login"; // or trigger your custom login modal
+  };
+
   return (
     <div
-      className={`flex flex-col min-h-screen font-[Fredoka] transition-colors duration-500
-        ${
-          darkMode
-            ? "bg-gradient-to-br from-gray-900 via-gray-800 to-gray-700 text-white"
-            : "bg-gradient-to-br from-sky-100 via-yellow-100 to-pink-100 text-black"
-        }
-      `}
+      className={`flex flex-col min-h-screen font-[Fredoka] transition-colors duration-500 ${
+        darkMode
+          ? "bg-gradient-to-br from-gray-900 via-gray-800 to-gray-700 text-white"
+          : "bg-gradient-to-br from-sky-100 via-yellow-100 to-pink-100 text-black"
+      }`}
     >
       <Header />
 
       <main className="flex-grow p-6 max-w-5xl mx-auto space-y-10">
-        <h1 className="text-4xl font-extrabold text-pink-500 select-none">{t.settings}</h1>
+        <h1 className="text-4xl font-extrabold text-pink-500">{t.settings}</h1>
 
         {/* Appearance Section */}
         <section
-          className={`bg-white rounded-3xl shadow-xl p-8 space-y-6
-          ${darkMode ? "bg-gray-800" : "bg-white"}
-          transition-colors duration-500
-        `}
+          className={`rounded-3xl shadow-xl p-8 space-y-6 ${
+            darkMode ? "bg-gray-800" : "bg-white"
+          }`}
         >
-          <h2 className="text-2xl font-bold text-blue-600 select-none">{t.appearance}</h2>
-
+          <h2 className="text-2xl font-bold text-blue-600">{t.appearance}</h2>
           <div className="flex items-center justify-between">
-            <span className="text-lg font-semibold select-none">{t.darkMode}</span>
+            <span className="text-lg font-semibold">{t.darkMode}</span>
             <button
               onClick={toggleDarkMode}
-              className={`px-5 py-2 rounded-full font-bold transition
-                ${
-                  darkMode
-                    ? "bg-yellow-400 text-black hover:bg-yellow-500"
-                    : "bg-gray-300 text-gray-700 hover:bg-gray-400"
-                }
-              `}
-              aria-pressed={darkMode}
-              aria-label="Toggle dark mode"
+              className={`px-5 py-2 rounded-full font-bold ${
+                darkMode
+                  ? "bg-yellow-400 text-black hover:bg-yellow-500"
+                  : "bg-gray-300 text-gray-700 hover:bg-gray-400"
+              }`}
             >
               {darkMode ? t.lightMode : t.darkMode}
             </button>
           </div>
 
           <div className="flex items-center justify-between">
-            <label htmlFor="language-select" className="text-lg font-semibold select-none">
+            <label htmlFor="language-select" className="text-lg font-semibold">
               {t.language}
             </label>
             <select
@@ -211,7 +234,6 @@ export default function SettingsPage() {
               value={language}
               onChange={handleLanguageChange}
               className="border rounded-full p-2 font-bold cursor-pointer"
-              aria-label="Select language"
             >
               {languages.map((lang) => (
                 <option key={lang} value={lang}>
@@ -224,34 +246,46 @@ export default function SettingsPage() {
 
         {/* Notifications Section */}
         <section
-          className={`rounded-3xl shadow-xl p-8 space-y-6
-            ${darkMode ? "bg-gray-800" : "bg-white"}
-            transition-colors duration-500
-          `}
+          className={`rounded-3xl shadow-xl p-8 space-y-6 ${
+            darkMode ? "bg-gray-800" : "bg-white"
+          }`}
         >
-          <h2 className="text-2xl font-bold text-blue-600 select-none">{t.notifications}</h2>
+          <h2 className="text-2xl font-bold text-blue-600">{t.notifications}</h2>
           <div className="flex items-center justify-between">
-            <span className="text-lg font-semibold select-none">{t.enableNotifications}</span>
+            <span className="text-lg font-semibold">{t.enableNotifications}</span>
             <input
               type="checkbox"
               checked={notificationsEnabled}
               onChange={toggleNotifications}
-              className="w-6 h-6 cursor-pointer accent-pink-500"
-              aria-checked={notificationsEnabled}
-              aria-label="Toggle notifications"
+              className="w-6 h-6 accent-pink-500 cursor-pointer"
             />
           </div>
         </section>
 
         {/* Account Section */}
         <section
-          className={`rounded-3xl shadow-xl p-8 space-y-6
-            ${darkMode ? "bg-gray-800" : "bg-white"}
-            transition-colors duration-500
-          `}
+          className={`rounded-3xl shadow-xl p-8 space-y-6 ${
+            darkMode ? "bg-gray-800" : "bg-white"
+          }`}
         >
-          <h2 className="text-2xl font-bold text-blue-600 select-none">{t.account}</h2>
-          <p className="text-gray-600 dark:text-gray-300 italic select-text">{t.comingSoon}</p>
+          <h2 className="text-2xl font-bold text-blue-600">{t.account}</h2>
+          {user ? (
+            <div className="flex flex-col items-center gap-4">
+              <p className="text-gray-200">
+                {t.loggedInAs}: <strong>{user.email}</strong>
+              </p>
+              <Button variant="destructive" onClick={handleLogout}>
+                {t.logout}
+              </Button>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center gap-4">
+              <p className="text-gray-600 dark:text-gray-300 italic">Not logged in</p>
+              <Button variant="default" onClick={handleLogin}>
+                {t.login}
+              </Button>
+            </div>
+          )}
         </section>
       </main>
 
