@@ -1,6 +1,9 @@
+/** @type {import('next').NextConfig} */
 const nextConfig = {
-  // ... your other config options
-  allowedDevOrigins: ['http://192.168.1.79:3000'],
+  reactStrictMode: true,
+  images: {
+    domains: ['https://nimi-learn.onrender.com'],
+  },
 };
 
-export default nextConfig;
+module.exports = nextConfig;
