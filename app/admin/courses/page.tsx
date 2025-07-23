@@ -15,12 +15,11 @@ interface Course {
   duration: number;
   created_at: string;
 }
-const [courses, setCourses] = useState<Course[]>([]);
 
 export default function CoursesPage() {
-  const [courses, setCourses] = useState([])
-  const [loading, setLoading] = useState(true)
-  const router = useRouter()
+  const [courses, setCourses] = useState<Course[]>([]);
+   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchCourses = async () => {
