@@ -436,5 +436,12 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+
+  "pnpm": {
+    "overrides": {
+      "string-width-cjs": "5.1.1"
+    }
+  }
+
 }
