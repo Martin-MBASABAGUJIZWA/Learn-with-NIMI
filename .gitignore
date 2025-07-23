@@ -11,3 +11,5 @@ dist/
 # Optional
 *.log
 *.zip
+.next/
+node_modules/
