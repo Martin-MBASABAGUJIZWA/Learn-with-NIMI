@@ -1,15 +1,8 @@
-# Do not push these — they are rebuilt during deployment
 .next/
 node_modules/
-out/
-dist/
-
-# Keep secrets safe
 .env
 .env.local
-
-# Optional
 *.log
 *.zip
-.next/
-node_modules/
+out/
+dist/
