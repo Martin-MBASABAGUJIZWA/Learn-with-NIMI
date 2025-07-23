@@ -1,8 +1,6 @@
+// app/api/creations/[id]/comments/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
-
-// Mock database - in a real app, use a database
-let comments: Comment[] = [];
 
 interface Comment {
   id: string;
@@ -12,28 +10,37 @@ interface Comment {
   createdAt: string;
 }
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
-  const { id } = params;
-  
-  const creationComments = comments.filter(c => c.creationId === id)
+let comments: Comment[] = [];
+
+export async function GET(
+  req: NextRequest,
+  context: { params: { id: string } }
+) {
+  const { id } = context.params;
+
+  const creationComments = comments
+    .filter(c => c.creationId === id)
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-  
+
   return NextResponse.json(creationComments);
 }
 
-export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
-  const { id } = params;
-  const { content } = await request.json();
-  
+export async function POST(
+  req: NextRequest,
+  context: { params: { id: string } }
+) {
+  const { id } = context.params;
+  const { content } = await req.json();
+
   const newComment: Comment = {
     id: uuidv4(),
     creationId: id,
-    author: 'User', // In a real app, use the logged in user's name
+    author: 'User',
     content,
-    createdAt: new Date().toISOString()
+    createdAt: new Date().toISOString(),
   };
-  
+
   comments.push(newComment);
-  
+
   return NextResponse.json(newComment, { status: 201 });
 }
