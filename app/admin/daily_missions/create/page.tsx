@@ -67,7 +67,6 @@ export default function CreateDailyMissionPage() {
       upsert: true,
       contentType: file.type,
     });
-
     if (error) {
       console.error(`${type} upload error:`, error);
       alert(`Failed to upload ${type}.`);
@@ -75,16 +74,11 @@ export default function CreateDailyMissionPage() {
     }
   const [audioFile, setAudioFile] = useState<File | null>(null);
 
-    const { data: publicUrlData, error: urlError } = supabase.storage.from("mission-media").getPublicUrl(path);
-    if (urlError || !publicUrlData) {
-      console.error(`${type} public URL error:`, urlError);
-      alert(`Failed to get ${type} public URL.`);
-      return null;
-    }
-
-    return publicUrlData.publicUrl;
-  };
-
+  const { publicUrl } = supabase.storage.from("mission-media").getPublicUrl(path).data;
+  if (!publicUrl) {
+    console.error(`${type} public URL not found`);
+    alert(`Failed to get ${type} public URL.`);
+  }
   const uploadStorybookFile = async (file: File) => {
     const ext = file.name.split(".").pop();
     const today = new Date().toISOString().split("T")[0];
