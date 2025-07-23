@@ -1,4 +1,3 @@
-// app/api/creations/[id]/comments/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -13,10 +12,10 @@ interface Comment {
 let comments: Comment[] = [];
 
 export async function GET(
-  req: NextRequest,
-  context: { params: { id: string } }
+  request: NextRequest,
+  { params }: { params: { id: string } }
 ) {
-  const { id } = context.params;
+  const { id } = params;
 
   const creationComments = comments
     .filter(c => c.creationId === id)
@@ -26,11 +25,11 @@ export async function GET(
 }
 
 export async function POST(
-  req: NextRequest,
-  context: { params: { id: string } }
+  request: NextRequest,
+  { params }: { params: { id: string } }
 ) {
-  const { id } = context.params;
-  const { content } = await req.json();
+  const { id } = params;
+  const { content } = await request.json();
 
   const newComment: Comment = {
     id: uuidv4(),

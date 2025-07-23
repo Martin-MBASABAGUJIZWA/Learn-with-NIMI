@@ -80,7 +80,7 @@
     "cookie-signature": "^1.2.2",
     "core-js": "^3.43.0",
     "react": "^18.2.0",
-    "next": "^15.4.3",
+    "next": "^13.5.0",
     "uuid": "^9.0.0",
     "@radix-ui/react-label": "^1.0.0",
     "@radix-ui/react-select": "^1.0.0",
