@@ -6,6 +6,17 @@ import supabase from '@/lib/supabaseClient'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 
+// app/admin/courses/page.tsx
+interface Course {
+  id: string;
+  title: string;
+  description: string;
+  instructor: string;
+  duration: number;
+  created_at: string;
+}
+const [courses, setCourses] = useState<Course[]>([]);
+
 export default function CoursesPage() {
   const [courses, setCourses] = useState([])
   const [loading, setLoading] = useState(true)
