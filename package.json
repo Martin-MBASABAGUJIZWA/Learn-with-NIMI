@@ -229,6 +229,7 @@
     "lodash": "^4.17.21",
     "log-symbols": "^5.1.0",
     "loose-envify": "^1.4.0",
+    "lottie-react": "^2.4.1",
     "lru-cache": "^5.1.1",
     "lucide-react": "^0.454.0",
     "math-intrinsics": "^1.1.0",
