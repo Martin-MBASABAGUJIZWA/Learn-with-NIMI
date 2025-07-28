@@ -8,6 +8,7 @@ import CreationCard from "@/components/CreationCard";
 import Header from "@/components/Header";
 import BottomNavigation from "@/components/BottomNavigation";
 import Footer from "@/components/Footer";
+import NimiChat from "@/components/NimiChat";
 import { MessageCircle, Heart, Star, Upload, Camera, Mic, Crown, Sparkles, Trophy, Send, X, Lock, Globe } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { create } from "zustand";
@@ -139,7 +140,6 @@ const useCreationsStore = create<CreationsState>((set) => ({
   setErrorPals: (val) => set({ errorPals: val }),
 }));
 
-
 // -------------------
 // Main Component
 // -------------------
@@ -174,9 +174,13 @@ export default function CommunityPage() {
 
   const [selectedCreation, setSelectedCreation] = useState<Creation | null>(null);
   const [showUploadModal, setShowUploadModal] = useState(false);
+  const [showNimiChat, setShowNimiChat] = useState(false);
+  const [nimiMessage, setNimiMessage] = useState("Want to show your drawing? I'll help you!");
+  const [celebrations, setCelebrations] = useState<{id: number, tag: string}[]>([]);
   const childNameFromContext = "Emma";
   const creationsContainerRef = useRef<HTMLDivElement>(null);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
+  const [friendOfTheWeek, setFriendOfTheWeek] = useState<PikoPal | null>(null);
 
   const fetchCreations = useCallback(async (pageToLoad = 1) => {
     setLoadingCreations(true);
@@ -195,6 +199,15 @@ export default function CommunityPage() {
       
       const filteredCreations = data.creations.filter((c: Creation) => c.age >= 2 && c.age <= 4);
       addCreations(filteredCreations, pageToLoad, data.totalPages);
+
+      // Add celebration tags for new creations
+      if (pageToLoad === 1) {
+        const newCelebrations = filteredCreations.slice(0, 3).map((c: Creation) => ({
+          id: c.id,
+          tag: ["Bravo!", "Amazing!", "Wow!"][Math.floor(Math.random() * 3)]
+        }));
+        setCelebrations(newCelebrations);
+      }
     } catch {
       setErrorCreations(true);
     } finally {
@@ -210,6 +223,11 @@ export default function CommunityPage() {
       const data = await res.json();
       const filteredPals = data.pikopals.filter((p: PikoPal) => p.age >= 2 && p.age <= 4);
       setPikopals(filteredPals);
+      
+      // Set a random friend of the week
+      if (filteredPals.length > 0) {
+        setFriendOfTheWeek(filteredPals[Math.floor(Math.random() * filteredPals.length)]);
+      }
     } catch {
       setErrorPals(true);
     } finally {
@@ -242,12 +260,30 @@ export default function CommunityPage() {
   const handleUploadSuccess = (newCreation: Creation) => {
     addCreations([newCreation], 1);
     setShowUploadModal(false);
+    
+    // Add celebration for the new creation
+    const newCelebration = {
+      id: newCreation.id,
+      tag: ["Yay!", "Great job!", "Beautiful!"][Math.floor(Math.random() * 3)]
+    };
+    setCelebrations([...celebrations, newCelebration]);
+    
+    // Trigger Nimi celebration
+    setNimiMessage(`Wow ${childNameFromContext}! I love your ${newCreation.type}!`);
+    setShowNimiChat(true);
   };
 
   const handleLoveCreation = async (creationId: number) => {
     likeCreation(creationId);
     try {
       await fetch(`/api/creations/${creationId}/like`, { method: "POST" });
+      
+      // Add heart animation celebration
+      const newCelebration = {
+        id: creationId,
+        tag: "❤️ Loved!"
+      };
+      setCelebrations([...celebrations, newCelebration]);
     } catch (err) {
       console.error("Error liking creation:", err);
     }
@@ -263,6 +299,13 @@ export default function CommunityPage() {
       if (!res.ok) throw new Error("Failed to add comment");
       const comment: CommentType = await res.json();
       addComment(creationId, comment);
+      
+      // Add comment celebration
+      const newCelebration = {
+        id: creationId,
+        tag: "💬 Commented!"
+      };
+      setCelebrations([...celebrations, newCelebration]);
     } catch (err) {
       alert("Failed to add comment. Please try again.");
     }
@@ -280,6 +323,13 @@ export default function CommunityPage() {
       contacts.forEach(contact => {
         addSharedWith(creationId, contact);
       });
+      
+      // Add share celebration
+      const newCelebration = {
+        id: creationId,
+        tag: "📤 Shared!"
+      };
+      setCelebrations([...celebrations, newCelebration]);
     } catch (err) {
       console.error("Error sharing creation:", err);
     }
@@ -290,6 +340,11 @@ export default function CommunityPage() {
   const SkeletonCard = () => (
     <div className="animate-pulse bg-white rounded-lg h-64 shadow-lg" />
   );
+
+  const triggerNimiCelebration = (message: string) => {
+    setNimiMessage(message);
+    setShowNimiChat(true);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 text-gray-900">
@@ -321,107 +376,126 @@ export default function CommunityPage() {
           <p className="text-xl text-gray-700 mb-6">
             Share and celebrate your amazing creations with friends!
           </p>
+          
+          {/* Nimi AI Prompt */}
+          <div 
+            className="bg-white/80 rounded-xl p-4 max-w-md mx-auto shadow-lg cursor-pointer hover:shadow-xl transition-all"
+            onClick={() => {
+              setNimiMessage("Want to show your drawing? I'll help you!");
+              setShowNimiChat(true);
+            }}
+          >
+            <div className="flex items-center justify-center space-x-2">
+              <div className="bg-pink-100 p-2 rounded-full">
+                <MessageCircle className="w-6 h-6 text-pink-600" />
+              </div>
+              <span className="font-medium">Hear from Nimi</span>
+            </div>
+          </div>
         </div>
 
-        {/* Upload Card */}
-        <Card className="mb-8 bg-gradient-to-r from-pink-100 to-purple-100 border-none shadow-xl">
+        {/* Upload Card - Simplified for Kids */}
+        <Card className="mb-8 bg-gradient-to-r from-pink-100 to-purple-100 border-none shadow-xl relative overflow-hidden">
+          <div className="absolute -top-10 -right-10 w-32 h-32 bg-pink-200 rounded-full opacity-20"></div>
+          <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-purple-200 rounded-full opacity-20"></div>
+          
           <CardHeader>
             <CardTitle className="flex items-center justify-center text-2xl">
-              <Upload className="w-8 h-8 mr-3 text-pink-600" />
-              <span>📸 Share Your Creation</span>
+              <Sparkles className="w-8 h-8 mr-3 text-pink-600" />
+              <span>Show My Drawing!</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="text-center">
             <p className="text-lg text-gray-700 mb-6">
-              Show everyone what you've created! Upload photos of your artwork, crafts, or anything you're proud of.
+              Let's share your artwork with friends! Tap the button below.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <Button
-                onClick={() => setShowUploadModal(true)}
+                onClick={() => {
+                  setNimiMessage("Let's share your drawing! Tap the camera to take a photo or choose one from your gallery.");
+                  setShowNimiChat(true);
+                  setShowUploadModal(true);
+                }}
                 className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white px-8 py-4 rounded-full text-lg font-bold shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-110"
               >
-                <Camera className="w-6 h-6 mr-3" />📷 Upload Photo
+                <Camera className="w-6 h-6 mr-3" />📷 Show My Art
               </Button>
             </div>
           </CardContent>
         </Card>
 
-        {/* Filters */}
-        <section className="mb-6 flex flex-col md:flex-row md:items-center md:justify-center space-y-4 md:space-y-0 md:space-x-6">
-          <div className="flex flex-col w-full max-w-xs">
-            <label htmlFor="filter-mission" className="mb-1 font-semibold">
-              Filter by Mission
-            </label>
-            <select
-              id="filter-mission"
-              value={filterMission || ""}
-              onChange={(e) => setFilterMission(e.target.value || null)}
-              className="p-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-500"
-            >
-              <option value="">All Missions</option>
-              {uniqueMissions.map((mission) => (
-                <option key={mission} value={mission}>{mission}</option>
-              ))}
-            </select>
-          </div>
-
-          <div className="flex flex-col w-full max-w-xs">
-            <label htmlFor="sort-by" className="mb-1 font-semibold">
-              Sort By
-            </label>
-            <select
-              id="sort-by"
-              value={sortBy || ""}
-              onChange={(e) => setSortBy(e.target.value as any || null)}
-              className="p-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-500"
-            >
-              <option value="">None</option>
-              <option value="likes">Most Likes</option>
-              <option value="recency">Newest</option>
-            </select>
-          </div>
-
-          <div className="flex flex-col w-full max-w-xs">
-            <label className="mb-1 font-semibold">Privacy</label>
-            <div className="flex space-x-2">
-              <Button
-                variant={privacyFilter === "all" ? "default" : "outline"}
-                onClick={() => setPrivacyFilter("all")}
-                className="flex-1"
-              >
-                All
-              </Button>
-              <Button
-                variant={privacyFilter === "public" ? "default" : "outline"}
-                onClick={() => setPrivacyFilter("public")}
-                className="flex-1"
-              >
-                Public
-              </Button>
-              <Button
-                variant={privacyFilter === "private" ? "default" : "outline"}
-                onClick={() => setPrivacyFilter("private")}
-                className="flex-1"
-              >
-                Private
-              </Button>
-            </div>
-          </div>
-        </section>
+        {/* Friend of the Week Spotlight */}
+        {friendOfTheWeek && (
+          <Card className="mb-8 bg-gradient-to-r from-yellow-100 to-orange-100 border-none shadow-xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-yellow-300 rounded-bl-full opacity-30"></div>
+            <CardHeader>
+              <CardTitle className="flex items-center justify-center text-2xl">
+                <Sparkles className="w-8 h-8 mr-3 text-yellow-600" />
+                <span>🌟 Friend of the Week</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col items-center">
+                <div className="text-8xl mb-4 animate-bounce" style={{ animationDelay: '0.2s' }}>
+                  {friendOfTheWeek.avatar}
+                </div>
+                <h3 className="text-2xl font-bold text-gray-800 mb-2">{friendOfTheWeek.name}</h3>
+                <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white mb-3">
+                  {friendOfTheWeek.title}
+                </Badge>
+                <p className="text-center text-gray-700 mb-4">
+                  Let's celebrate {friendOfTheWeek.name}'s amazing creations this week!
+                </p>
+                <Button 
+                  variant="outline" 
+                  className="border-pink-500 text-pink-600 hover:bg-pink-50"
+                  onClick={() => {
+                    setNimiMessage(`Say hello to ${friendOfTheWeek.name}, our Friend of the Week! 🌟`);
+                    setShowNimiChat(true);
+                  }}
+                >
+                  <Sparkles className="w-5 h-5 mr-2" /> Celebrate
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Creations Gallery */}
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center flex items-center justify-center">
             <Sparkles className="w-8 h-8 mr-3 text-pink-500" />
-            🎨 Creations Gallery
+            🎨 Our Gallery
             <Heart className="w-8 h-8 ml-3 text-red-500" />
           </h2>
+          
+          {/* Simple Filter for Kids */}
+          <div className="flex justify-center mb-6 space-x-2">
+            <Button
+              variant={filterMission === null ? "default" : "outline"}
+              onClick={() => setFilterMission(null)}
+              className="rounded-full"
+            >
+              All
+            </Button>
+            {uniqueMissions.slice(0, 3).map((mission) => (
+              <Button
+                key={mission}
+                variant={filterMission === mission ? "default" : "outline"}
+                onClick={() => setFilterMission(mission)}
+                className="rounded-full"
+              >
+                {mission}
+              </Button>
+            ))}
+          </div>
+          
           <div
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 h-[600px] overflow-y-auto"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 h-[600px] overflow-y-auto"
             ref={creationsContainerRef}
           >
             {loadingCreations && creations.length === 0 ? (
-              Array(8).fill(null).map((_, i) => <SkeletonCard key={i} />)
+              Array(6).fill(null).map((_, i) => <SkeletonCard key={i} />)
             ) : (
               creations
                 .filter(c => filterMission ? c.mission === filterMission : true)
@@ -437,13 +511,30 @@ export default function CommunityPage() {
                   return 0;
                 })
                 .map(creation => (
-                  <CreationCard
-                    key={creation.id}
-                    creation={creation}
-                    onLike={handleLoveCreation}
-                    onComment={handleAddComment}
-                    onClick={setSelectedCreation}
-                  />
+                  <div key={creation.id} className="relative">
+                    <CreationCard
+                      creation={creation}
+                      onLike={handleLoveCreation}
+                      onComment={handleAddComment}
+                      onClick={setSelectedCreation}
+                      onShare={handleSharePrivate}
+                      simpleView={true}
+                    />
+                    
+                    {/* Celebration Tags */}
+                    {celebrations.find(c => c.id === creation.id) && (
+                      <motion.div
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ type: "spring", stiffness: 500, damping: 20 }}
+                        className="absolute -top-3 -right-3 bg-yellow-100 border-2 border-yellow-300 px-3 py-1 rounded-full shadow-lg z-10"
+                      >
+                        <span className="font-bold text-yellow-700">
+                          {celebrations.find(c => c.id === creation.id)?.tag}
+                        </span>
+                      </motion.div>
+                    )}
+                  </div>
                 ))
             )}
             {loadingCreations && creations.length > 0 && (
@@ -459,11 +550,11 @@ export default function CommunityPage() {
           )}
         </div>
 
-        {/* Piko Pals Hall of Fame */}
+        {/* Simple Hall of Fame */}
         <Card className="mb-8 bg-gradient-to-r from-yellow-100 to-orange-100 border-none shadow-xl">
           <CardHeader>
             <CardTitle className="flex items-center justify-center text-2xl">
-              <Crown className="w-8 h-8 mr-3 text-yellow-600" />👑 Hall of Fame
+              <Crown className="w-8 h-8 mr-3 text-yellow-600" />🌟 Our Stars
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -473,26 +564,22 @@ export default function CommunityPage() {
               <p className="text-center text-red-600">Error loading Piko Pals</p>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {pikopals.map((pal) => (
+                {pikopals.slice(0, 3).map((pal) => (
                   <div
                     key={pal.name}
-                    className="text-center p-6 bg-white/80 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                    className="text-center p-6 bg-white/80 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer"
+                    onClick={() => {
+                      setNimiMessage(`This is ${pal.name}! ${pal.name} is a ${pal.title.toLowerCase()}!`);
+                      setShowNimiChat(true);
+                    }}
                   >
-                    <div className="text-6xl mb-4">{pal.avatar}</div>
+                    <div className="text-6xl mb-4 animate-bounce" style={{ animationDelay: '0.2s' }}>
+                      {pal.avatar}
+                    </div>
                     <h3 className="text-xl font-bold text-gray-800 mb-2">{pal.name}</h3>
                     <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white mb-3">
                       {pal.title}
                     </Badge>
-                    <div className="space-y-2 text-sm text-gray-700">
-                      <div className="flex items-center justify-center">
-                        <Trophy className="w-4 h-4 mr-2 text-yellow-600" />
-                        <span>{pal.achievements} achievements</span>
-                      </div>
-                      <div className="flex items-center justify-center">
-                        <Star className="w-4 h-4 mr-2 text-orange-600" />
-                        <span>{pal.streak} day streak</span>
-                      </div>
-                    </div>
                     <div className="flex justify-center space-x-1 mt-3">
                       {[...Array(3)].map((_, i) => (
                         <span
@@ -511,28 +598,18 @@ export default function CommunityPage() {
           </CardContent>
         </Card>
 
+        <NimiChat />
+
+
         {/* Coming Soon Section */}
         <Card className="bg-gradient-to-r from-green-100 to-emerald-100 border-none shadow-xl">
           <CardContent className="p-8 text-center">
             <div className="text-6xl mb-4">🚀</div>
             <h3 className="text-2xl font-bold text-gray-800 mb-4">Coming Soon!</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6 text-gray-700">
-              {[
-                { icon: "🎮", title: "Learning Games", desc: "Play educational games with friends" },
-                { icon: "📹", title: "Video Calls", desc: "Learn together with video calls" },
-                { icon: "🏆", title: "Group Challenges", desc: "Team up for learning adventures" },
-              ].map((item, i) => (
-                <div key={i} className="text-center">
-                  <div className="text-4xl mb-2">{item.icon}</div>
-                  <h4 className="font-bold">{item.title}</h4>
-                  <p className="text-sm">{item.desc}</p>
-                </div>
-              ))}
-            </div>
+            <p className="text-gray-700 mb-6">More fun ways to learn and play with friends!</p>
           </CardContent>
         </Card>
       </main>
-
       <Footer />
       <BottomNavigation />
     </div>
