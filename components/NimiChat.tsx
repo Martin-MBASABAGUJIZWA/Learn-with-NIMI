@@ -1,72 +1,144 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
+import { Mic, SendHorizontal, X } from "lucide-react";
+import { motion } from "framer-motion";
 
 export default function NimiChat({
   open,
   onClose,
-  message,
-  voiceEnabled = true,
+  language = "en",
+  childName = "friend",
   avatar,
+  voiceEnabled = true,
 }: {
   open: boolean;
   onClose: () => void;
-  message?: string;
-  voiceEnabled?: boolean;
+  language?: string;
+  childName?: string;
   avatar?: React.ReactNode;
+  voiceEnabled?: boolean;
 }) {
-  const [chat, setChat] = useState<string[]>([]);
+  const [chatLog, setChatLog] = useState<string[]>([]);
   const [input, setInput] = useState("");
+  const [isTalking, setIsTalking] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const chatRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (message) {
-      sendToAI(message);
+    if (open && chatRef.current) {
+      chatRef.current.scrollTop = chatRef.current.scrollHeight;
     }
-  }, [message]);
+  }, [chatLog, open]);
 
   const sendToAI = async (question: string) => {
-    setChat((prev) => [...prev, "You: " + question]);
-    const res = await fetch("/api/nimi", {
+    if (!question.trim()) return;
+    setChatLog((prev) => [...prev, `🧒: ${question}`]);
+    setInput("");
+
+    const response = await fetch("/api/nimi", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ question }),
+      body: JSON.stringify({
+        messages: [{ role: "user", content: question }],
+        childName,
+        language,
+      }),
     });
-    const data = await res.json();
-    setChat((prev) => [...prev, "Nimi: " + data.answer]);
+
+    const reader = response.body?.getReader();
+    const decoder = new TextDecoder("utf-8");
+    let aiReply = "";
+    setIsTalking(true);
+
+    if (reader) {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        aiReply += decoder.decode(value, { stream: true });
+        setChatLog((prev) => [...prev.slice(0, -1), `🤖 Nimi: ${aiReply}`]);
+      }
+    }
 
     if (voiceEnabled && typeof window !== "undefined") {
-      const utter = new SpeechSynthesisUtterance(data.answer);
+      const utter = new SpeechSynthesisUtterance(aiReply);
+      utter.lang = language;
+      utter.onend = () => setIsTalking(false);
       window.speechSynthesis.speak(utter);
+    } else {
+      setIsTalking(false);
     }
+  };
+
+  const handleVoiceInput = () => {
+    if (!("webkitSpeechRecognition" in window)) return alert("Voice not supported!");
+
+    const recognition = new (window as any).webkitSpeechRecognition();
+    recognition.lang = language;
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    recognition.onstart = () => setIsListening(true);
+    recognition.onerror = () => setIsListening(false);
+    recognition.onend = () => setIsListening(false);
+
+    recognition.onresult = (event: any) => {
+      const voiceInput = event.results[0][0].transcript;
+      setInput(voiceInput);
+      sendToAI(voiceInput);
+    };
+
+    recognition.start();
   };
 
   if (!open) return null;
 
   return (
-    <div className="fixed bottom-4 right-4 bg-white p-4 rounded-xl shadow-xl w-80">
-      <div className="flex justify-between items-center mb-2">
-        {avatar}
-        <button onClick={onClose}>×</button>
+    <div className="fixed inset-0 z-50 bg-gradient-to-br from-yellow-100 to-pink-100 p-4 flex flex-col items-center justify-center text-center">
+      <div className="absolute top-4 right-4">
+        <button onClick={onClose} className="text-xl rounded-full bg-red-400 text-white p-2">
+          <X />
+        </button>
       </div>
-      <div className="h-48 overflow-y-auto mb-2 space-y-1 text-sm">
-        {chat.map((line, i) => (
-          <div key={i}>{line}</div>
+
+      {/* Nimi Avatar */}
+      <motion.div
+        animate={{ scale: isTalking ? [1, 1.2, 1] : 1 }}
+        transition={{ duration: 1, repeat: Infinity }}
+        className="mb-4"
+      >
+        {avatar || <div className="text-6xl animate-bounce">🧚‍♀️</div>}
+      </motion.div>
+
+      {/* Chat Log */}
+      <div
+        ref={chatRef}
+        className="w-full max-w-xl h-64 overflow-y-auto p-4 bg-white rounded-xl shadow-inner text-lg font-semibold space-y-2"
+      >
+        {chatLog.map((line, i) => (
+          <div key={i} className="whitespace-pre-wrap">{line}</div>
         ))}
       </div>
-      <div className="flex items-center gap-2">
+
+      {/* Input */}
+      <div className="flex items-center mt-4 gap-2 w-full max-w-xl">
         <input
-          className="flex-1 border rounded px-2 py-1"
+          className="flex-1 text-xl p-2 rounded border-2 border-blue-300"
           value={input}
           onChange={(e) => setInput(e.target.value)}
+          placeholder="Type or tap the mic 🎤"
         />
         <button
-          className="bg-blue-500 text-white px-3 py-1 rounded"
-          onClick={() => {
-            sendToAI(input);
-            setInput("");
-          }}
+          onClick={() => sendToAI(input)}
+          className="bg-blue-500 text-white p-2 rounded-full"
         >
-          Send
+          <SendHorizontal />
+        </button>
+        <button
+          onClick={handleVoiceInput}
+          className={`p-2 rounded-full ${isListening ? "bg-green-500" : "bg-gray-300"}`}
+        >
+          <Mic />
         </button>
       </div>
     </div>
