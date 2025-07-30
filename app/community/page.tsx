@@ -8,14 +8,9 @@ import CreationCard from "@/components/CreationCard";
 import Header from "@/components/Header";
 import BottomNavigation from "@/components/BottomNavigation";
 import Footer from "@/components/Footer";
-import NimiChat from "@/components/NimiChat";
 import { MessageCircle, Heart, Star, Upload, Camera, Mic, Crown, Sparkles, Trophy, Send, X, Lock, Globe } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { create } from "zustand";
-
-// -------------------
-// Interfaces and Store
-// -------------------
 
 interface CommentType {
   id: number;
@@ -61,14 +56,12 @@ interface CreationsState {
   totalPages: number;
   filterMission: string | null;
   sortBy: "likes" | "recency" | null;
-  privacyFilter: "all" | "public" | "private";
   addCreations: (newCreations: Creation[], page?: number, totalPages?: number) => void;
   resetCreations: () => void;
   likeCreation: (id: number) => void;
   addComment: (creationId: number, comment: CommentType) => void;
   setFilterMission: (mission: string | null) => void;
   setSortBy: (sort: "likes" | "recency" | null) => void;
-  setPrivacyFilter: (filter: "all" | "public" | "private") => void;
   setPage: (page: number) => void;
   setPikopals: (pals: PikoPal[]) => void;
   setLoadingCreations: (val: boolean) => void;
@@ -89,7 +82,6 @@ const useCreationsStore = create<CreationsState>((set) => ({
   totalPages: 1,
   filterMission: null,
   sortBy: null,
-  privacyFilter: "all",
   addCreations: (newCreations, page, totalPages) => {
     set((state) => ({
       creations: page && page > 1 ? [...state.creations, ...newCreations] : newCreations,
@@ -131,7 +123,6 @@ const useCreationsStore = create<CreationsState>((set) => ({
   },
   setFilterMission: (mission) => set({ filterMission: mission }),
   setSortBy: (sort) => set({ sortBy: sort }),
-  setPrivacyFilter: (filter) => set({ privacyFilter: filter }),
   setPage: (page) => set({ page }),
   setPikopals: (pals) => set({ pikopals: pals, loadingPals: false, errorPals: false }),
   setLoadingCreations: (val) => set({ loadingCreations: val }),
@@ -140,9 +131,194 @@ const useCreationsStore = create<CreationsState>((set) => ({
   setErrorPals: (val) => set({ errorPals: val }),
 }));
 
-// -------------------
-// Main Component
-// -------------------
+const NimiChatCard = ({ 
+  messages,
+  onSend,
+  isTyping
+}: { 
+  messages: Array<{sender: 'user' | 'nimi', text: string}>;
+  onSend: (msg: string) => void;
+  isTyping: boolean;
+}) => {
+  const [input, setInput] = useState("");
+  const [isListening, setIsListening] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const recognitionRef = useRef<any>(null);
+
+  const handleSend = () => {
+    if (input.trim()) {
+      onSend(input);
+      setInput("");
+    }
+  };
+
+  const startListening = () => {
+    if (isListening) {
+      stopListening();
+      return;
+    }
+
+    setIsListening(true);
+    
+    // Initialize speech recognition
+    if ('webkitSpeechRecognition' in window) {
+      const SpeechRecognition = (window as any).webkitSpeechRecognition;
+      recognitionRef.current = new SpeechRecognition();
+      recognitionRef.current.continuous = false;
+      recognitionRef.current.interimResults = false;
+      recognitionRef.current.lang = 'en-US';
+
+      recognitionRef.current.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript;
+        setInput(transcript);
+        setIsListening(false);
+      };
+
+      recognitionRef.current.onerror = (event: any) => {
+        console.error('Speech recognition error', event.error);
+        setIsListening(false);
+      };
+
+      recognitionRef.current.onend = () => {
+        if (isListening) {
+          recognitionRef.current.start();
+        }
+      };
+
+      recognitionRef.current.start();
+    } else {
+      alert("Speech recognition is not supported in your browser. Try Chrome or Edge.");
+      setIsListening(false);
+    }
+  };
+
+  const stopListening = () => {
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
+    }
+    setIsListening(false);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  return (
+    <Card className="mb-8 bg-gradient-to-br from-indigo-100 to-purple-100 border-none shadow-xl relative overflow-hidden">
+      {/* Decorative elements */}
+      <div className="absolute -top-10 -right-10 w-32 h-32 bg-purple-200 rounded-full opacity-20"></div>
+      <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-indigo-200 rounded-full opacity-20"></div>
+      
+      <CardHeader>
+        <CardTitle className="flex items-center text-2xl">
+          <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center mr-3 shadow-sm">
+            <span className="text-2xl">🤖</span>
+          </div>
+          <span>Ask Nimi AI</span>
+          <Badge className="ml-2 bg-gradient-to-r from-purple-500 to-pink-500">
+            New!
+          </Badge>
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="h-64 p-4 bg-white rounded-lg border border-gray-200 overflow-y-auto mb-4 shadow-inner">
+          {messages.map((msg, i) => (
+            <div 
+              key={i} 
+              className={`mb-3 flex ${msg.sender === 'nimi' ? 'justify-start' : 'justify-end'}`}
+            >
+              <div className="flex items-start max-w-xs md:max-w-md">
+                {msg.sender === 'nimi' && (
+                  <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center mr-2 mt-1 flex-shrink-0">
+                    <span className="text-lg">🤖</span>
+                  </div>
+                )}
+                <div 
+                  className={`rounded-2xl px-4 py-2 ${msg.sender === 'nimi' 
+                    ? 'bg-purple-100 text-gray-800 rounded-tl-none' 
+                    : 'bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-tr-none'}`}
+                >
+                  <div className="whitespace-pre-wrap">{msg.text}</div>
+                </div>
+                {msg.sender === 'user' && (
+                  <div className="w-8 h-8 bg-pink-100 rounded-full flex items-center justify-center ml-2 mt-1 flex-shrink-0">
+                    <span className="text-lg">👧</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+          {isTyping && (
+            <div className="flex justify-start">
+              <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center mr-2 mt-1 flex-shrink-0">
+                <span className="text-lg">🤖</span>
+              </div>
+              <div className="bg-purple-100 rounded-2xl px-4 py-2 rounded-tl-none">
+                <div className="flex space-x-1">
+                  <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                  <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                  <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                </div>
+              </div>
+            </div>
+          )}
+          <div ref={messagesEndRef} />
+        </div>
+        
+        <div className="flex items-center gap-2">
+          <button
+            onClick={startListening}
+            className={`p-2 rounded-full ${isListening 
+              ? 'bg-red-500 text-white animate-pulse' 
+              : 'bg-gray-200 hover:bg-gray-300'}`}
+            aria-label={isListening ? "Stop listening" : "Start voice input"}
+          >
+            <Mic className="w-5 h-5" />
+          </button>
+          
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyPress={(e) => e.key === "Enter" && handleSend()}
+            placeholder="Ask about art, colors, or creativity..."
+            className="flex-1 border border-gray-300 rounded-full py-2 px-4 focus:outline-none focus:ring-2 focus:ring-purple-500"
+          />
+          
+          <button
+            onClick={handleSend}
+            disabled={isTyping || !input.trim()}
+            className={`p-2 rounded-full ${!input.trim() || isTyping 
+              ? 'bg-gray-300 text-gray-500' 
+              : 'bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:opacity-90'}`}
+          >
+            <Send className="w-5 h-5" />
+          </button>
+        </div>
+        
+        <div className="mt-3 text-xs text-gray-500 text-center">
+          {isListening ? (
+            <div className="flex items-center justify-center">
+              <div className="w-2 h-2 bg-red-500 rounded-full mr-1 animate-pulse"></div>
+              Listening...
+            </div>
+          ) : (
+            "Try saying 'How do I draw a cat?' or 'Tell me about colors'"
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
 export default function CommunityPage() {
   const {
     creations,
@@ -159,8 +335,6 @@ export default function CommunityPage() {
     setFilterMission,
     sortBy,
     setSortBy,
-    privacyFilter,
-    setPrivacyFilter,
     loadingCreations,
     loadingPals,
     errorCreations,
@@ -174,13 +348,15 @@ export default function CommunityPage() {
 
   const [selectedCreation, setSelectedCreation] = useState<Creation | null>(null);
   const [showUploadModal, setShowUploadModal] = useState(false);
-  const [showNimiChat, setShowNimiChat] = useState(false);
-  const [nimiMessage, setNimiMessage] = useState("Want to show your drawing? I'll help you!");
   const [celebrations, setCelebrations] = useState<{id: number, tag: string}[]>([]);
   const childNameFromContext = "Emma";
   const creationsContainerRef = useRef<HTMLDivElement>(null);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
   const [friendOfTheWeek, setFriendOfTheWeek] = useState<PikoPal | null>(null);
+  const [nimiMessages, setNimiMessages] = useState<Array<{sender: 'user' | 'nimi', text: string}>>([
+    {sender: 'nimi', text: "Hi there! 👋 I'm Nimi, your art helper! 🎨\n\nAsk me about colors, shapes, or how to make cool drawings! ✏️🌈"}
+  ]);
+  const [isNimiTyping, setIsNimiTyping] = useState(false);
 
   const fetchCreations = useCallback(async (pageToLoad = 1) => {
     setLoadingCreations(true);
@@ -189,7 +365,6 @@ export default function CommunityPage() {
       params.append("page", pageToLoad.toString());
       if (filterMission) params.append("mission", filterMission);
       if (sortBy) params.append("sortBy", sortBy);
-      if (privacyFilter !== "all") params.append("isPublic", privacyFilter === "public" ? "true" : "false");
       params.append("ageMin", "2");
       params.append("ageMax", "4");
 
@@ -200,7 +375,6 @@ export default function CommunityPage() {
       const filteredCreations = data.creations.filter((c: Creation) => c.age >= 2 && c.age <= 4);
       addCreations(filteredCreations, pageToLoad, data.totalPages);
 
-      // Add celebration tags for new creations
       if (pageToLoad === 1) {
         const newCelebrations = filteredCreations.slice(0, 3).map((c: Creation) => ({
           id: c.id,
@@ -213,7 +387,7 @@ export default function CommunityPage() {
     } finally {
       setLoadingCreations(false);
     }
-  }, [filterMission, sortBy, privacyFilter]);
+  }, [filterMission, sortBy]);
 
   const fetchPikoPals = useCallback(async () => {
     setLoadingPals(true);
@@ -224,7 +398,6 @@ export default function CommunityPage() {
       const filteredPals = data.pikopals.filter((p: PikoPal) => p.age >= 2 && p.age <= 4);
       setPikopals(filteredPals);
       
-      // Set a random friend of the week
       if (filteredPals.length > 0) {
         setFriendOfTheWeek(filteredPals[Math.floor(Math.random() * filteredPals.length)]);
       }
@@ -261,16 +434,13 @@ export default function CommunityPage() {
     addCreations([newCreation], 1);
     setShowUploadModal(false);
     
-    // Add celebration for the new creation
     const newCelebration = {
       id: newCreation.id,
       tag: ["Yay!", "Great job!", "Beautiful!"][Math.floor(Math.random() * 3)]
     };
     setCelebrations([...celebrations, newCelebration]);
     
-    // Trigger Nimi celebration
-    setNimiMessage(`Wow ${childNameFromContext}! I love your ${newCreation.type}!`);
-    setShowNimiChat(true);
+    setNimiMessages(prev => [...prev, {sender: 'nimi', text: `Wow ${childNameFromContext}! I love your ${newCreation.type}! It's so creative! 🎨✨`}]);
   };
 
   const handleLoveCreation = async (creationId: number) => {
@@ -278,7 +448,6 @@ export default function CommunityPage() {
     try {
       await fetch(`/api/creations/${creationId}/like`, { method: "POST" });
       
-      // Add heart animation celebration
       const newCelebration = {
         id: creationId,
         tag: "❤️ Loved!"
@@ -300,7 +469,6 @@ export default function CommunityPage() {
       const comment: CommentType = await res.json();
       addComment(creationId, comment);
       
-      // Add comment celebration
       const newCelebration = {
         id: creationId,
         tag: "💬 Commented!"
@@ -324,27 +492,73 @@ export default function CommunityPage() {
         addSharedWith(creationId, contact);
       });
       
-      // Add share celebration
       const newCelebration = {
         id: creationId,
         tag: "📤 Shared!"
       };
       setCelebrations([...celebrations, newCelebration]);
+      
+      // Open WhatsApp with the creation image
+      const creation = creations.find(c => c.id === creationId);
+      if (creation) {
+        const message = `Check out my creation on Piko! ${window.location.origin}/creation/${creationId}`;
+        const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+        window.open(whatsappUrl, '_blank');
+      }
     } catch (err) {
       console.error("Error sharing creation:", err);
     }
   };
+
+async function handleNimiSend(message: string) {
+  setNimiMessages(prev => [...prev, { sender: 'user', text: message }]);
+  setIsNimiTyping(true);
+
+  try {
+    const res = await fetch("/api/nimi", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        messages: [
+          {
+            role: "system",
+            content: `You are Nimi, a friendly art assistant for young children. Use simple, playful language with emojis. Keep responses under 3 sentences.`,
+          },
+          ...nimiMessages.map(msg => ({
+            role: msg.sender === "user" ? "user" : "assistant",
+            content: msg.text,
+          })),
+          { role: "user", content: message },
+        ],
+        childName: "Emma",
+        language: "en",
+      }),
+    });
+
+    if (!res.ok) throw new Error("Failed to get response");
+    const data = await res.json();
+    
+    setNimiMessages(prev => [...prev, { 
+      sender: 'nimi', 
+      text: data.response || "Hmm, I'm not sure how to answer that. Can you ask me about art or colors? 🎨" 
+    }]);
+  } catch (err) {
+    console.error("Nimi error:", err);
+    setNimiMessages(prev => [...prev, { 
+      sender: 'nimi', 
+      text: "Oops! I had trouble thinking. Can you try again? 🤔" 
+    }]);
+  } finally {
+    setIsNimiTyping(false);
+  }
+}
+  
 
   const uniqueMissions = Array.from(new Set(creations.map(c => c.mission))).filter(Boolean);
 
   const SkeletonCard = () => (
     <div className="animate-pulse bg-white rounded-lg h-64 shadow-lg" />
   );
-
-  const triggerNimiCelebration = (message: string) => {
-    setNimiMessage(message);
-    setShowNimiChat(true);
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 text-gray-900">
@@ -375,26 +589,9 @@ export default function CommunityPage() {
           </h1>
           <p className="text-xl text-gray-700 mb-6">
             Share and celebrate your amazing creations with friends!
-          </p>
-          
-          {/* Nimi AI Prompt */}
-          <div 
-            className="bg-white/80 rounded-xl p-4 max-w-md mx-auto shadow-lg cursor-pointer hover:shadow-xl transition-all"
-            onClick={() => {
-              setNimiMessage("Want to show your drawing? I'll help you!");
-              setShowNimiChat(true);
-            }}
-          >
-            <div className="flex items-center justify-center space-x-2">
-              <div className="bg-pink-100 p-2 rounded-full">
-                <MessageCircle className="w-6 h-6 text-pink-600" />
-              </div>
-              <span className="font-medium">Hear from Nimi</span>
-            </div>
-          </div>
+          </p> 
         </div>
 
-        {/* Upload Card - Simplified for Kids */}
         <Card className="mb-8 bg-gradient-to-r from-pink-100 to-purple-100 border-none shadow-xl relative overflow-hidden">
           <div className="absolute -top-10 -right-10 w-32 h-32 bg-pink-200 rounded-full opacity-20"></div>
           <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-purple-200 rounded-full opacity-20"></div>
@@ -412,19 +609,26 @@ export default function CommunityPage() {
             <div className="flex flex-wrap justify-center gap-4">
               <Button
                 onClick={() => {
-                  setNimiMessage("Let's share your drawing! Tap the camera to take a photo or choose one from your gallery.");
-                  setShowNimiChat(true);
+                  setNimiMessages(prev => [...prev, {sender: 'nimi', text: "Let's share your drawing! Tap the camera to take a photo or choose one from your gallery. 📸🎨"}]);
                   setShowUploadModal(true);
                 }}
                 className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white px-8 py-4 rounded-full text-lg font-bold shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-110"
               >
                 <Camera className="w-6 h-6 mr-3" />📷 Show My Art
               </Button>
+              <Button
+                onClick={() => {
+                  setNimiMessages(prev => [...prev, {sender: 'nimi', text: "What would you like to know about art and creativity today? 🎨✨"}]);
+                }}
+                variant="outline"
+                className="bg-white border-pink-300 text-pink-600 hover:bg-pink-50 px-8 py-4 rounded-full text-lg font-bold shadow-lg hover:shadow-xl transition-all duration-300"
+              >
+                <Sparkles className="w-6 h-6 mr-3" /> Ask Nimi AI
+              </Button>
             </div>
           </CardContent>
         </Card>
 
-        {/* Friend of the Week Spotlight */}
         {friendOfTheWeek && (
           <Card className="mb-8 bg-gradient-to-r from-yellow-100 to-orange-100 border-none shadow-xl relative overflow-hidden">
             <div className="absolute top-0 right-0 w-24 h-24 bg-yellow-300 rounded-bl-full opacity-30"></div>
@@ -450,8 +654,7 @@ export default function CommunityPage() {
                   variant="outline" 
                   className="border-pink-500 text-pink-600 hover:bg-pink-50"
                   onClick={() => {
-                    setNimiMessage(`Say hello to ${friendOfTheWeek.name}, our Friend of the Week! 🌟`);
-                    setShowNimiChat(true);
+                    setNimiMessages(prev => [...prev, {sender: 'nimi', text: `Say hello to ${friendOfTheWeek.name}, our Friend of the Week! 🌟 ${friendOfTheWeek.name} is a ${friendOfTheWeek.title.toLowerCase()}!`}]);
                   }}
                 >
                   <Sparkles className="w-5 h-5 mr-2" /> Celebrate
@@ -461,7 +664,6 @@ export default function CommunityPage() {
           </Card>
         )}
 
-        {/* Creations Gallery */}
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center flex items-center justify-center">
             <Sparkles className="w-8 h-8 mr-3 text-pink-500" />
@@ -469,7 +671,6 @@ export default function CommunityPage() {
             <Heart className="w-8 h-8 ml-3 text-red-500" />
           </h2>
           
-          {/* Simple Filter for Kids */}
           <div className="flex justify-center mb-6 space-x-2">
             <Button
               variant={filterMission === null ? "default" : "outline"}
@@ -499,7 +700,6 @@ export default function CommunityPage() {
             ) : (
               creations
                 .filter(c => filterMission ? c.mission === filterMission : true)
-                .filter(c => privacyFilter === "all" ? true : privacyFilter === "public" ? c.isPublic : !c.isPublic)
                 .sort((a, b) => {
                   if (sortBy === "likes") return b.likes - a.likes;
                   if (sortBy === "recency") {
@@ -521,7 +721,6 @@ export default function CommunityPage() {
                       simpleView={true}
                     />
                     
-                    {/* Celebration Tags */}
                     {celebrations.find(c => c.id === creation.id) && (
                       <motion.div
                         initial={{ scale: 0, opacity: 0 }}
@@ -550,7 +749,6 @@ export default function CommunityPage() {
           )}
         </div>
 
-        {/* Simple Hall of Fame */}
         <Card className="mb-8 bg-gradient-to-r from-yellow-100 to-orange-100 border-none shadow-xl">
           <CardHeader>
             <CardTitle className="flex items-center justify-center text-2xl">
@@ -569,8 +767,7 @@ export default function CommunityPage() {
                     key={pal.name}
                     className="text-center p-6 bg-white/80 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer"
                     onClick={() => {
-                      setNimiMessage(`This is ${pal.name}! ${pal.name} is a ${pal.title.toLowerCase()}!`);
-                      setShowNimiChat(true);
+                      setNimiMessages(prev => [...prev, {sender: 'nimi', text: `This is ${pal.name}! ${pal.name} is a ${pal.title.toLowerCase()}! ${pal.name} has been creating amazing things!`}]);
                     }}
                   >
                     <div className="text-6xl mb-4 animate-bounce" style={{ animationDelay: '0.2s' }}>
@@ -598,10 +795,12 @@ export default function CommunityPage() {
           </CardContent>
         </Card>
 
-        <NimiChat />
-
-
-        {/* Coming Soon Section */}
+        <NimiChatCard 
+          messages={nimiMessages}
+          onSend={handleNimiSend}
+          isTyping={isNimiTyping}
+        />
+            
         <Card className="bg-gradient-to-r from-green-100 to-emerald-100 border-none shadow-xl">
           <CardContent className="p-8 text-center">
             <div className="text-6xl mb-4">🚀</div>

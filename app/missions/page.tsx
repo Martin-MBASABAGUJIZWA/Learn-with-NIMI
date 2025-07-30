@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useCallback, useMemo, Suspense, useRef } from "react";
+import React, { useEffect, useState, useMemo, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import supabase from "@/lib/supabaseClient";
 import confetti from "canvas-confetti";
@@ -20,20 +20,29 @@ import {
   Play,
   Trophy,
   ChevronRight,
-  BookOpen,
   Sparkles,
-  PartyPopper,
   Volume2,
 } from "lucide-react";
 
-// Sound effects
-const SUCCESS_SOUND = new Howl({ src: ["/sounds/success-ding.mp3"] });
-const CLICK_SOUND = new Howl({ src: ["/sounds/click.mp3"] });
+// Sounds
+const SUCCESS_SOUND = new Howl({ src: ["/sounds/success-ding.mp3"], volume: 0.7 });
+const CLICK_SOUND = new Howl({ src: ["/sounds/click.mp3"], volume: 0.7 });
+
 const VOICE_SOUNDS: Record<string, Howl> = {
-  mission1: new Howl({ src: ["/sounds/voice-mission1.mp3"] }),
-  mission2: new Howl({ src: ["/sounds/voice-mission2.mp3"] }),
-  mission3: new Howl({ src: ["/sounds/voice-mission3.mp3"] }),
+  mission1: new Howl({ src: ["/sounds/voice-mission1.mp3"], volume: 0.8 }),
+  mission2: new Howl({ src: ["/sounds/voice-mission2.mp3"], volume: 0.8 }),
+  mission3: new Howl({ src: ["/sounds/voice-mission3.mp3"], volume: 0.8 }),
 };
+
+const CELEBRATION_VOICES = [
+  new Howl({ src: ["/sounds/nimi-great-job1.mp3"], volume: 0.8 }),
+  new Howl({ src: ["/sounds/nimi-great-job2.mp3"], volume: 0.8 }),
+];
+
+const DAY_COMPLETE_VOICES = [
+  new Howl({ src: ["/sounds/nimi-day-complete1.mp3"], volume: 0.8 }),
+  new Howl({ src: ["/sounds/nimi-day-complete2.mp3"], volume: 0.8 }),
+];
 
 interface Mission {
   id: string;
@@ -64,6 +73,123 @@ interface CompletionData {
 
 const MISSION_ICONS = ["🎵", "🎨", "📖", "🧩", "🎭", "🖍️"];
 
+const LazyVideoPlayer = React.lazy(() => import("@/components/LazyVideoPlayer"));
+
+const CelebrationModal = ({ onClose }: { onClose: () => void }) => {
+  useEffect(() => {
+    const voice = CELEBRATION_VOICES[Math.floor(Math.random() * CELEBRATION_VOICES.length)];
+    voice.play();
+  }, []);
+
+  return (
+    <motion.div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      role="alert"
+      aria-live="polite"
+    >
+      <motion.div
+        className="bg-white rounded-xl p-8 shadow-xl text-center max-w-xs w-full"
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.9, opacity: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <motion.div
+          className="text-6xl mb-5 select-none"
+          animate={{
+            scale: [1, 1.1, 1],
+            opacity: [1, 0.8, 1]
+          }}
+          transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
+          aria-hidden="true"
+        >
+          🎉
+        </motion.div>
+
+        <h2 className="text-2xl font-bold mb-4">Great Job!</h2>
+        <p className="mb-6 text-green-700 text-lg font-semibold">
+          You earned {Math.floor(Math.random() * 3) + 1} stars!
+        </p>
+        <Button onClick={onClose} aria-label="Keep going button">
+          Keep Going
+        </Button>
+      </motion.div>
+    </motion.div>
+  );
+};
+
+const DayCompleteModal = ({
+  day,
+  onClose,
+  onNextDay,
+  isLastDay,
+}: {
+  day: number;
+  onClose: () => void;
+  onNextDay: () => void;
+  isLastDay: boolean;
+}) => {
+  useEffect(() => {
+    const voice = DAY_COMPLETE_VOICES[Math.floor(Math.random() * DAY_COMPLETE_VOICES.length)];
+    voice.play();
+  }, []);
+
+  return (
+    <motion.div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      role="alert"
+      aria-live="polite"
+    >
+      <motion.div
+        className="bg-white rounded-xl p-8 shadow-xl text-center max-w-xs w-full"
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.9, opacity: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <motion.div
+          className="text-6xl mb-5 select-none"
+          animate={{
+            scale: [1, 1.05, 1],
+            opacity: [1, 0.85, 1]
+          }}
+          transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
+          aria-hidden="true"
+        >
+          🏆
+        </motion.div>
+
+        <h2 className="text-2xl font-bold mb-4">Day Complete!</h2>
+        <p className="mb-6">You finished all of Day {day}&apos;s activities!</p>
+
+        <div className="flex justify-center gap-4">
+          {!isLastDay && (
+            <Button
+              onClick={() => {
+                onNextDay();
+                onClose();
+              }}
+              className="gap-2"
+              aria-label={`Go to Day ${day + 1}`}
+            >
+              Go to Day {day + 1} <ChevronRight className="h-5 w-5" aria-hidden="true" />
+            </Button>
+          )}
+          <Button onClick={onClose} aria-label="Close day complete modal">
+            Close
+          </Button>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+};
+
 const KidFriendlyMissionsPage = () => {
   const [missionProgram, setMissionProgram] = useState<DayData[]>([]);
   const [selectedDay, setSelectedDay] = useState<number>(1);
@@ -73,13 +199,16 @@ const KidFriendlyMissionsPage = () => {
   const [showCelebration, setShowCelebration] = useState(false);
   const [showDayCompleteModal, setShowDayCompleteModal] = useState(false);
   const [playingVoice, setPlayingVoice] = useState<string | null>(null);
-  const [xpProgress, setXPProgress] = useState(0);
+  const [loadingMissions, setLoadingMissions] = useState(true);
+  const [loadingCompletions, setLoadingCompletions] = useState(true);
   const { user } = useUser();
 
   // Fetch data
   useEffect(() => {
     const fetchData = async () => {
-      // Fetch missions
+      setLoadingMissions(true);
+      setLoadingCompletions(true);
+
       const { data: missions } = await supabase
         .from("daily_missions")
         .select("*")
@@ -90,8 +219,8 @@ const KidFriendlyMissionsPage = () => {
         const grouped = groupMissionsByDay(missions);
         setMissionProgram(grouped);
       }
+      setLoadingMissions(false);
 
-      // Fetch completions if logged in
       if (user?.id) {
         const { data: completions } = await supabase
           .from("mission_completions")
@@ -99,6 +228,7 @@ const KidFriendlyMissionsPage = () => {
           .eq("user_id", user.id);
         setCompletions(completions || []);
       }
+      setLoadingCompletions(false);
     };
 
     fetchData();
@@ -107,7 +237,7 @@ const KidFriendlyMissionsPage = () => {
   const groupMissionsByDay = (missions: Mission[]) => {
     const active = missions.filter((m) => !m.archived);
     const grouped: Record<number, DayData> = {};
-    
+
     active.forEach((m) => {
       if (!grouped[m.day_number]) {
         grouped[m.day_number] = {
@@ -120,7 +250,7 @@ const KidFriendlyMissionsPage = () => {
       }
       grouped[m.day_number].missions.push(m);
     });
-    
+
     return Object.values(grouped).sort((a, b) => a.day - b.day);
   };
 
@@ -137,48 +267,48 @@ const KidFriendlyMissionsPage = () => {
   const playVoicePreview = (missionId: string) => {
     CLICK_SOUND.play();
     setPlayingVoice(missionId);
-    
-    // In a real app, we'd use actual voice recordings for each mission
+
+    // Randomly pick a voice sound for demo
     const voiceKey = `mission${Math.floor(Math.random() * 3) + 1}`;
     VOICE_SOUNDS[voiceKey].play();
-    
+
     setTimeout(() => setPlayingVoice(null), 3000);
   };
 
   const completeMission = async (mission: Mission) => {
     CLICK_SOUND.play();
     setHostMood("excited");
-    
+
     // Play celebration sound
     SUCCESS_SOUND.play();
     confetti({ particleCount: 50, spread: 70, origin: { y: 0.6 } });
-    
+
     // Add to completions
     const newCompletion = {
       mission_id: mission.id,
       completed_at: new Date().toISOString(),
     };
-    
+
     setCompletions((prev) => [...prev, newCompletion]);
-    setXPProgress((prev) => Math.min(prev + mission.points, 100));
     setShowCelebration(true);
-    
+
     // Save to database if logged in
     if (user?.id) {
       await supabase
         .from("mission_completions")
         .insert([{ ...newCompletion, user_id: user.id }]);
     }
-    
-    // Check if all missions completed - FIXED SYNTAX ERROR HERE
-    if (
-      currentDayData?.missions.every(m => completedIds.has(m.id)) || 
-      currentDayData?.missions.filter(m => !completedIds.has(m.id)).length === 1
-    ) {
-      setTimeout(() => setShowDayCompleteModal(true), 1500);
-    }
-    
-    setTimeout(() => setShowCelebration(false), 3000);
+
+    // Delay to show celebration then check day complete
+    setTimeout(() => {
+      setShowCelebration(false);
+
+      // Check if all missions completed for day
+      const allCompleted = currentDayData?.missions.every(m => completedIds.has(m.id) || m.id === mission.id);
+      if (allCompleted) {
+        setShowDayCompleteModal(true);
+      }
+    }, 3000);
   };
 
   const handleOpenVideo = (mission: Mission) => {
@@ -186,116 +316,149 @@ const KidFriendlyMissionsPage = () => {
     setOpenVideo(mission);
   };
 
-  const LazyVideoPlayer = React.lazy(() => import("@/components/LazyVideoPlayer"));
-
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 to-purple-50">
       <Header />
-      
+
       <main className="max-w-6xl mx-auto flex-grow px-4 py-6">
-        {/* Day Selection - Simplified for kids */}
-        <section className="mb-6">
-          <h2 className="text-3xl font-bold text-center mb-4">
-            {currentDayData?.emoji} {currentDayData?.theme}
-          </h2>
-          
-          <div className="flex overflow-x-auto pb-2 gap-2 px-2">
-            {missionProgram.slice(0, 7).map(day => (
-              <motion.button
-                key={day.day}
-                onClick={() => {
-                  CLICK_SOUND.play();
-                  setSelectedDay(day.day);
-                }}
-                whileTap={{ scale: 0.95 }}
-                className={`flex flex-col items-center p-3 rounded-xl min-w-[80px] ${
-                  selectedDay === day.day 
-                    ? "bg-purple-600 text-white shadow-lg" 
-                    : "bg-white shadow-md"
-                }`}
-              >
-                <span className="text-2xl">{day.emoji}</span>
-                <span className="text-lg font-bold">Day {day.day}</span>
-              </motion.button>
+        {/* Day Selection */}
+        {loadingMissions ? (
+          <div className="flex gap-3 overflow-x-auto px-4 py-2">
+            {[...Array(5)].map((_, i) => (
+              <div
+                key={i}
+                className="bg-purple-200 rounded-xl min-w-[80px] h-20 animate-pulse"
+              />
             ))}
           </div>
-        </section>
+        ) : missionProgram.length === 0 ? (
+          <div className="text-center py-20 text-gray-500 text-lg">No missions available yet. Please check back soon!</div>
+        ) : (
+          <section className="mb-6">
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 select-none" aria-live="polite">
+              {currentDayData?.emoji} {currentDayData?.theme}
+            </h2>
+
+            <div className="flex overflow-x-auto pb-2 gap-3 px-4 scrollbar-thin scrollbar-thumb-purple-400 scrollbar-track-purple-100">
+              {missionProgram.slice(0, 7).map(day => (
+                <motion.button
+                  key={day.day}
+                  onClick={() => {
+                    CLICK_SOUND.play();
+                    setSelectedDay(day.day);
+                  }}
+                  whileTap={{ scale: 0.95 }}
+                  className={`flex flex-col items-center p-4 rounded-xl min-w-[90px]
+                    ${selectedDay === day.day
+                      ? "bg-purple-600 text-white shadow-lg"
+                      : "bg-white shadow-md"}
+                    focus:outline-none focus-visible:ring-4 focus-visible:ring-purple-500`}
+                  aria-label={`Select day ${day.day} missions, theme ${day.theme}`}
+                >
+                  <span className="text-4xl select-none" aria-hidden="true">{day.emoji}</span>
+                  <span className="text-xl font-bold select-none">Day {day.day}</span>
+                </motion.button>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Nimi Assistant */}
         <div className="max-w-md mx-auto mb-6">
           <NimiAssistant mood={hostMood} />
         </div>
 
-        {/* Missions Grid - Kid Friendly */}
-        {currentDayData && (
-          <section className="max-w-2xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Missions Grid */}
+        {loadingMissions ? (
+          <div className="grid grid-cols-1 gap-5 max-w-2xl mx-auto px-2">
+            {[...Array(4)].map((_, i) => (
+              <div
+                key={i}
+                className="h-32 rounded-xl bg-purple-100 animate-pulse"
+                aria-hidden="true"
+              />
+            ))}
+          </div>
+        ) : currentDayData && currentDayData.missions.length > 0 ? (
+          <section className="max-w-2xl mx-auto px-2">
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
               {currentDayData.missions.map((mission, index) => {
                 const completed = completedIds.has(mission.id);
                 const icon = MISSION_ICONS[index % MISSION_ICONS.length];
-                
+
                 return (
                   <motion.div
                     key={mission.id}
                     whileHover={{ y: -5 }}
                     transition={{ type: "spring", stiffness: 300 }}
+                    tabIndex={-1}
                   >
-                    <Card className={`relative overflow-hidden ${
-                      completed ? "bg-green-50 border-green-200" : "bg-white"
-                    }`}>
+                    <Card
+                      className={`relative overflow-hidden
+                        ${completed ? "bg-green-50 border-green-200" : "bg-white"}
+                        focus:outline-none focus-visible:ring-4 focus-visible:ring-green-400`}
+                    >
                       {completed && (
-                        <div className="absolute top-2 right-2 bg-green-500 text-white p-1 rounded-full">
-                          <CheckCircle className="h-5 w-5" />
+                        <div className="absolute top-3 right-3 bg-green-500 text-white p-1 rounded-full" aria-hidden="true">
+                          <CheckCircle className="h-6 w-6" />
                         </div>
                       )}
-                      
+
                       <CardHeader className="pb-2">
                         <div className="flex items-center gap-3">
-                          <span className="text-4xl">{icon}</span>
-                          <CardTitle className="text-xl">{mission.title}</CardTitle>
+                          <span className="text-5xl select-none">{icon}</span>
+                          <CardTitle className="text-2xl">{mission.title}</CardTitle>
                         </div>
                       </CardHeader>
-                      
+
                       <CardContent className="grid gap-3">
-                        <Button 
+                        <Button
                           onClick={() => playVoicePreview(mission.id)}
-                          variant="ghost" 
-                          className="w-full justify-start gap-2"
+                          variant="ghost"
+                          className="w-full justify-center gap-3 py-4 text-xl min-h-[64px]"
                           disabled={!!playingVoice}
+                          aria-label={`Hear Nimi say mission: ${mission.title}`}
                         >
-                          <Volume2 className="h-5 w-5 text-purple-600" />
-                          <span>Hear from Nimi</span>
+                          <Volume2 className="h-6 w-6 text-purple-600" aria-hidden="true" />
+                          Hear from Nimi
                           {playingVoice === mission.id && (
-                            <motion.span 
-                              className="h-2 w-2 bg-purple-600 rounded-full"
-                              animate={{ opacity: [0.2, 1, 0.2] }}
+                            <motion.span
+                              className="h-4 w-4 bg-purple-600 rounded-full"
+                              animate={{ opacity: [0.3, 1, 0.3] }}
                               transition={{ repeat: Infinity, duration: 1 }}
+                              aria-hidden="true"
                             />
                           )}
                         </Button>
-                        
+
                         <Button
                           onClick={() => handleOpenVideo(mission)}
-                          className="w-full gap-2"
                           variant="gradient"
+                          className="w-full gap-3 py-4 text-xl min-h-[64px]"
+                          aria-label={`Watch video for mission: ${mission.title}`}
                         >
-                          <Play className="h-5 w-5" /> Watch
+                          <Play className="h-7 w-7" aria-hidden="true" />
+                          Watch
                         </Button>
-                        
+
                         {!completed && (
                           <Button
                             onClick={() => completeMission(mission)}
-                            className="w-full gap-2"
                             variant="outline"
+                            className="w-full gap-3 py-4 text-xl min-h-[64px]"
+                            aria-label={`Mark mission ${mission.title} as completed`}
                           >
-                            <Sparkles className="h-5 w-5 text-yellow-500" />
+                            <Sparkles className="h-7 w-7 text-yellow-500" aria-hidden="true" />
                             I Did It!
                           </Button>
                         )}
-                        
+
                         {completed && (
-                          <div className="flex items-center justify-center gap-2 text-green-600">
-                            <Trophy className="h-5 w-5" />
+                          <div
+                            className="flex items-center justify-center gap-3 text-green-600 text-xl font-semibold"
+                            aria-live="polite"
+                          >
+                            <Trophy className="h-7 w-7" aria-hidden="true" />
                             <span>Great job!</span>
                           </div>
                         )}
@@ -306,64 +469,28 @@ const KidFriendlyMissionsPage = () => {
               })}
             </div>
           </section>
+        ) : (
+          <div className="text-center py-20 text-gray-600 text-lg select-none">
+            No missions scheduled for this day.
+          </div>
         )}
 
-        {/* Celebration Modals */}
+        {/* Celebration Modal */}
         <AnimatePresence>
           {showCelebration && (
-            <motion.div
-              className="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            >
-              <motion.div
-                className="bg-white rounded-xl p-8 shadow-xl text-center max-w-xs w-full"
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.8, opacity: 0 }}
-              >
-                <div className="text-6xl mb-5 animate-bounce">🎉</div>
-                <h2 className="text-2xl font-bold mb-4">Great Job!</h2>
-                <p className="mb-6 text-green-700 text-lg font-semibold">
-                  You earned {Math.floor(Math.random() * 3) + 1} stars!
-                </p>
-                <Button onClick={() => setShowCelebration(false)}>
-                  Keep Going
-                </Button>
-              </motion.div>
-            </motion.div>
+            <CelebrationModal onClose={() => setShowCelebration(false)} />
           )}
-          
+        </AnimatePresence>
+
+        {/* Day Complete Modal */}
+        <AnimatePresence>
           {showDayCompleteModal && (
-            <motion.div
-              className="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            >
-              <motion.div
-                className="bg-white rounded-xl p-8 shadow-xl text-center max-w-xs w-full"
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.8, opacity: 0 }}
-              >
-                <div className="text-6xl mb-5 animate-pulse">🏆</div>
-                <h2 className="text-2xl font-bold mb-4">Day Complete!</h2>
-                <p className="mb-6">
-                  You finished all of Day {selectedDay}'s activities!
-                </p>
-                <Button 
-                  onClick={() => {
-                    setShowDayCompleteModal(false);
-                    setSelectedDay(prev => prev + 1);
-                  }}
-                  className="gap-2"
-                >
-                  Go to Day {selectedDay + 1} <ChevronRight className="h-5 w-5" />
-                </Button>
-              </motion.div>
-            </motion.div>
+            <DayCompleteModal
+              day={selectedDay}
+              onClose={() => setShowDayCompleteModal(false)}
+              onNextDay={() => setSelectedDay(prev => Math.min(prev + 1, missionProgram.length))}
+              isLastDay={selectedDay >= missionProgram.length}
+            />
           )}
         </AnimatePresence>
 

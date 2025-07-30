@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import supabase from "@/lib/supabaseClient";
+import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
@@ -11,10 +12,12 @@ import Footer from "@/components/Footer";
 import Confetti from "react-confetti";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { speak, loadVoices } from "@/lib/speak";
-import { Play, Star, Gift, Volume2 } from "lucide-react";
+import { Play, Star, Gift } from "lucide-react";
 
 export default function HomePage() {
   const { t, language } = useLanguage();
+  const router = useRouter();
+
   const [childName, setChildName] = useState<string | null>(null);
   const [starsEarned, setStarsEarned] = useState(0);
   const [showCelebration, setShowCelebration] = useState(false);
@@ -23,7 +26,6 @@ export default function HomePage() {
   const [showSurprise, setShowSurprise] = useState(false);
   const [mounted, setMounted] = useState(false);
 
-  // Load data and voices
   useEffect(() => {
     setMounted(true);
     loadVoices();
@@ -69,8 +71,7 @@ export default function HomePage() {
   const handleMissionStart = async () => {
     setShowCelebration(true);
     speak(t('letsPlay') || "Let's play!", language);
-    
-    // Update completed missions
+
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
       const newStars = starsEarned + 1;
@@ -79,11 +80,13 @@ export default function HomePage() {
         .update({ completed_missions: newStars })
         .eq("id", user.id);
       setStarsEarned(newStars);
-      
+
       if (newStars >= 3) setShowSurprise(true);
     }
 
     setTimeout(() => setShowCelebration(false), 3000);
+
+    router.push("/missions");
   };
 
   const handleNimiClick = () => {
@@ -96,12 +99,13 @@ export default function HomePage() {
     const randomMessage = messages[Math.floor(Math.random() * messages.length)];
     speak(randomMessage, language);
   };
+
   if (!mounted) return null;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex flex-col pb-24">
       <Header simple={true} />
-      
+
       {showCelebration && (
         <Confetti 
           recycle={false}
