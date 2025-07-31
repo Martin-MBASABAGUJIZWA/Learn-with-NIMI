@@ -7,6 +7,8 @@ export async function POST(req: NextRequest) {
     if (!OPENROUTER_API_KEY) {
       return new Response('Missing OpenRouter API key', { status: 500 });
     }
+    console.log('OPENROUTER_API_KEY loaded?', !!OPENROUTER_API_KEY);
+
 
     const { messages, childName = "friend", language = "en" } = await req.json();
 
