@@ -1,16 +1,22 @@
+
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
 import CreationCard from "@/components/CreationCard";
 import Header from "@/components/Header";
 import BottomNavigation from "@/components/BottomNavigation";
 import Footer from "@/components/Footer";
-import { MessageCircle, Heart, Star, Upload, Camera, Mic, Crown, Sparkles, Trophy, Send, X, Lock, Globe } from "lucide-react";
+import { MessageCircle, Heart, Star, Upload, Camera, Mic, Crown, Sparkles, Trophy, Send, X, Lock, Globe, Users, Share2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { create } from "zustand";
+import { WhatsappShareButton, WhatsappIcon } from "react-share";
+import { useDropzone } from "react-dropzone";
+import Image from "next/image";
 
 interface CommentType {
   id: number;
@@ -34,6 +40,7 @@ interface Creation {
   isPublic: boolean;
   createdAt?: string;
   sharedWith?: string[];
+  description?: string;
 }
 
 interface PikoPal {
@@ -54,14 +61,10 @@ interface CreationsState {
   errorPals: boolean;
   page: number;
   totalPages: number;
-  filterMission: string | null;
-  sortBy: "likes" | "recency" | null;
   addCreations: (newCreations: Creation[], page?: number, totalPages?: number) => void;
   resetCreations: () => void;
   likeCreation: (id: number) => void;
   addComment: (creationId: number, comment: CommentType) => void;
-  setFilterMission: (mission: string | null) => void;
-  setSortBy: (sort: "likes" | "recency" | null) => void;
   setPage: (page: number) => void;
   setPikopals: (pals: PikoPal[]) => void;
   setLoadingCreations: (val: boolean) => void;
@@ -80,8 +83,6 @@ const useCreationsStore = create<CreationsState>((set) => ({
   errorPals: false,
   page: 1,
   totalPages: 1,
-  filterMission: null,
-  sortBy: null,
   addCreations: (newCreations, page, totalPages) => {
     set((state) => ({
       creations: page && page > 1 ? [...state.creations, ...newCreations] : newCreations,
@@ -121,8 +122,6 @@ const useCreationsStore = create<CreationsState>((set) => ({
       })
     }));
   },
-  setFilterMission: (mission) => set({ filterMission: mission }),
-  setSortBy: (sort) => set({ sortBy: sort }),
   setPage: (page) => set({ page }),
   setPikopals: (pals) => set({ pikopals: pals, loadingPals: false, errorPals: false }),
   setLoadingCreations: (val) => set({ loadingCreations: val }),
@@ -130,6 +129,447 @@ const useCreationsStore = create<CreationsState>((set) => ({
   setErrorCreations: (val) => set({ errorCreations: val }),
   setErrorPals: (val) => set({ errorPals: val }),
 }));
+
+// Replace your existing UploadModal component with this improved version
+const UploadModal = ({ onClose, onSuccess, childName }: { onClose: () => void, onSuccess: (creation: Creation) => void, childName: string }) => {
+  const [image, setImage] = useState<string | null>(null);
+  const [description, setDescription] = useState("");
+  const [isPublic, setIsPublic] = useState(true);
+  const [isUploading, setIsUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [file, setFile] = useState<File | null>(null);
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    accept: {
+      'image/*': ['.jpeg', '.jpg', '.png']
+    },
+    maxFiles: 1,
+    maxSize: 5 * 1024 * 1024, // 5MB
+    onDrop: acceptedFiles => {
+      setError(null);
+      if (acceptedFiles.length > 0) {
+        const file = acceptedFiles[0];
+        setFile(file);
+        
+        // Additional client-side validation
+        if (file.size > 5 * 1024 * 1024) {
+          setError("File is too large (max 5MB)");
+          return;
+        }
+        
+        if (!['image/jpeg', 'image/png', 'image/jpg'].includes(file.type)) {
+          setError("Please upload a JPG or PNG image");
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = () => {
+          setImage(reader.result as string);
+        };
+        reader.readAsDataURL(file);
+      }
+    },
+    onDropRejected: (fileRejections) => {
+      const rejection = fileRejections[0];
+      if (rejection.errors.some(e => e.code === 'file-too-large')) {
+        setError("File is too large (max 5MB)");
+      } else if (rejection.errors.some(e => e.code === 'file-invalid-type')) {
+        setError("Please upload a valid image (JPG, PNG)");
+      } else {
+        setError("Unable to upload file");
+      }
+    }
+  });
+  const handleSubmit = async () => {
+    if (!image || !file) {
+      setError("Please select an image first");
+      return;
+    }
+  
+    setIsUploading(true);
+    setError(null);
+    setUploadProgress(0);
+  
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("childName", childName);
+      formData.append("description", description);
+      formData.append("isPublic", String(isPublic));
+  
+      const response = await fetch("/api/creations/upload", {
+        method: "POST",
+        body: formData,
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          errorData.error || 
+          `Upload failed with status ${response.status}`
+        );
+      }
+  
+      const responseData = await response.json();
+      onSuccess(responseData);
+    } catch (err: any) {
+      console.error("Upload error:", err);
+      
+      let errorMessage = err.message;
+      if (err.message.includes("404")) {
+        errorMessage = "Upload service unavailable. Please try again later.";
+      } else if (err.message.includes("413")) {
+        errorMessage = "File is too large (max 5MB)";
+      } else if (err.message.includes("415")) {
+        errorMessage = "Unsupported file type (only JPG/PNG allowed)";
+      }
+  
+      setError(errorMessage);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+    return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+      <motion.div
+        className="bg-white rounded-xl p-6 w-full max-w-md mx-4"
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.9, opacity: 0 }}
+      >
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-xl font-bold">Share Your Art</h3>
+          <button 
+            onClick={onClose} 
+            className="text-gray-500 hover:text-gray-700"
+            disabled={isUploading}
+          >
+            <X className="w-6 h-6" />
+          </button>
+        </div>
+
+        <div 
+          {...getRootProps()} 
+          className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer mb-4 transition-colors ${
+            isDragActive ? "border-blue-500 bg-blue-50" : "border-gray-300 hover:border-gray-400"
+          } ${isUploading ? "opacity-50 pointer-events-none" : ""}`}
+        >
+          <input {...getInputProps()} disabled={isUploading} />
+          {image ? (
+            <div className="relative h-48 w-full rounded-md overflow-hidden mb-2">
+              <Image
+                src={image}
+                alt="Preview"
+                fill
+                className="object-contain"
+              />
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <Camera className="w-10 h-10 mx-auto text-gray-400" />
+              <p className="text-sm text-gray-600">
+                {isDragActive ? "Drop your artwork here" : "Drag & drop your artwork, or click to select"}
+              </p>
+              <p className="text-xs text-gray-500">Supports JPG, PNG, GIF (max 5MB)</p>
+            </div>
+          )}
+        </div>
+
+          {isUploading && (
+            <div className="w-full space-y-2 mb-4">
+              <div className="w-full bg-gray-200 rounded-full h-2.5">
+                <div 
+                  className="bg-blue-600 h-2.5 rounded-full transition-all duration-300" 
+                  style={{ width: `${uploadProgress}%` }}
+                ></div>
+              </div>
+              <p className="text-sm text-center text-gray-600">
+                {uploadProgress < 30 && "Starting upload..."}
+                {uploadProgress >= 30 && uploadProgress < 70 && "Uploading your artwork..."}
+                {uploadProgress >= 70 && uploadProgress < 100 && "Almost done! Processing..."}
+                {uploadProgress === 100 && "Finalizing..."}
+              </p>
+            </div>
+          )}
+
+          {error && (
+            <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
+              <div className="font-medium">Upload failed</div>
+              <div>{error}</div>
+              {error.includes('large') && (
+                <div className="mt-1 text-xs">Try resizing your image or choose a different file.</div>
+              )}
+              {error.includes('type') && (
+                <div className="mt-1 text-xs">Supported formats: JPG, PNG (max 5MB)</div>
+              )}
+            </div>
+          )}
+
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Tell us about your art
+            </label>
+            <Input
+              placeholder="What did you create?"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="w-full"
+              disabled={isUploading}
+            />
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="visibility"
+              checked={isPublic}
+              onCheckedChange={setIsPublic}
+              disabled={isUploading}
+            />
+            <label htmlFor="visibility" className="text-sm font-medium">
+              {isPublic ? "Public (Share with everyone)" : "Private (Only family)"}
+            </label>
+          </div>
+
+          {error && (
+            <div className="text-red-500 text-sm text-center">{error}</div>
+          )}
+
+          <div className="flex space-x-3 pt-2">
+            <Button
+              onClick={onClose}
+              variant="outline"
+              className="flex-1"
+              disabled={isUploading}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSubmit}
+              className="flex-1 bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600"
+              disabled={!image || isUploading}
+            >
+              {isUploading ? (
+                <div className="flex items-center">
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  {uploadProgress}%
+                </div>
+              ) : (
+                "Share Art"
+              )}
+            </Button>
+          </div>
+        </div>
+      </motion.div>
+    </div>
+  );
+};
+
+const EnhancedCreationCard = ({ 
+  creation, 
+  onLike, 
+  onComment, 
+  onShare,
+  onClick,
+  simpleView,
+  showReactions
+}: {
+  creation: Creation;
+  onLike: (id: number) => void;
+  onComment: (id: number, content: string) => void;
+  onShare: (id: number, contacts: string[]) => void;
+  onClick?: (creation: Creation) => void;
+  simpleView?: boolean;
+  showReactions?: boolean;
+}) => {
+  const [showShareOptions, setShowShareOptions] = useState(false);
+  const [comment, setComment] = useState("");
+  const [activeComment, setActiveComment] = useState(false);
+  const [familyMembers] = useState(["Mom", "Dad", "Grandma", "Grandpa"]);
+
+  const handleShareClick = () => {
+    setShowShareOptions(true);
+  };
+
+  const handlePrivateShare = (contacts: string[]) => {
+    onShare(creation.id, contacts);
+    setShowShareOptions(false);
+  };
+
+  return (
+    <Card className="relative overflow-hidden hover:shadow-lg transition-shadow">
+      <div className="relative group">
+        <img 
+          src={creation.image} 
+          alt={`Art by ${creation.childName}`}
+          className="w-full h-auto object-cover cursor-pointer"
+          onClick={() => onClick && onClick(creation)}
+        />
+        
+        {!creation.isPublic && (
+          <div className="absolute top-2 left-2 bg-white/90 px-2 py-1 rounded-full flex items-center text-xs shadow-sm">
+            <Users className="w-3 h-3 mr-1" /> Family Only
+          </div>
+        )}
+      </div>
+      
+      <CardContent className="p-4">
+        <div className="flex justify-between items-center mb-2">
+          <h3 className="font-medium">{creation.childName}</h3>
+          <div className="text-xs text-gray-500">
+            {new Date(creation.createdAt || '').toLocaleDateString()}
+          </div>
+        </div>
+        
+        <div className="flex justify-around border-t pt-3">
+          <Button 
+            variant="ghost" 
+            className={`flex items-center space-x-1 ${showReactions ? 'text-red-500' : ''}`}
+            onClick={() => onLike(creation.id)}
+          >
+            <Heart 
+              className="w-5 h-5" 
+              fill={showReactions ? "currentColor" : "none"}
+            />
+            <span>{creation.likes}</span>
+          </Button>
+
+          <Button 
+            variant="ghost" 
+            className="flex items-center space-x-1"
+            onClick={() => setActiveComment(!activeComment)}
+          >
+            <MessageCircle className="w-5 h-5" />
+            <span>{creation.comments?.length || 0}</span>
+          </Button>
+
+          <Button 
+            variant="ghost" 
+            className="flex items-center space-x-1"
+            onClick={handleShareClick}
+          >
+            <Share2 className="w-5 h-5" />
+          </Button>
+        </div>
+
+        {activeComment && (
+          <div className="mt-3 space-y-2">
+            {creation.comments?.map(comment => (
+              <div key={comment.id} className="flex space-x-2">
+                <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-xs">
+                  {comment.author.charAt(0)}
+                </div>
+                <div className="bg-gray-100 rounded-lg px-3 py-2 flex-1">
+                  <div className="font-medium text-xs">{comment.author}</div>
+                  <div className="text-sm">{comment.content}</div>
+                </div>
+              </div>
+            ))}
+            
+            <div className="flex space-x-2 mt-2">
+              <Input
+                placeholder="Add a comment..."
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                onKeyPress={(e) => e.key === "Enter" && onComment(creation.id, comment)}
+                className="flex-1 text-sm"
+              />
+              <Button 
+                onClick={() => {
+                  onComment(creation.id, comment);
+                  setComment("");
+                }}
+                disabled={!comment.trim()}
+                size="sm"
+              >
+                Post
+              </Button>
+            </div>
+          </div>
+        )}
+      </CardContent>
+
+      <AnimatePresence>
+        {showShareOptions && (
+          <motion.div 
+            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="bg-white rounded-xl p-6 w-full max-w-sm"
+              initial={{ scale: 0.9 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.9 }}
+            >
+              <h3 className="text-xl font-bold mb-4">
+                {creation.isPublic ? "Share This Art" : "Share With Family"}
+              </h3>
+              
+              {creation.isPublic ? (
+                <div className="space-y-3">
+                  <WhatsappShareButton
+                    url={`${window.location.origin}/creation/${creation.id}`}
+                    title={`Check out ${creation.childName}'s art on Piko!`}
+                    className="w-full"
+                  >
+                    <Button className="w-full bg-green-500 hover:bg-green-600 text-white">
+                      <WhatsappIcon size={24} round className="mr-2" />
+                      Share on WhatsApp
+                    </Button>
+                  </WhatsappShareButton>
+                  <Button 
+                    variant="outline" 
+                    className="w-full"
+                    onClick={() => {
+                      navigator.clipboard.writeText(`${window.location.origin}/creation/${creation.id}`);
+                      setShowShareOptions(false);
+                    }}
+                  >
+                    Copy Link
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <p className="text-sm text-gray-600 mb-2">
+                    Select family members to share with:
+                  </p>
+                  <div className="space-y-2">
+                    {familyMembers.map(member => (
+                      <div 
+                        key={member} 
+                        className="flex items-center space-x-2 p-2 hover:bg-gray-50 rounded-lg cursor-pointer"
+                        onClick={() => handlePrivateShare([member])}
+                      >
+                        <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                          <Users className="w-4 h-4 text-blue-600" />
+                        </div>
+                        <span>{member}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              <Button 
+                variant="ghost" 
+                className="w-full mt-4"
+                onClick={() => setShowShareOptions(false)}
+              >
+                Cancel
+              </Button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </Card>
+  );
+};
 
 const NimiChatCard = ({ 
   messages,
@@ -160,7 +600,6 @@ const NimiChatCard = ({
 
     setIsListening(true);
     
-    // Initialize speech recognition
     if ('webkitSpeechRecognition' in window) {
       const SpeechRecognition = (window as any).webkitSpeechRecognition;
       recognitionRef.current = new SpeechRecognition();
@@ -213,7 +652,6 @@ const NimiChatCard = ({
 
   return (
     <Card className="mb-8 bg-gradient-to-br from-indigo-100 to-purple-100 border-none shadow-xl relative overflow-hidden">
-      {/* Decorative elements */}
       <div className="absolute -top-10 -right-10 w-32 h-32 bg-purple-200 rounded-full opacity-20"></div>
       <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-indigo-200 rounded-full opacity-20"></div>
       
@@ -222,10 +660,7 @@ const NimiChatCard = ({
           <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center mr-3 shadow-sm">
             <span className="text-2xl">🤖</span>
           </div>
-          <span>Ask Nimi AI</span>
-          <Badge className="ml-2 bg-gradient-to-r from-purple-500 to-pink-500">
-            New!
-          </Badge>
+          <span>Nimi Says...</span>
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -289,7 +724,7 @@ const NimiChatCard = ({
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={(e) => e.key === "Enter" && handleSend()}
-            placeholder="Ask about art, colors, or creativity..."
+            placeholder="Talk to Nimi about art..."
             className="flex-1 border border-gray-300 rounded-full py-2 px-4 focus:outline-none focus:ring-2 focus:ring-purple-500"
           />
           
@@ -302,17 +737,6 @@ const NimiChatCard = ({
           >
             <Send className="w-5 h-5" />
           </button>
-        </div>
-        
-        <div className="mt-3 text-xs text-gray-500 text-center">
-          {isListening ? (
-            <div className="flex items-center justify-center">
-              <div className="w-2 h-2 bg-red-500 rounded-full mr-1 animate-pulse"></div>
-              Listening...
-            </div>
-          ) : (
-            "Try saying 'How do I draw a cat?' or 'Tell me about colors'"
-          )}
         </div>
       </CardContent>
     </Card>
@@ -331,10 +755,6 @@ export default function CommunityPage() {
     page,
     totalPages,
     setPage,
-    filterMission,
-    setFilterMission,
-    sortBy,
-    setSortBy,
     loadingCreations,
     loadingPals,
     errorCreations,
@@ -354,17 +774,17 @@ export default function CommunityPage() {
   const [isFetchingMore, setIsFetchingMore] = useState(false);
   const [friendOfTheWeek, setFriendOfTheWeek] = useState<PikoPal | null>(null);
   const [nimiMessages, setNimiMessages] = useState<Array<{sender: 'user' | 'nimi', text: string}>>([
-    {sender: 'nimi', text: "Hi there! 👋 I'm Nimi, your art helper! 🎨\n\nAsk me about colors, shapes, or how to make cool drawings! ✏️🌈"}
+    {sender: 'nimi', text: "Hi there! 👋 I'm Nimi! Let's look at your friends' art! 🎨\n\nTap the camera to show me your drawing! 📸"}
   ]);
   const [isNimiTyping, setIsNimiTyping] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
+  const [celebrationText, setCelebrationText] = useState("");
 
   const fetchCreations = useCallback(async (pageToLoad = 1) => {
     setLoadingCreations(true);
     try {
       const params = new URLSearchParams();
       params.append("page", pageToLoad.toString());
-      if (filterMission) params.append("mission", filterMission);
-      if (sortBy) params.append("sortBy", sortBy);
       params.append("ageMin", "2");
       params.append("ageMax", "4");
 
@@ -378,16 +798,21 @@ export default function CommunityPage() {
       if (pageToLoad === 1) {
         const newCelebrations = filteredCreations.slice(0, 3).map((c: Creation) => ({
           id: c.id,
-          tag: ["Bravo!", "Amazing!", "Wow!"][Math.floor(Math.random() * 3)]
+          tag: ["🌟 Wow!", "🎉 Yay!", "💖 Love!"][Math.floor(Math.random() * 3)]
         }));
         setCelebrations(newCelebrations);
+        
+        // Auto-celebrate the first creation
+        if (filteredCreations.length > 0) {
+          triggerCelebration("Look what " + filteredCreations[0].childName + " made!");
+        }
       }
     } catch {
       setErrorCreations(true);
     } finally {
       setLoadingCreations(false);
     }
-  }, [filterMission, sortBy]);
+  }, []);
 
   const fetchPikoPals = useCallback(async () => {
     setLoadingPals(true);
@@ -399,7 +824,9 @@ export default function CommunityPage() {
       setPikopals(filteredPals);
       
       if (filteredPals.length > 0) {
-        setFriendOfTheWeek(filteredPals[Math.floor(Math.random() * filteredPals.length)]);
+        const randomPal = filteredPals[Math.floor(Math.random() * filteredPals.length)];
+        setFriendOfTheWeek(randomPal);
+        triggerCelebration(randomPal.name + " is our friend of the week!");
       }
     } catch {
       setErrorPals(true);
@@ -407,6 +834,12 @@ export default function CommunityPage() {
       setLoadingPals(false);
     }
   }, []);
+
+  const triggerCelebration = (text: string) => {
+    setCelebrationText(text);
+    setShowCelebration(true);
+    setTimeout(() => setShowCelebration(false), 3000);
+  };
 
   useEffect(() => {
     resetCreations();
@@ -436,11 +869,15 @@ export default function CommunityPage() {
     
     const newCelebration = {
       id: newCreation.id,
-      tag: ["Yay!", "Great job!", "Beautiful!"][Math.floor(Math.random() * 3)]
+      tag: "🌟 Your Art!"
     };
     setCelebrations([...celebrations, newCelebration]);
     
-    setNimiMessages(prev => [...prev, {sender: 'nimi', text: `Wow ${childNameFromContext}! I love your ${newCreation.type}! It's so creative! 🎨✨`}]);
+    setNimiMessages(prev => [...prev, {
+      sender: 'nimi', 
+      text: `Wow ${childNameFromContext}! I love your ${newCreation.type || 'art'}! ${newCreation.description ? `You said it's ${newCreation.description}` : ''} Let's show your friends! 🎨✨`
+    }]);
+    triggerCelebration("You did it! 🎉");
   };
 
   const handleLoveCreation = async (creationId: number) => {
@@ -450,9 +887,10 @@ export default function CommunityPage() {
       
       const newCelebration = {
         id: creationId,
-        tag: "❤️ Loved!"
+        tag: "💖 Loved!"
       };
       setCelebrations([...celebrations, newCelebration]);
+      triggerCelebration("You gave love! 💖");
     } catch (err) {
       console.error("Error liking creation:", err);
     }
@@ -471,90 +909,90 @@ export default function CommunityPage() {
       
       const newCelebration = {
         id: creationId,
-        tag: "💬 Commented!"
+        tag: "💬 Said Hi!"
       };
       setCelebrations([...celebrations, newCelebration]);
+      triggerCelebration("You said hello! 👋");
     } catch (err) {
-      alert("Failed to add comment. Please try again.");
+      alert("Oops! Try again!");
     }
   };
 
   const handleSharePrivate = async (creationId: number, contacts: string[]) => {
     try {
-      const res = await fetch(`/api/creations/${creationId}/share`, {
+      const creation = creations.find(c => c.id === creationId);
+      if (!creation) return;
+
+      // Update local state immediately
+      contacts.forEach(contact => {
+        addSharedWith(creationId, contact);
+      });
+
+      // Prepare WhatsApp share
+      const shareUrl = `${window.location.origin}/creation/${creationId}`;
+      const shareTitle = `Check out ${creation.childName}'s artwork on Piko!`;
+      
+      // Open WhatsApp
+      window.open(
+        `https://wa.me/?text=${encodeURIComponent(`${shareTitle}\n\n${shareUrl}`)}`,
+        '_blank'
+      );
+
+      // Send to backend
+      await fetch(`/api/creations/${creationId}/share`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ contacts }),
       });
-      if (!res.ok) throw new Error("Failed to share creation");
-      
-      contacts.forEach(contact => {
-        addSharedWith(creationId, contact);
-      });
-      
-      const newCelebration = {
-        id: creationId,
-        tag: "📤 Shared!"
-      };
-      setCelebrations([...celebrations, newCelebration]);
-      
-      // Open WhatsApp with the creation image
-      const creation = creations.find(c => c.id === creationId);
-      if (creation) {
-        const message = `Check out my creation on Piko! ${window.location.origin}/creation/${creationId}`;
-        const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
-        window.open(whatsappUrl, '_blank');
-      }
+
+      triggerCelebration("Shared with family! 👨👩👧");
     } catch (err) {
       console.error("Error sharing creation:", err);
+      triggerCelebration("Oops! Try again! 🤔");
     }
   };
 
-async function handleNimiSend(message: string) {
-  setNimiMessages(prev => [...prev, { sender: 'user', text: message }]);
-  setIsNimiTyping(true);
+  async function handleNimiSend(message: string) {
+    setNimiMessages(prev => [...prev, { sender: 'user', text: message }]);
+    setIsNimiTyping(true);
 
-  try {
-    const res = await fetch("/api/nimi", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        messages: [
-          {
-            role: "system",
-            content: `You are Nimi, a friendly art assistant for young children. Use simple, playful language with emojis. Keep responses under 3 sentences.`,
-          },
-          ...nimiMessages.map(msg => ({
-            role: msg.sender === "user" ? "user" : "assistant",
-            content: msg.text,
-          })),
-          { role: "user", content: message },
-        ],
-        childName: "Emma",
-        language: "en",
-      }),
-    });
+    try {
+      const res = await fetch("/api/nimi", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: [
+            {
+              role: "system",
+              content: `You are Nimi, a friendly art assistant for toddlers ages 2-4. Use very simple words (1-2 syllables), short sentences (3-5 words), and lots of emojis. Focus on colors, shapes, and feelings.`,
+            },
+            ...nimiMessages.map(msg => ({
+              role: msg.sender === "user" ? "user" : "assistant",
+              content: msg.text,
+            })),
+            { role: "user", content: message },
+          ],
+          childName: "Emma",
+          language: "en",
+        }),
+      });
 
-    if (!res.ok) throw new Error("Failed to get response");
-    const data = await res.json();
-    
-    setNimiMessages(prev => [...prev, { 
-      sender: 'nimi', 
-      text: data.response || "Hmm, I'm not sure how to answer that. Can you ask me about art or colors? 🎨" 
-    }]);
-  } catch (err) {
-    console.error("Nimi error:", err);
-    setNimiMessages(prev => [...prev, { 
-      sender: 'nimi', 
-      text: "Oops! I had trouble thinking. Can you try again? 🤔" 
-    }]);
-  } finally {
-    setIsNimiTyping(false);
+      if (!res.ok) throw new Error("Failed to get response");
+      const data = await res.json();
+      setNimiMessages(prev => [...prev, { 
+        sender: 'nimi', 
+        text: data.response || "Hmm, ask me about colors! 🎨" 
+      }]);
+    } catch (err) {
+      console.error("Nimi error:", err);
+      setNimiMessages(prev => [...prev, { 
+        sender: 'nimi', 
+        text: "Oops! Try again! 🤔" 
+      }]);
+    } finally {
+      setIsNimiTyping(false);
+    }
   }
-}
-  
-
-  const uniqueMissions = Array.from(new Set(creations.map(c => c.mission))).filter(Boolean);
 
   const SkeletonCard = () => (
     <div className="animate-pulse bg-white rounded-lg h-64 shadow-lg" />
@@ -562,22 +1000,32 @@ async function handleNimiSend(message: string) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 text-gray-900">
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        {["💖", "🌟", "🎈", "✨"].map((emoji, i) => (
-          <div 
-            key={i}
-            className={`absolute text-2xl select-none animate-bounce`}
-            style={{
-              top: `${20 + i * 10}%`,
-              left: `${10 + i * 20}%`,
-              animationDelay: `${i * 0.5}s`,
-              color: i % 2 ? "#f472b6" : "#60a5fa"
-            }}
+      <AnimatePresence>
+        {showCelebration && (
+          <motion.div
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0, opacity: 0 }}
+            className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none"
           >
-            {emoji}
-          </div>
-        ))}
-      </div>
+            <motion.div 
+              className="bg-gradient-to-r from-yellow-400 to-pink-500 text-white text-2xl font-bold px-8 py-4 rounded-full shadow-2xl"
+              animate={{ 
+                scale: [1, 1.1, 1],
+                rotate: [-5, 5, -5, 5, 0],
+              }}
+              transition={{ 
+                duration: 1.5,
+                ease: "easeInOut",
+                repeat: Infinity,
+                repeatType: "reverse"
+              }}
+            >
+              {celebrationText} 🎉
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <Header />
 
@@ -585,17 +1033,14 @@ async function handleNimiSend(message: string) {
         <div className="text-center mb-8">
           <div className="text-6xl mb-4">👥</div>
           <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">
-            Piko Community
+            Friends Gallery
           </h1>
           <p className="text-xl text-gray-700 mb-6">
-            Share and celebrate your amazing creations with friends!
+            See what your friends made! 🎨
           </p> 
         </div>
 
         <Card className="mb-8 bg-gradient-to-r from-pink-100 to-purple-100 border-none shadow-xl relative overflow-hidden">
-          <div className="absolute -top-10 -right-10 w-32 h-32 bg-pink-200 rounded-full opacity-20"></div>
-          <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-purple-200 rounded-full opacity-20"></div>
-          
           <CardHeader>
             <CardTitle className="flex items-center justify-center text-2xl">
               <Sparkles className="w-8 h-8 mr-3 text-pink-600" />
@@ -603,62 +1048,47 @@ async function handleNimiSend(message: string) {
             </CardTitle>
           </CardHeader>
           <CardContent className="text-center">
-            <p className="text-lg text-gray-700 mb-6">
-              Let's share your artwork with friends! Tap the button below.
-            </p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <Button
-                onClick={() => {
-                  setNimiMessages(prev => [...prev, {sender: 'nimi', text: "Let's share your drawing! Tap the camera to take a photo or choose one from your gallery. 📸🎨"}]);
-                  setShowUploadModal(true);
-                }}
-                className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white px-8 py-4 rounded-full text-lg font-bold shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-110"
-              >
-                <Camera className="w-6 h-6 mr-3" />📷 Show My Art
-              </Button>
-              <Button
-                onClick={() => {
-                  setNimiMessages(prev => [...prev, {sender: 'nimi', text: "What would you like to know about art and creativity today? 🎨✨"}]);
-                }}
-                variant="outline"
-                className="bg-white border-pink-300 text-pink-600 hover:bg-pink-50 px-8 py-4 rounded-full text-lg font-bold shadow-lg hover:shadow-xl transition-all duration-300"
-              >
-                <Sparkles className="w-6 h-6 mr-3" /> Ask Nimi AI
-              </Button>
-            </div>
+            <Button
+              onClick={() => {
+                setNimiMessages(prev => [...prev, {sender: 'nimi', text: "Let's share your drawing! Tap the camera to take a photo or choose one from your gallery. 📸🎨"}]);
+                setShowUploadModal(true);
+              }}
+              className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white px-8 py-6 rounded-full text-xl font-bold shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-110"
+              size="lg"
+            >
+              <Camera className="w-8 h-8 mr-3" />📷 Show My Art
+            </Button>
           </CardContent>
         </Card>
 
         {friendOfTheWeek && (
           <Card className="mb-8 bg-gradient-to-r from-yellow-100 to-orange-100 border-none shadow-xl relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-24 h-24 bg-yellow-300 rounded-bl-full opacity-30"></div>
             <CardHeader>
               <CardTitle className="flex items-center justify-center text-2xl">
-                <Sparkles className="w-8 h-8 mr-3 text-yellow-600" />
+                <Trophy className="w-8 h-8 mr-3 text-yellow-600" />
                 <span>🌟 Friend of the Week</span>
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex flex-col items-center">
-                <div className="text-8xl mb-4 animate-bounce" style={{ animationDelay: '0.2s' }}>
-                  {friendOfTheWeek.avatar}
-                </div>
-                <h3 className="text-2xl font-bold text-gray-800 mb-2">{friendOfTheWeek.name}</h3>
-                <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white mb-3">
-                  {friendOfTheWeek.title}
-                </Badge>
-                <p className="text-center text-gray-700 mb-4">
-                  Let's celebrate {friendOfTheWeek.name}'s amazing creations this week!
-                </p>
-                <Button 
-                  variant="outline" 
-                  className="border-pink-500 text-pink-600 hover:bg-pink-50"
-                  onClick={() => {
-                    setNimiMessages(prev => [...prev, {sender: 'nimi', text: `Say hello to ${friendOfTheWeek.name}, our Friend of the Week! 🌟 ${friendOfTheWeek.name} is a ${friendOfTheWeek.title.toLowerCase()}!`}]);
+                <motion.div 
+                  className="text-8xl mb-4"
+                  animate={{ 
+                    scale: [1, 1.1, 1],
+                    rotate: [0, 10, -10, 0],
+                  }}
+                  transition={{ 
+                    duration: 2,
+                    repeat: Infinity,
+                    repeatType: "reverse"
                   }}
                 >
-                  <Sparkles className="w-5 h-5 mr-2" /> Celebrate
-                </Button>
+                  {friendOfTheWeek.avatar}
+                </motion.div>
+                <h3 className="text-2xl font-bold text-gray-800 mb-2">{friendOfTheWeek.name}</h3>
+                <p className="text-center text-gray-700 mb-4">
+                  Say hello to {friendOfTheWeek.name}! 👋
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -667,29 +1097,8 @@ async function handleNimiSend(message: string) {
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center flex items-center justify-center">
             <Sparkles className="w-8 h-8 mr-3 text-pink-500" />
-            🎨 Our Gallery
-            <Heart className="w-8 h-8 ml-3 text-red-500" />
+            Friends' Art
           </h2>
-          
-          <div className="flex justify-center mb-6 space-x-2">
-            <Button
-              variant={filterMission === null ? "default" : "outline"}
-              onClick={() => setFilterMission(null)}
-              className="rounded-full"
-            >
-              All
-            </Button>
-            {uniqueMissions.slice(0, 3).map((mission) => (
-              <Button
-                key={mission}
-                variant={filterMission === mission ? "default" : "outline"}
-                onClick={() => setFilterMission(mission)}
-                className="rounded-full"
-              >
-                {mission}
-              </Button>
-            ))}
-          </div>
           
           <div
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 h-[600px] overflow-y-auto"
@@ -698,102 +1107,34 @@ async function handleNimiSend(message: string) {
             {loadingCreations && creations.length === 0 ? (
               Array(6).fill(null).map((_, i) => <SkeletonCard key={i} />)
             ) : (
-              creations
-                .filter(c => filterMission ? c.mission === filterMission : true)
-                .sort((a, b) => {
-                  if (sortBy === "likes") return b.likes - a.likes;
-                  if (sortBy === "recency") {
-                    if (a.createdAt && b.createdAt) {
-                      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-                    }
-                    return b.id - a.id;
-                  }
-                  return 0;
-                })
-                .map(creation => (
-                  <div key={creation.id} className="relative">
-                    <CreationCard
-                      creation={creation}
-                      onLike={handleLoveCreation}
-                      onComment={handleAddComment}
-                      onClick={setSelectedCreation}
-                      onShare={handleSharePrivate}
-                      simpleView={true}
-                    />
-                    
-                    {celebrations.find(c => c.id === creation.id) && (
-                      <motion.div
-                        initial={{ scale: 0, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        transition={{ type: "spring", stiffness: 500, damping: 20 }}
-                        className="absolute -top-3 -right-3 bg-yellow-100 border-2 border-yellow-300 px-3 py-1 rounded-full shadow-lg z-10"
-                      >
-                        <span className="font-bold text-yellow-700">
-                          {celebrations.find(c => c.id === creation.id)?.tag}
-                        </span>
-                      </motion.div>
-                    )}
-                  </div>
-                ))
-            )}
-            {loadingCreations && creations.length > 0 && (
-              <div className="absolute bottom-0 left-0 w-full text-center text-gray-500 p-2">
-                Loading more creations...
-              </div>
+              creations.map(creation => (
+                <div key={creation.id} className="relative">
+                  <EnhancedCreationCard
+                    creation={creation}
+                    onLike={handleLoveCreation}
+                    onComment={handleAddComment}
+                    onShare={handleSharePrivate}
+                    onClick={setSelectedCreation}
+                    showReactions={true}
+                  />
+                  
+                  {celebrations.find(c => c.id === creation.id) && (
+                    <motion.div
+                      initial={{ scale: 0, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ type: "spring", stiffness: 500, damping: 20 }}
+                      className="absolute -top-3 -right-3 bg-yellow-100 border-2 border-yellow-300 px-3 py-1 rounded-full shadow-lg z-10"
+                    >
+                      <span className="font-bold text-yellow-700">
+                        {celebrations.find(c => c.id === creation.id)?.tag}
+                      </span>
+                    </motion.div>
+                  )}
+                </div>
+              ))
             )}
           </div>
-          {errorCreations && (
-            <p className="mt-4 text-center text-red-600">
-              Error loading creations. Please try again.
-            </p>
-          )}
         </div>
-
-        <Card className="mb-8 bg-gradient-to-r from-yellow-100 to-orange-100 border-none shadow-xl">
-          <CardHeader>
-            <CardTitle className="flex items-center justify-center text-2xl">
-              <Crown className="w-8 h-8 mr-3 text-yellow-600" />🌟 Our Stars
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {loadingPals ? (
-              <p className="text-center text-gray-600 animate-pulse">Loading...</p>
-            ) : errorPals ? (
-              <p className="text-center text-red-600">Error loading Piko Pals</p>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {pikopals.slice(0, 3).map((pal) => (
-                  <div
-                    key={pal.name}
-                    className="text-center p-6 bg-white/80 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer"
-                    onClick={() => {
-                      setNimiMessages(prev => [...prev, {sender: 'nimi', text: `This is ${pal.name}! ${pal.name} is a ${pal.title.toLowerCase()}! ${pal.name} has been creating amazing things!`}]);
-                    }}
-                  >
-                    <div className="text-6xl mb-4 animate-bounce" style={{ animationDelay: '0.2s' }}>
-                      {pal.avatar}
-                    </div>
-                    <h3 className="text-xl font-bold text-gray-800 mb-2">{pal.name}</h3>
-                    <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white mb-3">
-                      {pal.title}
-                    </Badge>
-                    <div className="flex justify-center space-x-1 mt-3">
-                      {[...Array(3)].map((_, i) => (
-                        <span
-                          key={i}
-                          className="text-yellow-400 animate-bounce text-lg"
-                          style={{ animationDelay: `${i * 0.2}s` }}
-                        >
-                          ✨
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
 
         <NimiChatCard 
           messages={nimiMessages}
@@ -804,11 +1145,20 @@ async function handleNimiSend(message: string) {
         <Card className="bg-gradient-to-r from-green-100 to-emerald-100 border-none shadow-xl">
           <CardContent className="p-8 text-center">
             <div className="text-6xl mb-4">🚀</div>
-            <h3 className="text-2xl font-bold text-gray-800 mb-4">Coming Soon!</h3>
-            <p className="text-gray-700 mb-6">More fun ways to learn and play with friends!</p>
+            <h3 className="text-2xl font-bold text-gray-800 mb-4">More Fun Coming!</h3>
+            <p className="text-gray-700 mb-6">New ways to play with friends soon! 👋</p>
           </CardContent>
         </Card>
       </main>
+
+      {showUploadModal && (
+        <UploadModal
+          onClose={() => setShowUploadModal(false)}
+          onSuccess={handleUploadSuccess}
+          childName={childNameFromContext}
+        />
+      )}
+
       <Footer />
       <BottomNavigation />
     </div>
