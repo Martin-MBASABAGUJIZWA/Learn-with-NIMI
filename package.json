@@ -20,6 +20,8 @@
     "@radix-ui/react-progress": "^1.1.7",
     "@radix-ui/react-scroll-area": "^1.2.9",
     "@radix-ui/react-select": "^1.0.0",
+    "@radix-ui/react-switch": "^1.2.5",
+    "@react-pdf/renderer": "^4.3.0",
     "@supabase/auth-helpers-nextjs": "^0.10.0",
     "@supabase/auth-ui-react": "^0.4.7",
     "@supabase/auth-ui-shared": "^0.1.8",
@@ -153,9 +155,10 @@
     "finalhandler": "^2.1.0",
     "foreground-child": "^3.3.1",
     "formdata-polyfill": "^4.0.10",
+    "formidable": "^3.5.4",
     "forwarded": "^0.2.0",
     "fraction.js": "^4.3.7",
-    "framer-motion": "^12.23.5",
+    "framer-motion": "^12.23.12",
     "fresh": "^2.0.0",
     "fs-extra": "^11.3.0",
     "function-bind": "^1.1.2",
@@ -288,6 +291,7 @@
     "path-scurry": "^1.11.1",
     "path-to-regexp": "^6.3.0",
     "path-type": "^4.0.0",
+    "pdfjs-dist": "^5.4.54",
     "picocolors": "^1.1.1",
     "picomatch": "^2.3.1",
     "pify": "^2.3.0",
@@ -314,16 +318,19 @@
     "react-confetti": "^6.4.0",
     "react-day-picker": "^8.10.1",
     "react-dom": "^18.2.0",
+    "react-dropzone": "^14.3.8",
     "react-hook-form": "^7.60.0",
     "react-hot-toast": "^2.5.2",
     "react-i18next": "^15.5.3",
     "react-icons": "^5.5.0",
     "react-is": "^18.3.1",
     "react-pageflip": "^2.0.3",
+    "react-pdf": "^10.0.1",
     "react-player": "^3.0.0",
     "react-remove-scroll": "^2.7.1",
     "react-remove-scroll-bar": "^2.3.8",
     "react-resizable-panels": "^2.1.9",
+    "react-share": "^5.2.2",
     "react-smooth": "^4.0.4",
     "react-speech-kit": "^3.0.1",
     "react-style-singleton": "^2.2.3",
@@ -448,5 +455,9 @@
     "overrides": {
       "string-width-cjs": "5.1.1"
     }
+  },
+  "devDependencies": {
+    "@types/formidable": "^3.4.5",
+    "@types/react-pdf": "^7.0.0"
   }
 }
