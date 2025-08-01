@@ -5,7 +5,7 @@ import React, { useEffect, useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Document, Page, pdfjs } from "react-pdf";
 import supabase from "@/lib/supabaseClient";
-import confetti from "canvas-confetti";
+// import confetti from "canvas-confetti";
 import { Howl } from "howler";
 import Header from "@/components/Header";
 import BottomNavigation from "@/components/BottomNavigation";
@@ -363,39 +363,39 @@ const KidFriendlyMissionsPage = () => {
     () => missionProgram.find((d) => d.day === selectedDay),
     [missionProgram, selectedDay]
   );
-
   const completeMission = async (mission: Mission) => {
     const newCompletion = {
       mission_id: mission.id,
       completed_at: new Date().toISOString(),
     };
-
+  
     setCompletions((prev) => [...prev, newCompletion]);
-
+  
+    const confetti = (await import("canvas-confetti")).default;
     confetti({
       particleCount: 50,
       spread: 70,
       origin: { y: 0.6 },
     });
-
+  
     if (user?.id) {
       await supabase
         .from("mission_completions")
         .insert([{ ...newCompletion, user_id: user.id }]);
     }
-
+  
     if (currentDayData?.missions.every(m => completedIds.has(m.id) || m.id === mission.id)) {
       const { data } = await supabase
         .from('day_rewards')
         .select('pdf_url')
         .eq('day_number', selectedDay)
         .single();
-
+  
       setCurrentPdfUrl(data?.pdf_url || `/flipbooks/day${selectedDay}.pdf`);
       setShowDayCompleteModal(true);
     }
   };
-
+  
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 to-purple-50 overflow-x-hidden">
       <Header />
