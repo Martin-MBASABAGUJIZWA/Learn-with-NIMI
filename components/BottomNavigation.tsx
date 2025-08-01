@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, BookOpen, Users, Sparkles } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import  launchMagic  from "@/lib/sparkle"
+import {launchMagic}  from "@/lib/sparkle"
 
 export default function BottomNavigation() {
   const [isClient, setIsClient] = useState(false);
