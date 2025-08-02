@@ -1,37 +1,40 @@
 'use client';
 
-import React, { useEffect, useState, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Document, Page, pdfjs } from "react-pdf";
+import React, { useEffect, useState, useMemo, useRef } from "react";
+import { motion, AnimatePresence, useMotionValue, useTransform } from "framer-motion";
 import supabase from "@/lib/supabaseClient";
 import { Howl } from "howler";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import NimiAssistant from "@/components/NimiAssistant";
 import { useUser } from "@/contexts/UserContext";
-import { CheckCircle, Play, Trophy, Sparkles, Volume2, BookOpen } from "lucide-react";
+import { CheckCircle, Play, Trophy, Sparkles, Volume2, BookOpen, Palette } from "lucide-react";
 
-// Initialize PDF worker
-pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.js";
-
-// Audio Constants
-const MORNING_SONG = new Howl({
-  src: ["/sounds/morning-song.mp3"],
-  volume: 0.5
-});
+// Types
+interface BookCover {
+  id: string;
+  day: number;
+  cover_type: 'story' | 'coloring';
+  cover_url: string;
+  spine_color: string;
+  title: string;
+}
 
 interface Mission {
   id: string;
-  day_number: number;
+  day: number;
   title: string;
   description: string;
-  duration: string;
+  duration_minutes: number;
   points: number;
   video_url: string;
-  order: number;
-  theme?: string;
-  emoji?: string;
-  archived: boolean;
+  difficulty: number;
+  mission_type: string;
+}
+
+interface CompletionData {
+  mission_id: string;
+  completed_at: string;
 }
 
 interface DayData {
@@ -42,18 +45,58 @@ interface DayData {
   missions: Mission[];
 }
 
-interface CompletionData {
-  mission_id: string;
-  completed_at: string;
+interface AudioTrack {
+  id: string;
+  title: string;
+  audio_url: string;
+  is_default?: boolean;
 }
 
-const MusicPlayerCard = () => {
+interface StoryPage {
+  id: string;
+  day: number;
+  page_number: number;
+  image_url: string;
+  text: string;
+}
+
+interface ColoringPage {
+  id: string;
+  day: number;
+  page_number: number;
+  image_url: string;
+}
+
+// MotionButton component
+const MotionButton = motion(Button);
+
+// Music Player Component
+const MusicPlayerCard = ({ track }: { track: AudioTrack | null }) => {
   const [isPlaying, setIsPlaying] = useState(false);
+  const [sound, setSound] = useState<Howl | null>(null);
+
+  useEffect(() => {
+    if (track) {
+      const newSound = new Howl({
+        src: [track.audio_url],
+        volume: 0.5,
+        onend: () => setIsPlaying(false)
+      });
+      setSound(newSound);
+
+      return () => {
+        newSound.unload();
+      };
+    }
+  }, [track]);
 
   const togglePlay = () => {
+    if (!sound) return;
+    isPlaying ? sound.pause() : sound.play();
     setIsPlaying(!isPlaying);
-    isPlaying ? MORNING_SONG.pause() : MORNING_SONG.play();
   };
+
+  if (!track) return null;
 
   return (
     <motion.div 
@@ -68,12 +111,13 @@ const MusicPlayerCard = () => {
         >
           <Volume2 className={`h-6 w-6 md:h-8 md:w-8 ${isPlaying ? 'text-purple-600' : 'text-gray-500'}`} />
         </button>
-        <span className="text-lg md:text-xl font-bold truncate">Magic Song</span>
+        <span className="text-lg md:text-xl font-bold truncate">{track.title}</span>
       </div>
     </motion.div>
   );
 };
 
+// Video Player Modal
 const VideoPlayerModal = ({ videoUrl, onClose }: { videoUrl: string; onClose: () => void }) => {
   return (
     <motion.div
@@ -95,273 +139,456 @@ const VideoPlayerModal = ({ videoUrl, onClose }: { videoUrl: string; onClose: ()
         >
           ✕
         </button>
-        
-        <div className="w-full h-full">
-          <iframe
-            src={videoUrl}
-            className="w-full h-full"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-            loading="eager"
-          />
-        </div>
+        <iframe
+          src={videoUrl}
+          className="w-full h-full"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+        />
       </motion.div>
     </motion.div>
   );
 };
 
-const SimplePDFViewer = ({ pdfUrl, onClose }: { pdfUrl: string; onClose: () => void }) => {
-  const [numPages, setNumPages] = useState<number>(0);
-  const [pageNumber, setPageNumber] = useState<number>(1);
+// Realistic Book Viewer Component
+const RealBookViewer = ({ pages, onClose, type }: {
+  pages: { image_url: string; page_number: number; text?: string }[];
+  onClose: () => void;
+  type: 'story' | 'coloring';
+}) => {
+  const [currentSpread, setCurrentSpread] = useState(0);
+  const [processedPages, setProcessedPages] = useState<typeof pages>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [pdfData, setPdfData] = useState<Uint8Array | string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [windowWidth, setWindowWidth] = useState(800);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const bookRef = useRef<HTMLDivElement>(null);
+
+  const totalSpreads = Math.ceil(processedPages.length / 2);
 
   useEffect(() => {
-    setWindowWidth(window.innerWidth);
-    const handleResize = () => setWindowWidth(window.innerWidth);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  useEffect(() => {
-    const fetchPdf = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        
-        const urlParts = pdfUrl.replace('supabase://', '').split('/');
-        const bucket = urlParts[0];
-        const path = urlParts.slice(1).join('/');
-        
-        const { data, error: fetchError } = await supabase.storage
-          .from(bucket)
-          .download(path);
-          
-        if (fetchError) throw fetchError;
-        
-        const objectUrl = URL.createObjectURL(data);
-        setPdfData(objectUrl);
-        
-      } catch (err) {
-        console.error('Error loading PDF:', err);
-        setError('Failed to load storybook. Please try again later.');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    if (pdfUrl?.startsWith('supabase://')) {
-      fetchPdf();
-    } else if (pdfUrl) {
-      setPdfData(pdfUrl);
+    const processImages = async () => {
+      const processed = await Promise.all(pages.map(async (page) => {
+        if (page.image_url.startsWith('supabase://')) {
+          const path = page.image_url.replace('supabase://', '');
+          const [bucket, ...filePath] = path.split('/');
+          const { data: { publicUrl } } = await supabase.storage
+            .from(bucket)
+            .getPublicUrl(filePath.join('/'));
+          return { ...page, image_url: publicUrl };
+        }
+        return page;
+      }));
+      setProcessedPages(processed);
       setIsLoading(false);
-    }
+    };
+    processImages();
+  }, [pages]);
 
-    return () => {
-      if (pdfData && typeof pdfData === 'string') {
-        URL.revokeObjectURL(pdfData);
+  const turnProgress = useMotionValue(0);
+  const leftPageRotation = useTransform(turnProgress, [0, 1], [0, -180]);
+  const rightPageRotation = useTransform(turnProgress, [0, 1], [0, 180]);
+
+  const goToNextSpread = () => {
+    if (currentSpread < totalSpreads - 1 && !isAnimating) {
+      setIsAnimating(true);
+      turnProgress.set(1);
+      setTimeout(() => {
+        setCurrentSpread(prev => prev + 1);
+        turnProgress.set(0);
+        setIsAnimating(false);
+      }, 800);
+    }
+  };
+
+  const goToPrevSpread = () => {
+    if (currentSpread > 0 && !isAnimating) {
+      setIsAnimating(true);
+      turnProgress.set(1);
+      setTimeout(() => {
+        setCurrentSpread(prev => prev - 1);
+        turnProgress.set(0);
+        setIsAnimating(false);
+      }, 800);
+    }
+  };
+
+  const leftPageIndex = currentSpread * 2;
+  const rightPageIndex = leftPageIndex + 1;
+  const leftPage = processedPages[leftPageIndex];
+  const rightPage = processedPages[rightPageIndex];
+
+  if (isLoading) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90">
+        <div className="text-4xl animate-pulse">📖</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4">
+      <button
+        onClick={onClose}
+        className="absolute top-4 right-4 z-50 text-white text-2xl bg-black/50 rounded-full p-2"
+      >
+        ✕
+      </button>
+
+      <div ref={bookRef} className="relative w-full max-w-6xl h-[80vh] flex perspective-1000">
+        {leftPage && (
+          <div className="absolute left-0 w-1/2 h-full bg-white shadow-lg z-10 origin-right transform-style-preserve-3d">
+            <div className="h-full flex flex-col p-4">
+              <div className="flex-1 flex items-center justify-center">
+                <img 
+                  src={leftPage.image_url} 
+                  alt={`Page ${leftPage.page_number}`}
+                  className="max-h-full max-w-full object-contain"
+                  onError={(e) => (e.currentTarget.src = '/default-book.png')}
+                />
+              </div>
+              {type === 'story' && leftPage.text && (
+                <div className="mt-4 p-4 bg-yellow-50 rounded-lg text-center">
+                  {leftPage.text}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {rightPage && (
+          <motion.div
+            className="absolute right-0 w-1/2 h-full bg-white shadow-lg z-20 origin-left transform-style-preserve-3d"
+            style={{
+              rotateY: rightPageRotation,
+              transformStyle: 'preserve-3d',
+            }}
+          >
+            <div className="h-full flex flex-col p-4 backface-hidden">
+              <div className="flex-1 flex items-center justify-center">
+                <img 
+                  src={rightPage.image_url} 
+                  alt={`Page ${rightPage.page_number}`}
+                  className="max-h-full max-w-full object-contain"
+                  onError={(e) => (e.currentTarget.src = '/default-book.png')}
+                />
+              </div>
+              {type === 'story' && rightPage.text && (
+                <div className="mt-4 p-4 bg-yellow-50 rounded-lg text-center">
+                  {rightPage.text}
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+
+        <AnimatePresence>
+          {isAnimating && (
+            <motion.div
+              className="absolute right-1/2 w-1/2 h-full bg-gradient-to-r from-black/10 to-black/30 z-30"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.3 }}
+              exit={{ opacity: 0 }}
+            />
+          )}
+        </AnimatePresence>
+      </div>
+
+      <div className="absolute bottom-8 left-0 right-0 flex justify-center gap-4 z-40">
+        <Button
+          onClick={goToPrevSpread}
+          disabled={currentSpread === 0 || isAnimating}
+          variant="outline"
+          className="text-lg py-2 px-6"
+        >
+          Previous Page
+        </Button>
+        <span className="flex items-center justify-center text-lg font-medium bg-white/90 px-4 rounded-lg">
+          Spread {currentSpread + 1} of {totalSpreads}
+        </span>
+        <Button
+          onClick={goToNextSpread}
+          disabled={currentSpread === totalSpreads - 1 || isAnimating}
+          variant="outline"
+          className="text-lg py-2 px-6"
+        >
+          Next Page
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+// Realistic Book Card Component
+const BookCard = ({ 
+  day, 
+  onOpen, 
+  pageCount,
+  coverData,
+  type
+}: { 
+  day: number; 
+  onOpen: () => void; 
+  pageCount: number;
+  coverData?: BookCover;
+  type: 'story' | 'coloring';
+}) => {
+  const [coverUrl, setCoverUrl] = useState<string | null>(null);
+  const [isHovered, setIsHovered] = useState(false);
+
+  useEffect(() => {
+    const fetchCoverImage = async () => {
+      if (coverData?.cover_url) {
+        if (coverData.cover_url.startsWith('supabase://')) {
+          const path = coverData.cover_url.replace('supabase://', '');
+          const [bucket, ...filePath] = path.split('/');
+          const { data: { publicUrl } } = await supabase.storage
+            .from(bucket)
+            .getPublicUrl(filePath.join('/'));
+          setCoverUrl(publicUrl);
+        } else {
+          setCoverUrl(coverData.cover_url);
+        }
       }
     };
-  }, [pdfUrl]);
+    fetchCoverImage();
+  }, [coverData]);
 
-  const handlePageChange = (newPage: number) => {
-    setIsLoading(true);
-    setPageNumber(newPage);
-    const timer = setTimeout(() => setIsLoading(false), 200);
-    return () => clearTimeout(timer);
-  };
+  const defaultSpineColor = type === 'story' 
+    ? 'linear-gradient(to bottom, #6b46c1, #553c9a)' 
+    : 'linear-gradient(to bottom, #3182ce, #2c5282)';
+
+  const defaultBorderColor = type === 'story' 
+    ? 'border-purple-300' 
+    : 'border-yellow-300';
+
+  const defaultButtonGradient = type === 'story'
+    ? 'from-purple-500 to-pink-500'
+    : 'from-blue-500 to-green-500';
+
+  const defaultIcon = type === 'story' ? '📖' : '✏️';
 
   return (
     <motion.div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-2"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.3 }}
+      className="relative w-full max-w-[280px] mx-auto h-[320px] perspective-1000 mb-8"
+      initial={{ rotateY: type === 'story' ? -5 : 5 }}
+      whileHover={{ 
+        y: -10,
+        rotateY: type === 'story' ? 5 : -5,
+        transition: { duration: 0.3 }
+      }}
+      onHoverStart={() => setIsHovered(true)}
+      onHoverEnd={() => setIsHovered(false)}
     >
+      {/* Book Spine */}
+      <motion.div 
+        className={`absolute ${type === 'story' ? 'left-0 rounded-l-lg' : 'right-0 rounded-r-lg'} w-8 h-full shadow-lg z-10`}
+        style={{ 
+          background: coverData?.spine_color || defaultSpineColor
+        }}
+        whileHover={{ 
+          rotateY: type === 'story' ? -10 : 10,
+          transition: { duration: 0.3 }
+        }}
+      />
+      
+      {/* Book Cover */}
       <motion.div
-        className="bg-white rounded-xl p-3 md:p-6 w-full max-w-[95vw] h-[90vh] max-h-[90vh] overflow-auto relative"
-        initial={{ scale: 0.95 }}
-        animate={{ scale: 1 }}
-        exit={{ scale: 0.95 }}
+        className={`absolute inset-0 rounded-lg shadow-xl border-4 ${defaultBorderColor} p-6 flex flex-col items-center text-center overflow-hidden`}
+        style={{ transformStyle: 'preserve-3d' }}
+        whileHover={{ 
+          rotateY: type === 'story' ? -15 : 15,
+          transition: { duration: 0.3 }
+        }}
       >
-        <button
-          onClick={onClose}
-          className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-2xl md:text-3xl bg-white/80 rounded-full p-1"
-          aria-label="Close storybook"
-        >
-          ✕
-        </button>
-
-        {error ? (
-          <div className="text-red-500 p-4 text-center h-full flex flex-col items-center justify-center">
-            {error}
-            <Button 
-              onClick={() => window.location.reload()} 
-              className="mt-4"
-              variant="outline"
-            >
-              Try Again
-            </Button>
-          </div>
-        ) : isLoading ? (
-          <div className="h-full flex items-center justify-center">
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
-              className="text-4xl"
-            >
-              📖
-            </motion.div>
-          </div>
+        {/* Dynamic Book Cover Image */}
+        {coverUrl ? (
+          <div className="absolute inset-0 bg-cover bg-center z-0" 
+               style={{ backgroundImage: `url(${coverUrl})` }} />
         ) : (
-          <>
-            <Document
-              file={pdfData}
-              onLoadSuccess={({ numPages }) => {
-                setNumPages(numPages);
-                setIsLoading(false);
-              }}
-              loading={
-                <div className="h-full flex items-center justify-center">
-                  <div className="text-4xl">✨</div>
-                </div>
-              }
-              error={<div className="text-red-500 p-4 h-full flex items-center justify-center">Failed to load PDF content</div>}
-            >
-              <Page
-                pageNumber={pageNumber}
-                width={Math.min(800, windowWidth * 0.9)}
-                loading={
-                  <div className="h-full flex items-center justify-center">
-                    <div className="text-4xl">🔍</div>
-                  </div>
-                }
-                renderTextLayer={false}
-                renderAnnotationLayer={false}
-              />
-            </Document>
-
-            <div className="flex justify-between items-center mt-4 sticky bottom-0 bg-white py-2 border-t">
-              <Button
-                onClick={() => handlePageChange(Math.max(1, pageNumber - 1))}
-                disabled={pageNumber <= 1 || isLoading}
-                variant="outline"
-                className="text-sm md:text-base px-3 py-1 md:px-4 md:py-2"
-              >
-                Previous
-              </Button>
-              <span className="text-sm md:text-base text-gray-600 mx-2">
-                Page {pageNumber} of {numPages}
-              </span>
-              <Button
-                onClick={() => handlePageChange(Math.min(numPages, pageNumber + 1))}
-                disabled={pageNumber >= numPages || isLoading}
-                variant="outline"
-                className="text-sm md:text-base px-3 py-1 md:px-4 md:py-2"
-              >
-                Next
-              </Button>
-            </div>
-          </>
+          <div className={`absolute inset-0 bg-gradient-to-br ${
+            type === 'story' ? 'from-yellow-100 to-pink-100' : 'from-blue-100 to-green-100'
+          } z-0`} />
         )}
+        
+        {/* Overlay for better text visibility */}
+        <div className="absolute inset-0 bg-black/10 z-1" />
+        
+        {/* Book Content */}
+        <div className="relative z-10 w-full h-full flex flex-col">
+          <motion.div 
+            className="text-5xl mb-4"
+            animate={{ 
+              rotate: [0, type === 'story' ? 5 : -5, type === 'story' ? -5 : 5, 0],
+              y: [0, -5, 0]
+            }}
+            transition={{ repeat: Infinity, duration: type === 'story' ? 8 : 6 }}
+          >
+            {defaultIcon}
+          </motion.div>
+          
+          <h3 className="text-xl font-bold text-white drop-shadow-md">
+            {coverData?.title || (type === 'story' ? 'Story Time' : 'Coloring Book')}
+          </h3>
+          
+          <p className="text-sm mb-4 text-white/90 drop-shadow-md">
+            {pageCount} pages
+          </p>
+          
+          {/* Book Pages Edge */}
+          <div className={`absolute ${type === 'story' ? 'left-0' : 'right-0'} top-0 w-1 h-full bg-gray-200 shadow-md`} />
+          
+          <MotionButton
+            onClick={onOpen}
+            className={`mt-auto gap-2 py-3 px-4 bg-gradient-to-r ${defaultButtonGradient} text-white w-full`}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            {type === 'story' ? (
+              <BookOpen className="h-5 w-5" />
+            ) : (
+              <Palette className="h-5 w-5" />
+            )}
+            {type === 'story' ? 'Read Now' : 'Color Now'}
+          </MotionButton>
+        </div>
       </motion.div>
+
+      {/* Subtle page curl effect on hover */}
+      <AnimatePresence>
+        {isHovered && (
+          <motion.div
+            className={`absolute ${type === 'story' ? 'right-0' : 'left-0'} top-0 w-4 h-full z-20`}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.1 }}
+            exit={{ opacity: 0 }}
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-black/20 to-transparent"></div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };
 
-const StorybookCard = ({ day, onOpen }: { day: number; onOpen: () => void }) => (
-  <motion.div
-    className="bg-gradient-to-br from-yellow-100 to-pink-100 p-4 md:p-6 rounded-2xl border-4 border-purple-300 shadow-xl mb-6 md:mb-8 w-full max-w-2xl mx-auto"
-    initial={{ scale: 0.9 }}
-    animate={{ scale: 1 }}
-    whileHover={{ y: -5 }}
-  >
-    <div className="flex flex-col items-center text-center gap-3 md:gap-4">
-      <motion.div 
-        className="text-5xl md:text-6xl"
-        animate={{ 
-          rotate: [0, 10, -10, 0],
-          y: [0, -10, 0]
-        }}
-        transition={{ repeat: Infinity, duration: 4 }}
-      >
-        📚
-      </motion.div>
-      <h3 className="text-xl md:text-2xl font-bold text-purple-800">Today's Storybook</h3>
-      <p className="text-base md:text-lg">Read our special story for Day {day}</p>
-      <Button
-        onClick={onOpen}
-        className="gap-2 text-base md:text-lg py-3 md:py-4 px-4 md:px-6 bg-gradient-to-r from-purple-500 to-pink-500 text-white w-full max-w-xs"
-      >
-        <BookOpen className="h-5 w-5 md:h-6 md:w-6" />
-        Open Story
-      </Button>
-    </div>
-  </motion.div>
-);
-
+// Main Component
 const MissionsComponent = () => {
   const [missionProgram, setMissionProgram] = useState<DayData[]>([]);
   const [selectedDay, setSelectedDay] = useState(1);
   const [completions, setCompletions] = useState<CompletionData[]>([]);
   const [openVideo, setOpenVideo] = useState<string | null>(null);
   const [showDayCompleteModal, setShowDayCompleteModal] = useState(false);
-  const [showFlipbook, setShowFlipbook] = useState(false);
-  const [currentPdfUrl, setCurrentPdfUrl] = useState("");
+  const [showStorybook, setShowStorybook] = useState(false);
+  const [showColoringBook, setShowColoringBook] = useState(false);
+  const [storyPages, setStoryPages] = useState<StoryPage[]>([]);
+  const [coloringPages, setColoringPages] = useState<ColoringPage[]>([]);
+  const [audioTrack, setAudioTrack] = useState<AudioTrack | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [bookCovers, setBookCovers] = useState<BookCover[]>([]);
   const { user } = useUser();
 
-  // Fetch Data
+  // Fetch all data
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchAllData = async () => {
+      setIsLoading(true);
       try {
+        // Fetch missions
         const { data: missions, error: missionsError } = await supabase
-          .from("daily_missions")
+          .from("missions")
           .select("*")
-          .order("day_number", { ascending: true })
-          .order("order", { ascending: true });
+          .order("day", { ascending: true });
 
         if (missionsError) throw missionsError;
+        if (missions) setMissionProgram(groupMissionsByDay(missions));
 
-        if (missions) {
-          setMissionProgram(groupMissionsByDay(missions));
-        }
-
+        // Fetch completions
         if (user?.id) {
           const { data: completions, error: completionsError } = await supabase
             .from("mission_completions")
-            .select("*")
+            .select("mission_id, completed_at")
             .eq("user_id", user.id);
 
           if (completionsError) throw completionsError;
           setCompletions(completions || []);
         }
+
+        // Fetch audio track
+        const { data: audioData, error: audioError } = await supabase
+          .from("audio_tracks")
+          .select("*")
+          .eq("is_default", true)
+          .single();
+
+        if (!audioError && audioData) {
+          setAudioTrack(audioData);
+        }
+
+        // Fetch book covers
+        const { data: covers, error: coversError } = await supabase
+          .from("book_covers")
+          .select("*");
+
+        if (!coversError) {
+          setBookCovers(covers || []);
+        }
+
       } catch (error) {
         console.error("Error fetching data:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    fetchData();
+    fetchAllData();
   }, [user]);
 
-  // Helper Functions
+  // Fetch story pages and coloring pages when day changes
+  useEffect(() => {
+    const fetchDayContent = async () => {
+      setIsLoading(true);
+      try {
+        // Fetch story pages from storybook bucket
+        const { data: storyData, error: storyError } = await supabase
+          .from("storybook_pages")
+          .select("*")
+          .eq("day", selectedDay)
+          .order("page_number", { ascending: true });
+
+        if (storyError) throw storyError;
+        setStoryPages(storyData || []);
+
+        // Fetch coloring pages from coloriage bucket
+        const { data: coloringData, error: coloringError } = await supabase
+          .from("coloring_book_pages")
+          .select("*")
+          .eq("day", selectedDay)
+          .order("page_number", { ascending: true });
+
+        if (coloringError) throw coloringError;
+        setColoringPages(coloringData || []);
+
+      } catch (error) {
+        console.error("Error fetching day content:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchDayContent();
+  }, [selectedDay]);
+
   const groupMissionsByDay = (missions: Mission[]) => {
-    const active = missions.filter((m) => !m.archived);
     const grouped: Record<number, DayData> = {};
 
-    active.forEach((m) => {
-      if (!grouped[m.day_number]) {
-        grouped[m.day_number] = {
-          day: m.day_number,
-          title: `Day ${m.day_number}`,
-          theme: m.theme || "Magical Learning",
-          emoji: m.emoji || "✨",
+    missions.forEach((m) => {
+      if (!grouped[m.day]) {
+        grouped[m.day] = {
+          day: m.day,
+          title: `Day ${m.day}`,
+          theme: "Magical Learning",
+          emoji: "✨",
           missions: [],
         };
       }
-      grouped[m.day_number].missions.push(m);
+      grouped[m.day].missions.push(m);
     });
 
     return Object.values(grouped).sort((a, b) => a.day - b.day);
@@ -399,16 +626,17 @@ const MissionsComponent = () => {
     }
 
     if (currentDayData?.missions.every(m => completedIds.has(m.id) || m.id === mission.id)) {
-      const { data } = await supabase
-        .from('day_rewards')
-        .select('pdf_url')
-        .eq('day_number', selectedDay)
-        .single();
-
-      setCurrentPdfUrl(data?.pdf_url || `/flipbooks/day${selectedDay}.pdf`);
       setShowDayCompleteModal(true);
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-4xl animate-pulse">✨</div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -452,7 +680,7 @@ const MissionsComponent = () => {
 
       {/* Music Player & Nimi Assistant */}
       <div className="max-w-md mx-auto mb-4 sm:mb-6 space-y-3 sm:space-y-4 w-full px-2">
-        <MusicPlayerCard />
+        <MusicPlayerCard track={audioTrack} />
         <motion.div 
           animate={{ y: [0, -5, 0] }}
           transition={{ duration: 3, repeat: Infinity }}
@@ -532,25 +760,29 @@ const MissionsComponent = () => {
         </div>
       )}
 
-      {/* Storybook Card - Added below all missions */}
-      {currentDayData && (
-        <div className="max-w-2xl mx-auto mt-4 sm:mt-6 md:mt-8 w-full px-2">
-          <StorybookCard 
-            day={selectedDay} 
-            onOpen={() => {
-              supabase
-                .from('day_rewards')
-                .select('pdf_url')
-                .eq('day_number', selectedDay)
-                .single()
-                .then(({ data }) => {
-                  setCurrentPdfUrl(data?.pdf_url || `/flipbooks/day${selectedDay}.pdf`);
-                  setShowFlipbook(true);
-                });
-            }}
-          />
+      {/* Storybook and Coloring Book Cards */}
+      <div className="max-w-4xl mx-auto mt-4 sm:mt-6 md:mt-8 w-full px-2">
+        <div className="flex flex-col md:flex-row justify-center items-center gap-4 md:gap-8">
+          {storyPages.length > 0 && (
+            <BookCard 
+              day={selectedDay} 
+              onOpen={() => setShowStorybook(true)}
+              pageCount={storyPages.length}
+              coverData={bookCovers.find(c => c.day === selectedDay && c.cover_type === 'story')}
+              type="story"
+            />
+          )}
+          {coloringPages.length > 0 && (
+            <BookCard 
+              day={selectedDay}
+              onOpen={() => setShowColoringBook(true)}
+              pageCount={coloringPages.length}
+              coverData={bookCovers.find(c => c.day === selectedDay && c.cover_type === 'coloring')}
+              type="coloring"
+            />
+          )}
         </div>
-      )}
+      </div>
 
       {/* Day Complete Modal */}
       <AnimatePresence>
@@ -588,9 +820,7 @@ const MissionsComponent = () => {
               <p className="text-sm sm:text-base md:text-lg mb-3 sm:mb-4 md:mb-6">You mastered Day {selectedDay}'s magic!</p>
 
               <Button
-                onClick={() => {
-                  setShowDayCompleteModal(false);
-                }}
+                onClick={() => setShowDayCompleteModal(false)}
                 className="gap-2 text-sm sm:text-base md:text-lg py-2 sm:py-3 w-full max-w-xs mx-auto bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700"
               >
                 <Sparkles className="h-4 w-4 sm:h-5 sm:w-5" />
@@ -601,12 +831,31 @@ const MissionsComponent = () => {
         )}
       </AnimatePresence>
 
-      {/* PDF Viewer */}
+      {/* Storybook Viewer */}
       <AnimatePresence>
-        {showFlipbook && currentPdfUrl && (
-          <SimplePDFViewer 
-            pdfUrl={currentPdfUrl}
-            onClose={() => setShowFlipbook(false)}
+        {showStorybook && storyPages.length > 0 && (
+          <RealBookViewer 
+            pages={storyPages.map(page => ({
+              image_url: page.image_url,
+              page_number: page.page_number,
+              text: page.text
+            }))}
+            onClose={() => setShowStorybook(false)}
+            type="story"
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Coloring Book Viewer */}
+      <AnimatePresence>
+        {showColoringBook && coloringPages.length > 0 && (
+          <RealBookViewer 
+            pages={coloringPages.map(page => ({
+              image_url: page.image_url,
+              page_number: page.page_number
+            }))}
+            onClose={() => setShowColoringBook(false)}
+            type="coloring"
           />
         )}
       </AnimatePresence>
