@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Languages, Smile } from "lucide-react";
-import { useLanguage } from "@/contexts/LanguageContext";
+import { useLanguage } from "@/contexts/LanguageContext"; // <-- Make sure this import is here
 
 export default function Header() {
   const { language, setLanguage, t } = useLanguage();
@@ -43,32 +43,34 @@ export default function Header() {
           </Link>
 
           {isClient && (
-            <button
-              onClick={() => setShowLanguagePicker(!showLanguagePicker)}
-              className="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center shadow-md hover:bg-pink-200 transition-colors"
-              aria-label={t('changeLanguage') || "Change language"}
-            >
-              <span className="text-2xl">
-                {languages.find(l => l.code === language)?.flag || "🌐"}
-              </span>
-            </button>
-          )}
+            <div className="relative"> {/* Container relative for positioning */}
+              <button
+                onClick={() => setShowLanguagePicker(!showLanguagePicker)}
+                className="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center shadow-md hover:bg-pink-200 transition-colors"
+                aria-label={t('changeLanguage') || "Change language"}
+              >
+                <span className="text-2xl">
+                  {languages.find(l => l.code === language)?.flag || "🌐"}
+                </span>
+              </button>
 
-          {showLanguagePicker && isClient && (
-            <div className="absolute right-4 top-16 bg-white rounded-xl shadow-xl border-2 border-pink-200 overflow-hidden z-50">
-              {languages.map((lang) => (
-                <button
-                  key={lang.code}
-                  onClick={() => {
-                    setLanguage(lang.code);
-                    setShowLanguagePicker(false);
-                  }}
-                  className="flex items-center px-4 py-3 w-full hover:bg-pink-50 transition-colors text-lg"
-                >
-                  <span className="text-2xl mr-3">{lang.flag}</span>
-                  <span>{lang.label}</span>
-                </button>
-              ))}
+              {showLanguagePicker && (
+                <div className="absolute right-0 mt-2 bg-white rounded-xl shadow-xl border-2 border-pink-200 overflow-hidden z-50 w-40">
+                  {languages.map((lang) => (
+                    <button
+                      key={lang.code}
+                      onClick={() => {
+                        setLanguage(lang.code);
+                        setShowLanguagePicker(false);
+                      }}
+                      className="flex items-center px-4 py-3 w-full hover:bg-pink-50 transition-colors text-lg"
+                    >
+                      <span className="text-2xl mr-3">{lang.flag}</span>
+                      <span>{lang.label}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </div>
