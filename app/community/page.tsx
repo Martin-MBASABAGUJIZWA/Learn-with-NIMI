@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { v4 as uuidv4 } from 'uuid';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +15,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useDropzone } from "react-dropzone";
 import Header from "@/components/Header";
 import BottomNavigation from "@/components/BottomNavigation";
+import Footer from "@/components/Footer";
 
 interface Comment {
   id: string;
@@ -68,6 +70,7 @@ const CommunityPage = () => {
   const [celebrationText, setCelebrationText] = useState("");
   const currentUser = { name: "Emma", avatar: "👧" };
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const chatInputRef = useRef<HTMLInputElement>(null);
 
   // Upload form state
   const [uploadForm, setUploadForm] = useState({
@@ -80,6 +83,9 @@ const CommunityPage = () => {
     uploadProgress: 0,
     isUploading: false
   });
+
+  // Generate unique ID
+  const generateUniqueId = () => uuidv4();
 
   // Load data from Supabase
   const fetchCreations = async () => {
@@ -94,9 +100,11 @@ const CommunityPage = () => {
       
       setCreations(data.map(creation => ({
         ...creation,
+        childName: creation.child_name,
         createdAt: creation.created_at,
         isPublic: creation.is_public,
-        imageUrl: creation.image_url
+        imageUrl: creation.image_url,
+        likedByUser: creation.liked_by_user
       })));
 
       if (data.length > 0) {
@@ -146,6 +154,10 @@ const CommunityPage = () => {
           setError("File is too large. Please select an image under 5MB.");
           return;
         }
+        if (!['image/jpeg', 'image/jpg', 'image/png', 'image/gif'].includes(file.type)) {
+          setError("Invalid file type. Please upload an image (JPEG, JPG, PNG, GIF).");
+          return;
+        }
         setUploadForm(prev => ({
           ...prev,
           imageFile: file,
@@ -154,7 +166,7 @@ const CommunityPage = () => {
       }
     }, []),
     accept: {
-      'image/*': ['.jpeg', '.jpg', '.png']
+      'image/*': ['.jpeg', '.jpg', '.png', '.gif']
     },
     maxFiles: 1
   });
@@ -168,6 +180,11 @@ const CommunityPage = () => {
       return;
     }
 
+    if (!uploadForm.childName || !uploadForm.age) {
+      setError("Please fill in all required fields");
+      return;
+    }
+
     try {
       setUploadForm(prev => ({ ...prev, isUploading: true }));
       
@@ -177,14 +194,11 @@ const CommunityPage = () => {
       const filePath = `creations/${fileName}`;
 
       // Upload with progress tracking
-      const { error: uploadError } = await supabase.storage
+      const { data, error: uploadError } = await supabase.storage
         .from('creations')
         .upload(filePath, uploadForm.imageFile, {
           cacheControl: '3600',
-          upsert: false,
-          onProgress: (progress) => {
-            setUploadForm(prev => ({ ...prev, uploadProgress: progress }));
-          }
+          upsert: false
         });
 
       if (uploadError) throw uploadError;
@@ -204,7 +218,9 @@ const CommunityPage = () => {
           is_public: uploadForm.isPublic,
           image_url: publicUrl,
           type: 'art',
-          completion_status: 'completed'
+          completion_status: 'completed',
+          likes: 0,
+          liked_by_user: false
         })
         .select()
         .single();
@@ -218,9 +234,9 @@ const CommunityPage = () => {
         isPublic: creation.is_public,
         imageUrl: creation.image_url,
         createdAt: creation.created_at,
-        likes: 0,
-        likedByUser: false,
-        completionStatus: 'completed'
+        likes: creation.likes,
+        likedByUser: creation.liked_by_user,
+        completionStatus: creation.completion_status
       }, ...prev]);
 
       setShowUploadModal(false);
@@ -299,7 +315,8 @@ const CommunityPage = () => {
       const { error } = await supabase
         .from('creations')
         .update({ 
-          likes: creation.likedByUser ? creation.likes - 1 : creation.likes + 1
+          likes: creation.likedByUser ? creation.likes - 1 : creation.likes + 1,
+          liked_by_user: !creation.likedByUser
         })
         .eq('id', creationId);
 
@@ -361,36 +378,73 @@ const CommunityPage = () => {
     }
   }, []);
 
-  // Nimi AI chat
+  // Enhanced Nimi AI chat
   const handleNimiSend = useCallback(async (message: string) => {
+    if (!message.trim()) return;
+    
+    // Add user message
     setNimiMessages(prev => [...prev, { sender: 'user', text: message }]);
     setIsNimiTyping(true);
 
     try {
+      // Clear input if ref exists
+      if (chatInputRef.current) {
+        chatInputRef.current.value = '';
+      }
+
+      // Simulate typing delay
       await new Promise(resolve => setTimeout(resolve, 800 + Math.random() * 700));
 
       let responseText = "";
       const lowerMessage = message.toLowerCase();
 
-      if (lowerMessage.includes('art') || lowerMessage.includes('draw') || lowerMessage.includes('paint')) {
-        responseText = "That's beautiful! What inspired you to create this? 🎨";
+      // Enhanced response logic
+      if (lowerMessage.includes('art') || lowerMessage.includes('draw') || lowerMessage.includes('paint') || lowerMessage.includes('create')) {
+        const responses = [
+          "That's beautiful! What inspired you to create this? 🎨",
+          "I love seeing your creativity! Tell me more about your artwork. ✏️",
+          "Art is such a wonderful way to express yourself! What colors did you use? 🌈",
+          "Wow! I'd love to hear the story behind this creation. 🖌️"
+        ];
+        responseText = responses[Math.floor(Math.random() * responses.length)];
       } 
-      else if (lowerMessage.includes('how are you')) {
+      else if (lowerMessage.includes('how are you') || lowerMessage.includes("how's it going")) {
         responseText = "I'm doing great! Excited to see what you'll create today. 😊";
       }
-      else if (lowerMessage.includes('thank')) {
+      else if (lowerMessage.includes('thank') || lowerMessage.includes('thanks')) {
         responseText = "You're very welcome! 💕";
       }
-      else if (lowerMessage.includes('hello') || lowerMessage.includes('hi')) {
+      else if (lowerMessage.includes('hello') || lowerMessage.includes('hi') || lowerMessage.includes('hey')) {
         responseText = "Hi there! 👋 What would you like to create today?";
       }
+      else if (lowerMessage.includes('help') || lowerMessage.includes('support')) {
+        responseText = "I'm here to help! You can ask me about art, creativity, or just chat. What do you need? 🤗";
+      }
+      else if (lowerMessage.includes('love') || lowerMessage.includes('like')) {
+        responseText = "That's wonderful to hear! Creativity is all about expressing what you love. ❤️";
+      }
+      else if (lowerMessage.includes('color') || lowerMessage.includes('colour')) {
+        responseText = "Colors are amazing! My favorites are rainbow colors. What's your favorite color? 🌈";
+      }
+      else if (lowerMessage.includes('what') && lowerMessage.includes('do')) {
+        responseText = "I love helping kids with their creative projects! You can ask me about art, drawing, or anything creative. 🎨";
+      }
       else {
-        responseText = "That's interesting! Tell me more about it. 😊";
+        // Default responses with more variety
+        const defaultResponses = [
+          "That's interesting! Tell me more about it. 😊",
+          "I'd love to hear more! Can you explain that in a different way?",
+          "Creative minds think alike! What else would you like to share? ✨",
+          "That's wonderful! How does that make you feel?",
+          "I'm learning so much from you! Can we talk more about that?"
+        ];
+        responseText = defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
       }
 
       setNimiMessages(prev => [...prev, { sender: 'nimi', text: responseText }]);
     } catch (err) {
       setError("Sorry, I couldn't process that. Please try again!");
+      setNimiMessages(prev => [...prev, { sender: 'nimi', text: "Oops! Something went wrong. Can you try saying that again?" }]);
     } finally {
       setIsNimiTyping(false);
     }
@@ -605,7 +659,7 @@ const CommunityPage = () => {
                 <form onSubmit={handleUploadSubmit}>
                   <div className="space-y-4">
                     <div>
-                      <Label htmlFor="childName">Child's Name</Label>
+                      <Label htmlFor="childName">Child's Name *</Label>
                       <Input
                         id="childName"
                         value={uploadForm.childName}
@@ -617,7 +671,7 @@ const CommunityPage = () => {
                     </div>
 
                     <div>
-                      <Label htmlFor="age">Age</Label>
+                      <Label htmlFor="age">Age *</Label>
                       <Input
                         id="age"
                         type="number"
@@ -658,7 +712,7 @@ const CommunityPage = () => {
                     </div>
 
                     <div>
-                      <Label>Upload Image</Label>
+                      <Label>Upload Image *</Label>
                       <div 
                         {...getRootProps()} 
                         className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
@@ -742,7 +796,8 @@ const CommunityPage = () => {
         )}
       </AnimatePresence>
 
-      <Header />    
+      <Header />
+
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="text-center mb-8">
           <div className="text-6xl mb-4">👥</div>
@@ -902,23 +957,22 @@ const CommunityPage = () => {
             <div className="flex flex-col gap-3">
               <div className="flex gap-2">
                 <input
+                  ref={chatInputRef}
                   type="text"
                   placeholder="Chat with Nimi about anything..."
                   className="flex-1 border border-gray-300 rounded-full py-2 px-4 focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm md:text-base"
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' && e.currentTarget.value.trim()) {
-                      handleNimiSend(e.currentTarget.value);
-                      e.currentTarget.value = '';
+                      handleNimiSend(e.currentTarget.value.trim());
                     }
                   }}
                   disabled={isNimiTyping}
                 />
                 <button
                   onClick={(e) => {
-                    const input = e.currentTarget.previousElementSibling as HTMLInputElement;
-                    if (input.value.trim()) {
-                      handleNimiSend(input.value);
-                      input.value = '';
+                    const input = chatInputRef.current;
+                    if (input && input.value.trim()) {
+                      handleNimiSend(input.value.trim());
                     }
                   }}
                   disabled={isNimiTyping}
@@ -929,6 +983,9 @@ const CommunityPage = () => {
                   <Send className="w-5 h-5" />
                 </button>
               </div>
+              <p className="text-xs text-center text-gray-500">
+                Nimi loves talking about art, creativity, and your creations!
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -943,6 +1000,7 @@ const CommunityPage = () => {
         </Card>
       </main>
 
+      <Footer />
       <BottomNavigation />
     </div>
   );
