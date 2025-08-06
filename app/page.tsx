@@ -8,7 +8,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
 import BottomNavigation from "@/components/BottomNavigation";
-import Footer from "@/components/Footer";
 import Confetti from "react-confetti";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { speak, loadVoices } from "@/lib/speak";
@@ -220,7 +219,6 @@ export default function HomePage() {
         )}
       </main>
 
-      <Footer />
       {mounted && <BottomNavigation />}
     </div>
   );

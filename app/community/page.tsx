@@ -1,16 +1,19 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
-import { MessageCircle, Heart, Camera, Mic, Trophy, Send, X, Users, Share2, Sparkles } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { 
+  MessageCircle, Heart, Camera, Mic, Trophy, Send, X, Users, Share2, Sparkles, Loader2 
+} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useDropzone } from "react-dropzone";
 import Header from "@/components/Header";
 import BottomNavigation from "@/components/BottomNavigation";
-import Footer from "@/components/Footer";
 
 interface Comment {
   id: string;
@@ -32,6 +35,7 @@ interface Creation {
   description?: string;
   comments?: Comment[];
   likedByUser?: boolean;
+  completionStatus?: 'draft' | 'in-progress' | 'completed';
 }
 
 interface PikoPal {
@@ -49,130 +53,21 @@ interface UserMessage {
   text: string;
 }
 
-// Mock API functions with proper unique IDs
-const generateUniqueId = () => Math.random().toString(36).substring(2, 11);
-
-const mockFetchCreations = async (): Promise<Creation[]> => {
-  await new Promise(resolve => setTimeout(resolve, 800));
-  
-  return [
-    {
-      id: generateUniqueId(),
-      childName: 'Emma',
-      age: 7,
-      imageUrl: 'https://source.unsplash.com/random/300x300/?child,drawing',
-      likes: 12,
-      type: 'drawing',
-      isPublic: true,
-      createdAt: new Date().toISOString(),
-      description: 'My first drawing of a dinosaur!',
-      comments: [
-        {
-          id: generateUniqueId(),
-          creationId: '1',
-          author: 'Liam',
-          content: 'Wow, this is amazing!',
-          createdAt: new Date().toISOString()
-        }
-      ],
-      likedByUser: false
-    },
-    {
-      id: generateUniqueId(),
-      childName: 'Noah',
-      age: 5,
-      imageUrl: 'https://source.unsplash.com/random/300x300/?child,painting',
-      likes: 8,
-      type: 'painting',
-      isPublic: true,
-      createdAt: new Date(Date.now() - 86400000).toISOString(),
-      description: 'Rainbow painting for mom',
-      likedByUser: false
-    }
-  ];
-};
-
-const mockFetchPikopals = async (): Promise<PikoPal[]> => {
-  await new Promise(resolve => setTimeout(resolve, 500));
-  
-  return [
-    {
-      id: generateUniqueId(),
-      name: 'Sophia',
-      age: 6,
-      achievements: 5,
-      streak: 7,
-      avatar: '👧',
-      title: 'Creative Explorer'
-    }
-  ];
-};
-
-const mockUploadCreation = async (formData: FormData): Promise<Creation> => {
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  
-  const isPublic = formData.get('isPublic') === 'true';
-  const imageFile = formData.get('image') as File;
-  
-  return {
-    id: generateUniqueId(),
-    childName: formData.get('childName') as string,
-    age: parseInt(formData.get('age') as string),
-    imageUrl: isPublic 
-      ? URL.createObjectURL(imageFile)
-      : '', // Private creations don't get a public URL
-    likes: 0,
-    type: 'art',
-    isPublic,
-    createdAt: new Date().toISOString(),
-    description: formData.get('description') as string || undefined,
-    likedByUser: false
-  };
-};
-
-const mockLikeCreation = async (creationId: string): Promise<Creation> => {
-  await new Promise(resolve => setTimeout(resolve, 300));
-  
-  const creations = await mockFetchCreations();
-  const creation = creations.find(c => c.id === creationId) || creations[0];
-  
-  return {
-    ...creation,
-    likes: creation.likedByUser ? creation.likes - 1 : creation.likes + 1,
-    likedByUser: !creation.likedByUser
-  };
-};
-
-const mockAddComment = async (creationId: string, content: string): Promise<Comment> => {
-  await new Promise(resolve => setTimeout(resolve, 300));
-  
-  return {
-    id: generateUniqueId(),
-    creationId,
-    author: 'You',
-    content,
-    createdAt: new Date().toISOString()
-  };
-};
-
 const CommunityPage = () => {
-  // State management
+  const supabase = createClientComponentClient();
   const [creations, setCreations] = useState<Creation[]>([]);
   const [pikopals, setPikopals] = useState<PikoPal[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [nimiMessages, setNimiMessages] = useState<UserMessage[]>([
-    { 
-      sender: 'nimi', 
-      text: "Hello friend! I'm Nim!\n\n What's in your mind today" 
-    }
+    { sender: 'nimi', text: "Hello friend! I'm Nimi!\n\nWhat's on your mind today?" }
   ]);
   const [isNimiTyping, setIsNimiTyping] = useState(false);
-  const [celebrations, setCelebrations] = useState<{id: string, tag: string}[]>([]);
   const [showCelebration, setShowCelebration] = useState(false);
   const [celebrationText, setCelebrationText] = useState("");
   const currentUser = { name: "Emma", avatar: "👧" };
+  const chatEndRef = useRef<HTMLDivElement>(null);
 
   // Upload form state
   const [uploadForm, setUploadForm] = useState({
@@ -181,48 +76,59 @@ const CommunityPage = () => {
     description: "",
     isPublic: true,
     imageFile: null as File | null,
-    previewUrl: ""
+    previewUrl: "",
+    uploadProgress: 0,
+    isUploading: false
   });
 
-  // Memoized data loading
-  const loadData = useCallback(async () => {
+  // Load data from Supabase
+  const fetchCreations = async () => {
     try {
       setLoading(true);
-      setError(null);
-      
-      const [creationsData, pikopalsData] = await Promise.all([
-        mockFetchCreations(),
-        mockFetchPikopals()
-      ]);
+      const { data, error } = await supabase
+        .from('creations')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-      setCreations(creationsData.filter(c => c.isPublic)); // Only show public creations
-      setPikopals(pikopalsData);
+      if (error) throw error;
       
-      if (creationsData.length > 0) {
-        setCelebrations(
-          creationsData
-            .slice(0, 3)
-            .map(creation => ({
-              id: creation.id,
-              tag: ["🌟 Amazing!", "🎉 Wonderful!", "💖 Lovely!", "👏 Great job!", "✨ Fantastic!"][
-                Math.floor(Math.random() * 5)
-              ]
-            }))
-        );
-        triggerCelebration(`New art from ${creationsData[0].childName}!`);
+      setCreations(data.map(creation => ({
+        ...creation,
+        createdAt: creation.created_at,
+        isPublic: creation.is_public,
+        imageUrl: creation.image_url
+      })));
+
+      if (data.length > 0) {
+        triggerCelebration(`New art from ${data[0].child_name}!`);
       }
     } catch (err) {
-      setError("Couldn't load data. Please check your connection and try again.");
-      console.error("Data loading error:", err);
+      setError("Couldn't load creations. Please try again.");
+      console.error("Error fetching creations:", err);
     } finally {
       setLoading(false);
     }
+  };
+
+  // Load data on mount
+  useEffect(() => {
+    fetchCreations();
+    // Mock pikopals data
+    setPikopals([{
+      id: '1',
+      name: 'Sophia',
+      age: 6,
+      achievements: 5,
+      streak: 7,
+      avatar: '👧',
+      title: 'Creative Explorer'
+    }]);
   }, []);
 
-  // Load initial data
+  // Scroll chat to bottom when messages change
   useEffect(() => {
-    loadData();
-  }, [loadData]);
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [nimiMessages]);
 
   // Celebration animation
   const triggerCelebration = useCallback((text: string) => {
@@ -231,84 +137,30 @@ const CommunityPage = () => {
     setTimeout(() => setShowCelebration(false), 3000);
   }, []);
 
-  // Enhanced Nimi AI response handler
-  const handleNimiSend = useCallback(async (message: string) => {
-    // Add user message
-    setNimiMessages(prev => [...prev, { sender: 'user', text: message }]);
-    setIsNimiTyping(true);
-
-    try {
-      // Simulate processing delay
-      await new Promise(resolve => setTimeout(resolve, 800 + Math.random() * 700));
-
-      // Enhanced response logic
-      let responseText = "";
-      const lowerMessage = message.toLowerCase();
-
-      // Art-related responses
-      if (lowerMessage.includes('art') || lowerMessage.includes('draw') || lowerMessage.includes('paint')) {
-        responseText = [
-          "That's beautiful! What inspired you to create this? 🎨",
-          "I love seeing your creativity! Tell me more about this piece. 💖",
-          "Art is such a wonderful way to express yourself! What colors did you use? 🌈",
-          "Would you like to share this with your friends? They'd love to see it! 👀"
-        ][Math.floor(Math.random() * 4)];
-      } 
-      // General conversation
-      else if (lowerMessage.includes('how are you')) {
-        responseText = "I'm doing great! Excited to see what you'll create or share today. 😊";
-      }
-      else if (lowerMessage.includes('thank')) {
-        responseText = "You're very welcome! It's my pleasure to chat with you. 💕";
-      }
-      else if (lowerMessage.includes('hello') || lowerMessage.includes('hi')) {
-        responseText = "Hi there! 👋 What would you like to talk about today?";
-      }
-      // Default creative response
-      else {
-        responseText = [
-          "That's interesting! Tell me more about it. 😊",
-          "I'd love to hear more about what you're thinking! 💭",
-          "What a great thing to share! How does that make you feel? 🌟",
-          "That's wonderful! Would you like to create something about it? 🎨"
-        ][Math.floor(Math.random() * 4)];
-      }
-
-      setNimiMessages(prev => [...prev, { sender: 'nimi', text: responseText }]);
-    } catch (err) {
-      setError("Sorry, I couldn't process that. Please try again!");
-      console.error("Nimi response error:", err);
-    } finally {
-      setIsNimiTyping(false);
-    }
-  }, []);
-
-  // Handle file upload
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-    if (acceptedFiles.length > 0) {
-      const file = acceptedFiles[0];
-      if (file.size > 5 * 1024 * 1024) { // 5MB limit
-        setError("File is too large. Please select an image under 5MB.");
-        return;
-      }
-      setUploadForm(prev => ({
-        ...prev,
-        imageFile: file,
-        previewUrl: URL.createObjectURL(file)
-      }));
-    }
-  }, []);
-
+  // Enhanced dropzone for image upload
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop,
+    onDrop: useCallback((acceptedFiles: File[]) => {
+      if (acceptedFiles.length > 0) {
+        const file = acceptedFiles[0];
+        if (file.size > 5 * 1024 * 1024) {
+          setError("File is too large. Please select an image under 5MB.");
+          return;
+        }
+        setUploadForm(prev => ({
+          ...prev,
+          imageFile: file,
+          previewUrl: URL.createObjectURL(file)
+        }));
+      }
+    }, []),
     accept: {
       'image/*': ['.jpeg', '.jpg', '.png']
     },
     maxFiles: 1
   });
 
-  // Handle form submission
-  const handleUploadSubmit = useCallback(async (e: React.FormEvent) => {
+  // Handle upload submission to Supabase
+  const handleUploadSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!uploadForm.imageFile) {
@@ -317,121 +169,230 @@ const CommunityPage = () => {
     }
 
     try {
-      const formData = new FormData();
-      formData.append('childName', uploadForm.childName);
-      formData.append('age', uploadForm.age);
-      formData.append('description', uploadForm.description);
-      formData.append('isPublic', String(uploadForm.isPublic));
-      formData.append('image', uploadForm.imageFile);
+      setUploadForm(prev => ({ ...prev, isUploading: true }));
+      
+      // Upload image to Supabase Storage
+      const fileExt = uploadForm.imageFile.name.split('.').pop();
+      const fileName = `${generateUniqueId()}.${fileExt}`;
+      const filePath = `creations/${fileName}`;
 
-      const newCreation = await mockUploadCreation(formData);
-      
-      if (newCreation.isPublic) {
-        setCreations(prev => [newCreation, ...prev]);
-      }
-      
+      // Upload with progress tracking
+      const { error: uploadError } = await supabase.storage
+        .from('creations')
+        .upload(filePath, uploadForm.imageFile, {
+          cacheControl: '3600',
+          upsert: false,
+          onProgress: (progress) => {
+            setUploadForm(prev => ({ ...prev, uploadProgress: progress }));
+          }
+        });
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('creations')
+        .getPublicUrl(filePath);
+
+      // Insert creation record
+      const { data: creation, error: insertError } = await supabase
+        .from('creations')
+        .insert({
+          child_name: uploadForm.childName,
+          age: parseInt(uploadForm.age),
+          description: uploadForm.description,
+          is_public: uploadForm.isPublic,
+          image_url: publicUrl,
+          type: 'art',
+          completion_status: 'completed'
+        })
+        .select()
+        .single();
+
+      if (insertError) throw insertError;
+
+      // Update local state
+      setCreations(prev => [{
+        ...creation,
+        childName: creation.child_name,
+        isPublic: creation.is_public,
+        imageUrl: creation.image_url,
+        createdAt: creation.created_at,
+        likes: 0,
+        likedByUser: false,
+        completionStatus: 'completed'
+      }, ...prev]);
+
       setShowUploadModal(false);
+      triggerCelebration(`Your creation has been shared!`);
+      
+      // Reset form
       setUploadForm({
         childName: "",
         age: "",
         description: "",
         isPublic: true,
         imageFile: null,
-        previewUrl: ""
+        previewUrl: "",
+        uploadProgress: 0,
+        isUploading: false
       });
-      
-      // Share private creation directly via WhatsApp if not public
-      if (!newCreation.isPublic && uploadForm.imageFile) {
-        sharePrivateCreation(uploadForm.imageFile, newCreation);
-      } else {
-        triggerCelebration(`Your creation has been shared!`);
-      }
     } catch (err) {
       setError("Failed to upload creation. Please try again.");
       console.error("Upload error:", err);
+    } finally {
+      setUploadForm(prev => ({ ...prev, isUploading: false }));
     }
-  }, [uploadForm]);
+  };
 
-  // Share private creation via WhatsApp
-  const sharePrivateCreation = useCallback((file: File, creation: Creation) => {
+  // Share creation
+  const shareCreation = useCallback((creation: Creation) => {
     try {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const shareText = `Check out my private creation! ${creation.description ? `\n\n${creation.description}` : ''}`;
-        
-        if (navigator.share) {
-          navigator.share({
+      const shareText = creation.isPublic
+        ? `Check out this amazing creation by ${creation.childName} (${creation.age} years old)!\n\n${creation.description || "No description provided"}\n\nShared via PikoPal App`
+        : `Check out my private creation! ${creation.description ? `\n\n${creation.description}` : ''}`;
+
+      const shareData = creation.isPublic
+        ? {
+            title: `Art by ${creation.childName}`,
+            text: shareText,
+            url: creation.imageUrl
+          }
+        : {
             title: `My Private Creation`,
             text: shareText,
-            files: [file]
-          }).catch(() => {
-            // Fallback to WhatsApp web with text only
-            window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, '_blank');
-          });
-        } else {
-          // Direct WhatsApp sharing with text only
-          window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, '_blank');
-        }
-      };
-      reader.readAsDataURL(file);
-    } catch (err) {
-      console.error('Private sharing failed:', err);
-      setError("Sharing failed. Please try again or copy the text manually.");
-    }
-  }, []);
+            files: [new File([creation.imageUrl], 'art.png')]
+          };
 
-  // Share public creation via WhatsApp
-  const sharePublicCreation = useCallback((creation: Creation) => {
-    try {
-      const shareText = `Check out this amazing creation by ${creation.childName} (${creation.age} years old)!\n\n${creation.description || "No description provided"}\n\nShared via PikoPal App`;
-      
       if (navigator.share) {
-        navigator.share({
-          title: `Art by ${creation.childName}`,
-          text: shareText,
-          url: creation.imageUrl
-        }).catch(() => {
-          // Fallback to WhatsApp
-          window.open(`https://wa.me/?text=${encodeURIComponent(shareText + '\n\n' + creation.imageUrl)}`, '_blank');
+        navigator.share(shareData).catch(() => {
+          window.open(`https://wa.me/?text=${encodeURIComponent(shareText + (creation.isPublic ? '\n\n' + creation.imageUrl : ''))}`, '_blank');
         });
       } else {
-        // Direct WhatsApp sharing
-        window.open(`https://wa.me/?text=${encodeURIComponent(shareText + '\n\n' + creation.imageUrl)}`, '_blank');
+        window.open(`https://wa.me/?text=${encodeURIComponent(shareText + (creation.isPublic ? '\n\n' + creation.imageUrl : ''))}`, '_blank');
       }
     } catch (err) {
-      console.error('Sharing failed:', err);
-      setError("Sharing failed. Please try again or copy the link manually.");
+      setError("Sharing failed. Please try again.");
     }
   }, []);
 
-  // Handle like action
+  // Like creation
   const handleLike = useCallback(async (creationId: string) => {
     try {
-      const updatedCreation = await mockLikeCreation(creationId);
-      setCreations(prev => prev.map(c => c.id === creationId ? updatedCreation : c));
+      // Optimistic update
+      setCreations(prev => prev.map(c => {
+        if (c.id === creationId) {
+          const liked = !c.likedByUser;
+          return {
+            ...c,
+            likes: liked ? c.likes + 1 : c.likes - 1,
+            likedByUser: liked
+          };
+        }
+        return c;
+      }));
+
+      // Update in Supabase
+      const creation = creations.find(c => c.id === creationId);
+      if (!creation) return;
+
+      const { error } = await supabase
+        .from('creations')
+        .update({ 
+          likes: creation.likedByUser ? creation.likes - 1 : creation.likes + 1
+        })
+        .eq('id', creationId);
+
+      if (error) throw error;
     } catch (err) {
+      // Rollback on error
+      setCreations(prev => prev.map(c => {
+        if (c.id === creationId) {
+          return {
+            ...c,
+            likes: c.likedByUser ? c.likes - 1 : c.likes + 1,
+            likedByUser: !c.likedByUser
+          };
+        }
+        return c;
+      }));
       setError("Couldn't send like. Try again!");
-      console.error("Like error:", err);
+    }
+  }, [creations]);
+
+  // Add comment
+  const handleAddComment = useCallback(async (creationId: string, content: string) => {
+    try {
+      // Optimistic update
+      const newComment = {
+        id: generateUniqueId(),
+        creationId,
+        author: currentUser.name,
+        content,
+        createdAt: new Date().toISOString()
+      };
+
+      setCreations(prev => prev.map(c => 
+        c.id === creationId 
+          ? { ...c, comments: [...(c.comments || []), newComment] } 
+          : c
+      ));
+
+      // Save to Supabase
+      const { error } = await supabase
+        .from('comments')
+        .insert({
+          creation_id: creationId,
+          author: currentUser.name,
+          content
+        });
+
+      if (error) throw error;
+      return true;
+    } catch (err) {
+      // Rollback on error
+      setCreations(prev => prev.map(c => 
+        c.id === creationId 
+          ? { ...c, comments: c.comments?.slice(0, -1) } 
+          : c
+      ));
+      setError("Couldn't add comment. Try again!");
+      return false;
     }
   }, []);
 
-  // Handle comment submission
-  const handleAddComment = useCallback(async (creationId: string, content: string) => {
+  // Nimi AI chat
+  const handleNimiSend = useCallback(async (message: string) => {
+    setNimiMessages(prev => [...prev, { sender: 'user', text: message }]);
+    setIsNimiTyping(true);
+
     try {
-      const newComment = await mockAddComment(creationId, content);
-      setCreations(prev => prev.map(c => 
-        c.id === creationId 
-          ? { 
-              ...c, 
-              comments: [...(c.comments || []), newComment] 
-            } 
-          : c
-      ));
-      return true;
+      await new Promise(resolve => setTimeout(resolve, 800 + Math.random() * 700));
+
+      let responseText = "";
+      const lowerMessage = message.toLowerCase();
+
+      if (lowerMessage.includes('art') || lowerMessage.includes('draw') || lowerMessage.includes('paint')) {
+        responseText = "That's beautiful! What inspired you to create this? 🎨";
+      } 
+      else if (lowerMessage.includes('how are you')) {
+        responseText = "I'm doing great! Excited to see what you'll create today. 😊";
+      }
+      else if (lowerMessage.includes('thank')) {
+        responseText = "You're very welcome! 💕";
+      }
+      else if (lowerMessage.includes('hello') || lowerMessage.includes('hi')) {
+        responseText = "Hi there! 👋 What would you like to create today?";
+      }
+      else {
+        responseText = "That's interesting! Tell me more about it. 😊";
+      }
+
+      setNimiMessages(prev => [...prev, { sender: 'nimi', text: responseText }]);
     } catch (err) {
-      setError("Couldn't add comment. Try again!");
-      console.error("Comment error:", err);
-      return false;
+      setError("Sorry, I couldn't process that. Please try again!");
+    } finally {
+      setIsNimiTyping(false);
     }
   }, []);
 
@@ -461,33 +422,32 @@ const CommunityPage = () => {
       if (comment.trim()) {
         setIsCommenting(true);
         const success = await handleAddComment(creation.id, comment);
-        if (success) {
-          setComment("");
-        }
+        if (success) setComment("");
         setIsCommenting(false);
       }
     };
 
     return (
-      <Card className="overflow-hidden hover:shadow-lg transition-shadow">
+      <Card className="overflow-hidden hover:shadow-lg transition-shadow relative">
+        {creation.completionStatus === 'completed' && (
+          <div className="absolute top-2 right-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full flex items-center z-10">
+            <Sparkles className="w-3 h-3 mr-1" />
+            Completed!
+          </div>
+        )}
+        
         <div className="relative aspect-square">
           <img 
             src={creation.imageUrl} 
             alt={`Art by ${creation.childName}`}
             className="w-full h-full object-cover"
             loading="lazy"
-            decoding="async"
           />
-          {!creation.isPublic && (
-            <div className="absolute top-2 left-2 bg-white/90 px-2 py-1 rounded-full flex items-center text-xs shadow-sm">
-              <Users className="w-3 h-3 mr-1" /> Private
-            </div>
-          )}
         </div>
         
         <CardContent className="p-4">
           <div className="flex justify-between items-center mb-2">
-            <h3 className="font-medium">{creation.childName}</h3>
+            <h3 className="font-medium">{creation.childName} ({creation.age})</h3>
             <div className="text-xs text-gray-500">
               {new Date(creation.createdAt).toLocaleDateString()}
             </div>
@@ -504,11 +464,15 @@ const CommunityPage = () => {
               onClick={handleLikeClick}
               disabled={isLiking}
             >
-              <Heart 
-                className="w-5 h-5" 
-                fill={creation.likedByUser ? "currentColor" : "none"} 
-                color={creation.likedByUser ? "#ec4899" : "currentColor"}
-              />
+              {isLiking ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Heart 
+                  className="w-5 h-5" 
+                  fill={creation.likedByUser ? "currentColor" : "none"} 
+                  color={creation.likedByUser ? "#ec4899" : "currentColor"}
+                />
+              )}
               <span>{creation.likes}</span>
             </Button>
             
@@ -524,10 +488,7 @@ const CommunityPage = () => {
             
             <Button 
               variant="ghost" 
-              onClick={() => creation.isPublic 
-                ? sharePublicCreation(creation) 
-                : creation.imageUrl && sharePrivateCreation(new File([creation.imageUrl], 'art.png'), creation)
-              }
+              onClick={() => shareCreation(creation)}
             >
               <Share2 className="w-5 h-5" />
             </Button>
@@ -561,7 +522,7 @@ const CommunityPage = () => {
                   disabled={!comment.trim() || isCommenting}
                   size="sm"
                 >
-                  {isCommenting ? 'Posting...' : 'Post'}
+                  {isCommenting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Post'}
                 </Button>
               </div>
             </div>
@@ -633,8 +594,9 @@ const CommunityPage = () => {
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="text-xl font-bold">Share Your Creation</h3>
                   <button 
-                    onClick={() => setShowUploadModal(false)}
+                    onClick={() => !uploadForm.isUploading && setShowUploadModal(false)}
                     className="p-1 rounded-full hover:bg-gray-100"
+                    disabled={uploadForm.isUploading}
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -643,39 +605,45 @@ const CommunityPage = () => {
                 <form onSubmit={handleUploadSubmit}>
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium mb-1">Child's Name</label>
+                      <Label htmlFor="childName">Child's Name</Label>
                       <Input
+                        id="childName"
                         value={uploadForm.childName}
                         onChange={(e) => setUploadForm(prev => ({...prev, childName: e.target.value}))}
                         required
                         minLength={2}
+                        disabled={uploadForm.isUploading}
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium mb-1">Age</label>
+                      <Label htmlFor="age">Age</Label>
                       <Input
+                        id="age"
                         type="number"
                         min="1"
                         max="18"
                         value={uploadForm.age}
                         onChange={(e) => setUploadForm(prev => ({...prev, age: e.target.value}))}
                         required
+                        disabled={uploadForm.isUploading}
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium mb-1">Description (Optional)</label>
+                      <Label htmlFor="description">Description (Optional)</Label>
                       <Input
+                        id="description"
                         value={uploadForm.description}
                         onChange={(e) => setUploadForm(prev => ({...prev, description: e.target.value}))}
                         maxLength={200}
+                        disabled={uploadForm.isUploading}
                       />
                     </div>
 
                     <div className="flex items-center justify-between">
                       <div>
-                        <label className="text-sm font-medium">Visibility</label>
+                        <Label>Visibility</Label>
                         <p className="text-xs text-gray-500">
                           {uploadForm.isPublic 
                             ? "Public (visible to everyone)" 
@@ -685,18 +653,19 @@ const CommunityPage = () => {
                       <Switch
                         checked={uploadForm.isPublic}
                         onCheckedChange={(checked) => setUploadForm(prev => ({...prev, isPublic: checked}))}
+                        disabled={uploadForm.isUploading}
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium mb-1">Upload Image</label>
+                      <Label>Upload Image</Label>
                       <div 
                         {...getRootProps()} 
                         className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
                           isDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'
-                        }`}
+                        } ${uploadForm.isUploading ? 'opacity-50 cursor-not-allowed' : ''}`}
                       >
-                        <input {...getInputProps()} />
+                        <input {...getInputProps()} disabled={uploadForm.isUploading} />
                         {uploadForm.previewUrl ? (
                           <div className="relative">
                             <img 
@@ -705,16 +674,18 @@ const CommunityPage = () => {
                               className="mx-auto max-h-48 rounded-md mb-2"
                               loading="lazy"
                             />
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setUploadForm(prev => ({...prev, imageFile: null, previewUrl: ""}));
-                              }}
-                              className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-md hover:bg-gray-100"
-                            >
-                              <X className="w-4 h-4" />
-                            </button>
+                            {!uploadForm.isUploading && (
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setUploadForm(prev => ({...prev, imageFile: null, previewUrl: ""}));
+                                }}
+                                className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-md hover:bg-gray-100"
+                              >
+                                <X className="w-4 h-4" />
+                              </button>
+                            )}
                           </div>
                         ) : (
                           <>
@@ -728,13 +699,39 @@ const CommunityPage = () => {
                       </div>
                     </div>
 
+                    {/* Upload progress */}
+                    {uploadForm.isUploading && (
+                      <div className="pt-2">
+                        <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
+                          <motion.div
+                            className="h-full bg-blue-500"
+                            initial={{ width: '0%' }}
+                            animate={{ width: `${uploadForm.uploadProgress}%` }}
+                            transition={{ duration: 0.3 }}
+                          />
+                        </div>
+                        <p className="text-xs text-center text-gray-600 mt-1">
+                          Uploading... {uploadForm.uploadProgress}%
+                        </p>
+                      </div>
+                    )}
+
                     <div className="pt-2">
                       <Button 
                         type="submit" 
                         className="w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white"
-                        disabled={!uploadForm.imageFile || !uploadForm.childName || !uploadForm.age}
+                        disabled={!uploadForm.imageFile || !uploadForm.childName || !uploadForm.age || uploadForm.isUploading}
                       >
-                        {uploadForm.isPublic ? 'Share Publicly' : 'Share Privately via WhatsApp'}
+                        {uploadForm.isUploading ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Uploading...
+                          </>
+                        ) : uploadForm.isPublic ? (
+                          'Share Publicly'
+                        ) : (
+                          'Share Privately via WhatsApp'
+                        )}
                       </Button>
                     </div>
                   </div>
@@ -745,8 +742,7 @@ const CommunityPage = () => {
         )}
       </AnimatePresence>
 
-      <Header />
-
+      <Header />    
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="text-center mb-8">
           <div className="text-6xl mb-4">👥</div>
@@ -842,22 +838,7 @@ const CommunityPage = () => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {creations.map(creation => (
-                <div key={`creation-${creation.id}`} className="relative">
-                  <CreationCard creation={creation} />
-                  {celebrations.some(c => c.id === creation.id) && (
-                    <motion.div
-                      initial={{ scale: 0, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{ type: "spring", stiffness: 500, damping: 20 }}
-                      className="absolute -top-3 -right-3 bg-yellow-100 border-2 border-yellow-300 px-3 py-1 rounded-full shadow-lg z-10"
-                      key={`celebration-${creation.id}`}
-                    >
-                      <span className="font-bold text-yellow-700">
-                        {celebrations.find(c => c.id === creation.id)?.tag}
-                      </span>
-                    </motion.div>
-                  )}
-                </div>
+                <CreationCard key={`creation-${creation.id}`} creation={creation} />
               ))}
             </div>
           )}
@@ -915,7 +896,7 @@ const CommunityPage = () => {
                   </div>
                 </div>
               )}
-              <div ref={useRef<HTMLDivElement>(null)} className="h-4" />
+              <div ref={chatEndRef} />
             </div>
             
             <div className="flex flex-col gap-3">
@@ -948,19 +929,6 @@ const CommunityPage = () => {
                   <Send className="w-5 h-5" />
                 </button>
               </div>
-              
-              <Button
-                onClick={() => {
-                  setNimiMessages(prev => [...prev, {
-                    sender: 'nimi', 
-                    text: "What would you like to create or share today? I'm here to help! 😊"
-                  }]);
-                }}
-                variant="outline"
-                className="border-purple-300 bg-white hover:bg-purple-50 text-purple-600"
-              >
-                Get Creative Ideas
-              </Button>
             </div>
           </CardContent>
         </Card>
@@ -975,7 +943,6 @@ const CommunityPage = () => {
         </Card>
       </main>
 
-      <Footer />
       <BottomNavigation />
     </div>
   );

@@ -5,8 +5,6 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { Volume2 } from "lucide-react";
 
 function isEmoji(word: string) {
-  // Simple regex to detect emoji characters
-  // This is a basic one; you can expand if needed
   return /[\p{Emoji_Presentation}\p{Emoji}\uFE0F]/u.test(word);
 }
 
@@ -15,10 +13,14 @@ export default function NimiReaderButton() {
   const [voicesLoaded, setVoicesLoaded] = useState(false);
   const [speaking, setSpeaking] = useState(false);
 
-  // Store references to word spans to clear highlights later
   const wordSpansRef = useRef<HTMLSpanElement[]>([]);
-  // Keep track of current utterance to cancel on stop
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
+
+  // For draggable position
+  const buttonRef = useRef<HTMLButtonElement | null>(null);
+  const [position, setPosition] = useState({ x: 20, y: 500 });
+  const isDragging = useRef(false);
+  const offset = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -33,7 +35,6 @@ export default function NimiReaderButton() {
   }, []);
 
   const wrapWordsWithSpans = (element: HTMLElement) => {
-    // Walk text nodes inside the element and wrap words with spans
     const walker = document.createTreeWalker(
       element,
       NodeFilter.SHOW_TEXT,
@@ -44,7 +45,7 @@ export default function NimiReaderButton() {
     const textNodes: Text[] = [];
     while (walker.nextNode()) {
       const currentNode = walker.currentNode as Text;
-      if (currentNode.nodeValue && currentNode.nodeValue.trim().length > 0) {
+      if (currentNode.nodeValue?.trim().length > 0) {
         textNodes.push(currentNode);
       }
     }
@@ -55,7 +56,7 @@ export default function NimiReaderButton() {
       const parent = textNode.parentNode;
       if (!parent) return;
 
-      const words = textNode.nodeValue!.split(/(\s+)/); // keep spaces in array
+      const words = textNode.nodeValue!.split(/(\s+)/);
       const fragment = document.createDocumentFragment();
 
       words.forEach((word) => {
@@ -74,13 +75,12 @@ export default function NimiReaderButton() {
   };
 
   const removeHighlights = () => {
-    wordSpansRef.current.forEach((span) => {
-      span.classList.remove("nimi-reader-highlight");
-    });
+    wordSpansRef.current.forEach((span) =>
+      span.classList.remove("nimi-reader-highlight")
+    );
   };
 
   const unwrapSpans = (element: HTMLElement) => {
-    // Replace each span with its text content to clean up DOM
     wordSpansRef.current.forEach((span) => {
       const parent = span.parentNode;
       if (!parent) return;
@@ -93,7 +93,6 @@ export default function NimiReaderButton() {
     if (typeof window === "undefined" || !voicesLoaded) return;
 
     if (speaking) {
-      // Stop reading if already speaking
       window.speechSynthesis.cancel();
       setSpeaking(false);
       removeHighlights();
@@ -104,39 +103,30 @@ export default function NimiReaderButton() {
     const main = document.querySelector("main");
     if (!main) return;
 
-    // Prepare the page text for highlighting
     wrapWordsWithSpans(main);
 
-    // Collect words to read, skipping emojis
     const wordsToRead = wordSpansRef.current
       .map((span) => span.textContent || "")
       .filter((word) => !isEmoji(word.trim()));
 
     if (wordsToRead.length === 0) {
-      // Nothing to read
       unwrapSpans(main);
       return;
     }
 
-    // Build full text without emojis for utterance
     const textToSpeak = wordsToRead.join(" ");
-
     const utterance = new SpeechSynthesisUtterance(textToSpeak);
     utterance.lang = language || "en-US";
     utteranceRef.current = utterance;
 
     let currentWordIndex = 0;
-
     setSpeaking(true);
 
     utterance.onboundary = (event) => {
       if (event.name === "word") {
-        // Remove old highlight
         removeHighlights();
 
-        // Highlight current word if exists
         const wordSpan = wordSpansRef.current.find((span) => {
-          // Match span text to spoken word ignoring whitespace and emojis
           return (
             (span.textContent || "").trim() ===
             wordsToRead[currentWordIndex].trim()
@@ -145,7 +135,6 @@ export default function NimiReaderButton() {
 
         if (wordSpan) {
           wordSpan.classList.add("nimi-reader-highlight");
-          // Scroll to highlight if needed
           wordSpan.scrollIntoView({ behavior: "smooth", block: "center" });
         }
 
@@ -169,6 +158,47 @@ export default function NimiReaderButton() {
     window.speechSynthesis.speak(utterance);
   };
 
+  // 🟡 Drag and move handlers
+  const handleMouseDown = (e: React.MouseEvent | React.TouchEvent) => {
+    isDragging.current = true;
+    const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
+    const clientY = "touches" in e ? e.touches[0].clientY : e.clientY;
+    offset.current = {
+      x: clientX - position.x,
+      y: clientY - position.y,
+    };
+  };
+
+  const handleMouseMove = (e: MouseEvent | TouchEvent) => {
+    if (!isDragging.current) return;
+    const clientX =
+      "touches" in e ? e.touches[0].clientX : (e as MouseEvent).clientX;
+    const clientY =
+      "touches" in e ? e.touches[0].clientY : (e as MouseEvent).clientY;
+    setPosition({
+      x: clientX - offset.current.x,
+      y: clientY - offset.current.y,
+    });
+  };
+
+  const handleMouseUp = () => {
+    isDragging.current = false;
+  };
+
+  useEffect(() => {
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
+    document.addEventListener("touchmove", handleMouseMove);
+    document.addEventListener("touchend", handleMouseUp);
+
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+      document.removeEventListener("touchmove", handleMouseMove);
+      document.removeEventListener("touchend", handleMouseUp);
+    };
+  }, []);
+
   return (
     <>
       <style>{`
@@ -180,9 +210,19 @@ export default function NimiReaderButton() {
       `}</style>
 
       <button
+        ref={buttonRef}
         onClick={handleClick}
         disabled={!voicesLoaded}
-        className="fixed bottom-6 right-6 z-50 bg-purple-600 hover:bg-purple-700 text-white text-sm md:text-base font-bold px-5 py-3 rounded-full shadow-lg flex items-center gap-2 transition-all duration-300"
+        onMouseDown={handleMouseDown}
+        onTouchStart={handleMouseDown}
+        style={{
+          position: "fixed",
+          left: position.x,
+          top: position.y,
+          zIndex: 9999,
+          touchAction: "none",
+        }}
+        className="bg-purple-600 hover:bg-purple-700 text-white text-sm md:text-base font-bold px-5 py-3 rounded-full shadow-lg flex items-center gap-2 transition-all duration-300 cursor-grab active:cursor-grabbing"
       >
         <Volume2 className="w-5 h-5" />
         {speaking ? "🔊 Stop Reading" : "🗣️ Hear from Nimi"}
