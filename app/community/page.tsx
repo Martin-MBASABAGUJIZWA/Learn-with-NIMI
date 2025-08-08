@@ -5,55 +5,16 @@ import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { v4 as uuidv4 } from 'uuid';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
-import { 
-  MessageCircle, Heart, Camera, Mic, Trophy, Send, X, Users, Share2, Sparkles, Loader2 
-} from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import { useDropzone } from "react-dropzone";
+import { Sparkles, Trophy, Camera } from "lucide-react";
+import { CreationCard } from "@/components/community/CreationCard";
+import { UploadModal } from "@/components/community/UploadModal";
+import { NimiChat } from "@/components/community/NimiChat";
+import { CelebrationBanner } from "@/components/community/CelebrationBanner";
+import { ErrorToast } from "@/components/community/ErrorToast";
+import { Creation, PikoPal, UserMessage } from "@/components/community/types";
 import Header from "@/components/Header";
 import BottomNavigation from "@/components/BottomNavigation";
 import Footer from "@/components/Footer";
-
-interface Comment {
-  id: string;
-  creationId: string;
-  author: string;
-  content: string;
-  createdAt: string;
-}
-
-interface Creation {
-  id: string;
-  childName: string;
-  age: number;
-  imageUrl: string;
-  likes: number;
-  type: string;
-  isPublic: boolean;
-  createdAt: string;
-  description?: string;
-  comments?: Comment[];
-  likedByUser?: boolean;
-  completionStatus?: 'draft' | 'in-progress' | 'completed';
-}
-
-interface PikoPal {
-  id: string;
-  name: string;
-  age: number;
-  achievements: number;
-  streak: number;
-  avatar: string;
-  title: string;
-}
-
-interface UserMessage {
-  sender: 'user' | 'nimi';
-  text: string;
-}
 
 const CommunityPage = () => {
   const supabase = createClientComponentClient();
@@ -69,8 +30,6 @@ const CommunityPage = () => {
   const [showCelebration, setShowCelebration] = useState(false);
   const [celebrationText, setCelebrationText] = useState("");
   const currentUser = { name: "Emma", avatar: "👧" };
-  const chatEndRef = useRef<HTMLDivElement>(null);
-  const chatInputRef = useRef<HTMLInputElement>(null);
 
   // Upload form state
   const [uploadForm, setUploadForm] = useState({
@@ -81,7 +40,8 @@ const CommunityPage = () => {
     imageFile: null as File | null,
     previewUrl: "",
     uploadProgress: 0,
-    isUploading: false
+    isUploading: false,
+    shareMethod: 'public' as 'public' | 'whatsapp'
   });
 
   // Generate unique ID
@@ -104,7 +64,8 @@ const CommunityPage = () => {
         createdAt: creation.created_at,
         isPublic: creation.is_public,
         imageUrl: creation.image_url,
-        likedByUser: creation.liked_by_user
+        likedByUser: creation.liked_by_user,
+        comments: creation.comments || [] // Ensure comments is always an array
       })));
 
       if (data.length > 0) {
@@ -133,11 +94,6 @@ const CommunityPage = () => {
     }]);
   }, []);
 
-  // Scroll chat to bottom when messages change
-  useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [nimiMessages]);
-
   // Celebration animation
   const triggerCelebration = useCallback((text: string) => {
     setCelebrationText(text);
@@ -145,70 +101,62 @@ const CommunityPage = () => {
     setTimeout(() => setShowCelebration(false), 3000);
   }, []);
 
-  // Enhanced dropzone for image upload
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop: useCallback((acceptedFiles: File[]) => {
-      if (acceptedFiles.length > 0) {
-        const file = acceptedFiles[0];
-        if (file.size > 5 * 1024 * 1024) {
-          setError("File is too large. Please select an image under 5MB.");
-          return;
-        }
-        if (!['image/jpeg', 'image/jpg', 'image/png', 'image/gif'].includes(file.type)) {
-          setError("Invalid file type. Please upload an image (JPEG, JPG, PNG, GIF).");
-          return;
-        }
-        setUploadForm(prev => ({
-          ...prev,
-          imageFile: file,
-          previewUrl: URL.createObjectURL(file)
-        }));
-      }
-    }, []),
-    accept: {
-      'image/*': ['.jpeg', '.jpg', '.png', '.gif']
-    },
-    maxFiles: 1
-  });
-
-  // Handle upload submission to Supabase
+  // Handle upload submission
   const handleUploadSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (uploadForm.shareMethod === 'whatsapp') {
+      // Handle WhatsApp sharing
+      if (uploadForm.imageFile) {
+        const whatsappUrl = `https://wa.me/?text=Check%20out%20my%20creation!`;
+        window.open(whatsappUrl, '_blank');
+      }
+      setShowUploadModal(false);
+      return;
+    }
+
     if (!uploadForm.imageFile) {
       setError("Please select an image to upload");
       return;
     }
-
-    if (!uploadForm.childName || !uploadForm.age) {
-      setError("Please fill in all required fields");
-      return;
-    }
-
+  
     try {
       setUploadForm(prev => ({ ...prev, isUploading: true }));
       
-      // Upload image to Supabase Storage
+      // File validation
+      const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      
+      if (!validTypes.includes(uploadForm.imageFile.type)) {
+        throw new Error('Only JPG, PNG, or GIF images are allowed');
+      }
+      
+      if (uploadForm.imageFile.size > maxSize) {
+        throw new Error('Image must be smaller than 5MB');
+      }
+  
+      // Generate unique filename
       const fileExt = uploadForm.imageFile.name.split('.').pop();
       const fileName = `${generateUniqueId()}.${fileExt}`;
       const filePath = `creations/${fileName}`;
-
-      // Upload with progress tracking
-      const { data, error: uploadError } = await supabase.storage
+  
+      // Upload file to storage
+      const { error: uploadError } = await supabase.storage
         .from('creations')
         .upload(filePath, uploadForm.imageFile, {
           cacheControl: '3600',
-          upsert: false
+          upsert: false,
+          contentType: uploadForm.imageFile.type
         });
-
+  
       if (uploadError) throw uploadError;
-
+  
       // Get public URL
       const { data: { publicUrl } } = supabase.storage
         .from('creations')
         .getPublicUrl(filePath);
-
-      // Insert creation record
+  
+      // Insert record into database
       const { data: creation, error: insertError } = await supabase
         .from('creations')
         .insert({
@@ -224,25 +172,22 @@ const CommunityPage = () => {
         })
         .select()
         .single();
-
+  
       if (insertError) throw insertError;
-
+  
       // Update local state
       setCreations(prev => [{
         ...creation,
         childName: creation.child_name,
+        createdAt: creation.created_at,
         isPublic: creation.is_public,
         imageUrl: creation.image_url,
-        createdAt: creation.created_at,
-        likes: creation.likes,
         likedByUser: creation.liked_by_user,
-        completionStatus: creation.completion_status
+        comments: []
       }, ...prev]);
-
+  
+      // Close modal and reset form
       setShowUploadModal(false);
-      triggerCelebration(`Your creation has been shared!`);
-      
-      // Reset form
       setUploadForm({
         childName: "",
         age: "",
@@ -251,78 +196,80 @@ const CommunityPage = () => {
         imageFile: null,
         previewUrl: "",
         uploadProgress: 0,
-        isUploading: false
+        isUploading: false,
+        shareMethod: 'public'
       });
-    } catch (err) {
-      setError("Failed to upload creation. Please try again.");
-      console.error("Upload error:", err);
+  
+      triggerCelebration(`Your creation has been shared!`);
+  
+    } catch (err: any) {
+      setError(err.message || "Failed to upload creation. Please try again.");
     } finally {
       setUploadForm(prev => ({ ...prev, isUploading: false }));
     }
   };
 
-  // Share creation
-  const shareCreation = useCallback((creation: Creation) => {
+  // Share creation function
+  const shareCreation = useCallback(async (creation: Creation) => {
     try {
-      const shareText = creation.isPublic
-        ? `Check out this amazing creation by ${creation.childName} (${creation.age} years old)!\n\n${creation.description || "No description provided"}\n\nShared via PikoPal App`
-        : `Check out my private creation! ${creation.description ? `\n\n${creation.description}` : ''}`;
-
-      const shareData = creation.isPublic
-        ? {
-            title: `Art by ${creation.childName}`,
-            text: shareText,
-            url: creation.imageUrl
-          }
-        : {
-            title: `My Private Creation`,
-            text: shareText,
-            files: [new File([creation.imageUrl], 'art.png')]
-          };
-
+      let shareableUrl = creation.imageUrl;
+      
+      if (!shareableUrl.startsWith('http')) {
+        const pathParts = shareableUrl.split('/creations/');
+        const fileName = pathParts[pathParts.length - 1];
+        const { data: { publicUrl } } = supabase.storage
+          .from('creations')
+          .getPublicUrl(fileName);
+        shareableUrl = publicUrl;
+      }
+  
+      const shareData = {
+        title: `Art by ${creation.childName}`,
+        text: `${creation.description || "Check out this amazing creation!"}\n\nBy ${creation.childName} (age ${creation.age})`,
+        url: shareableUrl
+      };
+  
       if (navigator.share) {
-        navigator.share(shareData).catch(() => {
-          window.open(`https://wa.me/?text=${encodeURIComponent(shareText + (creation.isPublic ? '\n\n' + creation.imageUrl : ''))}`, '_blank');
-        });
+        await navigator.share(shareData);
+      } else if (navigator.clipboard) {
+        await navigator.clipboard.writeText(shareableUrl);
+        triggerCelebration("Link copied to clipboard!");
       } else {
-        window.open(`https://wa.me/?text=${encodeURIComponent(shareText + (creation.isPublic ? '\n\n' + creation.imageUrl : ''))}`, '_blank');
+        window.open(shareableUrl, '_blank');
       }
     } catch (err) {
-      setError("Sharing failed. Please try again.");
+      console.error("Sharing failed:", err);
+      setError("Sharing didn't work. Try copying the link manually.");
     }
-  }, []);
+  }, [triggerCelebration]);
 
-  // Like creation
+  // Like functionality
   const handleLike = useCallback(async (creationId: string) => {
     try {
-      // Optimistic update
       setCreations(prev => prev.map(c => {
         if (c.id === creationId) {
-          const liked = !c.likedByUser;
+          const newLikeState = !c.likedByUser;
           return {
             ...c,
-            likes: liked ? c.likes + 1 : c.likes - 1,
-            likedByUser: liked
+            likes: newLikeState ? c.likes + 1 : c.likes - 1,
+            likedByUser: newLikeState
           };
         }
         return c;
       }));
 
-      // Update in Supabase
-      const creation = creations.find(c => c.id === creationId);
-      if (!creation) return;
-
       const { error } = await supabase
         .from('creations')
         .update({ 
-          likes: creation.likedByUser ? creation.likes - 1 : creation.likes + 1,
-          liked_by_user: !creation.likedByUser
+          likes: creations.find(c => c.id === creationId)?.likes || 0,
+          liked_by_user: !creations.find(c => c.id === creationId)?.likedByUser
         })
         .eq('id', creationId);
 
       if (error) throw error;
     } catch (err) {
-      // Rollback on error
+      console.error("Like error:", err);
+      setError("Couldn't send like. Try again!");
       setCreations(prev => prev.map(c => {
         if (c.id === creationId) {
           return {
@@ -333,44 +280,67 @@ const CommunityPage = () => {
         }
         return c;
       }));
-      setError("Couldn't send like. Try again!");
     }
-  }, [creations]);
+  }, [creations, supabase]);
 
-  // Add comment
+  // Add comment functionality
   const handleAddComment = useCallback(async (creationId: string, content: string) => {
+    const tempCommentId = generateUniqueId();
+    
     try {
       // Optimistic update
       const newComment = {
-        id: generateUniqueId(),
-        creationId,
+        id: tempCommentId,
+        creation_id: creationId,
         author: currentUser.name,
         content,
-        createdAt: new Date().toISOString()
+        created_at: new Date().toISOString()
       };
 
       setCreations(prev => prev.map(c => 
         c.id === creationId 
-          ? { ...c, comments: [...(c.comments || []), newComment] } 
+          ? { 
+              ...c, 
+              comments: [...(c.comments || []), newComment] 
+            } 
           : c
       ));
 
       // Save to Supabase
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('comments')
         .insert({
           creation_id: creationId,
           author: currentUser.name,
           content
-        });
+        })
+        .select()
+        .single();
 
       if (error) throw error;
+
+      // Replace temp comment with actual comment from DB
+      setCreations(prev => prev.map(c => 
+        c.id === creationId 
+          ? { 
+              ...c, 
+              comments: [
+                ...(c.comments?.filter(comment => comment.id !== tempCommentId) || []), 
+                data
+              ] 
+            } 
+          : c
+      ));
+
       return true;
     } catch (err) {
       // Rollback on error
       setCreations(prev => prev.map(c => 
         c.id === creationId 
-          ? { ...c, comments: c.comments?.slice(0, -1) } 
+          ? { 
+              ...c, 
+              comments: c.comments?.filter(comment => comment.id !== tempCommentId) || [] 
+            } 
           : c
       ));
       setError("Couldn't add comment. Try again!");
@@ -379,77 +349,78 @@ const CommunityPage = () => {
   }, []);
 
   // Enhanced Nimi AI chat
-  const handleNimiSend = useCallback(async (message: string) => {
-    if (!message.trim()) return;
-    
-    // Add user message
-    setNimiMessages(prev => [...prev, { sender: 'user', text: message }]);
+  const handleNimiSend = async (message: string) => {
     setIsNimiTyping(true);
-
+    setNimiMessages(prev => [...prev, { sender: 'user', text: message }]);
+    
     try {
-      // Clear input if ref exists
-      if (chatInputRef.current) {
-        chatInputRef.current.value = '';
+      // Add a temporary typing indicator
+      setNimiMessages(prev => [...prev, { sender: 'nimi', text: '' }]);
+      
+      const response = await fetch('/api/nimi', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [{ role: 'user', content: message }],
+          childName: currentUser.name,
+          language: "en"
+        })
+      });
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-
-      // Simulate typing delay
-      await new Promise(resolve => setTimeout(resolve, 800 + Math.random() * 700));
-
-      let responseText = "";
-      const lowerMessage = message.toLowerCase();
-
-      // Enhanced response logic
-      if (lowerMessage.includes('art') || lowerMessage.includes('draw') || lowerMessage.includes('paint') || lowerMessage.includes('create')) {
-        const responses = [
-          "That's beautiful! What inspired you to create this? 🎨",
-          "I love seeing your creativity! Tell me more about your artwork. ✏️",
-          "Art is such a wonderful way to express yourself! What colors did you use? 🌈",
-          "Wow! I'd love to hear the story behind this creation. 🖌️"
-        ];
-        responseText = responses[Math.floor(Math.random() * responses.length)];
-      } 
-      else if (lowerMessage.includes('how are you') || lowerMessage.includes("how's it going")) {
-        responseText = "I'm doing great! Excited to see what you'll create today. 😊";
+  
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+      let aiMessage = '';
+      
+      if (reader) {
+        // Remove the empty typing indicator
+        setNimiMessages(prev => prev.slice(0, -1));
+        
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          
+          const chunk = decoder.decode(value);
+          const lines = chunk.split('\n').filter(line => line.trim());
+          
+          for (const line of lines) {
+            if (line.startsWith('data:')) {
+              try {
+                const data = JSON.parse(line.substring(5));
+                if (data.error) {
+                  throw new Error(data.error);
+                }
+                if (data.content) {
+                  aiMessage += data.content;
+                  // Update the last message with new content
+                  setNimiMessages(prev => {
+                    const lastMessage = prev[prev.length - 1];
+                    if (lastMessage?.sender === 'nimi') {
+                      return [...prev.slice(0, -1), { sender: 'nimi', text: aiMessage }];
+                    }
+                    return [...prev, { sender: 'nimi', text: aiMessage }];
+                  });
+                }
+              } catch (err) {
+                console.error("Error parsing chunk:", err);
+              }
+            }
+          }
+        }
       }
-      else if (lowerMessage.includes('thank') || lowerMessage.includes('thanks')) {
-        responseText = "You're very welcome! 💕";
-      }
-      else if (lowerMessage.includes('hello') || lowerMessage.includes('hi') || lowerMessage.includes('hey')) {
-        responseText = "Hi there! 👋 What would you like to create today?";
-      }
-      else if (lowerMessage.includes('help') || lowerMessage.includes('support')) {
-        responseText = "I'm here to help! You can ask me about art, creativity, or just chat. What do you need? 🤗";
-      }
-      else if (lowerMessage.includes('love') || lowerMessage.includes('like')) {
-        responseText = "That's wonderful to hear! Creativity is all about expressing what you love. ❤️";
-      }
-      else if (lowerMessage.includes('color') || lowerMessage.includes('colour')) {
-        responseText = "Colors are amazing! My favorites are rainbow colors. What's your favorite color? 🌈";
-      }
-      else if (lowerMessage.includes('what') && lowerMessage.includes('do')) {
-        responseText = "I love helping kids with their creative projects! You can ask me about art, drawing, or anything creative. 🎨";
-      }
-      else {
-        // Default responses with more variety
-        const defaultResponses = [
-          "That's interesting! Tell me more about it. 😊",
-          "I'd love to hear more! Can you explain that in a different way?",
-          "Creative minds think alike! What else would you like to share? ✨",
-          "That's wonderful! How does that make you feel?",
-          "I'm learning so much from you! Can we talk more about that?"
-        ];
-        responseText = defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
-      }
-
-      setNimiMessages(prev => [...prev, { sender: 'nimi', text: responseText }]);
-    } catch (err) {
-      setError("Sorry, I couldn't process that. Please try again!");
-      setNimiMessages(prev => [...prev, { sender: 'nimi', text: "Oops! Something went wrong. Can you try saying that again?" }]);
+    } catch (error) {
+      console.error("Error:", error);
+      setNimiMessages(prev => [...prev, { 
+        sender: 'nimi', 
+        text: "Sorry, I'm having trouble thinking right now. Could you try again?" 
+      }]);
     } finally {
       setIsNimiTyping(false);
     }
-  }, []);
-
+  };
   // Clean up blob URLs
   useEffect(() => {
     return () => {
@@ -459,342 +430,18 @@ const CommunityPage = () => {
     };
   }, [uploadForm.previewUrl]);
 
-  // Creation Card Component
-  const CreationCard = React.memo(({ creation }: { creation: Creation }) => {
-    const [comment, setComment] = useState("");
-    const [showComments, setShowComments] = useState(false);
-    const [isLiking, setIsLiking] = useState(false);
-    const [isCommenting, setIsCommenting] = useState(false);
-
-    const handleLikeClick = async () => {
-      setIsLiking(true);
-      await handleLike(creation.id);
-      setIsLiking(false);
-    };
-
-    const handleCommentSubmit = async () => {
-      if (comment.trim()) {
-        setIsCommenting(true);
-        const success = await handleAddComment(creation.id, comment);
-        if (success) setComment("");
-        setIsCommenting(false);
-      }
-    };
-
-    return (
-      <Card className="overflow-hidden hover:shadow-lg transition-shadow relative">
-        {creation.completionStatus === 'completed' && (
-          <div className="absolute top-2 right-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full flex items-center z-10">
-            <Sparkles className="w-3 h-3 mr-1" />
-            Completed!
-          </div>
-        )}
-        
-        <div className="relative aspect-square">
-          <img 
-            src={creation.imageUrl} 
-            alt={`Art by ${creation.childName}`}
-            className="w-full h-full object-cover"
-            loading="lazy"
-          />
-        </div>
-        
-        <CardContent className="p-4">
-          <div className="flex justify-between items-center mb-2">
-            <h3 className="font-medium">{creation.childName} ({creation.age})</h3>
-            <div className="text-xs text-gray-500">
-              {new Date(creation.createdAt).toLocaleDateString()}
-            </div>
-          </div>
-          
-          {creation.description && (
-            <p className="text-sm text-gray-600 mb-3">{creation.description}</p>
-          )}
-          
-          <div className="flex justify-around border-t pt-3">
-            <Button 
-              variant="ghost" 
-              className="flex items-center gap-1" 
-              onClick={handleLikeClick}
-              disabled={isLiking}
-            >
-              {isLiking ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <Heart 
-                  className="w-5 h-5" 
-                  fill={creation.likedByUser ? "currentColor" : "none"} 
-                  color={creation.likedByUser ? "#ec4899" : "currentColor"}
-                />
-              )}
-              <span>{creation.likes}</span>
-            </Button>
-            
-            <Button 
-              variant="ghost" 
-              className="flex items-center gap-1" 
-              onClick={() => setShowComments(!showComments)}
-              disabled={isCommenting}
-            >
-              <MessageCircle className="w-5 h-5" />
-              <span>{creation.comments?.length || 0}</span>
-            </Button>
-            
-            <Button 
-              variant="ghost" 
-              onClick={() => shareCreation(creation)}
-            >
-              <Share2 className="w-5 h-5" />
-            </Button>
-          </div>
-
-          {showComments && (
-            <div className="mt-3 space-y-2">
-              {creation.comments?.map(comment => (
-                <div key={comment.id} className="flex gap-2">
-                  <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-xs">
-                    {comment.author[0]}
-                  </div>
-                  <div className="bg-gray-100 rounded-lg px-3 py-2 flex-1">
-                    <div className="font-medium text-xs">{comment.author}</div>
-                    <div className="text-sm">{comment.content}</div>
-                  </div>
-                </div>
-              ))}
-              
-              <div className="flex gap-2 mt-2">
-                <Input
-                  placeholder="Add a comment..."
-                  value={comment}
-                  onChange={(e) => setComment(e.target.value)}
-                  className="flex-1 text-sm"
-                  onKeyDown={(e) => e.key === 'Enter' && handleCommentSubmit()}
-                  disabled={isCommenting}
-                />
-                <Button 
-                  onClick={handleCommentSubmit}
-                  disabled={!comment.trim() || isCommenting}
-                  size="sm"
-                >
-                  {isCommenting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Post'}
-                </Button>
-              </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    );
-  });
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
-      {/* Celebration Animation */}
-      <AnimatePresence>
-        {showCelebration && (
-          <motion.div
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0, opacity: 0 }}
-            className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 pointer-events-none"
-          >
-            <motion.div 
-              className="bg-gradient-to-r from-yellow-400 to-pink-500 text-white text-2xl font-bold px-8 py-4 rounded-full shadow-2xl"
-              animate={{ 
-                scale: [1, 1.1, 1],
-                rotate: [-5, 5, -5, 5, 0],
-              }}
-              transition={{ 
-                duration: 1.5,
-                ease: "easeInOut",
-                repeat: Infinity,
-                repeatType: "reverse"
-              }}
-            >
-              {celebrationText} 🎉
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <CelebrationBanner isVisible={showCelebration} text={celebrationText} />
+      <ErrorToast error={error} onDismiss={() => setError(null)} />
 
-      {/* Error Notification */}
-      {error && (
-        <motion.div
-          initial={{ y: -50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: -50, opacity: 0 }}
-          className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-4 py-2 rounded shadow-lg z-50 flex items-center"
-        >
-          {error}
-          <button 
-            onClick={() => setError(null)}
-            className="ml-3 p-1 rounded-full hover:bg-red-600"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </motion.div>
-      )}
-
-      {/* Upload Modal */}
-      <AnimatePresence>
-        {showUploadModal && (
-          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white rounded-xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto"
-            >
-              <div className="p-6">
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-xl font-bold">Share Your Creation</h3>
-                  <button 
-                    onClick={() => !uploadForm.isUploading && setShowUploadModal(false)}
-                    className="p-1 rounded-full hover:bg-gray-100"
-                    disabled={uploadForm.isUploading}
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                </div>
-
-                <form onSubmit={handleUploadSubmit}>
-                  <div className="space-y-4">
-                    <div>
-                      <Label htmlFor="childName">Child's Name *</Label>
-                      <Input
-                        id="childName"
-                        value={uploadForm.childName}
-                        onChange={(e) => setUploadForm(prev => ({...prev, childName: e.target.value}))}
-                        required
-                        minLength={2}
-                        disabled={uploadForm.isUploading}
-                      />
-                    </div>
-
-                    <div>
-                      <Label htmlFor="age">Age *</Label>
-                      <Input
-                        id="age"
-                        type="number"
-                        min="1"
-                        max="18"
-                        value={uploadForm.age}
-                        onChange={(e) => setUploadForm(prev => ({...prev, age: e.target.value}))}
-                        required
-                        disabled={uploadForm.isUploading}
-                      />
-                    </div>
-
-                    <div>
-                      <Label htmlFor="description">Description (Optional)</Label>
-                      <Input
-                        id="description"
-                        value={uploadForm.description}
-                        onChange={(e) => setUploadForm(prev => ({...prev, description: e.target.value}))}
-                        maxLength={200}
-                        disabled={uploadForm.isUploading}
-                      />
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <Label>Visibility</Label>
-                        <p className="text-xs text-gray-500">
-                          {uploadForm.isPublic 
-                            ? "Public (visible to everyone)" 
-                            : "Private (share only via WhatsApp)"}
-                        </p>
-                      </div>
-                      <Switch
-                        checked={uploadForm.isPublic}
-                        onCheckedChange={(checked) => setUploadForm(prev => ({...prev, isPublic: checked}))}
-                        disabled={uploadForm.isUploading}
-                      />
-                    </div>
-
-                    <div>
-                      <Label>Upload Image *</Label>
-                      <div 
-                        {...getRootProps()} 
-                        className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
-                          isDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'
-                        } ${uploadForm.isUploading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                      >
-                        <input {...getInputProps()} disabled={uploadForm.isUploading} />
-                        {uploadForm.previewUrl ? (
-                          <div className="relative">
-                            <img 
-                              src={uploadForm.previewUrl} 
-                              alt="Preview" 
-                              className="mx-auto max-h-48 rounded-md mb-2"
-                              loading="lazy"
-                            />
-                            {!uploadForm.isUploading && (
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setUploadForm(prev => ({...prev, imageFile: null, previewUrl: ""}));
-                                }}
-                                className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-md hover:bg-gray-100"
-                              >
-                                <X className="w-4 h-4" />
-                              </button>
-                            )}
-                          </div>
-                        ) : (
-                          <>
-                            <Camera className="w-10 h-10 mx-auto text-gray-400 mb-2" />
-                            <p className="text-sm text-gray-600">
-                              {isDragActive ? 'Drop the image here' : 'Drag & drop an image, or click to select'}
-                            </p>
-                            <p className="text-xs text-gray-500 mt-1">Supports JPG, PNG (max 5MB)</p>
-                          </>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Upload progress */}
-                    {uploadForm.isUploading && (
-                      <div className="pt-2">
-                        <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
-                          <motion.div
-                            className="h-full bg-blue-500"
-                            initial={{ width: '0%' }}
-                            animate={{ width: `${uploadForm.uploadProgress}%` }}
-                            transition={{ duration: 0.3 }}
-                          />
-                        </div>
-                        <p className="text-xs text-center text-gray-600 mt-1">
-                          Uploading... {uploadForm.uploadProgress}%
-                        </p>
-                      </div>
-                    )}
-
-                    <div className="pt-2">
-                      <Button 
-                        type="submit" 
-                        className="w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white"
-                        disabled={!uploadForm.imageFile || !uploadForm.childName || !uploadForm.age || uploadForm.isUploading}
-                      >
-                        {uploadForm.isUploading ? (
-                          <>
-                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                            Uploading...
-                          </>
-                        ) : uploadForm.isPublic ? (
-                          'Share Publicly'
-                        ) : (
-                          'Share Privately via WhatsApp'
-                        )}
-                      </Button>
-                    </div>
-                  </div>
-                </form>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
+      <UploadModal
+        isOpen={showUploadModal}
+        onClose={() => !uploadForm.isUploading && setShowUploadModal(false)}
+        onSubmit={handleUploadSubmit}
+        formState={uploadForm}
+        setFormState={setUploadForm}
+      />
 
       <Header />
 
@@ -838,20 +485,9 @@ const CommunityPage = () => {
             </CardHeader>
             <CardContent>
               <div className="flex flex-col items-center">
-                <motion.div 
-                  className="text-8xl mb-4"
-                  animate={{ 
-                    scale: [1, 1.1, 1],
-                    rotate: [0, 10, -10, 0],
-                  }}
-                  transition={{ 
-                    duration: 2,
-                    repeat: Infinity,
-                    repeatType: "reverse"
-                  }}
-                >
+                <div className="text-8xl mb-4 animate-bounce">
                   {pikopals[0].avatar}
-                </motion.div>
+                </div>
                 <h3 className="text-2xl font-bold text-gray-800 mb-2">{pikopals[0].name}</h3>
                 <p className="text-center text-gray-700 mb-4">
                   Our featured creator this week! Say hello to {pikopals[0].name}! 👋
@@ -893,103 +529,43 @@ const CommunityPage = () => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {creations.map(creation => (
-                <CreationCard key={`creation-${creation.id}`} creation={creation} />
+                <CreationCard 
+                  key={`creation-${creation.id}`} 
+                  creation={creation}
+                  onLike={handleLike}
+                  onAddComment={handleAddComment}
+                  onShare={shareCreation}
+                  currentUser={currentUser}
+                />
               ))}
             </div>
           )}
         </div>
 
         {/* Nimi Chat */}
-        <Card className="mb-8 bg-gradient-to-br from-indigo-50 to-purple-50 border border-purple-100 shadow-xl">
-          <CardHeader>
-            <CardTitle className="flex items-center text-2xl">
-              <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center mr-3 shadow-sm border border-purple-200">
-                <span className="text-2xl">🤖</span>
-              </div>
-              <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                Chat with Nimi
-              </span>
-            </CardTitle>
-          </CardHeader>
-          
-          <CardContent>
-            <div className="h-64 p-4 bg-white rounded-lg border border-gray-200 overflow-y-auto mb-4 shadow-inner">
-              {nimiMessages.map((msg, i) => (
-                <div key={`message-${i}`} className={`mb-3 flex ${msg.sender === 'nimi' ? 'justify-start' : 'justify-end'}`}>
-                  <div className="flex items-start max-w-xs md:max-w-md">
-                    {msg.sender === 'nimi' && (
-                      <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center mr-2 mt-1 flex-shrink-0 border border-purple-200">
-                        <span className="text-lg">🤖</span>
-                      </div>
-                    )}
-                    <div className={`rounded-2xl px-4 py-2 ${msg.sender === 'nimi' 
-                      ? 'bg-purple-100 text-gray-800 rounded-tl-none border border-purple-200' 
-                      : 'bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-tr-none'}`}
-                    >
-                      <div className="whitespace-pre-wrap text-sm md:text-base">{msg.text}</div>
-                    </div>
-                    {msg.sender === 'user' && (
-                      <div className="w-8 h-8 bg-pink-100 rounded-full flex items-center justify-center ml-2 mt-1 flex-shrink-0 border border-pink-200">
-                        <span className="text-lg">{currentUser.avatar}</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
-              
-              {isNimiTyping && (
-                <div className="flex justify-start">
-                  <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center mr-2 mt-1 flex-shrink-0 border border-purple-200">
-                    <span className="text-lg">🤖</span>
-                  </div>
-                  <div className="bg-purple-100 rounded-2xl px-4 py-2 rounded-tl-none border border-purple-200">
-                    <div className="flex space-x-1">
-                      <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                      <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                      <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-                    </div>
-                  </div>
-                </div>
-              )}
-              <div ref={chatEndRef} />
+      <Card className="mb-8 bg-gradient-to-br from-indigo-50 to-purple-50 border border-purple-100 shadow-xl">
+        <CardHeader>
+          <CardTitle className="flex items-center text-2xl">
+            <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center mr-3 shadow-sm border border-purple-200">
+              <span className="text-2xl">🤖</span>
             </div>
-            
-            <div className="flex flex-col gap-3">
-              <div className="flex gap-2">
-                <input
-                  ref={chatInputRef}
-                  type="text"
-                  placeholder="Chat with Nimi about anything..."
-                  className="flex-1 border border-gray-300 rounded-full py-2 px-4 focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm md:text-base"
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && e.currentTarget.value.trim()) {
-                      handleNimiSend(e.currentTarget.value.trim());
-                    }
-                  }}
-                  disabled={isNimiTyping}
-                />
-                <button
-                  onClick={(e) => {
-                    const input = chatInputRef.current;
-                    if (input && input.value.trim()) {
-                      handleNimiSend(input.value.trim());
-                    }
-                  }}
-                  disabled={isNimiTyping}
-                  className={`p-2 rounded-full ${isNimiTyping 
-                    ? 'bg-gray-200 text-gray-400' 
-                    : 'bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:opacity-90'}`}
-                >
-                  <Send className="w-5 h-5" />
-                </button>
-              </div>
-              <p className="text-xs text-center text-gray-500">
-                Nimi loves talking about art, creativity, and your creations!
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-            
+            <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              Chat with Nimi
+            </span>
+          </CardTitle>
+        </CardHeader>
+        
+        <CardContent>
+          <NimiChat 
+            messages={nimiMessages}
+            isTyping={isNimiTyping}
+            onSend={handleNimiSend}
+            currentUser={currentUser}
+            voiceEnabled={true}
+          />
+        </CardContent>
+      </Card>
+  
         {/* Coming Soon */}
         <Card className="bg-gradient-to-r from-green-100 to-emerald-100 border-none shadow-xl">
           <CardContent className="p-8 text-center">
