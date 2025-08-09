@@ -37,3 +37,4 @@ Thumbs.db
 core_dump.bin
 *.env
 replacements.txt
+.env.local
