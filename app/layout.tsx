@@ -1,5 +1,5 @@
 import "./globals.css";
-import { LanguageProvider } from "@/contexts/LanguageContext";
+import { LanguageProvider}  from "@/contexts/LanguageContext";
 import { NimiReaderProvider } from "@/contexts/NimiReaderContext";
 import { UserProvider } from "@/contexts/UserContext"; // import your UserProvider
 import NimiReaderButton from "@/components/NimiReaderButton";

@@ -13,8 +13,128 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { speak, loadVoices } from "@/lib/speak";
 import { Play, Star, Gift } from "lucide-react";
 
+// Translation dictionary for all supported languages
+const translations = {
+  en: {
+    goodMorning: "Good morning",
+    hello: "Hello",
+    goodEvening: "Good evening",
+    friend: "friend",
+    letsPlay: "Let's play!",
+    funTogether: "Let's have fun together!",
+    greatJob: "You're doing great!",
+    daysInRow: "days in a row!",
+    keepGoing: "Keep going!",
+    youreAwesome: "You're awesome!",
+    todaysActivity: "Today's Fun!",
+    loading: "Loading...",
+    startPlaying: "Start Playing!",
+    yourStars: "Your Stars",
+    youHave: "You have",
+    stars: "stars",
+    playToEarn: "Play to earn stars!",
+    surprise: "Surprise!",
+    unlockedReward: "You unlocked a reward!",
+    seeReward: "See Reward",
+    dayStreak: "day streak"
+  },
+  es: {
+    goodMorning: "Buenos días",
+    hello: "Hola",
+    goodEvening: "Buenas noches",
+    friend: "amigo",
+    letsPlay: "¡Vamos a jugar!",
+    funTogether: "¡Vamos a divertirnos juntos!",
+    greatJob: "¡Lo estás haciendo genial!",
+    daysInRow: "días seguidos!",
+    keepGoing: "¡Continúa así!",
+    youreAwesome: "¡Eres increíble!",
+    todaysActivity: "¡Diversión de hoy!",
+    loading: "Cargando...",
+    startPlaying: "¡Empezar a jugar!",
+    yourStars: "Tus estrellas",
+    youHave: "Tienes",
+    stars: "estrellas",
+    playToEarn: "¡Juega para ganar estrellas!",
+    surprise: "¡Sorpresa!",
+    unlockedReward: "¡Desbloqueaste una recompensa!",
+    seeReward: "Ver recompensa",
+    dayStreak: "racha de días"
+  },
+  fr: {
+    goodMorning: "Bonjour",
+    hello: "Salut",
+    goodEvening: "Bonsoir",
+    friend: "ami",
+    letsPlay: "Jouons!",
+    funTogether: "Amusons-nous ensemble!",
+    greatJob: "Tu fais du bon travail!",
+    daysInRow: "jours d'affilée!",
+    keepGoing: "Continue comme ça!",
+    youreAwesome: "Tu es génial!",
+    todaysActivity: "Activité du jour",
+    loading: "Chargement...",
+    startPlaying: "Commencer à jouer!",
+    yourStars: "Tes étoiles",
+    youHave: "Tu as",
+    stars: "étoiles",
+    playToEarn: "Joue pour gagner des étoiles!",
+    surprise: "Surprise!",
+    unlockedReward: "Vous avez débloqué une récompense!",
+    seeReward: "Voir la récompense",
+    dayStreak: "série de jours"
+  },
+  rw: {
+    goodMorning: "Mwaramutse",
+    hello: "Muraho",
+    goodEvening: "Mwiriwe",
+    friend: "inshuti",
+    letsPlay: "Reka duseke!",
+    funTogether: "Reka duhagarare!",
+    greatJob: "Urakora neza!",
+    daysInRow: "iminsi ikurikira!",
+    keepGoing: "Komeza!",
+    youreAwesome: "Uri umuntu mwiza!",
+    todaysActivity: "Umusaruro wa none!",
+    loading: "Kuringaniza...",
+    startPlaying: "Tangira Guseka!",
+    yourStars: "Inyenyeri zawe",
+    youHave: "Ufite",
+    stars: "inyenyeri",
+    playToEarn: "Seka kugira ngo ubone inyenyeri!",
+    surprise: "Gutangaza!",
+    unlockedReward: "Wasohoye igihembo!",
+    seeReward: "Reba igihembo",
+    dayStreak: "iminsi ikurikira"
+  },
+  sw: {
+    goodMorning: "Habari za asubuhi",
+    hello: "Hujambo",
+    goodEvening: "Habari za jioni",
+    friend: "rafiki",
+    letsPlay: "Tucheze!",
+    funTogether: "Tufurahie pamoja!",
+    greatJob: "Unafanya vizuri!",
+    daysInRow: "siku mfululizo!",
+    keepGoing: "Endelea!",
+    youreAwesome: "Wewe ni mzuri!",
+    todaysActivity: "Burudani ya leo!",
+    loading: "Inapakia...",
+    startPlaying: "Anza Kucheza!",
+    yourStars: "Nyota zako",
+    youHave: "Una",
+    stars: "nyota",
+    playToEarn: "Cheza kupata nyota!",
+    surprise: "Mshangao!",
+    unlockedReward: "Umefungua tuzo!",
+    seeReward: "Ona tuzo",
+    dayStreak: "mfululizo wa siku"
+  }
+};
+
 export default function HomePage() {
-  const { t, language } = useLanguage();
+  const { language } = useLanguage();
+  const t = (key: string) => translations[language][key] || translations.en[key] || key;
   const router = useRouter();
 
   const [childName, setChildName] = useState<string | null>(null);
@@ -31,6 +151,12 @@ export default function HomePage() {
     fetchUserData();
     fetchTodaysMission();
   }, []);
+
+  useEffect(() => {
+    if (childName) {
+      speak(getGreeting(childName), language);
+    }
+  }, [language, childName]);
 
   const fetchUserData = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -62,14 +188,14 @@ export default function HomePage() {
 
   const getGreeting = (name: string | null) => {
     const hour = new Date().getHours();
-    if (hour < 12) return `${t('goodMorning') || "Good morning"}, ${name || "friend"}!`;
-    if (hour < 18) return `${t('hello') || "Hello"}, ${name || "friend"}!`;
-    return `${t('goodEvening') || "Good evening"}, ${name || "friend"}!`;
+    if (hour < 12) return `${t('goodMorning')}, ${name || t('friend')}!`;
+    if (hour < 18) return `${t('hello')}, ${name || t('friend')}!`;
+    return `${t('goodEvening')}, ${name || t('friend')}!`;
   };
 
   const handleMissionStart = async () => {
     setShowCelebration(true);
-    speak(t('letsPlay') || "Let's play!", language);
+    speak(t('letsPlay'), language);
 
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
@@ -84,16 +210,15 @@ export default function HomePage() {
     }
 
     setTimeout(() => setShowCelebration(false), 3000);
-
     router.push("/missions");
   };
 
   const handleNimiClick = () => {
     const messages = [
-      t('funTogether') || "Let's have fun together!",
-      t('greatJob') || "You're doing great!",
-      streak > 3 ? `${streak} ${t('daysInRow') || "days in a row!"} 🌟` : t('keepGoing') || "Keep going!",
-      t('youreAwesome') || "You're awesome!"
+      t('funTogether'),
+      t('greatJob'),
+      streak > 3 ? `${streak} ${t('daysInRow')} 🌟` : t('keepGoing'),
+      t('youreAwesome')
     ];
     const randomMessage = messages[Math.floor(Math.random() * messages.length)];
     speak(randomMessage, language);
@@ -133,11 +258,11 @@ export default function HomePage() {
           </div>
 
           <h1 className="text-3xl font-bold text-purple-600 mb-2">
-            👋 {childName || t('friend') || "Friend"}!
+            👋 {childName || t('friend')}!
           </h1>
           {streak > 0 && (
             <p className="text-lg text-pink-500">
-              {streak} {t('dayStreak') || "day streak"}! 🌟
+              {streak} {t('dayStreak')}! 🌟
             </p>
           )}
         </div>
@@ -149,10 +274,10 @@ export default function HomePage() {
               <Star className="w-10 h-10 text-white" />
             </div>
             <h2 className="text-2xl font-bold text-gray-800 mb-2">
-              {t('todaysActivity') || "Today's Fun!"}
+              {t('todaysActivity')}
             </h2>
             <h3 className="text-xl font-bold text-purple-600 mb-6">
-              {todaysMission?.title || t('loading') || "Loading..."}
+              {todaysMission?.title || t('loading')}
             </h3>
             <Button
               onClick={handleMissionStart}
@@ -160,7 +285,7 @@ export default function HomePage() {
               size="lg"
             >
               <Play className="w-8 h-8 mr-3" /> 
-              {t('startPlaying') || "Start Playing!"}
+              {t('startPlaying')}
             </Button>
           </CardContent>
         </Card>
@@ -169,7 +294,7 @@ export default function HomePage() {
         <Card className="bg-white border-none shadow-md mb-8">
           <CardContent className="p-6">
             <h3 className="text-xl font-bold text-center mb-4">
-              {t('yourStars') || "Your Stars"} ⭐
+              {t('yourStars')} ⭐
             </h3>
             <div className="flex justify-center space-x-4 mb-4">
               {[1, 2, 3, 4, 5].map((star) => (
@@ -187,8 +312,8 @@ export default function HomePage() {
             </div>
             <p className="text-lg text-center text-gray-600">
               {starsEarned > 0 
-                ? `${t('youHave') || "You have"} ${starsEarned} ${t('stars') || "stars"}!`
-                : t('playToEarn') || "Play to earn stars!"}
+                ? `${t('youHave')} ${starsEarned} ${t('stars')}!`
+                : t('playToEarn')}
             </p>
           </CardContent>
         </Card>
@@ -201,17 +326,17 @@ export default function HomePage() {
                 <Gift className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-xl font-bold text-orange-600 mb-2">
-                {t('surprise') || "Surprise!"} 🎁
+                {t('surprise')} 🎁
               </h3>
               <p className="text-gray-700 mb-4">
-                {t('unlockedReward') || "You unlocked a reward!"}
+                {t('unlockedReward')}
               </p>
               <Link href="/rewards">
                 <Button 
                   variant="outline" 
                   className="border-orange-300 text-orange-600 hover:bg-orange-50"
                 >
-                  {t('seeReward') || "See Reward"}
+                  {t('seeReward')}
                 </Button>
               </Link>
             </CardContent>
