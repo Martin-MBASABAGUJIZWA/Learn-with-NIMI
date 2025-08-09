@@ -253,7 +253,6 @@ const RealBookViewer = ({
   const totalSpreads = Math.ceil(processedPages.length / 2);
 
   useEffect(() => {
-    useEffect(() => {
     const processImages = async () => {
       const processed = await Promise.all(
         pages.map(async (page) => {
@@ -266,15 +265,13 @@ const RealBookViewer = ({
             return { ...page, image_url: publicUrl };
           }
           return page;
-        }) // <-- close the map here
+        })
       );
       setProcessedPages(processed);
       setIsLoading(false);
     };
     processImages();
   }, [pages]);
-
-
   const turnProgress = useMotionValue(0);
   const leftPageRotation = useTransform(turnProgress, [0, 1], [0, -180]);
   const rightPageRotation = useTransform(turnProgress, [0, 1], [0, 180]);
@@ -411,7 +408,7 @@ const RealBookViewer = ({
         </Button>
       </div>
     </div>
-  );
+  )
 };
 
 // Realistic Book Card Component with translations

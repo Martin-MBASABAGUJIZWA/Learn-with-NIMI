@@ -1,6 +1,5 @@
-"use client"
 
-import type React from "react"
+"use client"
 
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -9,8 +8,9 @@ import { Check, Gem, Shield, Sparkles, Trophy } from "lucide-react"
 import Header from "@/components/Header"
 import BottomNavigation from "@/components/BottomNavigation"
 import { useLanguage } from "@/contexts/LanguageContext";
-`import { useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { useToast } from "@/hooks/use-toast"
+import { t } from "@/lib/translations" // Import your actual translation function
 
 export default function SubscriptionPage() {
   const { language } = useLanguage()
@@ -24,7 +24,10 @@ export default function SubscriptionPage() {
   const startTrial = () => {
     localStorage.setItem("subscriptionStatus", "subscribed")
     setIsSubscribed(true)
-    toast({ title: t(language, "subscribed"), description: t(language, "premiumBenefits") })
+    toast({ 
+      title: t(language, "subscribed"), 
+      description: t(language, "premiumBenefits") 
+    })
   }
 
   const plans = [
@@ -142,3 +145,4 @@ function BenefitTile({ icon, title, desc }: { icon: React.ReactNode; title: stri
     </Card>
   )
 }
+
