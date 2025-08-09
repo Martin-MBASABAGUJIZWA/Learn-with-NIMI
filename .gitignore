@@ -34,3 +34,6 @@ Thumbs.db
 
 # Render build cache (if any)
 .cache/
+core_dump.bin
+*.env
+replacements.txt
