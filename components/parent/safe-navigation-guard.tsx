@@ -8,7 +8,7 @@ import { useLanguage} from "@/contexts/LanguageContext";
 // Whitelist entries are hostnames like "example.com".
 export function SafeNavigationGuard({ enabled, whitelist }: { enabled: boolean; whitelist: string[] }) {
   const { toast } = useToast()
-  const { language } = useLanguage()
+  const { language, t } = useLanguage()
 
   useEffect(() => {
     if (!enabled) return
@@ -35,13 +35,13 @@ export function SafeNavigationGuard({ enabled, whitelist }: { enabled: boolean; 
         if (!allowed.includes(host)) {
           e.preventDefault()
           e.stopPropagation()
-          toast({ title: "Kid-Safe", description: t(language, "blockedExternal"), variant: "destructive" })
+          toast({ title: "Kid-Safe", description: t("blockedExternal"), variant: "destructive" })
         }
       } catch {
         // if URL parse fails, block
         e.preventDefault()
         e.stopPropagation()
-        toast({ title: "Kid-Safe", description: t(language, "blockedExternal"), variant: "destructive" })
+        toast({ title: "Kid-Safe", description: t("blockedExternal"), variant: "destructive" })
       }
     }
 

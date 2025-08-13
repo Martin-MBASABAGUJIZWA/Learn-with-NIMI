@@ -34,71 +34,75 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<ProfileType | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
-
   useEffect(() => {
     const fetchProfile = async (userId: string) => {
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
-        .eq("id", userId)
-        .single();
-
+        .eq("id", userId);
+  
       if (error) {
         console.error("Failed to fetch profile:", error.message);
         setProfile(null);
+      } else if (data && data.length === 1) {
+        setProfile(data[0]);
+      } else if (data && data.length > 1) {
+        console.warn("Multiple profiles found, using the first one.");
+        setProfile(data[0]);
       } else {
-        setProfile(data);
+        setProfile(null);
       }
     };
-
-  const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
-  const currentUser = session?.user ?? null;
-
-  setUser(currentUser);
-
-  if (currentUser) {
-    await fetchProfile(currentUser.id);
-
-    if (event === "SIGNED_IN") {
-      // Sync guest progress to Supabase after login
-      await syncGuestProgressToSupabase(currentUser.id);
-    }
-  } else {
-    setProfile(null);
-  }
-
-  if (event === "SIGNED_OUT") {
-    router.push("/login");
-  }
-
-  setLoading(false);
-});
-
-
+  
+    // Listen for auth state changes
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        const currentUser = session?.user ?? null;
+        setUser(currentUser);
+  
+        if (currentUser) {
+          await fetchProfile(currentUser.id);
+          if (event === "SIGNED_IN") {
+            await syncGuestProgressToSupabase(currentUser.id);
+          }
+        } else {
+          setProfile(null);
+        }
+  
+        if (event === "SIGNED_OUT") {
+          router.push("/login");
+        }
+  
+        setLoading(false);
+      }
+    );
+  
+    // Initial fetch
     const getSessionAndProfile = async () => {
       setLoading(true);
       const {
         data: { session },
       } = await supabase.auth.getSession();
-
+  
       const currentUser = session?.user ?? null;
       setUser(currentUser);
-
+  
       if (currentUser) {
         await fetchProfile(currentUser.id);
       } else {
         setProfile(null);
       }
-
+  
       setLoading(false);
     };
-
+  
     getSessionAndProfile();
-
+  
     return () => {
       authListener.subscription.unsubscribe();
     };
   }, [router]);
+  
 
   const updateUser = (newUser: UserType | null) => {
     setUser(newUser);

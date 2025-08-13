@@ -29,13 +29,13 @@ export function StickerPreviewCard({
   return (
     <Card className="bg-white border-2 border-violet-200">
       <CardHeader>
-        <CardTitle className="text-violet-700">{t(language, "stickerPreviewTitle")}</CardTitle>
+        <CardTitle className="text-violet-700">{t("stickerPreviewTitle")}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
         {url ? (
           <img
             src={url || "/placeholder.svg?height=400&width=400&query=sticker%20preview"}
-            alt={`${child.name} ${t(language, "stickerPreviewAlt")}`}
+            alt={`${child.name} ${t("stickerPreviewAlt")}`}
             className="w-full rounded-md border"
           />
         ) : null}

@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogT
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
-import { useLanguage } from "@/contexts/LanguageContext";
+import { useLanguage } from "@/contexts/LanguageContext"
 import { useToast } from "@/hooks/use-toast"
 
 type ParentProfile = {
@@ -23,10 +23,10 @@ const STORAGE_KEY = "parentProfileV2"
 const AUTH_KEY = "parentAuth"
 const SUB_KEY = "subscriptionStatus"
 
+export function ParentProfileMenu() {
+  const { t } = useLanguage()
+  const { toast } = useToast()
 
-  export function ParentProfileMenu() {
-  const { language, t } = useLanguage()
-    const { toast } = useToast()
   const [open, setOpen] = useState(false)
   const [profile, setProfile] = useState<ParentProfile>({
     name: "Parent",
@@ -57,37 +57,37 @@ const SUB_KEY = "subscriptionStatus"
   const saveProfile = () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(profile))
     setOpen(false)
-    toast({ title: t(language, "saved"), description: t(language, "profileSaved") })
+    toast({ title: t("saved"), description: t("profileSaved") })
   }
 
   const login = () => {
-    // Simulated login
     if (loginEmail.trim()) {
       localStorage.setItem(AUTH_KEY, "logged-in")
       setLoggedIn(true)
       setShowLogin(false)
-      toast({ title: t(language, "loggedIn"), description: loginEmail })
+      toast({ title: t("loggedIn"), description: loginEmail })
     } else {
-      toast({ title: t(language, "loginError"), description: t(language, "enterEmail"), variant: "destructive" })
+      toast({ title: t("loginError"), description: t("enterEmail"), variant: "destructive" })
     }
   }
+
   const logout = () => {
     localStorage.setItem(AUTH_KEY, "logged-out")
     setLoggedIn(false)
-    toast({ title: t(language, "loggedOut") })
+    toast({ title: t("loggedOut") })
   }
 
   const requestNotificationPermission = async () => {
     if (typeof window === "undefined" || !("Notification" in window)) return
     if (Notification.permission === "granted") {
-      toast({ title: t(language, "notificationsEnabled") })
+      toast({ title: t("notificationsEnabled") })
       return
     }
     const res = await Notification.requestPermission()
     if (res === "granted") {
-      toast({ title: t(language, "notificationsEnabled") })
+      toast({ title: t("notificationsEnabled") })
     } else {
-      toast({ title: t(language, "notificationsDenied"), variant: "destructive" })
+      toast({ title: t("notificationsDenied"), variant: "destructive" })
     }
   }
 
@@ -98,6 +98,7 @@ const SUB_KEY = "subscriptionStatus"
     if (profile.reminderTimes.includes(newTime)) return
     setProfile((p) => ({ ...p, reminderTimes: [...p.reminderTimes, newTime] }))
   }
+
   const removeReminderTime = (tStr: string) => {
     setProfile((p) => ({ ...p, reminderTimes: p.reminderTimes.filter((x) => x !== tStr) }))
   }
@@ -116,33 +117,33 @@ const SUB_KEY = "subscriptionStatus"
       </DialogTrigger>
       <DialogContent className="sm:max-w-[520px]">
         <DialogHeader>
-          <DialogTitle>{t(language, "parentProfileTitle")}</DialogTitle>
+          <DialogTitle>{t("parentProfileTitle")}</DialogTitle>
         </DialogHeader>
 
         {/* Auth status and actions */}
         <div className="rounded-md border p-3 bg-muted/30 space-y-2">
           <div className="text-sm">
-            {t(language, "authStatus")}:{" "}
+            {t("authStatus")}:{" "}
             <span className={loggedIn ? "text-green-700 font-medium" : "text-amber-700 font-medium"}>
-              {loggedIn ? t(language, "loggedIn") : t(language, "loggedOut")}
+              {loggedIn ? t("loggedIn") : t("loggedOut")}
             </span>
           </div>
           <div className="flex gap-2">
             {!loggedIn ? (
               <>
                 <Button variant="outline" onClick={() => setShowLogin((v) => !v)}>
-                  {t(language, "authLogin")}
+                  {t("authLogin")}
                 </Button>
               </>
             ) : (
               <Button variant="outline" onClick={logout}>
-                {t(language, "authLogout")}
+                {t("authLogout")}
               </Button>
             )}
             <span className="text-xs text-muted-foreground self-center">
-              {t(language, "subscriptionStatus")}:{" "}
+              {t("subscriptionStatus")}:{" "}
               <b className={isSubscribed ? "text-purple-700" : ""}>
-                {isSubscribed ? t(language, "subscribed") : t(language, "notSubscribed")}
+                {isSubscribed ? t("subscribed") : t("notSubscribed")}
               </b>
             </span>
           </div>
@@ -151,12 +152,12 @@ const SUB_KEY = "subscriptionStatus"
               <Input placeholder="you@example.com" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} />
               <Input
                 type="password"
-                placeholder="••••••••"
+                placeholder="password"
                 value={loginPassword}
                 onChange={(e) => setLoginPassword(e.target.value)}
               />
               <div className="sm:col-span-2">
-                <Button onClick={login}>{t(language, "authLogin")}</Button>
+                <Button onClick={login}>{t("authLogin")}</Button>
               </div>
             </div>
           )}
@@ -165,7 +166,7 @@ const SUB_KEY = "subscriptionStatus"
         {/* Profile */}
         <div className="grid gap-4 py-2">
           <div className="grid gap-2">
-            <Label htmlFor="pp-name">{t(language, "parentName")}</Label>
+            <Label htmlFor="pp-name">{t("parentName")}</Label>
             <Input
               id="pp-name"
               value={profile.name}
@@ -173,7 +174,7 @@ const SUB_KEY = "subscriptionStatus"
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="pp-email">{t(language, "parentEmail")}</Label>
+            <Label htmlFor="pp-email">{t("parentEmail")}</Label>
             <Input
               id="pp-email"
               type="email"
@@ -184,8 +185,8 @@ const SUB_KEY = "subscriptionStatus"
           </div>
           <div className="flex items-center justify-between">
             <div>
-              <div className="font-medium">{t(language, "notifyEmail")}</div>
-              <p className="text-xs text-muted-foreground">{t(language, "notifyEmailHint")}</p>
+              <div className="font-medium">{t("notifyEmail")}</div>
+              <p className="text-xs text-muted-foreground">{t("notifyEmailHint")}</p>
             </div>
             <Switch
               checked={profile.notifyEmail}
@@ -194,8 +195,8 @@ const SUB_KEY = "subscriptionStatus"
           </div>
           <div className="flex items-center justify-between">
             <div>
-              <div className="font-medium">{t(language, "marketingOptIn")}</div>
-              <p className="text-xs text-muted-foreground">{t(language, "marketingOptInHint")}</p>
+              <div className="font-medium">{t("marketingOptIn")}</div>
+              <p className="text-xs text-muted-foreground">{t("marketingOptInHint")}</p>
             </div>
             <Switch
               checked={profile.marketingOptIn}
@@ -207,7 +208,7 @@ const SUB_KEY = "subscriptionStatus"
         {/* Notifications / Reminders */}
         <div className="rounded-md border p-3 bg-muted/30 space-y-3">
           <div className="flex items-center justify-between">
-            <div className="font-medium">{t(language, "remindersTitle")}</div>
+            <div className="font-medium">{t("remindersTitle")}</div>
             <Switch
               checked={profile.remindersEnabled}
               onCheckedChange={(v) => setProfile((p) => ({ ...p, remindersEnabled: v }))}
@@ -221,7 +222,7 @@ const SUB_KEY = "subscriptionStatus"
               >
                 {time}
                 <button onClick={() => removeReminderTime(time)} className="text-red-600 hover:underline">
-                  {t(language, "remove")}
+                  {t("remove")}
                 </button>
               </span>
             ))}
@@ -229,17 +230,17 @@ const SUB_KEY = "subscriptionStatus"
           <div className="flex items-center gap-2">
             <Input type="time" value={newTime} onChange={(e) => setNewTime(e.target.value)} className="max-w-[160px]" />
             <Button variant="outline" onClick={addReminderTime}>
-              {t(language, "addReminder")}
+              {t("addReminder")}
             </Button>
             <Button variant="outline" onClick={requestNotificationPermission}>
-              {t(language, "grantPermission")}
+              {t("grantPermission")}
             </Button>
           </div>
-          <p className="text-xs text-muted-foreground">{t(language, "remindersHint")}</p>
+          <p className="text-xs text-muted-foreground">{t("remindersHint")}</p>
         </div>
 
         <DialogFooter>
-          <Button onClick={saveProfile}>{t(language, "save")}</Button>
+          <Button onClick={saveProfile}>{t("save")}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

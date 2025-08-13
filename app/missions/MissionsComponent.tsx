@@ -1,7 +1,8 @@
+
 'use client';
 
 import React, { useEffect, useState, useMemo, useRef } from "react";
-import { motion, AnimatePresence, useMotionValue, useTransform } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import supabase from "@/lib/supabaseClient";
 import { Howl } from "howler";
 import { Button } from "@/components/ui/button";
@@ -10,6 +11,7 @@ import NimiAssistant from "@/components/NimiAssistant";
 import { useUser } from "@/contexts/UserContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { CheckCircle, Play, Trophy, Sparkles, Volume2, BookOpen, Palette } from "lucide-react";
+
 
 // Translation dictionary for all supported languages
 const translations = {
@@ -232,7 +234,9 @@ const VideoPlayerModal = ({ videoUrl, onClose }: { videoUrl: string; onClose: ()
   );
 };
 
-// Realistic Book Viewer Component with translations
+
+
+// RealBookViewer
 const RealBookViewer = ({ 
   pages, 
   onClose, 
@@ -244,14 +248,19 @@ const RealBookViewer = ({
   type: 'story' | 'coloring';
   t: (key: string) => string;
 }) => {
-  const [currentSpread, setCurrentSpread] = useState(0);
   const [processedPages, setProcessedPages] = useState<typeof pages>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isAnimating, setIsAnimating] = useState(false);
+  const [currentSpread, setCurrentSpread] = useState(0);
+  const [isTurning, setIsTurning] = useState(false);
+  const [flipDirection, setFlipDirection] = useState<'left' | 'right'>('right');
+  const [touchStart, setTouchStart] = useState<number | null>(null);
   const bookRef = useRef<HTMLDivElement>(null);
+  
+  // Calculate total spreads (each spread = 2 pages)
+  const totalSpreads = Math.ceil(pages.length / 2);
+  const bucket = type === 'story' ? 'storybook-pages' : 'coloringbook-pages';
 
-  const totalSpreads = Math.ceil(processedPages.length / 2);
-
+  // Process images from Supabase storage
   useEffect(() => {
     const processImages = async () => {
       const processed = await Promise.all(
@@ -272,38 +281,83 @@ const RealBookViewer = ({
     };
     processImages();
   }, [pages]);
-  const turnProgress = useMotionValue(0);
-  const leftPageRotation = useTransform(turnProgress, [0, 1], [0, -180]);
-  const rightPageRotation = useTransform(turnProgress, [0, 1], [0, 180]);
+  // Get pages for current spread
+  const getSpreadPages = () => {
+    const startIndex = currentSpread * 2;
+    return [
+      processedPages[startIndex],
+      processedPages[startIndex + 1]
+    ].filter(Boolean);
+  };
 
   const goToNextSpread = () => {
-    if (currentSpread < totalSpreads - 1 && !isAnimating) {
-      setIsAnimating(true);
-      turnProgress.set(1);
+    if (currentSpread < totalSpreads - 1 && !isTurning) {
+      setFlipDirection('right');
+      setIsTurning(true);
       setTimeout(() => {
         setCurrentSpread(prev => prev + 1);
-        turnProgress.set(0);
-        setIsAnimating(false);
-      }, 800);
+        setIsTurning(false);
+      }, 600);
+      playPageTurnSound();
     }
   };
 
   const goToPrevSpread = () => {
-    if (currentSpread > 0 && !isAnimating) {
-      setIsAnimating(true);
-      turnProgress.set(1);
+    if (currentSpread > 0 && !isTurning) {
+      setFlipDirection('left');
+      setIsTurning(true);
       setTimeout(() => {
         setCurrentSpread(prev => prev - 1);
-        turnProgress.set(0);
-        setIsAnimating(false);
-      }, 800);
+        setIsTurning(false);
+      }, 600);
+      playPageTurnSound();
     }
   };
 
-  const leftPageIndex = currentSpread * 2;
-  const rightPageIndex = leftPageIndex + 1;
-  const leftPage = processedPages[leftPageIndex];
-  const rightPage = processedPages[rightPageIndex];
+  // Play page turn sound
+  const playPageTurnSound = () => {
+    const audio = document.getElementById('pageTurnSound') as HTMLAudioElement;
+    if (audio) {
+      audio.currentTime = 0;
+      audio.play().catch(e => console.log("Audio play failed:", e));
+    }
+  };
+
+  // Swipe handling
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStart(e.touches[0].clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (touchStart === null) return;
+    
+    const touchCurrent = e.touches[0].clientX;
+    const diff = touchStart - touchCurrent;
+    
+    // Only consider significant swipes
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) {
+        goToNextSpread();
+      } else {
+        goToPrevSpread();
+      }
+      setTouchStart(null);
+    }
+  };
+
+  // Edge page handling
+  const getCursorStyle = () => {
+    if (currentSpread === 0 && currentSpread === totalSpreads - 1) {
+      return 'cursor-default';
+    }
+    if (currentSpread === 0) {
+      return 'cursor-e-resize';
+    }
+    if (currentSpread === totalSpreads - 1) {
+      return 'cursor-w-resize';
+    }
+    return 'cursor-grab';
+  };
 
   if (isLoading) {
     return (
@@ -313,8 +367,14 @@ const RealBookViewer = ({
     );
   }
 
+  const currentPages = getSpreadPages();
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4"
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+    >
       <button
         onClick={onClose}
         className="absolute top-4 right-4 z-50 text-white text-2xl bg-black/50 rounded-full p-2"
@@ -322,96 +382,173 @@ const RealBookViewer = ({
         ✕
       </button>
 
-      <div ref={bookRef} className="relative w-full max-w-6xl h-[80vh] flex perspective-1000">
-        {/* Left page content */}
-        {leftPage && (
-          <div className="absolute left-0 w-1/2 h-full bg-white shadow-lg z-10 origin-right transform-style-preserve-3d">
-            <div className="h-full flex flex-col p-4">
-              <div className="flex-1 flex items-center justify-center">
-                <img 
-                  src={leftPage.image_url} 
-                  alt={`Page ${leftPage.page_number}`}
-                  className="max-h-full max-w-full object-contain"
-                  onError={(e) => (e.currentTarget.src = '/default-book.png')}
-                />
-              </div>
-              {type === 'story' && leftPage.text && (
-                <div className="mt-4 p-4 bg-yellow-50 rounded-lg text-center">
-                  {leftPage.text}
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Right page content */}
-        {rightPage && (
-          <motion.div
-            className="absolute right-0 w-1/2 h-full bg-white shadow-lg z-20 origin-left transform-style-preserve-3d"
-            style={{
-              rotateY: rightPageRotation,
-              transformStyle: 'preserve-3d',
-            }}
-          >
-            <div className="h-full flex flex-col p-4 backface-hidden">
-              <div className="flex-1 flex items-center justify-center">
-                <img 
-                  src={rightPage.image_url} 
-                  alt={`Page ${rightPage.page_number}`}
-                  className="max-h-full max-w-full object-contain"
-                  onError={(e) => (e.currentTarget.src = '/default-book.png')}
-                />
-              </div>
-              {type === 'story' && rightPage.text && (
-                <div className="mt-4 p-4 bg-yellow-50 rounded-lg text-center">
-                  {rightPage.text}
-                </div>
-              )}
-            </div>
-          </motion.div>
-        )}
-
-        <AnimatePresence>
-          {isAnimating && (
+      <div 
+        ref={bookRef} 
+        className={`relative w-full max-w-6xl h-[80vh] flex justify-center perspective-1000 ${getCursorStyle()}`}
+      >
+        <div className="relative w-full h-full max-w-4xl flex justify-center">
+          {/* Left Page */}
+          {currentPages[0] && (
             <motion.div
-              className="absolute right-1/2 w-1/2 h-full bg-gradient-to-r from-black/10 to-black/30 z-30"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 0.3 }}
-              exit={{ opacity: 0 }}
+              className="absolute left-0 w-1/2 h-full bg-gray-100 shadow-lg rounded-l-lg overflow-hidden"
+              animate={isTurning && flipDirection === 'right' ? "flipLeft" : {}}
+              variants={{
+                flipLeft: {
+                  rotateY: -180,
+                  transition: { 
+                    duration: 0.6,
+                    ease: "easeInOut"
+                  }
+                }
+              }}
+              style={{ 
+                transformStyle: 'preserve-3d',
+                transformOrigin: 'right center'
+              }}
+            >
+              <div className="w-full h-full relative">
+                {/* Page Content */}
+                <div className="absolute inset-0 w-full h-full">
+                  <img 
+                    src={currentPages[0].image_url} 
+                    alt={`Page ${currentPages[0].page_number}`}
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                
+                {/* Text Overlay */}
+                {type === 'story' && currentPages[0].text && (
+                  <div className="absolute bottom-0 left-0 right-0 p-4 bg-white/80 text-center">
+                    {currentPages[0].text}
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          )}
+          
+          {/* Right Page */}
+          {currentPages[1] && (
+            <motion.div
+              className={`absolute right-0 w-1/2 h-full bg-white shadow-lg rounded-r-lg overflow-hidden z-10 ${
+                isTurning ? 'pointer-events-none' : ''
+              }`}
+              animate={isTurning && flipDirection === 'right' ? "flipRight" : {}}
+              variants={{
+                flipRight: {
+                  rotateY: -180,
+                  transition: { 
+                    duration: 0.6,
+                    ease: "easeInOut"
+                  }
+                }
+              }}
+              style={{ 
+                transformStyle: 'preserve-3d',
+                transformOrigin: 'left center',
+                backfaceVisibility: 'hidden'
+              }}
+            >
+              <div className="w-full h-full relative">
+                {/* Page Content */}
+                <div className="absolute inset-0 w-full h-full">
+                  <img 
+                    src={currentPages[1].image_url} 
+                    alt={`Page ${currentPages[1].page_number}`}
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                
+                {/* Text Overlay */}
+                {type === 'story' && currentPages[1].text && (
+                  <div className="absolute bottom-0 left-0 right-0 p-4 bg-white/80 text-center">
+                    {currentPages[1].text}
+                  </div>
+                )}
+                
+                {/* Page Shadow (during turn) */}
+                <AnimatePresence>
+                  {isTurning && flipDirection === 'right' && (
+                    <motion.div
+                      className="absolute inset-0 bg-black/30"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 0.3 }}
+                      exit={{ opacity: 0 }}
+                    />
+                  )}
+                </AnimatePresence>
+              </div>
+            </motion.div>
+          )}
+          
+          {/* Previous Spread Preview (peeking) */}
+          {currentSpread > 0 && (
+            <motion.div 
+              className="absolute left-0 w-[5%] h-full bg-gray-800 rounded-l-lg z-0"
+              animate={{ width: isTurning ? '5%' : '8%' }}
+              transition={{ duration: 0.3 }}
             />
           )}
-        </AnimatePresence>
+          
+          {/* Next Spread Preview (peeking) */}
+          {currentSpread < totalSpreads - 1 && (
+            <motion.div 
+              className="absolute right-0 w-[5%] h-full bg-gray-800 rounded-r-lg z-0"
+              animate={{ width: isTurning ? '5%' : '8%' }}
+              transition={{ duration: 0.3 }}
+            />
+          )}
+        </div>
       </div>
 
-      <div className="absolute bottom-8 left-0 right-0 flex justify-center gap-4 z-40">
-        <Button
+      {/* Navigation Arrows */}
+      <div className="absolute top-1/2 left-4 transform -translate-y-1/2 z-40">
+        <button
           onClick={goToPrevSpread}
-          disabled={currentSpread === 0 || isAnimating}
-          variant="outline"
-          className="text-lg py-2 px-6"
+          disabled={currentSpread === 0 || isTurning}
+          className={`p-3 rounded-full bg-black/50 ${currentSpread === 0 ? 'opacity-30' : 'hover:bg-black/70'}`}
+          aria-label={t('previousPage')}
         >
-          {t('previousPage')}
-        </Button>
-        <span className="flex items-center justify-center text-lg font-medium bg-white/90 px-4 rounded-lg">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+      </div>
+      
+      <div className="absolute top-1/2 right-4 transform -translate-y-1/2 z-40">
+        <button
+          onClick={goToNextSpread}
+          disabled={currentSpread === totalSpreads - 1 || isTurning}
+          className={`p-3 rounded-full bg-black/50 ${currentSpread === totalSpreads - 1 ? 'opacity-30' : 'hover:bg-black/70'}`}
+          aria-label={t('nextPage')}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      </div>
+      
+      {/* Spread Counter */}
+      <div className="absolute bottom-8 left-0 right-0 flex justify-center z-40">
+        <div className="flex items-center justify-center text-lg font-medium bg-white/90 px-6 py-2 rounded-full">
           {t('spreadCount', {
             current: currentSpread + 1,
             total: totalSpreads
           })}
-        </span>
-        <Button
-          onClick={goToNextSpread}
-          disabled={currentSpread === totalSpreads - 1 || isAnimating}
-          variant="outline"
-          className="text-lg py-2 px-6"
-        >
-          {t('nextPage')}
-        </Button>
+        </div>
       </div>
+
+      {/* Page turning sound effect */}
+      <audio 
+        id="pageTurnSound" 
+        src="/sounds/page-turn.mp3" 
+        preload="auto"
+      />
     </div>
   )
 };
 
-// Realistic Book Card Component with translations
+
+// ENHANCED BOOK CARD COMPONENT
 const BookCard = ({ 
   day, 
   onOpen, 
@@ -429,6 +566,7 @@ const BookCard = ({
 }) => {
   const [coverUrl, setCoverUrl] = useState<string | null>(null);
   const [isHovered, setIsHovered] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   useEffect(() => {
     const fetchCoverImage = async () => {
@@ -437,7 +575,7 @@ const BookCard = ({
           const path = coverData.cover_url.replace('supabase://', '');
           const [bucket, ...filePath] = path.split('/');
           const { data: { publicUrl } } = await supabase.storage
-            .from(bucket)
+            .from('book-covers')
             .getPublicUrl(filePath.join('/'));
           setCoverUrl(publicUrl);
         } else {
@@ -446,6 +584,14 @@ const BookCard = ({
       }
     };
     fetchCoverImage();
+    
+    // Add periodic animation
+    const interval = setInterval(() => {
+      setIsAnimating(true);
+      setTimeout(() => setIsAnimating(false), 1000);
+    }, 15000);
+    
+    return () => clearInterval(interval);
   }, [coverData]);
 
   const defaultSpineColor = type === 'story' 
@@ -480,20 +626,20 @@ const BookCard = ({
         style={{ 
           background: coverData?.spine_color || defaultSpineColor
         }}
-        whileHover={{ 
-          rotateY: type === 'story' ? -10 : 10,
-          transition: { duration: 0.3 }
-        }}
+        animate={isAnimating ? { 
+          rotateY: [0, type === 'story' ? -5 : 5, 0],
+          transition: { duration: 0.8 }
+        } : {}}
       />
       
       {/* Book Cover */}
       <motion.div
         className={`absolute inset-0 rounded-lg shadow-xl border-4 ${defaultBorderColor} p-6 flex flex-col items-center text-center overflow-hidden`}
         style={{ transformStyle: 'preserve-3d' }}
-        whileHover={{ 
-          rotateY: type === 'story' ? -15 : 15,
-          transition: { duration: 0.3 }
-        }}
+        animate={isAnimating ? { 
+          rotateY: [0, type === 'story' ? -10 : 10, 0],
+          transition: { duration: 0.8 }
+        } : {}}
       >
         {/* Dynamic Book Cover Image */}
         {coverUrl ? (
@@ -532,19 +678,19 @@ const BookCard = ({
           {/* Book Pages Edge */}
           <div className={`absolute ${type === 'story' ? 'left-0' : 'right-0'} top-0 w-1 h-full bg-gray-200 shadow-md`} />
           
-          <motion.Button
+          <motion.button
             onClick={onOpen}
-            className={`mt-auto gap-2 py-3 px-4 bg-gradient-to-r ${defaultButtonGradient} text-white w-full`}
+            className={`mt-auto gap-2 py-3 px-4 bg-gradient-to-r ${defaultButtonGradient} text-white w-full rounded-lg font-bold`}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
             {type === 'story' ? (
-              <BookOpen className="h-5 w-5" />
+              <BookOpen className="h-5 w-5 inline mr-2" />
             ) : (
-              <Palette className="h-5 w-5" />
+              <Palette className="h-5 w-5 inline mr-2" />
             )}
             {type === 'story' ? t('readNow') : t('colorNow')}
-          </motion.Button>
+          </motion.button>
         </div>
       </motion.div>
 
@@ -869,31 +1015,30 @@ const MissionsComponent = () => {
         </div>
       )}
 
-      {/* Storybook and Coloring Book Cards */}
-      <div className="max-w-4xl mx-auto mt-4 sm:mt-6 md:mt-8 w-full px-2">
-        <div className="flex flex-col md:flex-row justify-center items-center gap-4 md:gap-8">
-          {storyPages.length > 0 && (
-            <BookCard 
-              day={selectedDay} 
-              onOpen={() => setShowStorybook(true)}
-              pageCount={storyPages.length}
-              coverData={bookCovers.find(c => c.day === selectedDay && c.cover_type === 'story')}
-              type="story"
-              t={t}
-            />
-          )}
-          {coloringPages.length > 0 && (
-            <BookCard 
-              day={selectedDay}
-              onOpen={() => setShowColoringBook(true)}
-              pageCount={coloringPages.length}
-              coverData={bookCovers.find(c => c.day === selectedDay && c.cover_type === 'coloring')}
-              type="coloring"
-              t={t}
-            />
-          )}
-        </div>
-      </div>
+     {/* Storybook and Coloring Book Cards */}
+     <div className="flex flex-col md:flex-row justify-center items-center gap-4 md:gap-8">
+  {storyPages.length > 0 && (
+    <BookCard 
+      day={selectedDay} 
+      onOpen={() => setShowStorybook(true)}
+      pageCount={storyPages.length}
+      coverData={bookCovers.find(c => c.day === selectedDay && c.cover_type === 'story')}
+      type="story"
+      t={t}
+    />
+  )}
+  
+  {coloringPages.length > 0 && (
+    <BookCard 
+      day={selectedDay}
+      onOpen={() => setShowColoringBook(true)}
+      pageCount={coloringPages.length}
+      coverData={bookCovers.find(c => c.day === selectedDay && c.cover_type === 'coloring')}
+      type="coloring"
+      t={t}
+    />
+  )}
+</div>
 
       {/* Day Complete Modal */}
       <AnimatePresence>
@@ -944,8 +1089,8 @@ const MissionsComponent = () => {
         )}
       </AnimatePresence>
 
-      {/* Storybook Viewer */}
-      <AnimatePresence>
+            {/* Storybook Viewer */}
+            <AnimatePresence>
         {showStorybook && storyPages.length > 0 && (
           <RealBookViewer 
             pages={storyPages.map(page => ({

@@ -8,7 +8,7 @@ import { useLanguage} from "@/contexts/LanguageContext";
 // Uses timeouts to next occurrence; falls back to an in-app toast if Notifications are not granted [^2].
 export function ReminderScheduler() {
   const { toast } = useToast()
-  const { language } = useLanguage()
+  const { language, t } = useLanguage()
   const timers = useRef<number[]>([])
 
   useEffect(() => {
@@ -56,7 +56,7 @@ export function ReminderScheduler() {
 
     function fireReminder() {
       const title = "Nimi"
-      const body = t(language, "learnReminderBody")
+      const body = t("learnReminderBody")
       if (typeof window !== "undefined" && "Notification" in window && Notification.permission === "granted") {
         new Notification(title, { body })
       } else {
