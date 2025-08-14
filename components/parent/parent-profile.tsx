@@ -215,17 +215,10 @@ export function ParentProfileMenu() {
             />
           </div>
           <div className="flex flex-wrap gap-2">
-            {profile.reminderTimes.map((time) => (
-              <span
-                key={time}
-                className="inline-flex items-center gap-2 px-2 py-1 rounded-full border bg-white text-xs"
-              >
-                {time}
-                <button onClick={() => removeReminderTime(time)} className="text-red-600 hover:underline">
-                  {t("remove")}
-                </button>
-              </span>
+          {(profile.reminderTimes || []).map((time) => (
+              <span key={time}>{time}</span>
             ))}
+
           </div>
           <div className="flex items-center gap-2">
             <Input type="time" value={newTime} onChange={(e) => setNewTime(e.target.value)} className="max-w-[160px]" />

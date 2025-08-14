@@ -2,18 +2,21 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import  supabase  from "@/lib/supabaseClient";
+import supabase from "@/lib/supabaseClient";
 
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [message, setMessage] = useState(""); // Success message
 
   const login = async () => {
     setLoading(true);
     setError("");
+    setMessage("");
 
     const { data, error: loginError } = await supabase.auth.signInWithPassword({
       email,
@@ -27,7 +30,6 @@ export default function LoginPage() {
     }
 
     if (data.user) {
-      // Fetch user profile
       const { data: userProfile, error: profileError } = await supabase
         .from("users")
         .select("*")
@@ -43,7 +45,7 @@ export default function LoginPage() {
       localStorage.setItem("parentAuth", "logged-in");
       localStorage.setItem("parentProfileV2", JSON.stringify(userProfile));
 
-      router.push("/parent-profile");
+      router.push("/parents");
     } else {
       setError("Login failed: no user returned");
     }
@@ -52,31 +54,72 @@ export default function LoginPage() {
   };
 
   return (
-    <div style={{ maxWidth: 400, margin: "auto", padding: 20 }}>
-      <h2>Login</h2>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      <input
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        disabled={loading}
-        style={{ width: "100%", marginBottom: 10, padding: 8 }}
-      />
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        disabled={loading}
-        style={{ width: "100%", marginBottom: 10, padding: 8 }}
-      />
-      <button onClick={login} disabled={loading} style={{ width: "100%", padding: 10 }}>
-        {loading ? "Logging in..." : "Login"}
-      </button>
-      <p style={{ marginTop: 10 }}>
-        Don't have an account? <a href="/signuppage">Sign up</a>
-      </p>
+    <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-purple-50 to-blue-50 p-6">
+      <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8 space-y-6 transform hover:scale-[1.02] transition-transform duration-300">
+        <h2 className="text-3xl font-bold text-center text-purple-700 animate-pulse">
+          Welcome Back!
+        </h2>
+
+        {error && (
+          <p className="text-red-600 bg-red-100 p-2 rounded text-center">{error}</p>
+        )}
+        {message && (
+          <p className="text-green-600 bg-green-100 p-2 rounded text-center">{message}</p>
+        )}
+
+        <div className="space-y-4">
+          <input
+            type="email"
+            placeholder="Email Address"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            disabled={loading}
+            className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400 placeholder-gray-400"
+          />
+
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              disabled={loading}
+              className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400 placeholder-gray-400 pr-10"
+            />
+            <button
+              type="button"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-purple-600"
+              onClick={() => setShowPassword((prev) => !prev)}
+            >
+              {showPassword ? "🙈" : "👁️"}
+            </button>
+          </div>
+        </div>
+
+        <div className="flex justify-between items-center">
+          <a
+            href="/forgot-password"
+            className="text-sm text-purple-600 hover:underline"
+          >
+            Forgot Password?
+          </a>
+        </div>
+
+        <button
+          onClick={login}
+          disabled={loading}
+          className="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {loading ? "Logging in..." : "Login"}
+        </button>
+
+        <p className="text-center text-sm text-gray-500">
+          Don't have an account?{" "}
+          <a href="/signuppage" className="text-purple-600 hover:underline">
+            Sign up
+          </a>
+        </p>
+      </div>
     </div>
   );
 }
