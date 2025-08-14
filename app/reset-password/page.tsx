@@ -1,89 +1,69 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import supabase from "@/lib/supabaseClient";
+import  supabase  from "@/lib/supabaseClient";
 
-export default function ResetPasswordPage() {
+export default function ResetPassword() {
   const router = useRouter();
   const [password, setPassword] = useState("");
-  const [confirm, setConfirm] = useState("");
-  const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Ensure Supabase knows the session from the link
+  // When the page loads, try to exchange the token for a session
   useEffect(() => {
     const hash = window.location.hash;
-    if (hash) {
-      supabase.auth.exchangeCodeForSession(hash).catch((err) => {
-        console.error("Session exchange error:", err);
-        setError("Invalid or expired link.");
-      });
+    if (hash.includes("access_token")) {
+      supabase.auth
+        .exchangeCodeForSession(hash)
+        .then(({ error }) => {
+          if (error) {
+            setMessage(`❌ Invalid or expired link.`);
+          }
+        });
     }
   }, []);
 
-  const handleResetPassword = async () => {
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
     setLoading(true);
-    setError("");
     setMessage("");
 
-    if (!password || !confirm) {
-      setError("Please fill in both password fields.");
-      setLoading(false);
-      return;
-    }
-
-    if (password !== confirm) {
-      setError("Passwords do not match.");
-      setLoading(false);
-      return;
-    }
-
-    const { error } = await supabase.auth.updateUser({ password });
-
-    if (error) {
-      setError(error.message);
-    } else {
-      setMessage("✅ Password updated! Redirecting to login...");
-      setTimeout(() => {
-        router.push("/login");
-      }, 2000);
-    }
+    const { error } = await supabase.auth.updateUser({
+      password,
+    });
 
     setLoading(false);
+
+    if (error) {
+      setMessage(`❌ ${error.message}`);
+    } else {
+      setMessage("✅ Password updated successfully. Redirecting to login...");
+      setTimeout(() => router.push("/login"), 2000);
+    }
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100 p-4">
-      <div className="bg-white p-6 rounded-xl shadow-lg w-full max-w-md space-y-4">
-        <h1 className="text-2xl font-bold text-center">Reset Password</h1>
-        {message && <p className="text-green-600">{message}</p>}
-        {error && <p className="text-red-600">{error}</p>}
+    <div className="max-w-md mx-auto p-4">
+      <h1 className="text-xl font-bold mb-4">Reset Password</h1>
+      <form onSubmit={handleResetPassword} className="space-y-4">
         <input
           type="password"
-          placeholder="New password"
+          required
+          placeholder="Enter new password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full border px-4 py-2 rounded"
-          disabled={loading}
-        />
-        <input
-          type="password"
-          placeholder="Confirm new password"
-          value={confirm}
-          onChange={(e) => setConfirm(e.target.value)}
-          className="w-full border px-4 py-2 rounded"
-          disabled={loading}
+          className="w-full border p-2 rounded"
         />
         <button
-          onClick={handleResetPassword}
+          type="submit"
           disabled={loading}
-          className="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 rounded"
+          className="bg-green-500 text-white px-4 py-2 rounded w-full"
         >
           {loading ? "Updating..." : "Update Password"}
         </button>
-      </div>
+      </form>
+      {message && <p className="mt-4">{message}</p>}
     </div>
   );
 }

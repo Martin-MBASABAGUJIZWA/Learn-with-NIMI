@@ -1,60 +1,57 @@
 "use client";
 
 import { useState } from "react";
-import supabase from "@/lib/supabaseClient";
+import  supabase  from "@/lib/supabaseClient";
 
-export default function ForgotPasswordPage() {
+export default function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleForgotPassword = async () => {
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
     setLoading(true);
     setMessage("");
-    setError("");
 
-    if (!email) {
-      setError("Please enter your email.");
-      setLoading(false);
-      return;
-    }
+    const redirectUrl =
+      process.env.NODE_ENV === "production"
+        ? "https://https://nimi-learn.onrender.com/reset-password"
+        : "http://localhost:3000/reset-password";
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
+      redirectTo: redirectUrl,
     });
 
-    if (error) {
-      setError(error.message);
-    } else {
-      setMessage("📩 Check your email for a password reset link.");
-    }
-
     setLoading(false);
+
+    if (error) {
+      setMessage(`❌ Error: ${error.message}`);
+    } else {
+      setMessage("✅ Check your email for the password reset link.");
+    }
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100 p-4">
-      <div className="bg-white p-6 rounded-xl shadow-lg w-full max-w-md space-y-4">
-        <h1 className="text-2xl font-bold text-center">Forgot Password</h1>
-        {message && <p className="text-green-600">{message}</p>}
-        {error && <p className="text-red-600">{error}</p>}
+    <div className="max-w-md mx-auto p-4">
+      <h1 className="text-xl font-bold mb-4">Forgot Password</h1>
+      <form onSubmit={handleForgotPassword} className="space-y-4">
         <input
           type="email"
+          required
           placeholder="Enter your email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full border px-4 py-2 rounded"
-          disabled={loading}
+          className="w-full border p-2 rounded"
         />
         <button
-          onClick={handleForgotPassword}
+          type="submit"
           disabled={loading}
-          className="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 rounded"
+          className="bg-blue-500 text-white px-4 py-2 rounded w-full"
         >
           {loading ? "Sending..." : "Send Reset Link"}
         </button>
-      </div>
+      </form>
+      {message && <p className="mt-4">{message}</p>}
     </div>
   );
 }
