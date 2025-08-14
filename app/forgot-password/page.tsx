@@ -5,58 +5,55 @@ import supabase from "@/lib/supabaseClient";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
-  const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const sendReset = async () => {
+  const handleForgotPassword = async () => {
     setLoading(true);
     setMessage("");
+    setError("");
 
-    const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+    if (!email) {
+      setError("Please enter your email.");
+      setLoading(false);
+      return;
+    }
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/reset-password`,
     });
 
     if (error) {
-      setMessage(`❌ Oops! ${error.message}`);
+      setError(error.message);
     } else {
-      setMessage(`✅ Check your email! We sent a reset link to ${email} 📧`);
+      setMessage("📩 Check your email for a password reset link.");
     }
 
     setLoading(false);
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-purple-50 to-blue-50 p-6">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8 space-y-6 transform hover:scale-[1.02] transition-transform duration-300">
-        <h2 className="text-3xl font-bold text-center text-purple-700 animate-pulse">
-          Forgot your password? 🔑
-        </h2>
-        {message && (
-          <p className="text-center text-sm p-2 rounded bg-purple-100 text-purple-700">
-            {message}
-          </p>
-        )}
+    <div className="flex min-h-screen items-center justify-center bg-gray-100 p-4">
+      <div className="bg-white p-6 rounded-xl shadow-lg w-full max-w-md space-y-4">
+        <h1 className="text-2xl font-bold text-center">Forgot Password</h1>
+        {message && <p className="text-green-600">{message}</p>}
+        {error && <p className="text-red-600">{error}</p>}
         <input
           type="email"
-          placeholder="Enter your email 📧"
+          placeholder="Enter your email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          className="w-full border px-4 py-2 rounded"
           disabled={loading}
-          className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400 placeholder-gray-400"
         />
         <button
-          onClick={sendReset}
-          disabled={loading || !email}
-          className="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          onClick={handleForgotPassword}
+          disabled={loading}
+          className="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 rounded"
         >
-          {loading ? "Sending reset link..." : "Send Reset Link ✉️"}
+          {loading ? "Sending..." : "Send Reset Link"}
         </button>
-        <p className="text-center text-sm text-gray-500">
-          Remembered your password?{" "}
-          <a href="/loginpage" className="text-purple-600 hover:underline">
-            Log in 😎
-          </a>
-        </p>
       </div>
     </div>
   );
