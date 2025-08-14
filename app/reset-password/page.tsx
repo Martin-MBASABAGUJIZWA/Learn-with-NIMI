@@ -17,18 +17,21 @@ export default function ResetPassword() {
   const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
+    setMessage("");
+  
     const { error } = await supabase.auth.updateUser({ password });
-
+  
+    setLoading(false); // stop spinner immediately
+  
     if (error) {
       setMessage(`❌ ${error.message}`);
+      setPassword(""); // clear the field for retry
     } else {
       setMessage("✅ Password updated successfully! Redirecting...");
       setTimeout(() => router.push("/login"), 2000);
     }
-
-    setLoading(false);
   };
+  
 
   return (
     <form onSubmit={handleUpdatePassword} className="space-y-4">
