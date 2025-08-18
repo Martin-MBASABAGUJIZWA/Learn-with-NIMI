@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { Baby, CalendarCheck, Clock, Gem, Lock, Moon, Plus, Settings, Shield, Star } from "lucide-react"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -14,23 +15,25 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogT
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useLanguage } from "@/contexts/LanguageContext"
-import { useLocalChildren } from "@/hooks/use-local-children"
+import { useChildren, Child } from "@/hooks/useChildren"
 import { useDebouncedCallback } from "@/hooks/use-debounce"
 import { StickerPreviewCard } from "@/components/parent/sticker-preview-card"
 import { ParentProfileMenu } from "@/components/parent/parent-profile"
 import { ReminderScheduler } from "@/components/parent/reminder-scheduler"
 import { SafeNavigationGuard } from "@/components/parent/safe-navigation-guard"
 import { useKidSafeWhitelist } from "@/hooks/use-kid-safe"
-import type { Activity, ChildProfile } from "@/components/parent/child-types"
+import type { Activity } from "@/components/parent/child-types"
 import Header from "@/components/Header"
 import BottomNavigation from "@/components/BottomNavigation"
+
+const MAX_CHILDREN_FREE = 2;
 
 function ChildChip({
   child,
   isActive,
   onClick,
 }: {
-  child: ChildProfile
+  child: Child
   isActive: boolean
   onClick: () => void
 }) {
@@ -60,13 +63,19 @@ function ActivityItem({ activity }: { activity: Activity }) {
     </div>
   )
 }
-
 export default function ParentPage() {
   const { language, t } = useLanguage()
-  const { children, updateChild, addChild, isReady } = useLocalChildren()
+  const router = useRouter()
+  
+  // Use children without user context
+  const { children, updateChild, addChild, isReady } = useChildren()
+  
   const [currentChildId, setCurrentChildId] = useState<string | null>(null)
   const [isAddingChild, setIsAddingChild] = useState(false)
+  const [addChildError, setAddChildError] = useState("")
+  
   const currentChild = children.find((c) => c.id === currentChildId) || children[0]
+  const [upgradeModalOpen, setUpgradeModalOpen] = useState(false)
 
   const { whitelist, setWhitelist } = useKidSafeWhitelist()
 
@@ -84,16 +93,19 @@ export default function ParentPage() {
 
   const progressPercent = useMemo(() => {
     if (!currentChild) return 0
-    const completed = currentChild.activities.filter((a) => a.completed).length
-    const total = currentChild.activities.length || 1
+    const completed = currentChild.activities?.filter((a) => a.completed).length || 0
+    const total = currentChild.activities?.length || 1
     return (completed / total) * 100
   }, [currentChild])
 
   const badge = useMemo(() => {
     if (!currentChild) return t("badgeLittleStarter")
-    const weeklyScore =
-      currentChild.activities.reduce((acc, a) => acc + (a.weeklyRecord?.reduce((s, v) => s + v, 0) || 0), 0) /
-      Math.max(currentChild.activities.length * 7, 1)
+    const activities = currentChild.activities || []
+    const weeklyScore = activities.reduce((acc, a) => {
+      const weeklyTotal = a.weeklyRecord?.reduce((s, v) => s + v, 0) || 0
+      return acc + weeklyTotal
+    }, 0) / Math.max(activities.length * 7, 1)
+    
     return weeklyScore >= 0.8
       ? t("badgeStarExplorer")
       : weeklyScore >= 0.6
@@ -103,15 +115,16 @@ export default function ParentPage() {
           : t("badgeLittleStarter")
   }, [currentChild, t])
 
-  if (!isReady) {
+  const isLoading = !isReady
+  
+  if (isLoading) {
     return (
       <div className="flex flex-col min-h-screen bg-blue-50">
         <Header />
         <main className="flex-grow flex items-center justify-center">
-        <div
+          <div
             className="h-12 w-12 animate-spin border-4 border-blue-300 border-t-transparent rounded-full"
             aria-label="Loading"
-            suppressHydrationWarning // Add this to suppress the warning if needed
           />
         </main>
       </div>
@@ -119,6 +132,28 @@ export default function ParentPage() {
   }
 
   const grayTheme = currentChild?.bedtimeMode ? "filter grayscale contrast-90" : ""
+
+  const handleAddChild = async (name: string) => {    
+    if (children.length >= MAX_CHILDREN_FREE) {
+      setAddChildError(t("upgradeRequired"))
+      return null
+    }
+    
+    try {
+      const newId = await addChild(name)
+      if (newId) {
+        setCurrentChildId(newId)
+        setIsAddingChild(false)
+        setAddChildError("")
+        return newId
+      }
+    } catch (error) {
+      console.error("Error adding child:", error)
+      setAddChildError(t("addChildError"))
+    }
+    
+    return null
+  }
 
   return (
     <div className={`flex flex-col min-h-screen bg-blue-50 ${grayTheme}`}>
@@ -152,7 +187,13 @@ export default function ParentPage() {
           ))}
           <Button
             variant="outline"
-            onClick={() => setIsAddingChild(true)}
+            onClick={() => {
+              if (children.length >= MAX_CHILDREN_FREE) {
+                setUpgradeModalOpen(true)
+                return
+              }
+              setIsAddingChild(true)
+            }}
             className="flex items-center gap-2 min-w-fit"
           >
             <Plus className="h-4 w-4" />
@@ -163,14 +204,11 @@ export default function ParentPage() {
         {isAddingChild && (
           <AddChildForm
             onCancel={() => setIsAddingChild(false)}
-            onSubmit={async (name) => {
-              const newId = await addChild(name)
-              if (newId) {
-                setCurrentChildId(newId)
-                setIsAddingChild(false)
-              }
-            }}
+            onSubmit={handleAddChild}
             t={t}
+            error={addChildError}
+            currentChildCount={children.length}
+            maxChildrenFree={MAX_CHILDREN_FREE}
           />
         )}
 
@@ -199,21 +237,78 @@ export default function ParentPage() {
           </div>
         )}
 
+        {/* Show empty state when no children */}
+        {!isAddingChild && children.length === 0 && (
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <Baby className="h-16 w-16 text-blue-400 mb-4" />
+            <h3 className="text-xl font-semibold text-gray-800 mb-2">
+              {t("noChildrenTitle")}
+            </h3>
+            <p className="text-gray-600 max-w-md mb-6">
+              {t("noChildrenDescription")}
+            </p>
+            <Button onClick={() => setIsAddingChild(true)}>
+              <Plus className="h-4 w-4 mr-2" />
+              {t("addFirstChild")}
+            </Button>
+          </div>
+        )}
+
         <p className="text-center text-sm text-gray-500 mt-6">{t("footerTagline")}</p>
       </main>
       <BottomNavigation />
+      
+      {/* Upgrade Modal */}
+      <Dialog open={upgradeModalOpen} onOpenChange={setUpgradeModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("upgradeRequired")}</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-gray-700 mb-4">
+              {t("upgradeMessage")}
+            </p>
+            <div className="flex justify-center gap-4">
+              <Gem className="h-12 w-12 text-purple-500" />
+              <div>
+                <p className="font-semibold">{t("premiumBenefitsTitle")}</p>
+                <ul className="list-disc pl-5 mt-2 text-sm">
+                  <li>{t("premiumBenefit1")}</li>
+                  <li>{t("premiumBenefit2")}</li>
+                  <li>{t("premiumBenefit3")}</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setUpgradeModalOpen(false)}>
+              {t("cancel")}
+            </Button>
+            <Button asChild>
+              <Link href="/subscription">
+                {t("upgradeToPremium")}
+              </Link>
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
-
 function AddChildForm({
   onCancel,
   onSubmit,
   t,
+  error,
+  currentChildCount,
+  maxChildrenFree
 }: {
   onCancel: () => void
-  onSubmit: (name: string) => void
+  onSubmit: (name: string) => Promise<string | null>
   t: (key: string) => string
+  error: string
+  currentChildCount: number
+  maxChildrenFree: number
 }) {
   const [name, setName] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -224,6 +319,12 @@ function AddChildForm({
         <CardTitle>{t("addNewChild")}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-md p-3 text-red-700 text-sm">
+            {error}
+          </div>
+        )}
+        
         <div className="space-y-2">
           <Label htmlFor="childName">{t("childName")}</Label>
           <Input
@@ -233,6 +334,13 @@ function AddChildForm({
             placeholder={t("childNamePlaceholder")}
           />
         </div>
+        
+        {currentChildCount >= maxChildrenFree && (
+          <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3 text-yellow-700 text-sm">
+            {t("freePlanLimitReached", { max: maxChildrenFree })}
+          </div>
+        )}
+        
         <div className="flex gap-2">
           <Button
             onClick={async () => {
@@ -259,8 +367,8 @@ function ChildProfileCard({
   onUpdate,
   t,
 }: {
-  child: ChildProfile
-  onUpdate: (updates: Partial<ChildProfile>) => void
+  child: Child
+  onUpdate: (updates: Partial<Child>) => void
   t: (key: string) => string
 }) {
   const [open, setOpen] = useState(false)
@@ -369,16 +477,18 @@ function ChildProfileCard({
     </Card>
   )
 }
-
 function WeeklyReportCard({
   child,
   progressPercent,
   t,
 }: {
-  child: ChildProfile
+  child: Child
   progressPercent: number
   t: (key: string) => string
 }) {
+  // Ensure activities is always an array
+  const activities = child.activities || []
+
   return (
     <Card className="bg-yellow-50 border-2 border-yellow-200">
       <CardHeader>
@@ -388,23 +498,29 @@ function WeeklyReportCard({
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
-        {child.activities.map((item) => (
-          <div key={item.id} className="space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="font-medium">{item.name}</span>
-              <span className="text-xs text-muted-foreground">{t("thisWeek")}</span>
+        {activities.length === 0 ? (
+          <p className="text-sm text-gray-500">{t("noActivitiesYet")}</p>
+        ) : (
+          activities.map((item) => (
+            <div key={item.id} className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="font-medium">{item.name}</span>
+                <span className="text-xs text-muted-foreground">{t("thisWeek")}</span>
+              </div>
+              <div className="flex gap-1">
+                {item.weeklyRecord?.map((v, i) => (
+                  <div
+                    key={i}
+                    className={`h-4 w-6 rounded ${
+                      v ? "bg-green-500" : "bg-yellow-200"
+                    } border border-yellow-300`}
+                    aria-label={`${t("day")} ${i + 1}: ${v ? t("done") : t("missed")}`}
+                  />
+                ))}
+              </div>
             </div>
-            <div className="flex gap-1">
-              {item.weeklyRecord?.map((v, i) => (
-                <div
-                  key={i}
-                  className={`h-4 w-6 rounded ${v ? "bg-green-500" : "bg-yellow-200"} border border-yellow-300`}
-                  aria-label={`${t("day")} ${i + 1}: ${v ? t("done") : t("missed")}`}
-                />
-              ))}
-            </div>
-          </div>
-        ))}
+          ))
+        )}
         <Progress value={progressPercent} className="h-3 mt-4 bg-yellow-100" />
         <p className="text-sm text-yellow-700 text-center mt-1">
           {Math.round(progressPercent)}% {t("activitiesCompleted")}
@@ -414,6 +530,7 @@ function WeeklyReportCard({
   )
 }
 
+
 function ControlsCard({
   child,
   onUpdate,
@@ -422,8 +539,8 @@ function ControlsCard({
   whitelist,
   setWhitelist,
 }: {
-  child: ChildProfile
-  onUpdate: (updates: Partial<ChildProfile>) => void
+  child: Child
+  onUpdate: (updates: Partial<Child>) => void
   onScreenTimeChange: (value: number) => void
   t: (key: string) => string
   whitelist: string[]

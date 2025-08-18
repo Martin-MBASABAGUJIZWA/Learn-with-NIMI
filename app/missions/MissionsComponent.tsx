@@ -170,7 +170,7 @@ const MusicPlayerCard = ({ track, t }: { track: AudioTrack | null; t: (key: stri
 
       return () => {
         newSound.unload();
-      };
+      }; 
     }
   }, [track]);
 
@@ -236,7 +236,7 @@ const VideoPlayerModal = ({ videoUrl, onClose }: { videoUrl: string; onClose: ()
 
 
 
-// RealBookViewer
+// ENHANCED RESPONSIVE REAL BOOK VIEWER
 const RealBookViewer = ({ 
   pages, 
   onClose, 
@@ -254,11 +254,28 @@ const RealBookViewer = ({
   const [isTurning, setIsTurning] = useState(false);
   const [flipDirection, setFlipDirection] = useState<'left' | 'right'>('right');
   const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [aspectRatio, setAspectRatio] = useState(1);
+  const [windowSize, setWindowSize] = useState({
+    width: typeof window !== 'undefined' ? window.innerWidth : 1200,
+    height: typeof window !== 'undefined' ? window.innerHeight : 800
+  });
   const bookRef = useRef<HTMLDivElement>(null);
   
   // Calculate total spreads (each spread = 2 pages)
   const totalSpreads = Math.ceil(pages.length / 2);
-  const bucket = type === 'story' ? 'storybook-pages' : 'coloringbook-pages';
+
+  // Track window size for responsiveness
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowSize({
+        width: window.innerWidth,
+        height: window.innerHeight
+      });
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Process images from Supabase storage
   useEffect(() => {
@@ -281,6 +298,18 @@ const RealBookViewer = ({
     };
     processImages();
   }, [pages]);
+
+  // Calculate aspect ratio when pages are processed
+  useEffect(() => {
+    if (processedPages.length > 0 && processedPages[0].image_url) {
+      const img = new Image();
+      img.src = processedPages[0].image_url;
+      img.onload = () => {
+        setAspectRatio(img.width / img.height);
+      };
+    }
+  }, [processedPages]);
+
   // Get pages for current spread
   const getSpreadPages = () => {
     const startIndex = currentSpread * 2;
@@ -369,24 +398,46 @@ const RealBookViewer = ({
 
   const currentPages = getSpreadPages();
 
+  // Calculate book dimensions based on aspect ratio and window size
+  const maxBookWidth = Math.min(800, windowSize.width * 0.95);
+  const maxBookHeight = Math.min(600, windowSize.height * 0.8);
+  
+  // Determine book height based on aspect ratio
+  let bookHeight = maxBookHeight;
+  let bookWidth = bookHeight * aspectRatio * 2;
+  
+  // If book is too wide for screen, adjust dimensions
+  if (bookWidth > maxBookWidth) {
+    bookWidth = maxBookWidth;
+    bookHeight = bookWidth / (aspectRatio * 2);
+  }
+  
+  // Mobile optimization
+  const isMobile = windowSize.width < 640;
+  const bookPadding = isMobile ? 'p-1' : 'p-4';
+
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/90"
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
     >
       <button
         onClick={onClose}
-        className="absolute top-4 right-4 z-50 text-white text-2xl bg-black/50 rounded-full p-2"
+        className="absolute top-2 right-2 sm:top-4 sm:right-4 z-50 text-white text-2xl bg-black/50 rounded-full p-1 sm:p-2"
       >
         ✕
       </button>
 
       <div 
         ref={bookRef} 
-        className={`relative w-full max-w-6xl h-[80vh] flex justify-center perspective-1000 ${getCursorStyle()}`}
+        className={`relative flex justify-center perspective-1000 ${getCursorStyle()} ${bookPadding}`}
+        style={{
+          width: `${bookWidth}px`,
+          height: `${bookHeight}px`
+        }}
       >
-        <div className="relative w-full h-full max-w-4xl flex justify-center">
+        <div className="relative w-full h-full flex justify-center">
           {/* Left Page */}
           {currentPages[0] && (
             <motion.div
@@ -408,7 +459,7 @@ const RealBookViewer = ({
             >
               <div className="w-full h-full relative">
                 {/* Page Content */}
-                <div className="absolute inset-0 w-full h-full">
+                <div className="absolute inset-0 w-full h-full flex items-center justify-center bg-white">
                   <img 
                     src={currentPages[0].image_url} 
                     alt={`Page ${currentPages[0].page_number}`}
@@ -418,7 +469,7 @@ const RealBookViewer = ({
                 
                 {/* Text Overlay */}
                 {type === 'story' && currentPages[0].text && (
-                  <div className="absolute bottom-0 left-0 right-0 p-4 bg-white/80 text-center">
+                  <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3 bg-white/80 text-center text-xs sm:text-sm">
                     {currentPages[0].text}
                   </div>
                 )}
@@ -450,7 +501,7 @@ const RealBookViewer = ({
             >
               <div className="w-full h-full relative">
                 {/* Page Content */}
-                <div className="absolute inset-0 w-full h-full">
+                <div className="absolute inset-0 w-full h-full flex items-center justify-center bg-white">
                   <img 
                     src={currentPages[1].image_url} 
                     alt={`Page ${currentPages[1].page_number}`}
@@ -460,7 +511,7 @@ const RealBookViewer = ({
                 
                 {/* Text Overlay */}
                 {type === 'story' && currentPages[1].text && (
-                  <div className="absolute bottom-0 left-0 right-0 p-4 bg-white/80 text-center">
+                  <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3 bg-white/80 text-center text-xs sm:text-sm">
                     {currentPages[1].text}
                   </div>
                 )}
@@ -501,35 +552,35 @@ const RealBookViewer = ({
       </div>
 
       {/* Navigation Arrows */}
-      <div className="absolute top-1/2 left-4 transform -translate-y-1/2 z-40">
+      <div className="absolute top-1/2 left-1 sm:left-2 transform -translate-y-1/2 z-40">
         <button
           onClick={goToPrevSpread}
           disabled={currentSpread === 0 || isTurning}
-          className={`p-3 rounded-full bg-black/50 ${currentSpread === 0 ? 'opacity-30' : 'hover:bg-black/70'}`}
+          className={`p-1 sm:p-2 rounded-full bg-black/50 ${currentSpread === 0 ? 'opacity-30' : 'hover:bg-black/70'}`}
           aria-label={t('previousPage')}
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 sm:h-8 sm:w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
       </div>
       
-      <div className="absolute top-1/2 right-4 transform -translate-y-1/2 z-40">
+      <div className="absolute top-1/2 right-1 sm:right-2 transform -translate-y-1/2 z-40">
         <button
           onClick={goToNextSpread}
           disabled={currentSpread === totalSpreads - 1 || isTurning}
-          className={`p-3 rounded-full bg-black/50 ${currentSpread === totalSpreads - 1 ? 'opacity-30' : 'hover:bg-black/70'}`}
+          className={`p-1 sm:p-2 rounded-full bg-black/50 ${currentSpread === totalSpreads - 1 ? 'opacity-30' : 'hover:bg-black/70'}`}
           aria-label={t('nextPage')}
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 sm:h-8 sm:w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
         </button>
       </div>
       
       {/* Spread Counter */}
-      <div className="absolute bottom-8 left-0 right-0 flex justify-center z-40">
-        <div className="flex items-center justify-center text-lg font-medium bg-white/90 px-6 py-2 rounded-full">
+      <div className="absolute bottom-2 sm:bottom-4 left-0 right-0 flex justify-center z-40">
+        <div className="flex items-center justify-center text-xs sm:text-sm font-medium bg-white/90 px-3 py-1 sm:px-4 sm:py-2 rounded-full">
           {t('spreadCount', {
             current: currentSpread + 1,
             total: totalSpreads
@@ -546,7 +597,6 @@ const RealBookViewer = ({
     </div>
   )
 };
-
 
 // ENHANCED BOOK CARD COMPONENT
 const BookCard = ({ 
