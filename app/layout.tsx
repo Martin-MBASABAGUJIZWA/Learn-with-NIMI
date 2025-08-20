@@ -3,6 +3,7 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import { NimiReaderProvider } from "@/contexts/NimiReaderContext";
 import NimiReaderButton from "@/components/NimiReaderButton";
 import SupabaseProviderWrapper from "@/components/SupabaseProviderWrapper";
+import { UserProvider } from "@/contexts/UserContext"; // added
 
 export const metadata = {
   title: "Your Site",
@@ -16,8 +17,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <LanguageProvider>
           <NimiReaderProvider>
             <SupabaseProviderWrapper>
-              {children}
-              <NimiReaderButton />
+              <UserProvider> {/* wrap with UserProvider */}
+                {children}
+                <NimiReaderButton />
+              </UserProvider>
             </SupabaseProviderWrapper>
           </NimiReaderProvider>
         </LanguageProvider>
