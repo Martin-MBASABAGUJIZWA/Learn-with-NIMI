@@ -8,13 +8,12 @@ import { Check, Gem, Shield, Sparkles, Trophy } from "lucide-react"
 import Header from "@/components/Header"
 import BottomNavigation from "@/components/BottomNavigation"
 import { useLanguage } from "@/contexts/LanguageContext"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 import { useToast } from "@/hooks/use-toast"
 import { t } from "@/lib/translations"
-import  supabase  from "@/lib/supabaseClient"
+import supabase from "@/lib/supabaseClient"
 
 // Types
-
 type PlanType = "monthly" | "yearly"
 
 type Subscription = {
@@ -23,12 +22,35 @@ type Subscription = {
 }
 
 // Main Component
-
 export default function SubscriptionPage({ parentId }: { parentId: string }) {
   const { language } = useLanguage()
   const { toast } = useToast()
   const [subscription, setSubscription] = useState<Subscription | null>(null)
   const [loading, setLoading] = useState(true)
+  const [changingPlan, setChangingPlan] = useState<PlanType | null>(null)
+
+  // Define Plans
+  const plans = useMemo(() => [
+    {
+      nameKey: "planMonthly",
+      price: "$6.99",
+      periodKey: "perMonth",
+      features: ["f1", "f2", "f3", "f4"],
+      planId: "monthly" as PlanType,
+      highlighted: false,
+    },
+    {
+      nameKey: "planYearly",
+      price: "$59.99",
+      periodKey: "perYear",
+      features: ["f1", "f2", "f3", "f4", "f5"],
+      planId: "yearly" as PlanType,
+      highlighted: true,
+      badge: t(language, "bestValue")
+    },
+  ], [language])
+
+  const isSubscribed = subscription?.status === "subscribed"
 
   // Fetch subscription from Supabase
   useEffect(() => {
@@ -39,7 +61,7 @@ export default function SubscriptionPage({ parentId }: { parentId: string }) {
         .select("*")
         .eq("parent_id", parentId)
         .single()
-
+  
       if (error && error.code !== "PGRST116") {
         toast({ title: t(language, "error"), description: error.message })
       } else {
@@ -47,11 +69,34 @@ export default function SubscriptionPage({ parentId }: { parentId: string }) {
       }
       setLoading(false)
     }
+  
     fetchSubscription()
+  
+    // --- Supabase v2 Realtime ---
+    const channel = supabase
+      .channel(`subscription-updates-${parentId}`)
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "subscriptions", filter: `parent_id=eq.${parentId}` },
+        (payload) => {
+          setSubscription(payload.new)
+        }
+      )
+      .subscribe()
+  
+    return () => {
+      supabase.removeChannel(channel)
+    }
   }, [parentId, language, toast])
+  
 
+  // Subscribe / Switch Plan
   const subscribe = async (plan: PlanType) => {
-    setLoading(true)
+    if (subscription?.plan && subscription.plan !== plan) {
+      if (!confirm(t(language, "confirmSwitchPlan"))) return
+    }
+
+    setChangingPlan(plan)
     const { error } = await supabase
       .from("subscriptions")
       .upsert(
@@ -70,36 +115,32 @@ export default function SubscriptionPage({ parentId }: { parentId: string }) {
       setSubscription({ plan, status: "subscribed" })
       toast({ title: t(language, "subscribed"), description: t(language, "premiumBenefits") })
     }
-    setLoading(false)
+    setChangingPlan(null)
   }
 
-  const plans = [
-    {
-      nameKey: "planMonthly",
-      price: "$6.99",
-      periodKey: "perMonth",
-      features: ["f1", "f2", "f3", "f4"],
-      planId: "monthly" as PlanType,
-      highlighted: false,
-    },
-    {
-      nameKey: "planYearly",
-      price: "$59.99",
-      periodKey: "perYear",
-      badge: t(language, "bestValue"),
-      features: ["f1", "f2", "f3", "f4", "f5"],
-      planId: "yearly" as PlanType,
-      highlighted: true,
-    },
-  ]
-
-  const isSubscribed = subscription?.status === "subscribed"
+  // Skeleton loader
+  if (loading) {
+    return (
+      <div className="flex flex-col min-h-screen p-4 md:p-8 space-y-8">
+        <Header />
+        <div className="animate-pulse space-y-4">
+          <div className="h-8 w-48 bg-gray-300 rounded" />
+          <div className="h-6 w-64 bg-gray-300 rounded" />
+          <div className="grid md:grid-cols-2 gap-6 mt-4">
+            <div className="h-60 bg-gray-200 rounded" />
+            <div className="h-60 bg-gray-200 rounded" />
+          </div>
+        </div>
+        <BottomNavigation />
+      </div>
+    )
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-purple-50 to-white">
       <Header />
 
-   {/* Subscription Status Badge */}
+      {/* Subscription Status Badge */}
       {isSubscribed && subscription?.plan && (
         <motion.div
           className="flex justify-center mt-4"
@@ -108,15 +149,13 @@ export default function SubscriptionPage({ parentId }: { parentId: string }) {
           transition={{ duration: 0.5 }}
         >
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-100 text-green-700 text-sm font-medium shadow-sm">
-            <Gem className="h-4 w-4" /> {/* Added gem icon */}
-            🎉 {t(language, "youAreOn")}{" "}
+            <Gem className="h-4 w-4" /> 🎉 {t(language, "youAreOn")}{" "}
             {subscription.plan === "yearly"
               ? t(language, "planYearly")
               : t(language, "planMonthly")}
           </div>
         </motion.div>
       )}
-
 
       <main className="flex-1 container max-w-5xl mx-auto p-4 md:p-8 space-y-12">
         {/* Premium Banner */}
@@ -150,10 +189,8 @@ export default function SubscriptionPage({ parentId }: { parentId: string }) {
             >
               <Card
                 className={`${
-                  p.highlighted
-                    ? "border-purple-400 ring-2 ring-purple-200 scale-[1.02]"
-                    : ""
-                } transition-transform hover:scale-[1.02] cursor-pointer`}
+                  p.highlighted ? "border-purple-400 ring-2 ring-purple-200 scale-[1.02]" : ""
+                } transition-transform hover:scale-[1.03] cursor-pointer shadow-sm`}
               >
                 <CardHeader>
                   <div className="flex items-center justify-between">
@@ -185,11 +222,11 @@ export default function SubscriptionPage({ parentId }: { parentId: string }) {
                   <Button
                     className="w-full bg-purple-600 hover:bg-purple-700 shadow-md"
                     onClick={() => subscribe(p.planId)}
-                    disabled={isSubscribed || loading}
+                    disabled={changingPlan !== null}
                   >
-                    {loading
+                    {changingPlan === p.planId
                       ? t(language, "loading")
-                      : isSubscribed
+                      : subscription?.plan === p.planId
                       ? t(language, "subscribed")
                       : t(language, "startTrial")}
                   </Button>
@@ -253,7 +290,6 @@ export default function SubscriptionPage({ parentId }: { parentId: string }) {
 }
 
 // Benefit Tile Component
-
 function BenefitTile({ icon, title, desc }: { icon: React.ReactNode; title: string; desc: string }) {
   return (
     <motion.div

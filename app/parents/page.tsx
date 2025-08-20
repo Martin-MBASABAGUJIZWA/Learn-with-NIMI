@@ -12,6 +12,7 @@ import { Slider } from "@/components/ui/slider";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import Link from "next/link"
 import {
   Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger
 } from "@/components/ui/dialog";
@@ -127,14 +128,40 @@ export default function ParentPage() {
         {isAddingChild && (
           <AddChildForm onCancel={() => setIsAddingChild(false)} onSubmit={handleAddChild} t={t} error={addChildError} currentChildCount={children.length} maxChildrenFree={MAX_CHILDREN_FREE} />
         )}
-
         {currentChild && !isAddingChild && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6">
-            <ChildProfileCard child={currentChild} onUpdate={(updates) => updateChild(currentChild.id, updates)} t={t} />
-            <WeeklyReportCard child={currentChild} progressPercent={progressPercent} t={t} />
-            {/* Add other cards like ControlsCard, StickerPreviewCard, PremiumCard */}
+            {/* Child profile info */}
+            <ChildProfileCard
+              child={currentChild}
+              onUpdate={(updates) => updateChild(currentChild.id, updates)}
+              t={t}
+            />
+
+            {/* Weekly report */}
+            <WeeklyReportCard
+              child={currentChild}
+              progressPercent={progressPercent}
+              t={t}
+            />
+
+            {/* Controls Card */}
+            <ControlsCard
+              child={currentChild}
+              onUpdate={(updates) => updateChild(currentChild.id, updates)}
+              onScreenTimeChange={(val) => updateChild(currentChild.id, { screenTimeLimit: val })}
+              t={t}
+              whitelist={currentChild.whitelist || []}
+              setWhitelist={(newList) => updateChild(currentChild.id, { whitelist: newList })}
+            />
+
+            {/* Premium Card */}
+            <PremiumCard t={t} />
+
+            {/* StickerPreviewCard - optional placeholder */}
+            {/* <StickerPreviewCard child={currentChild} t={t} /> */}
           </div>
         )}
+
       </main>
       <BottomNavigation />
     </div>
@@ -589,4 +616,4 @@ function PremiumCard({ t }: { t: (key: string) => string }) {
       </CardContent>
     </Card>
   )
-}
+}      
