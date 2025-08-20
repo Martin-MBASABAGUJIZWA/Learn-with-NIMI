@@ -39,3 +39,4 @@ core_dump.bin
 replacements.txt
 .env.local
 core.122681
+core.*
