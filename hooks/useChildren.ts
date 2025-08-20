@@ -1,43 +1,45 @@
-import { useState, useEffect, useCallback } from "react";
-import supabase from "@/lib/supabaseClient";
-import type { Child, Activity } from "@/components/parent/child-types";
+"use client";
 
-export function useChildren(parentId?: string) {
+import { useEffect, useState, useCallback } from "react";
+import supabase from "@/lib/supabaseClient";
+import { useUser } from "@supabase/auth-helpers-react";
+
+export interface Child {
+  id: string;
+  name: string;
+  birthDate: string;
+  screenTimeLimit?: number;
+  bedtimeMode?: boolean;
+  activities?: any[];
+  contentLock?: boolean;
+}
+
+interface UseChildrenResult {
+  children: Child[];
+  isReady: boolean;
+  addChild: (name: string) => Promise<{ success: boolean; child?: Child; error?: string }>;
+  updateChild: (id: string, updates: Partial<Child>) => void;
+  removeChild: (id: string) => void;
+}
+
+export function useChildren(parentId: string | null): UseChildrenResult {
+  const user = useUser();
   const [children, setChildren] = useState<Child[]>([]);
   const [isReady, setIsReady] = useState(false);
 
-  // Columns needed for the parent dashboard
-  const childColumns = [
-    "id",
-    "name",
-    "avatar",
-    "age",
-    "screenTimeLimit",
-    "bedtimeMode",
-    "contentLock",
-    "activities",
-    "created_at"
-  ];
-
   const fetchChildren = useCallback(async () => {
-    if (!parentId) {
-      setChildren([]);
-      setIsReady(true);
-      return;
-    }
-
+    if (!parentId) return;
     try {
       const { data, error } = await supabase
         .from("children")
-        .select(childColumns.join(", "))
+        .select("*")
         .eq("parent_id", parentId)
         .order("created_at", { ascending: true });
 
       if (error) throw error;
-      setChildren(data || []);
-    } catch (error) {
-      console.error("Failed to fetch children:", error);
-      setChildren([]);
+      setChildren(data as Child[]);
+    } catch (err: any) {
+      console.error("Failed to fetch children:", err);
     } finally {
       setIsReady(true);
     }
@@ -47,63 +49,63 @@ export function useChildren(parentId?: string) {
     fetchChildren();
   }, [fetchChildren]);
 
+  // --- Add a new child ---
   const addChild = async (name: string) => {
-    if (!parentId) return null;
-    
-    try {
-      const newChild: Partial<Child> = {
-        name,
-        parent_id: parentId,
-        avatar: "",
-        age: "2-4 years",  // Default age range
-        screenTimeLimit: 60,
-        bedtimeMode: false,
-        contentLock: true,
-        activities: [],
-        streak: 0,
-        level: 1,
-        points: 0
-      };
+    if (!parentId) return { success: false, error: "Parent not found" };
 
+    try {
       const { data, error } = await supabase
         .from("children")
-        .insert([newChild])
-        .select(childColumns.join(", "))
+        .insert([{ name, parent_id: parentId }])
+        .select()
         .single();
 
       if (error) throw error;
-      setChildren(prev => [...prev, data as Child]);
-      return data.id;
-    } catch (error) {
-      console.error("Error adding child:", error);
-      return null;
+
+      setChildren((prev) => [...prev, data as Child]);
+      return { success: true, child: data as Child };
+    } catch (err: any) {
+      // Make sure we extract a readable error message
+      const message =
+        err?.message || err?.error_description || JSON.stringify(err) || "Failed to add child";
+
+      console.error("Add child error:", message);
+      return { success: false, error: message };
     }
   };
 
-  const updateChild = async (childId: string, updates: Partial<Child>) => {
-    if (!parentId) return;
-    
+  // --- Update a child locally and in Supabase ---
+  const updateChild = async (id: string, updates: Partial<Child>) => {
     try {
-      // First update local state for immediate UI feedback
-      setChildren(prev => 
-        prev.map(child => 
-          child.id === childId ? { ...child, ...updates } : child
-        )
-      );
-      
-      // Then send update to database
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from("children")
         .update(updates)
-        .match({ id: childId, parent_id: parentId });
+        .eq("id", id)
+        .select()
+        .single();
 
       if (error) throw error;
-    } catch (error) {
-      console.error("Error updating child:", error);
-      // Revert local state on error
-      fetchChildren();
+
+      setChildren((prev) =>
+        prev.map((child) => (child.id === id ? { ...child, ...data } : child))
+      );
+    } catch (err: any) {
+      const message = err?.message || JSON.stringify(err) || "Failed to update child";
+      console.error("Update child error:", message);
     }
   };
 
-  return { children, addChild, updateChild, isReady, fetchChildren };
+  // --- Remove a child ---
+  const removeChild = async (id: string) => {
+    try {
+      const { error } = await supabase.from("children").delete().eq("id", id);
+      if (error) throw error;
+      setChildren((prev) => prev.filter((child) => child.id !== id));
+    } catch (err: any) {
+      const message = err?.message || JSON.stringify(err) || "Failed to remove child";
+      console.error("Remove child error:", message);
+    }
+  };
+
+  return { children, isReady, addChild, updateChild, removeChild };
 }

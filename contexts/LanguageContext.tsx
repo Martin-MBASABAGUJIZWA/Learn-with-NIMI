@@ -121,6 +121,11 @@ const dict: Record<Language, Record<string, string>> = {
     notificationsEnabled: "Notifications enabled",
     notificationsDenied: "Notifications blocked",
     learnReminderBody: "Time to learn with Nimi! A quick play can make a big difference.",
+      Child: "Child",
+      noChildrenTitle: "No children added yet",
+      noChildrenDescription: "Add a child to get started with personalized learning",
+      addFirstChild: "Add your first child",
+    
     
   },
   sw: {

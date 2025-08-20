@@ -2,34 +2,24 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import supabase from "@/lib/supabaseClient"; // Use direct import
-import { useUser } from "@/contexts/AuthContext";
+import { useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
 
 export default function LoginPage() {
   const router = useRouter();
+  const supabase = useSupabaseClient();
+  const user = useUser();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState(""); // Success message
-  
-  // Safely handle user context
-  const userContext = useUser();
-  const client = userContext?.supabase || supabase; // Fallback to direct import
 
-  // Check if user is already logged in
+  // Redirect if already logged in
   useEffect(() => {
-    const checkSession = async () => {
-      const { data: { session } } = await client.auth.getSession();
-      if (session?.user) {
-        // Redirect to parents page if already logged in
-        router.push("/parents");
-      }
-    };
-    
-    checkSession();
-  }, [client.auth, router]);
+    if (user) router.replace("/parents");
+  }, [user, router]);
 
   const login = async () => {
     setLoading(true);
@@ -37,43 +27,22 @@ export default function LoginPage() {
     setMessage("");
 
     try {
-      const { data, error: loginError } = await client.auth.signInWithPassword({
+      const { error: loginError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (loginError) {
         setError(loginError.message);
-        setLoading(false);
         return;
       }
 
-      if (data.user) {
-        const { data: userProfile, error: profileError } = await client
-          .from("users")
-          .select("*")
-          .eq("auth_user_id", data.user.id)
-          .single();
-
-        if (profileError) {
-          setError("Failed to fetch user profile: " + profileError.message);
-          setLoading(false);
-          return;
-        }
-
-        // Redirect to parents page after successful login
-        const redirectAction = sessionStorage.getItem("postLoginRedirect");
-        if (redirectAction) {
-          sessionStorage.removeItem("postLoginRedirect");
-        }
-        
-        router.push("/parents");
-      } else {
-        setError("Login failed: no user returned");
-      }
+      // Successful login, redirect to parents page
+      setMessage("Login successful! Redirecting...");
+      router.replace("/parents");
     } catch (err) {
-      setError("An unexpected error occurred");
-      console.error("Login error:", err);
+      console.error("Unexpected login error:", err);
+      setError("An unexpected error occurred.");
     } finally {
       setLoading(false);
     }

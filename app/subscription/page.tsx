@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Check, Gem, Shield, Sparkles, Trophy } from "lucide-react"
@@ -10,17 +11,23 @@ import { useLanguage } from "@/contexts/LanguageContext"
 import { useEffect, useState } from "react"
 import { useToast } from "@/hooks/use-toast"
 import { t } from "@/lib/translations"
-import { supabase } from "@/lib/supabase"
+import  supabase  from "@/lib/supabaseClient"
+
+// Types
 
 type PlanType = "monthly" | "yearly"
+
+type Subscription = {
+  plan: PlanType
+  status: string
+}
+
+// Main Component
 
 export default function SubscriptionPage({ parentId }: { parentId: string }) {
   const { language } = useLanguage()
   const { toast } = useToast()
-  const [subscription, setSubscription] = useState<{
-    plan: PlanType
-    status: string
-  } | null>(null)
+  const [subscription, setSubscription] = useState<Subscription | null>(null)
   const [loading, setLoading] = useState(true)
 
   // Fetch subscription from Supabase
@@ -33,7 +40,7 @@ export default function SubscriptionPage({ parentId }: { parentId: string }) {
         .eq("parent_id", parentId)
         .single()
 
-      if (error && error.code !== "PGRST116") { // ignore "no rows" error
+      if (error && error.code !== "PGRST116") {
         toast({ title: t(language, "error"), description: error.message })
       } else {
         setSubscription(data || null)
@@ -89,62 +96,127 @@ export default function SubscriptionPage({ parentId }: { parentId: string }) {
   const isSubscribed = subscription?.status === "subscribed"
 
   return (
-    <div className="flex flex-col min-h-screen bg-white">
+    <div className="flex flex-col min-h-screen bg-gradient-to-b from-purple-50 to-white">
       <Header />
-      <main className="flex-1 container max-w-5xl mx-auto p-4 md:p-8 space-y-8">
-        <div className="text-center space-y-2">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-100 text-purple-700 text-sm">
+
+   {/* Subscription Status Badge */}
+      {isSubscribed && subscription?.plan && (
+        <motion.div
+          className="flex justify-center mt-4"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-100 text-green-700 text-sm font-medium shadow-sm">
+            <Gem className="h-4 w-4" /> {/* Added gem icon */}
+            🎉 {t(language, "youAreOn")}{" "}
+            {subscription.plan === "yearly"
+              ? t(language, "planYearly")
+              : t(language, "planMonthly")}
+          </div>
+        </motion.div>
+      )}
+
+
+      <main className="flex-1 container max-w-5xl mx-auto p-4 md:p-8 space-y-12">
+        {/* Premium Banner */}
+        <motion.div
+          className="text-center space-y-3"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-purple-100 text-purple-700 text-sm font-medium shadow-sm">
             <Gem className="h-4 w-4" />
             {t(language, "premiumTitle")}
           </div>
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900">{t(language, "premiumHeadline")}</h1>
-          <p className="text-muted-foreground">{t(language, "premiumSubhead")}</p>
-        </div>
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-900">
+            {t(language, "premiumHeadline")}
+          </h1>
+          <p className="text-muted-foreground max-w-xl mx-auto">
+            {t(language, "premiumSubhead")}
+          </p>
+        </motion.div>
 
+        {/* Plans */}
         <div className="grid md:grid-cols-2 gap-6">
           {plans.map((p, idx) => (
-            <Card key={idx} className={`${p.highlighted ? "border-purple-400 ring-2 ring-purple-200" : ""}`}>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-xl">{t(language, p.nameKey)}</CardTitle>
-                  {p.badge && (
-                    <span className="text-xs font-semibold bg-yellow-100 text-yellow-800 rounded px-2 py-1">
-                      {p.badge}
-                    </span>
-                  )}
-                </div>
-                <div className="mt-2">
-                  <div className="text-3xl font-bold">{p.price}</div>
-                  <div className="text-xs text-muted-foreground">{t(language, p.periodKey)}</div>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <ul className="space-y-2">
-                  {p.features.map((f) => (
-                    <li key={f} className="flex items-start gap-2">
-                      <Check className="h-4 w-4 text-green-600 mt-0.5" />
-                      <span className="text-sm">{t(language, f)}</span>
-                    </li>
-                  ))}
-                </ul>
-                <Button
-                  className="w-full bg-purple-600 hover:bg-purple-700"
-                  onClick={() => subscribe(p.planId)}
-                  disabled={isSubscribed || loading}
-                >
-                  {loading
-                    ? t(language, "loading")
-                    : isSubscribed
-                    ? t(language, "subscribed")
-                    : t(language, "startTrial")}
-                </Button>
-                <p className="text-xs text-muted-foreground">{t(language, "trialNote")}</p>
-              </CardContent>
-            </Card>
+            <motion.div
+              key={idx}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: idx * 0.15 }}
+              viewport={{ once: true }}
+            >
+              <Card
+                className={`${
+                  p.highlighted
+                    ? "border-purple-400 ring-2 ring-purple-200 scale-[1.02]"
+                    : ""
+                } transition-transform hover:scale-[1.02] cursor-pointer`}
+              >
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-xl font-semibold">
+                      {t(language, p.nameKey)}
+                    </CardTitle>
+                    {p.badge && (
+                      <span className="text-xs font-semibold bg-yellow-100 text-yellow-800 rounded px-2 py-1">
+                        {p.badge}
+                      </span>
+                    )}
+                  </div>
+                  <div className="mt-2">
+                    <div className="text-3xl font-bold">{p.price}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {t(language, p.periodKey)}
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <ul className="space-y-2">
+                    {p.features.map((f) => (
+                      <li key={f} className="flex items-start gap-2">
+                        <Check className="h-4 w-4 text-green-600 mt-0.5" />
+                        <span className="text-sm">{t(language, f)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <Button
+                    className="w-full bg-purple-600 hover:bg-purple-700 shadow-md"
+                    onClick={() => subscribe(p.planId)}
+                    disabled={isSubscribed || loading}
+                  >
+                    {loading
+                      ? t(language, "loading")
+                      : isSubscribed
+                      ? t(language, "subscribed")
+                      : t(language, "startTrial")}
+                  </Button>
+                  <p className="text-xs text-muted-foreground text-center">
+                    {t(language, "trialNote")}
+                  </p>
+                </CardContent>
+              </Card>
+            </motion.div>
           ))}
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6">
+        {/* Benefits */}
+        <motion.div
+          className="grid md:grid-cols-3 gap-6"
+          initial="hidden"
+          whileInView="visible"
+          variants={{
+            hidden: { opacity: 0, y: 20 },
+            visible: {
+              opacity: 1,
+              y: 0,
+              transition: { staggerChildren: 0.2 },
+            },
+          }}
+          viewport={{ once: true }}
+        >
           <BenefitTile
             icon={<Trophy className="h-5 w-5" />}
             title={t(language, "benefit1Title")}
@@ -160,29 +232,45 @@ export default function SubscriptionPage({ parentId }: { parentId: string }) {
             title={t(language, "benefit3Title")}
             desc={t(language, "benefit3Desc")}
           />
-        </div>
+        </motion.div>
 
-        <div className="text-center space-y-3">
+        {/* Back */}
+        <motion.div
+          className="text-center space-y-3"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4 }}
+        >
           <Link href="/parent">
             <Button variant="outline">{t(language, "backToParentZone")}</Button>
           </Link>
-        </div>
+        </motion.div>
       </main>
+
       <BottomNavigation />
     </div>
   )
 }
 
+// Benefit Tile Component
+
 function BenefitTile({ icon, title, desc }: { icon: React.ReactNode; title: string; desc: string }) {
   return (
-    <Card className="bg-muted/30">
-      <CardContent className="p-4">
-        <div className="flex items-center gap-2 text-purple-700 mb-2">
-          {icon}
-          <div className="font-semibold">{title}</div>
-        </div>
-        <p className="text-sm text-muted-foreground">{desc}</p>
-      </CardContent>
-    </Card>
+    <motion.div
+      initial={{ opacity: 0, y: 15 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      viewport={{ once: true }}
+    >
+      <Card className="bg-muted/30 hover:shadow-md transition-shadow">
+        <CardContent className="p-4">
+          <div className="flex items-center gap-2 text-purple-700 mb-2">
+            {icon}
+            <div className="font-semibold">{title}</div>
+          </div>
+          <p className="text-sm text-muted-foreground">{desc}</p>
+        </CardContent>
+      </Card>
+    </motion.div>
   )
 }

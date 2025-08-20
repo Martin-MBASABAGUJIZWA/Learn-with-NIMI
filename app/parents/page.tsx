@@ -1,174 +1,106 @@
-"use client"
+"use client";
 
-import { useEffect, useMemo, useState } from "react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { Baby, CalendarCheck, Clock, Gem, Lock, Moon, Plus, Settings, Shield, Star } from "lucide-react"
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Switch } from "@/components/ui/switch"
-import { Slider } from "@/components/ui/slider"
-import { Progress } from "@/components/ui/progress"
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
-import { Input } from "@/components/ui/input"
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useLanguage } from "@/contexts/LanguageContext"
-import { useChildren, Child } from "@/hooks/useChildren"
-import { useDebouncedCallback } from "@/hooks/use-debounce"
-import { StickerPreviewCard } from "@/components/parent/sticker-preview-card"
-import { ParentProfileMenu } from "@/components/parent/parent-profile"
-import { ReminderScheduler } from "@/components/parent/reminder-scheduler"
-import { SafeNavigationGuard } from "@/components/parent/safe-navigation-guard"
-import { useKidSafeWhitelist } from "@/hooks/use-kid-safe"
-import type { Activity } from "@/components/parent/child-types"
-import Header from "@/components/Header"
-import BottomNavigation from "@/components/BottomNavigation"
+import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import {
+  Baby, CalendarCheck, Clock, Gem, Lock, Moon, Plus, Settings, Shield, Star
+} from "lucide-react";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { Slider } from "@/components/ui/slider";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger
+} from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+import Header from "@/components/Header";
+import BottomNavigation from "@/components/BottomNavigation";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { useChildren, Child } from "@/hooks/useChildren";
+import { useSession } from "@supabase/auth-helpers-react";
+import { Progress } from "@/components/ui/progress";
 
 const MAX_CHILDREN_FREE = 2;
 
-function ChildChip({
-  child,
-  isActive,
-  onClick,
-}: {
-  child: Child
-  isActive: boolean
-  onClick: () => void
-}) {
-  return (
-    <div
-      role="button"
-      onClick={onClick}
-      className={`flex items-center gap-2 min-w-fit rounded-md border px-4 py-2 cursor-pointer ${
-        isActive ? "bg-primary text-primary-foreground" : "bg-background hover:bg-accent hover:text-accent-foreground"
-      }`}
-    >
-      <Avatar className="h-6 w-6">
-        <AvatarImage src={child.avatar || ""} />
-        <AvatarFallback>{child.name.charAt(0)}</AvatarFallback>
-      </Avatar>
-      <span className="text-sm">{child.name}</span>
-    </div>
-  )
-}
-
-function ActivityItem({ activity }: { activity: Activity }) {
-  const completed = activity.completed
-  return (
-    <div className="flex items-center gap-3">
-      <div className={`h-3 w-3 rounded-full ${completed ? "bg-green-500" : "bg-gray-300"}`} />
-      <span className={completed ? "font-medium" : "text-gray-500"}>{activity.name}</span>
-    </div>
-  )
-}
 export default function ParentPage() {
-  const { language, t } = useLanguage()
-  const router = useRouter()
-  
-  // Use children without user context
-  const { children, updateChild, addChild, isReady } = useChildren()
-  
-  const [currentChildId, setCurrentChildId] = useState<string | null>(null)
-  const [isAddingChild, setIsAddingChild] = useState(false)
-  const [addChildError, setAddChildError] = useState("")
-  
-  const currentChild = children.find((c) => c.id === currentChildId) || children[0]
-  const [upgradeModalOpen, setUpgradeModalOpen] = useState(false)
+  const { t } = useLanguage();
+  const router = useRouter();
+  const session = useSession();
+  const parentId = session?.user?.id ?? null;
 
-  const { whitelist, setWhitelist } = useKidSafeWhitelist()
+  const { children, updateChild, addChild, isReady } = useChildren(parentId);
+  const [currentChildId, setCurrentChildId] = useState<string | null>(null);
+  const [isAddingChild, setIsAddingChild] = useState(false);
+  const [addChildError, setAddChildError] = useState("");
 
+  const currentChild = children.find((c) => c.id === currentChildId) || children[0];
+
+  // --- Redirect if not logged in ---
+  useEffect(() => {
+    if (parentId === null && session !== undefined) {
+      router.replace("/loginpage");
+    }
+  }, [parentId, session, router]);
+
+  // --- Set default child ---
   useEffect(() => {
     if (!currentChildId && children.length > 0) {
-      setCurrentChildId(children[0].id)
+      setCurrentChildId(children[0].id);
     }
-  }, [children, currentChildId])
+  }, [children, currentChildId]);
 
-  const handleScreenTimeChange = useDebouncedCallback((value: number) => {
-    if (currentChild) {
-      updateChild(currentChild.id, { screenTimeLimit: value })
+  const handleAddChild = async (name: string) => {
+    if (children.length >= MAX_CHILDREN_FREE) {
+      setAddChildError(t("upgradeRequired"));
+      return null;
     }
-  }, 300)
+    const result = await addChild(name);
+    if (result.success && result.child) {
+      setCurrentChildId(result.child.id);
+      setIsAddingChild(false);
+      setAddChildError("");
+      return result.child.id;
+    } else {
+      setAddChildError(result.error || t("addChildError"));
+      return null;
+    }
+  };
 
   const progressPercent = useMemo(() => {
-    if (!currentChild) return 0
-    const completed = currentChild.activities?.filter((a) => a.completed).length || 0
-    const total = currentChild.activities?.length || 1
-    return (completed / total) * 100
-  }, [currentChild])
+    if (!currentChild) return 0;
+    const completed = currentChild.activities?.filter(a => a.completed).length || 0;
+    const total = currentChild.activities?.length || 1;
+    return (completed / total) * 100;
+  }, [currentChild]);
 
-  const badge = useMemo(() => {
-    if (!currentChild) return t("badgeLittleStarter")
-    const activities = currentChild.activities || []
-    const weeklyScore = activities.reduce((acc, a) => {
-      const weeklyTotal = a.weeklyRecord?.reduce((s, v) => s + v, 0) || 0
-      return acc + weeklyTotal
-    }, 0) / Math.max(activities.length * 7, 1)
-    
-    return weeklyScore >= 0.8
-      ? t("badgeStarExplorer")
-      : weeklyScore >= 0.6
-        ? t("badgeCuriousLearner")
-        : weeklyScore >= 0.4
-          ? t("badgeBrightBeginner")
-          : t("badgeLittleStarter")
-  }, [currentChild, t])
-
-  const isLoading = !isReady
-  
-  if (isLoading) {
+  if (!isReady || session === undefined) {
     return (
       <div className="flex flex-col min-h-screen bg-blue-50">
         <Header />
         <main className="flex-grow flex items-center justify-center">
-          <div
-            className="h-12 w-12 animate-spin border-4 border-blue-300 border-t-transparent rounded-full"
-            aria-label="Loading"
-          />
+          <div className="h-12 w-12 animate-spin border-4 border-blue-300 border-t-transparent rounded-full" />
         </main>
       </div>
-    )
+    );
   }
 
-  const grayTheme = currentChild?.bedtimeMode ? "filter grayscale contrast-90" : ""
-
-  const handleAddChild = async (name: string) => {    
-    if (children.length >= MAX_CHILDREN_FREE) {
-      setAddChildError(t("upgradeRequired"))
-      return null
-    }
-    
-    try {
-      const newId = await addChild(name)
-      if (newId) {
-        setCurrentChildId(newId)
-        setIsAddingChild(false)
-        setAddChildError("")
-        return newId
-      }
-    } catch (error) {
-      console.error("Error adding child:", error)
-      setAddChildError(t("addChildError"))
-    }
-    
-    return null
-  }
+  if (!parentId) return null; // redirect in progress
 
   return (
-    <div className={`flex flex-col min-h-screen bg-blue-50 ${grayTheme}`}>
+    <div className="flex flex-col min-h-screen bg-blue-50">
       <Header />
-      <ReminderScheduler />
-      <SafeNavigationGuard enabled={!!currentChild?.contentLock} whitelist={whitelist} />
-
       <main className="flex-grow w-full max-w-5xl mx-auto p-4 md:p-6 space-y-6 relative">
         <div className="absolute top-4 right-4 z-10">
-          <ParentProfileMenu />
+          {/* Profile Menu Component */}
         </div>
 
         <div className="text-center pt-2 md:pt-4">
           <div className="flex justify-center items-center gap-3">
-            <Baby className="text-pink-500 h-8 w-8" />
+            <Baby className="text-pink-500 h-8 w-8 animate-bounce" />
             <h1 className="text-2xl md:text-3xl font-bold text-blue-600">
               {currentChild ? `${currentChild.name}${t("parentZoneTitleSuffix")}` : t("child")}
             </h1>
@@ -176,125 +108,39 @@ export default function ParentPage() {
           <p className="text-blue-400 mt-1 text-sm">{t("subtitleAgeRange")}</p>
         </div>
 
+        {/* Children Chips & Add Child */}
         <div className="flex gap-2 overflow-x-auto pb-2">
-          {children.map((child) => (
-            <ChildChip
+          {children.map(child => (
+            <Button
               key={child.id}
-              child={child}
-              isActive={currentChildId === child.id}
+              variant={currentChildId === child.id ? "default" : "outline"}
               onClick={() => setCurrentChildId(child.id)}
-            />
+            >
+              {child.name}
+            </Button>
           ))}
-          <Button
-            variant="outline"
-            onClick={() => {
-              if (children.length >= MAX_CHILDREN_FREE) {
-                setUpgradeModalOpen(true)
-                return
-              }
-              setIsAddingChild(true)
-            }}
-            className="flex items-center gap-2 min-w-fit"
-          >
-            <Plus className="h-4 w-4" />
-            {t("addChild")}
+          <Button variant="outline" onClick={() => setIsAddingChild(true)}>
+            <Plus className="h-4 w-4" /> {t("addChild")}
           </Button>
         </div>
 
         {isAddingChild && (
-          <AddChildForm
-            onCancel={() => setIsAddingChild(false)}
-            onSubmit={handleAddChild}
-            t={t}
-            error={addChildError}
-            currentChildCount={children.length}
-            maxChildrenFree={MAX_CHILDREN_FREE}
-          />
+          <AddChildForm onCancel={() => setIsAddingChild(false)} onSubmit={handleAddChild} t={t} error={addChildError} currentChildCount={children.length} maxChildrenFree={MAX_CHILDREN_FREE} />
         )}
 
-        {!isAddingChild && currentChild && (
+        {currentChild && !isAddingChild && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6">
-            <ChildProfileCard
-              child={currentChild}
-              onUpdate={(updates) => updateChild(currentChild.id, updates)}
-              t={t}
-            />
-
+            <ChildProfileCard child={currentChild} onUpdate={(updates) => updateChild(currentChild.id, updates)} t={t} />
             <WeeklyReportCard child={currentChild} progressPercent={progressPercent} t={t} />
-
-            <StickerPreviewCard child={currentChild} badge={badge} t={t} />
-
-            <ControlsCard
-              child={currentChild}
-              onUpdate={(updates) => updateChild(currentChild.id, updates)}
-              onScreenTimeChange={handleScreenTimeChange}
-              t={t}
-              whitelist={whitelist}
-              setWhitelist={setWhitelist}
-            />
-
-            <PremiumCard t={t} />
+            {/* Add other cards like ControlsCard, StickerPreviewCard, PremiumCard */}
           </div>
         )}
-
-        {/* Show empty state when no children */}
-        {!isAddingChild && children.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-12 text-center">
-            <Baby className="h-16 w-16 text-blue-400 mb-4" />
-            <h3 className="text-xl font-semibold text-gray-800 mb-2">
-              {t("noChildrenTitle")}
-            </h3>
-            <p className="text-gray-600 max-w-md mb-6">
-              {t("noChildrenDescription")}
-            </p>
-            <Button onClick={() => setIsAddingChild(true)}>
-              <Plus className="h-4 w-4 mr-2" />
-              {t("addFirstChild")}
-            </Button>
-          </div>
-        )}
-
-        <p className="text-center text-sm text-gray-500 mt-6">{t("footerTagline")}</p>
       </main>
       <BottomNavigation />
-      
-      {/* Upgrade Modal */}
-      <Dialog open={upgradeModalOpen} onOpenChange={setUpgradeModalOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{t("upgradeRequired")}</DialogTitle>
-          </DialogHeader>
-          <div className="py-4">
-            <p className="text-gray-700 mb-4">
-              {t("upgradeMessage")}
-            </p>
-            <div className="flex justify-center gap-4">
-              <Gem className="h-12 w-12 text-purple-500" />
-              <div>
-                <p className="font-semibold">{t("premiumBenefitsTitle")}</p>
-                <ul className="list-disc pl-5 mt-2 text-sm">
-                  <li>{t("premiumBenefit1")}</li>
-                  <li>{t("premiumBenefit2")}</li>
-                  <li>{t("premiumBenefit3")}</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setUpgradeModalOpen(false)}>
-              {t("cancel")}
-            </Button>
-            <Button asChild>
-              <Link href="/subscription">
-                {t("upgradeToPremium")}
-              </Link>
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
-  )
+  );
 }
+
 function AddChildForm({
   onCancel,
   onSubmit,
@@ -372,17 +218,18 @@ function ChildProfileCard({
   t: (key: string) => string
 }) {
   const [open, setOpen] = useState(false)
-  const [name, setName] = useState(child.name)
-  const [age, setAge] = useState(child.age)
-  const [avatar, setAvatar] = useState(child.avatar)
-  const [theme, setTheme] = useState(child.theme || "ocean")
+  const [name, setName] = useState(child.name ?? "")
+  const [age, setAge] = useState(child.age ?? "")
+  const [avatar, setAvatar] = useState(child.avatar ?? "")
+  const [theme, setTheme] = useState(child.theme ?? "ocean")
 
   useEffect(() => {
-    setName(child.name)
-    setAge(child.age)
-    setAvatar(child.avatar)
-    setTheme(child.theme || "ocean")
+    setName(child.name ?? "")
+    setAge(child.age ?? "")
+    setAvatar(child.avatar ?? "")
+    setTheme(child.theme ?? "ocean")
   }, [child])
+  
 
   return (
     <Card className="bg-white border-2 border-blue-200">
