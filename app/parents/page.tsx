@@ -13,6 +13,8 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link"
+import  {UserProfileMenu} from "@/components/parent/parent-profile";
+
 import {
   Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger
 } from "@/components/ui/dialog";
@@ -96,7 +98,7 @@ export default function ParentPage() {
       <Header />
       <main className="flex-grow w-full max-w-5xl mx-auto p-4 md:p-6 space-y-6 relative">
         <div className="absolute top-4 right-4 z-10">
-          {/* Profile Menu Component */}
+          <UserProfileMenu />
         </div>
 
         <div className="text-center pt-2 md:pt-4">
