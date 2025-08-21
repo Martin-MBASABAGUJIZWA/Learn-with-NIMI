@@ -7,13 +7,13 @@ import { Howl } from "howler";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import NimiAssistant from "@/components/NimiAssistant";
-import { useUser } from "@/contexts/UserContext";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { CheckCircle, Play, Trophy, Sparkles, Volume2, BookOpen, Palette, User, LogIn, X } from "lucide-react";
+import { CheckCircle, Play, Trophy, Sparkles, Volume2, BookOpen, Palette, User, X } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 
 // Translation dictionary for all supported languages
 const translations = {
@@ -32,14 +32,6 @@ const translations = {
     nextPage: "Next Page",
     spreadCount: "Spread {current} of {total}",
     loadingMissions: "Loading missions...",
-    selectChild: "Select Child",
-    noChildren: "No children found. Please add a child first.",
-    childSelectionTitle: "Who is completing this mission?",
-    childSelectionDescription: "Please select which child is completing this mission",
-    loginRequired: "Login Required",
-    loginDescription: "Please log in to save mission progress",
-    morningSong: "Morning Song",
-    playVideo: "Play Video",
     enterChildName: "Enter your child's name",
     childName: "Child's Name",
     submit: "Submit",
@@ -49,7 +41,13 @@ const translations = {
     coloringBook: "Coloring Book",
     pages: "pages",
     pauseMusic: "Pause music",
-    playMusic: "Play music"
+    playMusic: "Play music",
+    morningSong: "Morning Song",
+    playVideo: "Play Video",
+    missionCompleted: "Mission completed!",
+    missionAlreadyCompleted: "Mission already completed!",
+    watchVideoFirst: "Watch video first",
+    pleaseWatchVideo: "Please watch the video to completion before completing the mission"
   },
   es: {
     magicalLearning: "Aprendizaje Mágico",
@@ -66,14 +64,6 @@ const translations = {
     nextPage: "Página Siguiente",
     spreadCount: "Doble página {current} de {total}",
     loadingMissions: "Cargando misiones...",
-    selectChild: "Seleccionar Niño",
-    noChildren: "No se encontraron niños. Por favor agregue un niño primero.",
-    childSelectionTitle: "¿Quién está completando esta misión?",
-    childSelectionDescription: "Por favor seleccione qué niño está completando esta misión",
-    loginRequired: "Inicio de sesión requerido",
-    loginDescription: "Por favor inicie sesión para guardar el progreso de la misión",
-    morningSong: "Canción de la Mañana",
-    playVideo: "Reproducir Video",
     enterChildName: "Ingrese el nombre de su hijo",
     childName: "Nombre del Niño",
     submit: "Enviar",
@@ -83,7 +73,13 @@ const translations = {
     coloringBook: "Libro para Colorear",
     pages: "páginas",
     pauseMusic: "Pausar música",
-    playMusic: "Reproducir música"
+    playMusic: "Reproducir música",
+    morningSong: "Canción de la Mañana",
+    playVideo: "Reproducir Video",
+    missionCompleted: "¡Misión completada!",
+    missionAlreadyCompleted: "¡Misión ya completada!",
+    watchVideoFirst: "Ver video primero",
+    pleaseWatchVideo: "Por favor mira el video completo antes de completar la misión"
   },
   fr: {
     magicalLearning: "Apprentissage Magique",
@@ -100,15 +96,7 @@ const translations = {
     nextPage: "Page Suivante",
     spreadCount: "Double page {current} sur {total}",
     loadingMissions: "Chargement des missions...",
-    selectChild: "Sélectionner l'Enfant",
-    noChildren: "Aucun enfant trouvé. Veuillez d'abord ajouter un enfant.",
-    childSelectionTitle: "Qui termine cette mission?",
-    childSelectionDescription: "Veuillez sélectionner quel enfant termine cette mission",
-    loginRequired: "Connexion Requise",
-    loginDescription: "Veuillez vous connecter pour enregistrer la progression de la mission",
-    morningSong: "Chanson du Matin",
-    playVideo: "Lire la Vidéo",
-    enterChildName: "Entrez le nom de votre enfant",
+    enterChildName: "Entrez le nombre de votre enfant",
     childName: "Nom de l'Enfant",
     submit: "Soumettre",
     cancel: "Annuler",
@@ -117,7 +105,13 @@ const translations = {
     coloringBook: "Livre de Coloriage",
     pages: "pages",
     pauseMusic: "Pause musique",
-    playMusic: "Lecture musique"
+    playMusic: "Lecture musique",
+    morningSong: "Chanson du Matin",
+    playVideo: "Lire la Vidéo",
+    missionCompleted: "Mission terminée!",
+    missionAlreadyCompleted: "Mission déjà terminée!",
+    watchVideoFirst: "Regarder la vidéo d'abord",
+    pleaseWatchVideo: "Veuillez regarder la vidéo jusqu'au bout avant de terminer la mission"
   },
   rw: {
     magicalLearning: "Kwiga Ubumenyi",
@@ -134,14 +128,6 @@ const translations = {
     nextPage: "Ipaji Ikurikira",
     spreadCount: "Ipaji {current} muri {total}",
     loadingMissions: "Kuringaniza imirimo...",
-    selectChild: "Hitamo Umwana",
-    noChildren: "Nta mwana wabonetse. Ongera umwana mbere.",
-    childSelectionTitle: "Ni nde ugiye kurangiza iri murimo?",
-    childSelectionDescription: "Nyamuneka hitamo umwana ugiye kurangiza iri murimo",
-    loginRequired: "Login Ifunika",
-    loginDescription: "Nyamuneka winjire kugirango ubike iterambere ry'umurimo",
-    morningSong: "Indirimbo yo mu Gitondo",
-    playVideo: "Videra Video",
     enterChildName: "Andika izina ry'umwana wawe",
     childName: "Izina ry'Umwana",
     submit: "Ohereza",
@@ -151,7 +137,13 @@ const translations = {
     coloringBook: "Igito cyo Gupaka",
     pages: "ipaji",
     pauseMusic: "Pause umuziki",
-    playMusic: "Kina umuziki"
+    playMusic: "Kina umuziki",
+    morningSong: "Indirimbo yo mu Gitondo",
+    playVideo: "Videra Video",
+    missionCompleted: "Umurimo warangiye!",
+    missionAlreadyCompleted: "Umurimo warangiye kera!",
+    watchVideoFirst: "Reba video mbere",
+    pleaseWatchVideo: "Nyamuneka reba video ukomeza mbere y'uko ukomeza umurimo"
   },
   sw: {
     magicalLearning: "Kujifunza Kichawi",
@@ -168,14 +160,6 @@ const translations = {
     nextPage: "Ukurasa Unaofuata",
     spreadCount: "Ukurasa {current} kati ya {total}",
     loadingMissions: "Inapakia misheni...",
-    selectChild: "Chagua Mtoto",
-    noChildren: "Hakuna watoto waliopatikana. Tafadhali ongeza mtoto kwanza.",
-    childSelectionTitle: "Nani anakamilisha hii kazi?",
-    childSelectionDescription: "Tafadhali chagua mtoto anayekamilisha hii kazi",
-    loginRequired: "Login Inahitajika",
-    loginDescription: "Tafadhali ingia ili kuokoa maendeleo ya kazi",
-    morningSong: "Wimbo wa Asubuhi",
-    playVideo: "Cheza Video",
     enterChildName: "Weka jina la mtoto wako",
     childName: "Jina la Mtoto",
     submit: "Wasilisha",
@@ -185,7 +169,13 @@ const translations = {
     coloringBook: "Kitabu cha Rangi",
     pages: "kurasa",
     pauseMusic: "Pausa muziki",
-    playMusic: "Cheza muziki"
+    playMusic: "Cheza muziki",
+    morningSong: "Wimbo wa Asubuhi",
+    playVideo: "Cheza Video",
+    missionCompleted: "Misheni imekamilika!",
+    missionAlreadyCompleted: "Misheni tayari imekamilika!",
+    watchVideoFirst: "Tazama video kwanza",
+    pleaseWatchVideo: "Tafadhali tazama video hadi mwisho kabla ya kukamilisha misheni"
   }
 };
 
@@ -214,7 +204,7 @@ interface Mission {
 interface CompletionData {
   mission_id: string;
   completed_at: string;
-  child_id?: string;
+  child_name?: string;
 }
 
 interface DayData {
@@ -247,17 +237,24 @@ interface ColoringPage {
   image_url: string;
 }
 
-interface Child {
-  id: string;
-  name: string;
-  parent_id: string;
-}
-
-// Video Player Modal with disabled fast-forward
-const VideoPlayerModal = ({ videoUrl, onClose }: { videoUrl: string; onClose: () => void }) => {
+// Video Player Modal with disabled fast-forward and completion tracking
+const VideoPlayerModal = ({ 
+  videoUrl, 
+  onClose, 
+  mission,
+  onMissionComplete,
+  t
+}: { 
+  videoUrl: string; 
+  onClose: () => void;
+  mission: Mission;
+  onMissionComplete: (mission: Mission) => void;
+  t: (key: string) => string;
+}) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [hasCompleted, setHasCompleted] = useState(false);
   
   useEffect(() => {
     const handleContextMenu = (e: MouseEvent) => e.preventDefault();
@@ -283,6 +280,14 @@ const VideoPlayerModal = ({ videoUrl, onClose }: { videoUrl: string; onClose: ()
         videoRef.current.currentTime = currentTime;
       } else {
         setCurrentTime(videoRef.current.currentTime);
+        
+        // Check if video is at least 95% complete
+        if (videoRef.current.duration > 0 && 
+            videoRef.current.currentTime / videoRef.current.duration >= 0.95 &&
+            !hasCompleted) {
+          setHasCompleted(true);
+          onMissionComplete(mission);
+        }
       }
     }
   };
@@ -321,6 +326,12 @@ const VideoPlayerModal = ({ videoUrl, onClose }: { videoUrl: string; onClose: ()
           onTimeUpdate={handleTimeUpdate}
           onLoadedMetadata={handleLoadedMetadata}
           onSeeked={handleTimeUpdate}
+          onEnded={() => {
+            if (!hasCompleted) {
+              setHasCompleted(true);
+              onMissionComplete(mission);
+            }
+          }}
         />
       </motion.div>
     </motion.div>
@@ -353,6 +364,9 @@ const MorningVideoCard = ({ video, t }: { video: AudioTrack | null; t: (key: str
           <VideoPlayerModal 
             videoUrl={video.audio_url}
             onClose={() => setOpenVideo(false)}
+            mission={{} as Mission}
+            onMissionComplete={() => {}}
+            t={t}
           />
         )}
       </AnimatePresence>
@@ -387,7 +401,7 @@ const ChildNameModal = ({
         <DialogHeader>
           <DialogTitle>{t('enterChildName')}</DialogTitle>
           <DialogDescription>
-            {t('childSelectionDescription')}
+            Please enter your child's name to track their progress
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
@@ -406,28 +420,6 @@ const ChildNameModal = ({
           <Button variant="outline" onClick={onClose}>{t('cancel')}</Button>
           <Button onClick={handleSubmit} disabled={!name.trim()}>{t('submit')}</Button>
         </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
-};
-
-// Login Prompt Modal
-const LoginPromptModal = ({ isOpen, onClose, t }: { isOpen: boolean; onClose: () => void; t: (key: string) => string }) => {
-  return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>{t('loginRequired')}</DialogTitle>
-          <DialogDescription>
-            {t('loginDescription')}
-          </DialogDescription>
-        </DialogHeader>
-        <div className="flex justify-center py-4">
-          <Button onClick={() => {/* Add your login redirect logic here */}}>
-            <LogIn className="h-4 w-4 mr-2" />
-            Log In
-          </Button>
-        </div>
       </DialogContent>
     </Dialog>
   );
@@ -963,7 +955,7 @@ const MissionsComponent = () => {
   const [missionProgram, setMissionProgram] = useState<DayData[]>([]);
   const [selectedDay, setSelectedDay] = useState(1);
   const [completions, setCompletions] = useState<CompletionData[]>([]);
-  const [openVideo, setOpenVideo] = useState<string | null>(null);
+  const [openVideo, setOpenVideo] = useState<{url: string, mission: Mission} | null>(null);
   const [showDayCompleteModal, setShowDayCompleteModal] = useState(false);
   const [showStorybook, setShowStorybook] = useState(false);
   const [showColoringBook, setShowColoringBook] = useState(false);
@@ -972,13 +964,12 @@ const MissionsComponent = () => {
   const [audioTrack, setAudioTrack] = useState<AudioTrack | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [bookCovers, setBookCovers] = useState<BookCover[]>([]);
-  const { user } = useUser();
   const { language } = useLanguage();
-  const [children, setChildren] = useState<Child[]>([]);
   const [showChildNameModal, setShowChildNameModal] = useState(false);
   const [missionToComplete, setMissionToComplete] = useState<Mission | null>(null);
-  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [childNotFound, setChildNotFound] = useState(false);
+  const [videoProgress, setVideoProgress] = useState<Record<string, number>>({});
+  const [videoCompletion, setVideoCompletion] = useState<Record<string, boolean>>({});
   
   // Translation function
   const t = (key: string, params?: Record<string, any>) => {
@@ -1005,15 +996,28 @@ const MissionsComponent = () => {
         if (missionsError) throw missionsError;
         if (missions) setMissionProgram(groupMissionsByDay(missions));
 
-        // Fetch completions
-        if (user?.id) {
-          const { data: completions, error: completionsError } = await supabase
-            .from("mission_completions")
-            .select("mission_id, completed_at, child_id")
-            .eq("user_id", user.id);
+        // Fetch completions from local storage first
+        const storedCompletions = localStorage.getItem('missionCompletions');
+        if (storedCompletions) {
+          setCompletions(JSON.parse(storedCompletions));
+        }
 
-          if (completionsError) throw completionsError;
-          setCompletions(completions || []);
+        // Also fetch from database for persistence
+        const { data: dbCompletions, error: completionsError } = await supabase
+          .from("mission_completions")
+          .select("mission_id, completed_at, child_name");
+
+        if (!completionsError && dbCompletions) {
+          // Merge with local completions, prioritizing local ones
+          setCompletions(prev => {
+            const merged = [...prev];
+            dbCompletions.forEach(dbCompletion => {
+              if (!prev.find(c => c.mission_id === dbCompletion.mission_id)) {
+                merged.push(dbCompletion);
+              }
+            });
+            return merged;
+          });
         }
 
         // Fetch audio track (now used as morning video)
@@ -1036,18 +1040,6 @@ const MissionsComponent = () => {
           setBookCovers(covers || []);
         }
 
-        // Fetch children if user is logged in
-        if (user?.id) {
-          const { data: childrenData, error: childrenError } = await supabase
-            .from("children")
-            .select("*")
-            .eq("parent_id", user.id);
-
-          if (!childrenError) {
-            setChildren(childrenData || []);
-          }
-        }
-
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -1056,7 +1048,12 @@ const MissionsComponent = () => {
     };
 
     fetchAllData();
-  }, [user]);
+  }, []);
+
+  // Save completions to local storage whenever they change
+  useEffect(() => {
+    localStorage.setItem('missionCompletions', JSON.stringify(completions));
+  }, [completions]);
 
   // Fetch story pages and coloring pages when day changes
   useEffect(() => {
@@ -1122,51 +1119,177 @@ const MissionsComponent = () => {
     [missionProgram, selectedDay]
   );
 
-  const handleMissionComplete = (mission: Mission) => {
-    if (!user) {
-      setShowLoginPrompt(true);
+  const handleMissionComplete = async (mission: Mission, childName?: string) => {
+    // Check if mission is already completed locally first
+    if (completedIds.has(mission.id)) {
+      toast.info(t('missionAlreadyCompleted'));
       return;
     }
 
-    // If user is logged in, ask for child name
-    setMissionToComplete(mission);
-    setShowChildNameModal(true);
+    try {
+      let childId: string | null = null;
+      
+      // If child name is provided, find or create the child
+      if (childName && childName.trim() !== '') {
+        const trimmedName = childName.trim();
+        
+        // First try to find the child by name (get first match if multiple exist)
+        const { data: existingChildren, error: findError } = await supabase
+          .from('children')
+          .select('id')
+          .ilike('name', trimmedName)
+          .limit(1);
+
+        if (findError) {
+          console.error('Error finding child:', findError);
+          throw new Error(`Failed to find child: ${findError.message}`);
+        }
+
+        if (existingChildren && existingChildren.length > 0) {
+          // Child exists, use their ID
+          childId = existingChildren[0].id;
+          
+          // Check if this child has already completed this mission
+          const { data: existingCompletion, error: completionError } = await supabase
+            .from('mission_completions')
+            .select('id')
+            .eq('mission_id', mission.id)
+            .eq('child_id', childId)
+            .maybeSingle();
+
+          if (completionError) {
+            console.error('Error checking existing completion:', completionError);
+            throw new Error(`Failed to check existing completion: ${completionError.message}`);
+          }
+
+          if (existingCompletion) {
+            toast.info(t('missionAlreadyCompleted'));
+            return;
+          }
+        } else {
+          // Child doesn't exist, create a new child record
+          const { data: newChild, error: createError } = await supabase
+            .from('children')
+            .insert([{ name: trimmedName }])
+            .select('id')
+            .single();
+
+          if (createError) {
+            console.error('Error creating child:', createError);
+            throw new Error(`Failed to create child: ${createError.message}`);
+          }
+
+          childId = newChild.id;
+        }
+      } else {
+        // For anonymous completions, check if mission is already completed by anyone
+        const { data: existingCompletion, error: completionError } = await supabase
+          .from('mission_completions')
+          .select('id')
+          .eq('mission_id', mission.id)
+          .is('child_id', null)
+          .maybeSingle();
+
+        if (completionError) {
+          console.error('Error checking existing completion:', completionError);
+          throw new Error(`Failed to check existing completion: ${completionError.message}`);
+        }
+
+        if (existingCompletion) {
+          toast.info(t('missionAlreadyCompleted'));
+          return;
+        }
+      }
+
+      // Insert completion into Supabase
+      const completionData: any = {
+        mission_id: mission.id,
+        completed_at: new Date().toISOString()
+      };
+
+      // Only add child_id if we have one (for anonymous completions, don't set it)
+      if (childId) {
+        completionData.child_id = childId;
+      }
+
+      const { data, error } = await supabase
+        .from('mission_completions')
+        .insert([completionData])
+        .select()
+        .single();
+
+      if (error) {
+        // Check if it's a duplicate error (unique constraint violation)
+        if (error.code === '23505') {
+          toast.info(t('missionAlreadyCompleted'));
+          return;
+        }
+        throw new Error(`Supabase error: ${error.message} (code: ${error.code})`);
+      }
+
+      // Update local state
+      const newCompletion = {
+        mission_id: mission.id,
+        completed_at: new Date().toISOString(),
+        child_name: childName
+      };
+
+      setCompletions((prev) => [...prev, newCompletion]);
+
+      // Show success message
+      toast.success(t('missionCompleted'));
+
+      // Trigger confetti
+      const confetti = await import("canvas-confetti");
+      confetti.default({
+        particleCount: 50,
+        spread: 70,
+        origin: { y: 0.6 },
+      });
+
+      // Check if all missions for the day are completed
+      if (currentDayData?.missions.every(m => completedIds.has(m.id) || m.id === mission.id)) {
+        setShowDayCompleteModal(true);
+      }
+    } catch (error) {
+      console.error('Error completing mission:', error);
+      
+      // Extract error message
+      let errorMessage = 'Unknown error';
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      } else if (error && typeof error === 'object' && 'message' in error) {
+        errorMessage = String(error.message);
+      }
+      
+      toast.error(`Failed to complete mission: ${errorMessage}`);
+    }
   };
 
-  const completeMission = async (mission: Mission, childName: string) => {
-    // Find child by name
-    const child = children.find(c => c.name.toLowerCase() === childName.toLowerCase());
-    
-    if (!child) {
-      setChildNotFound(true);
-      setTimeout(() => setChildNotFound(false), 3000);
+  const handleVideoOpen = (mission: Mission) => {
+    setOpenVideo({ url: mission.video_url, mission });
+  };
+
+  const handleVideoComplete = (mission: Mission) => {
+    setVideoCompletion(prev => ({ ...prev, [mission.id]: true }));
+  };
+
+  const handleManualCompletion = (mission: Mission) => {
+    // Check if video was watched to completion
+    if (!videoCompletion[mission.id]) {
+      toast.error(t('pleaseWatchVideo'));
       return;
     }
 
-    const newCompletion = {
-      mission_id: mission.id,
-      completed_at: new Date().toISOString(),
-      child_id: child.id,
-    };
-
-    setCompletions((prev) => [...prev, newCompletion]);
-
-    const confetti = await import("canvas-confetti");
-    confetti.default({
-      particleCount: 50,
-      spread: 70,
-      origin: { y: 0.6 },
-    });
-
-    if (user?.id) {
-      await supabase
-        .from("mission_completions")
-        .insert([{ ...newCompletion, user_id: user.id }]);
+    // Check if already completed
+    if (completedIds.has(mission.id)) {
+      toast.info(t('missionAlreadyCompleted'));
+      return;
     }
 
-    if (currentDayData?.missions.every(m => completedIds.has(m.id) || m.id === mission.id)) {
-      setShowDayCompleteModal(true);
-    }
+    // Show child name modal
+    setMissionToComplete(mission);
+    setShowChildNameModal(true);
   };
 
   if (isLoading) {
@@ -1254,6 +1377,7 @@ const MissionsComponent = () => {
             {currentDayData.missions.map((mission, index) => {
               const completed = completedIds.has(mission.id);
               const icon = ["🧙", "🦄", "🌈", "🔮", "🎩", "🌟"][index % 6];
+              const videoWatched = videoCompletion[mission.id];
 
               return (
                 <motion.div
@@ -1282,7 +1406,7 @@ const MissionsComponent = () => {
 
                     <CardContent className="grid gap-3">
                       <Button
-                        onClick={() => setOpenVideo(mission.video_url)}
+                        onClick={() => handleVideoOpen(mission)}
                         className="w-full gap-3 py-4 text-xl min-h-[64px] bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
                       >
                         <Play className="h-7 w-7" />
@@ -1291,12 +1415,19 @@ const MissionsComponent = () => {
 
                       {!completed ? (
                         <Button
-                          onClick={() => handleMissionComplete(mission)}
+                          onClick={() => handleManualCompletion(mission)}
                           variant="outline"
-                          className="w-full gap-3 py-4 text-xl min-h-[64px] border-yellow-400 text-yellow-600 hover:bg-yellow-50"
+                          className={`w-full gap-3 py-4 text-xl min-h-[64px] ${
+                            videoWatched 
+                              ? "border-yellow-400 text-yellow-600 hover:bg-yellow-50" 
+                              : "border-gray-300 text-gray-400 cursor-not-allowed"
+                          }`}
+                          disabled={!videoWatched}
                         >
                           <Sparkles className="h-7 w-7" />
-                          <span>{t('completeMission')}</span>
+                          <span>
+                            {videoWatched ? t('completeMission') : t('watchVideoFirst')}
+                          </span>
                         </Button>
                       ) : (
                         <div className="flex items-center justify-center gap-3 text-green-600 text-xl font-semibold p-4 bg-green-100 rounded-lg">
@@ -1348,18 +1479,11 @@ const MissionsComponent = () => {
         onClose={() => setShowChildNameModal(false)}
         onConfirm={(childName) => {
           if (missionToComplete) {
-            completeMission(missionToComplete, childName);
+            handleMissionComplete(missionToComplete, childName);
           }
           setShowChildNameModal(false);
           setMissionToComplete(null);
         }}
-        t={t}
-      />
-
-      {/* Login Prompt Modal */}
-      <LoginPromptModal
-        isOpen={showLoginPrompt}
-        onClose={() => setShowLoginPrompt(false)}
         t={t}
       />
 
@@ -1464,8 +1588,11 @@ const MissionsComponent = () => {
       <AnimatePresence>
         {openVideo && (
           <VideoPlayerModal 
-            videoUrl={openVideo}
+            videoUrl={openVideo.url}
             onClose={() => setOpenVideo(null)}
+            mission={openVideo.mission}
+            onMissionComplete={handleVideoComplete}
+            t={t}
           />
         )}
       </AnimatePresence>
