@@ -13,7 +13,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link"
-import  {UserProfileMenu} from "@/components/parent/parent-profile";
+import { UserProfileMenu } from "@/components/parent/parent-profile";
 
 import {
   Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger
@@ -26,6 +26,8 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useChildren, Child } from "@/hooks/useChildren";
 import { useSession } from "@supabase/auth-helpers-react";
 import { Progress } from "@/components/ui/progress";
+import { useToast } from "@/hooks/use-toast";
+import supabase from "@/lib/supabaseClient";
 
 const MAX_CHILDREN_FREE = 2;
 
@@ -33,6 +35,7 @@ export default function ParentPage() {
   const { t } = useLanguage();
   const router = useRouter();
   const session = useSession();
+  const { toast } = useToast();
   const parentId = session?.user?.id ?? null;
 
   const { children, updateChild, addChild, isReady } = useChildren(parentId);
@@ -157,7 +160,7 @@ export default function ParentPage() {
             />
 
             {/* Premium Card */}
-            <PremiumCard t={t} />
+            <PremiumCard t={t} userId={parentId} toast={toast} />
 
             {/* StickerPreviewCard - optional placeholder */}
             {/* <StickerPreviewCard child={currentChild} t={t} /> */}
@@ -353,6 +356,7 @@ function ChildProfileCard({
     </Card>
   )
 }
+
 function WeeklyReportCard({
   child,
   progressPercent,
@@ -405,7 +409,6 @@ function WeeklyReportCard({
     </Card>
   )
 }
-
 
 function ControlsCard({
   child,
@@ -522,32 +525,87 @@ function ControlsCard({
   )
 }
 
-function PremiumCard({ t }: { t: (key: string) => string }) {
-  const [isSubscribed, setIsSubscribed] = useState(false)
-  const [prefStorybook, setPrefStorybook] = useState(true)
-  const [prefColoring, setPrefColoring] = useState(true)
-  const [deliveryDay, setDeliveryDay] = useState("Friday")
+function PremiumCard({ t, userId, toast }: { t: (key: string) => string; userId: string | null; toast: any }) {
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [prefStorybook, setPrefStorybook] = useState(true);
+  const [prefColoring, setPrefColoring] = useState(true);
+  const [deliveryDay, setDeliveryDay] = useState("Friday");
+  const [isLoading, setIsLoading] = useState(true);
 
+  // Fetch user preferences from Supabase
   useEffect(() => {
-    const sub = localStorage.getItem("subscriptionStatus") === "subscribed"
-    setIsSubscribed(sub)
-    const prefs = localStorage.getItem("deliveryPrefs")
-    if (prefs) {
-      try {
-        const p = JSON.parse(prefs)
-        setPrefStorybook(!!p.storybook)
-        setPrefColoring(!!p.coloring)
-        setDeliveryDay(p.day || "Friday")
-      } catch {}
-    }
-  }, [])
+    if (!userId) return;
 
-  const savePrefs = () => {
-    localStorage.setItem(
-      "deliveryPrefs",
-      JSON.stringify({ storybook: prefStorybook, coloring: prefColoring, day: deliveryDay }),
-    )
-  }
+    const fetchUserPreferences = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("users")
+          .select("subscription_status, delivery_preferences")
+          .eq("auth_user_id", userId)
+          .maybeSingle();
+
+        if (error) {
+          console.error("Error fetching user preferences:", error);
+          return;
+        }
+
+        if (data) {
+          setIsSubscribed(data.subscription_status === "premium");
+          
+          // Set delivery preferences if they exist
+          if (data.delivery_preferences) {
+            setPrefStorybook(data.delivery_preferences.storybook ?? true);
+            setPrefColoring(data.delivery_preferences.coloring ?? true);
+            setDeliveryDay(data.delivery_preferences.day || "Friday");
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching user preferences:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUserPreferences();
+  }, [userId]);
+
+  const savePrefs = async () => {
+    if (!userId) return;
+
+    try {
+      const deliveryPrefs = {
+        storybook: prefStorybook,
+        coloring: prefColoring,
+        day: deliveryDay,
+      };
+
+      const { error } = await supabase
+        .from("users")
+        .update({ delivery_preferences: deliveryPrefs })
+        .eq("auth_user_id", userId);
+
+      if (error) {
+        console.error("Error saving preferences:", error);
+        toast({
+          title: "Error",
+          description: "Failed to save preferences",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Success",
+          description: "Preferences saved successfully",
+        });
+      }
+    } catch (error) {
+      console.error("Error saving preferences:", error);
+      toast({
+        title: "Error",
+        description: "Failed to save preferences",
+        variant: "destructive",
+      });
+    }
+  };
 
   const bullets = [
     t("premiumBullet1"),
@@ -555,7 +613,17 @@ function PremiumCard({ t }: { t: (key: string) => string }) {
     t("premiumBullet3"),
     t("premiumBullet4"),
     t("premiumBullet5"),
-  ]
+  ];
+
+  if (isLoading) {
+    return (
+      <Card className="bg-purple-50 border-2 border-purple-200">
+        <CardContent className="flex items-center justify-center h-40">
+          <div className="h-8 w-8 animate-spin border-4 border-purple-300 border-t-transparent rounded-full" />
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="bg-purple-50 border-2 border-purple-200">
@@ -580,16 +648,30 @@ function PremiumCard({ t }: { t: (key: string) => string }) {
           <div className="font-semibold">{t("premiumDeliveriesTitle")}</div>
           <div className={`grid sm:grid-cols-2 gap-3 ${!isSubscribed ? "opacity-60 pointer-events-none" : ""}`}>
             <label className="flex items-center gap-2">
-              <input type="checkbox" checked={prefStorybook} onChange={(e) => setPrefStorybook(e.target.checked)} />
+              <input 
+                type="checkbox" 
+                checked={prefStorybook} 
+                onChange={(e) => setPrefStorybook(e.target.checked)} 
+                disabled={!isSubscribed}
+              />
               <span>{t("weeklyHardStorybook")}</span>
             </label>
             <label className="flex items-center gap-2">
-              <input type="checkbox" checked={prefColoring} onChange={(e) => setPrefColoring(e.target.checked)} />
+              <input 
+                type="checkbox" 
+                checked={prefColoring} 
+                onChange={(e) => setPrefColoring(e.target.checked)} 
+                disabled={!isSubscribed}
+              />
               <span>{t("weeklyColoringBook")}</span>
             </label>
             <div className="sm:col-span-2">
               <Label htmlFor="deliveryDay">{t("chooseDeliveryDay")}</Label>
-              <Select value={deliveryDay} onValueChange={setDeliveryDay}>
+              <Select 
+                value={deliveryDay} 
+                onValueChange={setDeliveryDay}
+                disabled={!isSubscribed}
+              >
                 <SelectTrigger id="deliveryDay" className="mt-1">
                   <SelectValue />
                 </SelectTrigger>
@@ -610,12 +692,16 @@ function PremiumCard({ t }: { t: (key: string) => string }) {
             <Link href="/subscription" className="block mt-1">
               <Button className="bg-purple-600 hover:bg-purple-700">{t("manageSubscription")}</Button>
             </Link>
-            <Button variant="outline" onClick={savePrefs}>
+            <Button 
+              variant="outline" 
+              onClick={savePrefs}
+              disabled={!isSubscribed}
+            >
               {t("savePreferences")}
             </Button>
           </div>
         </div>
       </CardContent>
     </Card>
-  )
-}      
+  );
+}

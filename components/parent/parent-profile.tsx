@@ -10,6 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { useUser } from "@/contexts/UserContext";
 import supabase from "@/lib/supabaseClient";
+import { useRouter } from "next/navigation";
 import { useSession } from "@supabase/auth-helpers-react";
 
 export function UserProfileMenu() {
@@ -17,11 +18,11 @@ export function UserProfileMenu() {
   const { toast } = useToast();
   const { user, setUser } = useUser();
   const [open, setOpen] = useState(false);
+  const router = useRouter();
   const [profile, setProfile] = useState<any>({
     id: "",
     auth_user_id: "",
     name: "",
-    email: "",
     subscription_status: "free",
     preferred_language: "en",
     avatar_url: "",
@@ -69,11 +70,10 @@ export function UserProfileMenu() {
           return;
         }
   
-        // 2️⃣ Profile not found → create one
+        // 2️⃣ Profile not found → create one (without email field)
         const defaultProfile = {
-          auth_user_id: session.user.id, // MUST match RLS check
+          auth_user_id: session.user.id,
           name: session.user.user_metadata?.full_name || "Parent",
-          email: session.user.email || null,
           status: "pending",
           subscription_status: "free",
           preferred_language: "en",
@@ -119,8 +119,6 @@ export function UserProfileMenu() {
     fetchOrCreateProfile();
   }, [session?.user?.id, toast]);
   
-  
-
   // --- Save profile ---
   const saveProfile = async () => {
     if (!session?.user?.id) return;
@@ -197,8 +195,8 @@ export function UserProfileMenu() {
       const fileName = `${session.user.id}.${fileExt}`;
 
       const { error: uploadError } = await supabase.storage
-      .from("avatars")
-      .upload(`avatars/${fileName}`, croppedFile, { upsert: true });    
+        .from("avatars")
+        .upload(`avatars/${fileName}`, croppedFile, { upsert: true });
 
       if (uploadError) throw uploadError;
 
@@ -235,6 +233,21 @@ export function UserProfileMenu() {
     if (e.dataTransfer.files.length) handleAvatarUpload(e.dataTransfer.files[0]);
   };
 
+  // --- Handle Logout ---
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      router.push("/loginpage");
+    } catch (error) {
+      console.error("Logout error:", error);
+      toast({ 
+        title: "Logout Error", 
+        description: "Failed to logout. Please try again.", 
+        variant: "destructive" 
+      });
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -259,6 +272,14 @@ export function UserProfileMenu() {
         <DialogHeader>
           <DialogTitle>Profile</DialogTitle>
         </DialogHeader>
+
+        {/* Display email from session if available */}
+        {session?.user?.email && (
+          <div className="mb-2">
+            <Label>Email</Label>
+            <div className="text-sm text-gray-600">{session.user.email}</div>
+          </div>
+        )}
 
         {/* Avatar */}
         <div
@@ -364,13 +385,10 @@ export function UserProfileMenu() {
           <Button
             variant="outline"
             className="w-full"
-            onClick={() => {
-              if (user) supabase.auth.signOut().then(() => location.reload());
-              else location.href = "/loginpage";
-            }}
+            onClick={handleLogout}
             disabled={isLoading}
           >
-            {user ? "Logout" : "Login"}
+            Logout
           </Button>
         </DialogFooter>
       </DialogContent>

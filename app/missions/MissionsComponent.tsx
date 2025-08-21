@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useEffect, useState, useMemo, useRef } from "react";
@@ -10,8 +9,11 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import NimiAssistant from "@/components/NimiAssistant";
 import { useUser } from "@/contexts/UserContext";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { CheckCircle, Play, Trophy, Sparkles, Volume2, BookOpen, Palette } from "lucide-react";
-
+import { CheckCircle, Play, Trophy, Sparkles, Volume2, BookOpen, Palette, User, LogIn, X } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 // Translation dictionary for all supported languages
 const translations = {
@@ -30,6 +32,24 @@ const translations = {
     nextPage: "Next Page",
     spreadCount: "Spread {current} of {total}",
     loadingMissions: "Loading missions...",
+    selectChild: "Select Child",
+    noChildren: "No children found. Please add a child first.",
+    childSelectionTitle: "Who is completing this mission?",
+    childSelectionDescription: "Please select which child is completing this mission",
+    loginRequired: "Login Required",
+    loginDescription: "Please log in to save mission progress",
+    morningSong: "Morning Song",
+    playVideo: "Play Video",
+    enterChildName: "Enter your child's name",
+    childName: "Child's Name",
+    submit: "Submit",
+    cancel: "Cancel",
+    childNotFound: "Child not found. Please check the name and try again.",
+    storyTime: "Story Time",
+    coloringBook: "Coloring Book",
+    pages: "pages",
+    pauseMusic: "Pause music",
+    playMusic: "Play music"
   },
   es: {
     magicalLearning: "Aprendizaje Mágico",
@@ -46,6 +66,24 @@ const translations = {
     nextPage: "Página Siguiente",
     spreadCount: "Doble página {current} de {total}",
     loadingMissions: "Cargando misiones...",
+    selectChild: "Seleccionar Niño",
+    noChildren: "No se encontraron niños. Por favor agregue un niño primero.",
+    childSelectionTitle: "¿Quién está completando esta misión?",
+    childSelectionDescription: "Por favor seleccione qué niño está completando esta misión",
+    loginRequired: "Inicio de sesión requerido",
+    loginDescription: "Por favor inicie sesión para guardar el progreso de la misión",
+    morningSong: "Canción de la Mañana",
+    playVideo: "Reproducir Video",
+    enterChildName: "Ingrese el nombre de su hijo",
+    childName: "Nombre del Niño",
+    submit: "Enviar",
+    cancel: "Cancelar",
+    childNotFound: "Niño no encontrado. Por favor verifique el nombre e intente nuevamente.",
+    storyTime: "Hora del Cuento",
+    coloringBook: "Libro para Colorear",
+    pages: "páginas",
+    pauseMusic: "Pausar música",
+    playMusic: "Reproducir música"
   },
   fr: {
     magicalLearning: "Apprentissage Magique",
@@ -62,6 +100,24 @@ const translations = {
     nextPage: "Page Suivante",
     spreadCount: "Double page {current} sur {total}",
     loadingMissions: "Chargement des missions...",
+    selectChild: "Sélectionner l'Enfant",
+    noChildren: "Aucun enfant trouvé. Veuillez d'abord ajouter un enfant.",
+    childSelectionTitle: "Qui termine cette mission?",
+    childSelectionDescription: "Veuillez sélectionner quel enfant termine cette mission",
+    loginRequired: "Connexion Requise",
+    loginDescription: "Veuillez vous connecter pour enregistrer la progression de la mission",
+    morningSong: "Chanson du Matin",
+    playVideo: "Lire la Vidéo",
+    enterChildName: "Entrez le nom de votre enfant",
+    childName: "Nom de l'Enfant",
+    submit: "Soumettre",
+    cancel: "Annuler",
+    childNotFound: "Enfant non trouvé. Veuillez vérifier le nom et réessayer.",
+    storyTime: "Heure du Conte",
+    coloringBook: "Livre de Coloriage",
+    pages: "pages",
+    pauseMusic: "Pause musique",
+    playMusic: "Lecture musique"
   },
   rw: {
     magicalLearning: "Kwiga Ubumenyi",
@@ -78,6 +134,24 @@ const translations = {
     nextPage: "Ipaji Ikurikira",
     spreadCount: "Ipaji {current} muri {total}",
     loadingMissions: "Kuringaniza imirimo...",
+    selectChild: "Hitamo Umwana",
+    noChildren: "Nta mwana wabonetse. Ongera umwana mbere.",
+    childSelectionTitle: "Ni nde ugiye kurangiza iri murimo?",
+    childSelectionDescription: "Nyamuneka hitamo umwana ugiye kurangiza iri murimo",
+    loginRequired: "Login Ifunika",
+    loginDescription: "Nyamuneka winjire kugirango ubike iterambere ry'umurimo",
+    morningSong: "Indirimbo yo mu Gitondo",
+    playVideo: "Videra Video",
+    enterChildName: "Andika izina ry'umwana wawe",
+    childName: "Izina ry'Umwana",
+    submit: "Ohereza",
+    cancel: "Hagarika",
+    childNotFound: "Umwana ntabwo yabonetse. Ngaho cegeranya izina unongere ugerageze.",
+    storyTime: "Igiro cy'Inkuru",
+    coloringBook: "Igito cyo Gupaka",
+    pages: "ipaji",
+    pauseMusic: "Pause umuziki",
+    playMusic: "Kina umuziki"
   },
   sw: {
     magicalLearning: "Kujifunza Kichawi",
@@ -94,10 +168,28 @@ const translations = {
     nextPage: "Ukurasa Unaofuata",
     spreadCount: "Ukurasa {current} kati ya {total}",
     loadingMissions: "Inapakia misheni...",
+    selectChild: "Chagua Mtoto",
+    noChildren: "Hakuna watoto waliopatikana. Tafadhali ongeza mtoto kwanza.",
+    childSelectionTitle: "Nani anakamilisha hii kazi?",
+    childSelectionDescription: "Tafadhali chagua mtoto anayekamilisha hii kazi",
+    loginRequired: "Login Inahitajika",
+    loginDescription: "Tafadhali ingia ili kuokoa maendeleo ya kazi",
+    morningSong: "Wimbo wa Asubuhi",
+    playVideo: "Cheza Video",
+    enterChildName: "Weka jina la mtoto wako",
+    childName: "Jina la Mtoto",
+    submit: "Wasilisha",
+    cancel: "Ghairi",
+    childNotFound: "Mtoto hajapatikana. Tafadhali angalia jina na ujaribu tena.",
+    storyTime: "Wakati wa Hadithi",
+    coloringBook: "Kitabu cha Rangi",
+    pages: "kurasa",
+    pauseMusic: "Pausa muziki",
+    playMusic: "Cheza muziki"
   }
 };
 
-// Types (same as before)
+// Types
 interface BookCover {
   id: string;
   day: number;
@@ -122,6 +214,7 @@ interface Mission {
 interface CompletionData {
   mission_id: string;
   completed_at: string;
+  child_id?: string;
 }
 
 interface DayData {
@@ -154,55 +247,52 @@ interface ColoringPage {
   image_url: string;
 }
 
-// Music Player Component with translations
-const MusicPlayerCard = ({ track, t }: { track: AudioTrack | null; t: (key: string) => string }) => {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [sound, setSound] = useState<Howl | null>(null);
+interface Child {
+  id: string;
+  name: string;
+  parent_id: string;
+}
 
+// Video Player Modal with disabled fast-forward
+const VideoPlayerModal = ({ videoUrl, onClose }: { videoUrl: string; onClose: () => void }) => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  
   useEffect(() => {
-    if (track) {
-      const newSound = new Howl({
-        src: [track.audio_url],
-        volume: 0.5,
-        onend: () => setIsPlaying(false)
-      });
-      setSound(newSound);
+    const handleContextMenu = (e: MouseEvent) => e.preventDefault();
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowRight' || e.key === 'ArrowLeft' || e.key === ' ') {
+        e.preventDefault();
+      }
+    };
+    
+    document.addEventListener('contextmenu', handleContextMenu);
+    document.addEventListener('keydown', handleKeyDown);
+    
+    return () => {
+      document.removeEventListener('contextmenu', handleContextMenu);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
 
-      return () => {
-        newSound.unload();
-      }; 
+  const handleTimeUpdate = () => {
+    if (videoRef.current) {
+      // Prevent seeking by resetting if user tries to jump ahead
+      if (videoRef.current.currentTime > currentTime + 1) {
+        videoRef.current.currentTime = currentTime;
+      } else {
+        setCurrentTime(videoRef.current.currentTime);
+      }
     }
-  }, [track]);
-
-  const togglePlay = () => {
-    if (!sound) return;
-    isPlaying ? sound.pause() : sound.play();
-    setIsPlaying(!isPlaying);
   };
 
-  if (!track) return null;
+  const handleLoadedMetadata = () => {
+    if (videoRef.current) {
+      setDuration(videoRef.current.duration);
+    }
+  };
 
-  return (
-    <motion.div 
-      className="bg-gradient-to-r from-purple-100 to-blue-100 p-3 md:p-4 rounded-xl mb-4 md:mb-6 border-2 border-yellow-300 w-full max-w-[400px] mx-auto"
-      whileHover={{ scale: 1.02 }}
-    >
-      <div className="flex items-center justify-center gap-3 md:gap-4">
-        <button 
-          onClick={togglePlay}
-          className="p-2 md:p-3 bg-white rounded-full shadow-md flex-shrink-0"
-          aria-label={isPlaying ? t('pauseMusic') : t('playMusic')}
-        >
-          <Volume2 className={`h-6 w-6 md:h-8 md:w-8 ${isPlaying ? 'text-purple-600' : 'text-gray-500'}`} />
-        </button>
-        <span className="text-lg md:text-xl font-bold truncate">{track.title}</span>
-      </div>
-    </motion.div>
-  );
-};
-
-// Video Player Modal (no translations needed as it only has a close button)
-const VideoPlayerModal = ({ videoUrl, onClose }: { videoUrl: string; onClose: () => void }) => {
   return (
     <motion.div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-2"
@@ -223,18 +313,125 @@ const VideoPlayerModal = ({ videoUrl, onClose }: { videoUrl: string; onClose: ()
         >
           ✕
         </button>
-        <iframe
+        <video
+          ref={videoRef}
           src={videoUrl}
+          controls
           className="w-full h-full"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
+          onTimeUpdate={handleTimeUpdate}
+          onLoadedMetadata={handleLoadedMetadata}
+          onSeeked={handleTimeUpdate}
         />
       </motion.div>
     </motion.div>
   );
 };
 
+// Morning Video Card Component
+const MorningVideoCard = ({ video, t }: { video: AudioTrack | null; t: (key: string) => string }) => {
+  const [openVideo, setOpenVideo] = useState(false);
 
+  if (!video) return null;
+
+  return (
+    <>
+      <motion.div 
+        className="bg-gradient-to-r from-purple-100 to-blue-100 p-4 rounded-xl mb-6 border-2 border-yellow-300 w-full max-w-[400px] mx-auto cursor-pointer"
+        whileHover={{ scale: 1.02 }}
+        onClick={() => setOpenVideo(true)}
+      >
+        <div className="flex items-center justify-center gap-4">
+          <div className="p-3 bg-white rounded-full shadow-md flex-shrink-0">
+            <Play className="h-8 w-8 text-purple-600" />
+          </div>
+          <span className="text-xl font-bold truncate">{t('morningSong')}</span>
+        </div>
+      </motion.div>
+
+      <AnimatePresence>
+        {openVideo && (
+          <VideoPlayerModal 
+            videoUrl={video.audio_url}
+            onClose={() => setOpenVideo(false)}
+          />
+        )}
+      </AnimatePresence>
+    </>
+  );
+};
+
+// Child Name Input Modal
+const ChildNameModal = ({ 
+  isOpen, 
+  onClose, 
+  onConfirm,
+  t 
+}: { 
+  isOpen: boolean; 
+  onClose: () => void; 
+  onConfirm: (name: string) => void;
+  t: (key: string) => string;
+}) => {
+  const [name, setName] = useState('');
+
+  const handleSubmit = () => {
+    if (name.trim()) {
+      onConfirm(name.trim());
+      setName('');
+    }
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>{t('enterChildName')}</DialogTitle>
+          <DialogDescription>
+            {t('childSelectionDescription')}
+          </DialogDescription>
+        </DialogHeader>
+        <div className="grid gap-4 py-4">
+          <div className="grid gap-2">
+            <Label htmlFor="child-name">{t('childName')}</Label>
+            <Input
+              id="child-name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder={t('enterChildName')}
+              onKeyPress={(e) => e.key === 'Enter' && handleSubmit()}
+            />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>{t('cancel')}</Button>
+          <Button onClick={handleSubmit} disabled={!name.trim()}>{t('submit')}</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+// Login Prompt Modal
+const LoginPromptModal = ({ isOpen, onClose, t }: { isOpen: boolean; onClose: () => void; t: (key: string) => string }) => {
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>{t('loginRequired')}</DialogTitle>
+          <DialogDescription>
+            {t('loginDescription')}
+          </DialogDescription>
+        </DialogHeader>
+        <div className="flex justify-center py-4">
+          <Button onClick={() => {/* Add your login redirect logic here */}}>
+            <LogIn className="h-4 w-4 mr-2" />
+            Log In
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
 
 // ENHANCED RESPONSIVE REAL BOOK VIEWER
 const RealBookViewer = ({ 
@@ -777,6 +974,11 @@ const MissionsComponent = () => {
   const [bookCovers, setBookCovers] = useState<BookCover[]>([]);
   const { user } = useUser();
   const { language } = useLanguage();
+  const [children, setChildren] = useState<Child[]>([]);
+  const [showChildNameModal, setShowChildNameModal] = useState(false);
+  const [missionToComplete, setMissionToComplete] = useState<Mission | null>(null);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+  const [childNotFound, setChildNotFound] = useState(false);
   
   // Translation function
   const t = (key: string, params?: Record<string, any>) => {
@@ -807,14 +1009,14 @@ const MissionsComponent = () => {
         if (user?.id) {
           const { data: completions, error: completionsError } = await supabase
             .from("mission_completions")
-            .select("mission_id, completed_at")
+            .select("mission_id, completed_at, child_id")
             .eq("user_id", user.id);
 
           if (completionsError) throw completionsError;
           setCompletions(completions || []);
         }
 
-        // Fetch audio track
+        // Fetch audio track (now used as morning video)
         const { data: audioData, error: audioError } = await supabase
           .from("audio_tracks")
           .select("*")
@@ -832,6 +1034,18 @@ const MissionsComponent = () => {
 
         if (!coversError) {
           setBookCovers(covers || []);
+        }
+
+        // Fetch children if user is logged in
+        if (user?.id) {
+          const { data: childrenData, error: childrenError } = await supabase
+            .from("children")
+            .select("*")
+            .eq("parent_id", user.id);
+
+          if (!childrenError) {
+            setChildren(childrenData || []);
+          }
         }
 
       } catch (error) {
@@ -908,10 +1122,31 @@ const MissionsComponent = () => {
     [missionProgram, selectedDay]
   );
 
-  const completeMission = async (mission: Mission) => {
+  const handleMissionComplete = (mission: Mission) => {
+    if (!user) {
+      setShowLoginPrompt(true);
+      return;
+    }
+
+    // If user is logged in, ask for child name
+    setMissionToComplete(mission);
+    setShowChildNameModal(true);
+  };
+
+  const completeMission = async (mission: Mission, childName: string) => {
+    // Find child by name
+    const child = children.find(c => c.name.toLowerCase() === childName.toLowerCase());
+    
+    if (!child) {
+      setChildNotFound(true);
+      setTimeout(() => setChildNotFound(false), 3000);
+      return;
+    }
+
     const newCompletion = {
       mission_id: mission.id,
       completed_at: new Date().toISOString(),
+      child_id: child.id,
     };
 
     setCompletions((prev) => [...prev, newCompletion]);
@@ -936,9 +1171,26 @@ const MissionsComponent = () => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-4xl animate-pulse">✨</div>
-        <p className="ml-4">{t('loadingMissions')}</p>
+      <div className="flex flex-col items-center justify-center min-h-screen p-4">
+        <div className="text-4xl animate-pulse mb-4">✨</div>
+        <Skeleton className="h-8 w-48 mb-8" />
+        
+        <div className="flex overflow-x-auto pb-4 gap-3 w-full max-w-2xl">
+          {[1, 2, 3, 4, 5, 6, 7].map(day => (
+            <Skeleton key={day} className="h-20 w-20 rounded-xl" />
+          ))}
+        </div>
+        
+        <div className="w-full max-w-md mb-6">
+          <Skeleton className="h-20 w-full rounded-xl mb-4" />
+          <Skeleton className="h-32 w-full rounded-xl" />
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-2xl">
+          {[1, 2, 3, 4].map(item => (
+            <Skeleton key={item} className="h-40 w-full rounded-xl" />
+          ))}
+        </div>
       </div>
     );
   }
@@ -946,46 +1198,46 @@ const MissionsComponent = () => {
   return (
     <>
       {/* Day Selection */}
-      <section className="mb-4 sm:mb-6 md:mb-8 w-full">
-        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-3 sm:mb-4 md:mb-6 select-none">
+      <section className="mb-6 w-full">
+        <h2 className="text-4xl font-bold text-center mb-6 select-none">
           <motion.span 
             animate={{ rotate: [0, 10, -10, 0] }}
             transition={{ repeat: Infinity, duration: 5 }}
-            className="inline-block mr-2 sm:mr-3"
+            className="inline-block mr-3"
           >
             {currentDayData?.emoji || "✨"}
           </motion.span>
           {currentDayData?.theme}
         </h2>
 
-        <div className="flex overflow-x-auto pb-2 sm:pb-3 gap-2 sm:gap-3 md:gap-4 px-2 sm:px-3 scrollbar-thin w-full">
+        <div className="flex overflow-x-auto pb-4 gap-4 px-4 scrollbar-thin w-full">
           {missionProgram.slice(0, 7).map(day => (
             <motion.button
               key={day.day}
               onClick={() => setSelectedDay(day.day)}
               whileHover={{ y: -5 }}
               whileTap={{ scale: 0.95 }}
-              className={`flex flex-col items-center p-2 sm:p-3 md:p-4 rounded-xl min-w-[70px] sm:min-w-[80px] md:min-w-[100px] transition-all flex-shrink-0
+              className={`flex flex-col items-center p-4 rounded-xl min-w-[100px] transition-all flex-shrink-0
                 ${selectedDay === day.day
                   ? "bg-gradient-to-br from-purple-600 to-blue-600 text-white shadow-lg"
                   : "bg-white shadow-md hover:shadow-lg"}`}
             >
               <motion.span 
-                className="text-2xl sm:text-3xl md:text-4xl"
+                className="text-4xl"
                 animate={selectedDay === day.day ? { scale: [1, 1.1, 1] } : {}}
                 transition={{ duration: 1, repeat: Infinity }}
               >
                 {day.emoji}
               </motion.span>
-              <span className="text-sm sm:text-base md:text-lg lg:text-xl font-bold">{t('day')} {day.day}</span>
+              <span className="text-lg font-bold">Day {day.day}</span>
             </motion.button>
           ))}
         </div>
       </section>
 
-      {/* Music Player & Nimi Assistant */}
-      <div className="max-w-md mx-auto mb-4 sm:mb-6 space-y-3 sm:space-y-4 w-full px-2">
-        <MusicPlayerCard track={audioTrack} t={t} />
+      {/* Morning Video & Nimi Assistant */}
+      <div className="max-w-md mx-auto mb-6 space-y-4 w-full px-4">
+        <MorningVideoCard video={audioTrack} t={t} />
         <motion.div 
           animate={{ y: [0, -5, 0] }}
           transition={{ duration: 3, repeat: Infinity }}
@@ -997,8 +1249,8 @@ const MissionsComponent = () => {
 
       {/* Missions Grid */}
       {currentDayData?.missions.length ? (
-        <section className="max-w-2xl mx-auto px-1 sm:px-2 w-full">
-          <div className="grid grid-cols-1 gap-3 sm:gap-4 md:gap-6 md:grid-cols-2 w-full">
+        <section className="max-w-2xl mx-auto px-4 w-full">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 w-full">
             {currentDayData.missions.map((mission, index) => {
               const completed = completedIds.has(mission.id);
               const icon = ["🧙", "🦄", "🌈", "🔮", "🎩", "🌟"][index % 6];
@@ -1016,39 +1268,39 @@ const MissionsComponent = () => {
                     ${completed ? "border-green-300 bg-green-50" : "border-purple-200 hover:border-purple-300"}`}
                   >
                     {completed && (
-                      <div className="absolute top-2 right-2 sm:top-3 sm:right-3 bg-green-500 text-white p-1 rounded-full">
-                        <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6" />
+                      <div className="absolute top-3 right-3 bg-green-500 text-white p-1 rounded-full">
+                        <CheckCircle className="h-6 w-6" />
                       </div>
                     )}
 
-                    <CardHeader className="pb-1 sm:pb-2">
-                      <div className="flex items-center gap-2 sm:gap-3">
-                        <span className="text-3xl sm:text-4xl md:text-5xl">{icon}</span>
-                        <CardTitle className="text-lg sm:text-xl md:text-2xl">{mission.title}</CardTitle>
+                    <CardHeader className="pb-2">
+                      <div className="flex items-center gap-3">
+                        <span className="text-5xl">{icon}</span>
+                        <CardTitle className="text-2xl">{mission.title}</CardTitle>
                       </div>
                     </CardHeader>
 
-                    <CardContent className="grid gap-2 sm:gap-3">
+                    <CardContent className="grid gap-3">
                       <Button
                         onClick={() => setOpenVideo(mission.video_url)}
-                        className="w-full gap-2 sm:gap-3 py-2 sm:py-3 md:py-4 text-base sm:text-lg md:text-xl min-h-[50px] sm:min-h-[60px] md:min-h-[64px] bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
+                        className="w-full gap-3 py-4 text-xl min-h-[64px] bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
                       >
-                        <Play className="h-5 w-5 sm:h-6 sm:w-6 md:h-7 md:w-7" />
+                        <Play className="h-7 w-7" />
                         <span>{t('watchMagic')}</span>
                       </Button>
 
                       {!completed ? (
                         <Button
-                          onClick={() => completeMission(mission)}
+                          onClick={() => handleMissionComplete(mission)}
                           variant="outline"
-                          className="w-full gap-2 sm:gap-3 py-2 sm:py-3 md:py-4 text-base sm:text-lg md:text-xl min-h-[50px] sm:min-h-[60px] md:min-h-[64px] border-yellow-400 text-yellow-600 hover:bg-yellow-50"
+                          className="w-full gap-3 py-4 text-xl min-h-[64px] border-yellow-400 text-yellow-600 hover:bg-yellow-50"
                         >
-                          <Sparkles className="h-5 w-5 sm:h-6 sm:w-6 md:h-7 md:w-7" />
+                          <Sparkles className="h-7 w-7" />
                           <span>{t('completeMission')}</span>
                         </Button>
                       ) : (
-                        <div className="flex items-center justify-center gap-2 sm:gap-3 text-green-600 text-base sm:text-lg md:text-xl font-semibold p-2 sm:p-3 md:p-4 bg-green-100 rounded-lg">
-                          <Trophy className="h-5 w-5 sm:h-6 sm:w-6 md:h-7 md:w-7" />
+                        <div className="flex items-center justify-center gap-3 text-green-600 text-xl font-semibold p-4 bg-green-100 rounded-lg">
+                          <Trophy className="h-7 w-7" />
                           <span>{t('completed')}</span>
                         </div>
                       )}
@@ -1060,56 +1312,94 @@ const MissionsComponent = () => {
           </div>
         </section>
       ) : (
-        <div className="text-center py-12 sm:py-16 md:py-20 text-gray-600 text-base sm:text-lg md:text-lg w-full">
+        <div className="text-center py-20 text-gray-600 text-lg w-full">
           {t('preparingMagic')}
         </div>
       )}
 
-     {/* Storybook and Coloring Book Cards */}
-     <div className="flex flex-col md:flex-row justify-center items-center gap-4 md:gap-8">
-  {storyPages.length > 0 && (
-    <BookCard 
-      day={selectedDay} 
-      onOpen={() => setShowStorybook(true)}
-      pageCount={storyPages.length}
-      coverData={bookCovers.find(c => c.day === selectedDay && c.cover_type === 'story')}
-      type="story"
-      t={t}
-    />
-  )}
-  
-  {coloringPages.length > 0 && (
-    <BookCard 
-      day={selectedDay}
-      onOpen={() => setShowColoringBook(true)}
-      pageCount={coloringPages.length}
-      coverData={bookCovers.find(c => c.day === selectedDay && c.cover_type === 'coloring')}
-      type="coloring"
-      t={t}
-    />
-  )}
-</div>
+      {/* Storybook and Coloring Book Cards */}
+      <div className="flex flex-col md:flex-row justify-center items-center gap-8 mt-8">
+        {storyPages.length > 0 && (
+          <BookCard 
+            day={selectedDay} 
+            onOpen={() => setShowStorybook(true)}
+            pageCount={storyPages.length}
+            coverData={bookCovers.find(c => c.day === selectedDay && c.cover_type === 'story')}
+            type="story"
+            t={t}
+          />
+        )}
+        
+        {coloringPages.length > 0 && (
+          <BookCard 
+            day={selectedDay}
+            onOpen={() => setShowColoringBook(true)}
+            pageCount={coloringPages.length}
+            coverData={bookCovers.find(c => c.day === selectedDay && c.cover_type === 'coloring')}
+            type="coloring"
+            t={t}
+          />
+        )}
+      </div>
+
+      {/* Child Name Input Modal */}
+      <ChildNameModal
+        isOpen={showChildNameModal}
+        onClose={() => setShowChildNameModal(false)}
+        onConfirm={(childName) => {
+          if (missionToComplete) {
+            completeMission(missionToComplete, childName);
+          }
+          setShowChildNameModal(false);
+          setMissionToComplete(null);
+        }}
+        t={t}
+      />
+
+      {/* Login Prompt Modal */}
+      <LoginPromptModal
+        isOpen={showLoginPrompt}
+        onClose={() => setShowLoginPrompt(false)}
+        t={t}
+      />
+
+      {/* Child Not Found Toast */}
+      <AnimatePresence>
+        {childNotFound && (
+          <motion.div
+            className="fixed top-4 right-4 bg-red-500 text-white p-4 rounded-lg shadow-lg z-50"
+            initial={{ opacity: 0, x: 100 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 100 }}
+          >
+            <div className="flex items-center">
+              <X className="h-5 w-5 mr-2" />
+              <span>{t('childNotFound')}</span>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Day Complete Modal */}
       <AnimatePresence>
         {showDayCompleteModal && (
           <motion.div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-3"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
             <motion.div
-              className="bg-gradient-to-br from-blue-100 to-purple-100 rounded-xl p-4 sm:p-6 md:p-8 shadow-xl text-center w-full max-w-[90%] sm:max-w-md border-2 border-blue-300 relative overflow-hidden"
+              className="bg-gradient-to-br from-blue-100 to-purple-100 rounded-xl p-8 shadow-xl text-center w-full max-w-md border-2 border-blue-300 relative overflow-hidden"
               initial={{ scale: 0.9 }}
               animate={{ scale: 1 }}
               exit={{ scale: 0.9 }}
             >
-              <div className="absolute -top-6 -left-6 sm:-top-8 sm:-left-8 text-4xl sm:text-5xl opacity-20">🏆</div>
-              <div className="absolute -bottom-6 -right-6 sm:-bottom-8 sm:-right-8 text-4xl sm:text-5xl opacity-20">🎉</div>
+              <div className="absolute -top-8 -left-8 text-5xl opacity-20">🏆</div>
+              <div className="absolute -bottom-8 -right-8 text-5xl opacity-20">🎉</div>
               
               <motion.div
-                className="text-4xl sm:text-5xl mb-3 sm:mb-4 mx-auto w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20"
+                className="text-5xl mb-4 mx-auto w-20 h-20"
                 animate={{
                   rotate: 360,
                   scale: [1, 1.1, 1]
@@ -1122,16 +1412,16 @@ const MissionsComponent = () => {
                 🏅
               </motion.div>
 
-              <h2 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3 md:mb-4 text-blue-800">{t('dayComplete')}</h2>
-              <p className="text-sm sm:text-base md:text-lg mb-3 sm:mb-4 md:mb-6">
+              <h2 className="text-2xl font-bold mb-4 text-blue-800">{t('dayComplete')}</h2>
+              <p className="text-lg mb-6">
                 {t('masteredDay', { day: selectedDay })}
               </p>
 
               <Button
                 onClick={() => setShowDayCompleteModal(false)}
-                className="gap-2 text-sm sm:text-base md:text-lg py-2 sm:py-3 w-full max-w-xs mx-auto bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700"
+                className="gap-2 text-lg py-3 w-full max-w-xs mx-auto bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700"
               >
-                <Sparkles className="h-4 w-4 sm:h-5 sm:w-5" />
+                <Sparkles className="h-5 w-5" />
                 {t('awesome')}
               </Button>
             </motion.div>
@@ -1139,8 +1429,8 @@ const MissionsComponent = () => {
         )}
       </AnimatePresence>
 
-            {/* Storybook Viewer */}
-            <AnimatePresence>
+      {/* Storybook Viewer */}
+      <AnimatePresence>
         {showStorybook && storyPages.length > 0 && (
           <RealBookViewer 
             pages={storyPages.map(page => ({
