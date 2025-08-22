@@ -21,7 +21,6 @@ type Subscription = {
   status: string
 }
 
-// Main Component
 export default function SubscriptionPage({ parentId }: { parentId: string }) {
   const { language } = useLanguage()
   const { toast } = useToast()
@@ -72,53 +71,37 @@ export default function SubscriptionPage({ parentId }: { parentId: string }) {
   
     fetchSubscription()
   
-    // --- Supabase v2 Realtime ---
     const channel = supabase
       .channel(`subscription-updates-${parentId}`)
       .on(
         "postgres_changes",
         { event: "UPDATE", schema: "public", table: "subscriptions", filter: `parent_id=eq.${parentId}` },
-        (payload) => {
-          setSubscription(payload.new)
-        }
+        (payload) => setSubscription(payload.new)
       )
       .subscribe()
   
-    return () => {
-      supabase.removeChannel(channel)
-    }
+    return () => supabase.removeChannel(channel)
   }, [parentId, language, toast])
-  
 
-  // Subscribe / Switch Plan
+  // Subscribe via Stripe Checkout
   const subscribe = async (plan: PlanType) => {
-    if (subscription?.plan && subscription.plan !== plan) {
-      if (!confirm(t(language, "confirmSwitchPlan"))) return
-    }
-
     setChangingPlan(plan)
-    const { error } = await supabase
-      .from("subscriptions")
-      .upsert(
-        {
-          parent_id: parentId,
-          plan,
-          status: "subscribed",
-          renewed_at: new Date().toISOString(),
-        },
-        { onConflict: "parent_id" }
-      )
 
-    if (error) {
-      toast({ title: t(language, "error"), description: error.message })
-    } else {
-      setSubscription({ plan, status: "subscribed" })
-      toast({ title: t(language, "subscribed"), description: t(language, "premiumBenefits") })
+    try {
+      const res = await fetch("/api/create-checkout-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ parentId, plan }),
+      })
+
+      const data = await res.json()
+      if (data.url) window.location.href = data.url
+    } catch (err) {
+      toast({ title: t(language, "error"), description: (err as any).message })
+      setChangingPlan(null)
     }
-    setChangingPlan(null)
   }
 
-  // Skeleton loader
   if (loading) {
     return (
       <div className="flex flex-col min-h-screen p-4 md:p-8 space-y-8">
@@ -140,7 +123,6 @@ export default function SubscriptionPage({ parentId }: { parentId: string }) {
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-purple-50 to-white">
       <Header />
 
-      {/* Subscription Status Badge */}
       {isSubscribed && subscription?.plan && (
         <motion.div
           className="flex justify-center mt-4"
@@ -158,7 +140,6 @@ export default function SubscriptionPage({ parentId }: { parentId: string }) {
       )}
 
       <main className="flex-1 container max-w-5xl mx-auto p-4 md:p-8 space-y-12">
-        {/* Premium Banner */}
         <motion.div
           className="text-center space-y-3"
           initial={{ opacity: 0, y: -20 }}
@@ -177,7 +158,6 @@ export default function SubscriptionPage({ parentId }: { parentId: string }) {
           </p>
         </motion.div>
 
-        {/* Plans */}
         <div className="grid md:grid-cols-2 gap-6">
           {plans.map((p, idx) => (
             <motion.div
@@ -194,9 +174,7 @@ export default function SubscriptionPage({ parentId }: { parentId: string }) {
               >
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-xl font-semibold">
-                      {t(language, p.nameKey)}
-                    </CardTitle>
+                    <CardTitle className="text-xl font-semibold">{t(language, p.nameKey)}</CardTitle>
                     {p.badge && (
                       <span className="text-xs font-semibold bg-yellow-100 text-yellow-800 rounded px-2 py-1">
                         {p.badge}
@@ -205,9 +183,7 @@ export default function SubscriptionPage({ parentId }: { parentId: string }) {
                   </div>
                   <div className="mt-2">
                     <div className="text-3xl font-bold">{p.price}</div>
-                    <div className="text-xs text-muted-foreground">
-                      {t(language, p.periodKey)}
-                    </div>
+                    <div className="text-xs text-muted-foreground">{t(language, p.periodKey)}</div>
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -220,7 +196,7 @@ export default function SubscriptionPage({ parentId }: { parentId: string }) {
                     ))}
                   </ul>
                   <Button
-                    className="w-full bg-purple-600 hover:bg-purple-700 shadow-md"
+                    className={`w-full ${p.highlighted ? "bg-purple-700 hover:bg-purple-800" : "bg-purple-600 hover:bg-purple-700"} shadow-md`}
                     onClick={() => subscribe(p.planId)}
                     disabled={changingPlan !== null}
                   >
@@ -228,50 +204,30 @@ export default function SubscriptionPage({ parentId }: { parentId: string }) {
                       ? t(language, "loading")
                       : subscription?.plan === p.planId
                       ? t(language, "subscribed")
-                      : t(language, "startTrial")}
+                      : `${t(language, "pay")} ${p.price}`}
                   </Button>
-                  <p className="text-xs text-muted-foreground text-center">
-                    {t(language, "trialNote")}
-                  </p>
+                  <p className="text-xs text-muted-foreground text-center">{t(language, "trialNote")}</p>
                 </CardContent>
               </Card>
             </motion.div>
           ))}
         </div>
 
-        {/* Benefits */}
         <motion.div
           className="grid md:grid-cols-3 gap-6"
           initial="hidden"
           whileInView="visible"
           variants={{
             hidden: { opacity: 0, y: 20 },
-            visible: {
-              opacity: 1,
-              y: 0,
-              transition: { staggerChildren: 0.2 },
-            },
+            visible: { opacity: 1, y: 0, transition: { staggerChildren: 0.2 } },
           }}
           viewport={{ once: true }}
         >
-          <BenefitTile
-            icon={<Trophy className="h-5 w-5" />}
-            title={t(language, "benefit1Title")}
-            desc={t(language, "benefit1Desc")}
-          />
-          <BenefitTile
-            icon={<Sparkles className="h-5 w-5" />}
-            title={t(language, "benefit2Title")}
-            desc={t(language, "benefit2Desc")}
-          />
-          <BenefitTile
-            icon={<Shield className="h-5 w-5" />}
-            title={t(language, "benefit3Title")}
-            desc={t(language, "benefit3Desc")}
-          />
+          <BenefitTile icon={<Trophy className="h-5 w-5" />} title={t(language, "benefit1Title")} desc={t(language, "benefit1Desc")} />
+          <BenefitTile icon={<Sparkles className="h-5 w-5" />} title={t(language, "benefit2Title")} desc={t(language, "benefit2Desc")} />
+          <BenefitTile icon={<Shield className="h-5 w-5" />} title={t(language, "benefit3Title")} desc={t(language, "benefit3Desc")} />
         </motion.div>
 
-        {/* Back */}
         <motion.div
           className="text-center space-y-3"
           initial={{ opacity: 0 }}
@@ -292,12 +248,7 @@ export default function SubscriptionPage({ parentId }: { parentId: string }) {
 // Benefit Tile Component
 function BenefitTile({ icon, title, desc }: { icon: React.ReactNode; title: string; desc: string }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 15 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
-      viewport={{ once: true }}
-    >
+    <motion.div initial={{ opacity: 0, y: 15 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} viewport={{ once: true }}>
       <Card className="bg-muted/30 hover:shadow-md transition-shadow">
         <CardContent className="p-4">
           <div className="flex items-center gap-2 text-purple-700 mb-2">

@@ -301,8 +301,54 @@ const CommunityPage = () => {
     }
   }, [currentUser, creations, supabase, triggerCelebration]);
 
+  // WhatsApp sharing function
+  const shareViaWhatsApp = async (creation: Creation) => {
+    try {
+      // Get the public URL of the image
+      let imageUrl = creation.imageUrl;
+      
+      if (!imageUrl.startsWith('http')) {
+        const pathParts = imageUrl.split('/creations/');
+        const fileName = pathParts[pathParts.length - 1];
+        const { data: { publicUrl } } = supabase.storage
+          .from('creations')
+          .getPublicUrl(fileName);
+        imageUrl = publicUrl;
+      }
+
+      // Create the share text
+      const shareText = `${creation.description || "Check out this amazing creation!"}\n\nBy ${creation.childName} (age ${creation.age})`;
+      
+      // Create the WhatsApp share URL based on device type
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      const encodedText = encodeURIComponent(`${shareText}\n\n${imageUrl}`);
+      
+      let whatsappUrl;
+      if (isMobile) {
+        // For mobile devices - opens WhatsApp app directly
+        whatsappUrl = `whatsapp://send?text=${encodedText}`;
+      } else {
+        // For desktop - opens WhatsApp Web with QR code
+        whatsappUrl = `https://web.whatsapp.com/send?text=${encodedText}`;
+      }
+      
+      // Open WhatsApp
+      window.open(whatsappUrl, '_blank');
+      
+    } catch (err) {
+      console.error("WhatsApp sharing failed:", err);
+      setError("WhatsApp sharing didn't work. Try copying the link manually.");
+    }
+  };
+
   // Share creation function with multiple platform options
   const shareCreation = useCallback(async (creation: Creation, platform?: string) => {
+    // For WhatsApp specifically, use the new function
+    if (platform === 'whatsapp') {
+      await shareViaWhatsApp(creation);
+      return;
+    }
+    
     try {
       let shareableUrl = creation.imageUrl;
       
@@ -319,12 +365,6 @@ const CommunityPage = () => {
       const shareTitle = `Art by ${creation.childName}`;
   
       // Platform-specific sharing
-      if (platform === 'whatsapp') {
-        const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText + '\n\n' + shareableUrl)}`;
-        window.open(whatsappUrl, '_blank');
-        return;
-      }
-      
       if (platform === 'facebook') {
         const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareableUrl)}&quote=${encodeURIComponent(shareText)}`;
         window.open(facebookUrl, '_blank');
@@ -365,7 +405,7 @@ const CommunityPage = () => {
     e.preventDefault();
   
     if (!uploadForm.imageFile) {
-      setError("Please select an image to upload");
+      setError("Please select an image to share");
       return;
     }
   
@@ -377,16 +417,93 @@ const CommunityPage = () => {
       // ----------------------------
       const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
       const maxSize = 5 * 1024 * 1024; // 5MB
-      if (!validTypes.includes(uploadForm.imageFile.type)) throw new Error('Only JPG, PNG, or GIF images are allowed');
-      if (uploadForm.imageFile.size > maxSize) throw new Error('Image must be smaller than 5MB');
+      if (!validTypes.includes(uploadForm.imageFile.type)) {
+        throw new Error('Only JPG, PNG, or GIF images are allowed');
+      }
+      if (uploadForm.imageFile.size > maxSize) {
+        throw new Error('Image must be smaller than 5MB');
+      }
   
       // ----------------------------
-      // 2️⃣ Generate unique filename & upload
+      // 2️⃣ WhatsApp private sharing
+      // ----------------------------
+      if (uploadForm.shareMethod === 'whatsapp') {
+        // Generate temporary filename
+        const fileExt = uploadForm.imageFile.name.split('.').pop();
+        const tempFileName = `temp_${uuidv4()}.${fileExt}`;
+        const filePath = `temp-creations/${tempFileName}`;
+  
+        // Upload to Supabase storage (temporary folder)
+        const { error: uploadError } = await supabase.storage
+          .from('creations')
+          .upload(filePath, uploadForm.imageFile, {
+            cacheControl: '3600', // 1 hour
+            upsert: true,
+            contentType: uploadForm.imageFile.type
+          });
+        if (uploadError) throw uploadError;
+  
+        // Get public URL
+        const { data: { publicUrl } } = supabase.storage
+          .from('creations')
+          .getPublicUrl(filePath);
+  
+        // Create WhatsApp message
+        const text = `Check out ${uploadForm.childName}'s creation!${uploadForm.description ? `\n${uploadForm.description}` : ''}\n\n${publicUrl}`;
+        
+        // Determine if we're on mobile or desktop
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        const encodedText = encodeURIComponent(text);
+        
+        let whatsappUrl;
+        if (isMobile) {
+          // For mobile devices - opens WhatsApp app directly
+          whatsappUrl = `whatsapp://send?text=${encodedText}`;
+        } else {
+          // For desktop - opens WhatsApp Web with QR code
+          whatsappUrl = `https://web.whatsapp.com/send?text=${encodedText}`;
+        }
+  
+        // Open WhatsApp
+        window.open(whatsappUrl, "_blank");
+  
+        // Schedule cleanup of the temporary file after 1 hour
+        setTimeout(async () => {
+          try {
+            await supabase.storage
+              .from('creations')
+              .remove([filePath]);
+          } catch (cleanupError) {
+            console.error("Error cleaning up temporary file:", cleanupError);
+          }
+        }, 3600000); // 1 hour
+  
+        // Reset form
+        setShowUploadModal(false);
+        setUploadForm({
+          childName: "",
+          age: "",
+          description: "",
+          isPublic: false,
+          imageFile: null,
+          previewUrl: "",
+          uploadProgress: 0,
+          isUploading: false,
+          shareMethod: 'whatsapp'
+        });
+  
+        triggerCelebration("Shared privately via WhatsApp!");
+        return; 
+      }
+  
+      // ----------------------------
+      // 3️⃣ Public upload (Supabase + DB)
       // ----------------------------
       const fileExt = uploadForm.imageFile.name.split('.').pop();
       const fileName = `${generateUniqueId()}.${fileExt}`;
       const filePath = `creations/${fileName}`;
   
+      // Upload file to storage
       const { error: uploadError } = await supabase.storage
         .from('creations')
         .upload(filePath, uploadForm.imageFile, {
@@ -400,41 +517,15 @@ const CommunityPage = () => {
         .from('creations')
         .getPublicUrl(filePath);
   
-      // ----------------------------
-      // 3️⃣ Private WhatsApp share (no DB insert)
-      // ----------------------------
-      if (uploadForm.shareMethod === 'whatsapp') {
-        const text = `Check out ${uploadForm.childName}'s creation!${uploadForm.description ? `\n\n"${uploadForm.description}"` : ''}\n\n${publicUrl}`;
-        const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
-        window.open(whatsappUrl, '_blank'); // Mobile app or desktop QR
-  
-        setShowUploadModal(false);
-        setUploadForm({
-          childName: "",
-          age: "",
-          description: "",
-          isPublic: true,
-          imageFile: null,
-          previewUrl: "",
-          uploadProgress: 0,
-          isUploading: false,
-          shareMethod: 'public'
-        });
-  
-        triggerCelebration("Shared privately via WhatsApp!");
-        return;
-      }
-  
-      // ----------------------------
-      // 4️⃣ Public community share (normal DB insert)
-      // ----------------------------
+      // Get current user's child
       const { data: children } = await supabase
         .from('children')
         .select('id')
         .eq('parent_id', currentUser.id)
         .limit(1);
-      const childId = children?.[0]?.id || null;
+      const childId = children && children.length > 0 ? children[0].id : null;
   
+      // Insert creation record in DB
       const { data: creation, error: insertError } = await supabase
         .from('creations')
         .insert({
@@ -468,7 +559,6 @@ const CommunityPage = () => {
         comments: []
       }, ...prev]);
   
-      // Close modal and reset form
       setShowUploadModal(false);
       setUploadForm({
         childName: "",
@@ -482,7 +572,7 @@ const CommunityPage = () => {
         shareMethod: 'public'
       });
   
-      triggerCelebration("Your creation has been shared publicly!");
+      triggerCelebration(`Your creation has been shared publicly!`);
   
     } catch (err: any) {
       setError(err.message || "Failed to upload creation. Please try again.");
@@ -597,7 +687,6 @@ const CommunityPage = () => {
         setFormState={setUploadForm}
         onShareMethodChange={(method) => setUploadForm(prev => ({ ...prev, shareMethod: method }))}
       />
-
       <Header />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
