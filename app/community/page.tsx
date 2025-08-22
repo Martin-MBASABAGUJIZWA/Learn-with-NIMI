@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Trophy, Camera } from "lucide-react";
+import { Sparkles, Trophy, Camera, Share2, MessageCircle, Heart } from "lucide-react";
 import { CreationCard } from "@/components/community/CreationCard";
 import { UploadModal } from "@/components/community/UploadModal";
 import { NimiChat } from "@/components/community/NimiChat";
@@ -29,7 +29,12 @@ const CommunityPage = () => {
   const [isNimiTyping, setIsNimiTyping] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
   const [celebrationText, setCelebrationText] = useState("");
-  const currentUser = { name: "Emma", avatar: "👧" };
+  const [currentUser, setCurrentUser] = useState({
+    id: "",
+    name: "Guest",
+    avatar: "👤",
+    avatarUrl: ""
+  });
 
   // Upload form state
   const [uploadForm, setUploadForm] = useState({
@@ -47,52 +52,141 @@ const CommunityPage = () => {
   // Generate unique ID
   const generateUniqueId = () => uuidv4();
 
-  // Load data from Supabase
-  const fetchCreations = async () => {
+  // Fetch current user
+  useEffect(() => {
+    const getCurrentUser = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          // Try both 'users' and 'profiles' tables
+          let profileData = null;
+          
+          // First try 'users' table
+          const { data: userData } = await supabase
+            .from("users")
+            .select("*")
+            .eq("auth_user_id", user.id)
+            .maybeSingle();
+
+          if (userData) {
+            profileData = userData;
+          } else {
+            // Fallback to 'profiles' table
+            const { data: profileDataFromProfiles } = await supabase
+              .from("profiles")
+              .select("*")
+              .eq("id", user.id)
+              .maybeSingle();
+            
+            profileData = profileDataFromProfiles;
+          }
+
+          if (profileData) {
+            setCurrentUser({
+              id: user.id,
+              name: profileData.full_name || user.email?.split("@")[0] || "User",
+              avatar: profileData.avatar_url || "👤",
+              avatarUrl: profileData.avatar_url || ""
+            });
+          }
+        }
+      } catch (err) {
+        console.error("Error fetching user:", err);
+      }
+    };
+
+    getCurrentUser();
+  }, [supabase]);
+
+  // Fetch public creations
+  const fetchCreations = useCallback(async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('creations')
-        .select('*')
-        .order('created_at', { ascending: false });
+      
+      // Try different table structures
+      let query = supabase
+        .from("creations")
+        .select(`
+          *,
+          comments:comments(*),
+          likes:likes(*)
+        `)
+        .order("created_at", { ascending: false });
+
+      const { data, error } = await query;
 
       if (error) throw error;
-      
-      setCreations(data.map(creation => ({
-        ...creation,
-        childName: creation.child_name,
-        createdAt: creation.created_at,
-        isPublic: creation.is_public,
-        imageUrl: creation.image_url,
-        likedByUser: creation.liked_by_user,
-        comments: creation.comments || [] // Ensure comments is always an array
-      })));
 
-      if (data.length > 0) {
-        triggerCelebration(`New art from ${data[0].child_name}!`);
-      }
+      // Format creations based on available data
+      const formattedCreations: Creation[] = data.map((c: any) => ({
+        id: c.id,
+        childId: c.child_id,
+        childName: c.child_name || "Unknown",
+        age: c.age,
+        description: c.description,
+        imageUrl: c.image_url,
+        likes: c.likes?.length || c.likes_count || 0,
+        likedByUser: c.likes?.some((l: any) => l.user_id === currentUser.id) || false,
+        isPublic: c.is_public !== undefined ? c.is_public : true,
+        type: c.type || "art",
+        completionStatus: c.completion_status || "completed",
+        createdAt: c.created_at,
+        comments: c.comments || []
+      }));
+
+      setCreations(formattedCreations);
     } catch (err) {
-      setError("Couldn't load creations. Please try again.");
-      console.error("Error fetching creations:", err);
+      setError("Couldn't load creations.");
+      console.error(err);
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentUser.id, supabase]);
 
-  // Load data on mount
   useEffect(() => {
     fetchCreations();
-    // Mock pikopals data
-    setPikopals([{
-      id: '1',
-      name: 'Sophia',
-      age: 6,
-      achievements: 5,
-      streak: 7,
-      avatar: '👧',
-      title: 'Creative Explorer'
-    }]);
-  }, []);
+  }, [fetchCreations]);
+
+  // Fetch Pikopals (featured children)
+  const fetchPikopals = useCallback(async () => {
+    try {
+      // Try different table structures
+      let query = supabase
+        .from("children")
+        .select(`
+          id, name, age, points, streak, avatar,
+          creations:creations(count)
+        `)
+        .order("points", { ascending: false })
+        .limit(1);
+
+      const { data, error } = await query;
+
+      if (error) throw error;
+
+      if (data && data.length > 0) {
+        const child = data[0];
+        const achievements = child.creations?.[0]?.count || 0;
+        
+        setPikopals([{
+          id: child.id,
+          name: child.name,
+          age: parseInt(child.age) || 0,
+          achievements,
+          streak: child.streak || 0,
+          avatar: child.avatar || "👦",
+          avatarUrl: child.avatar || "",
+          title: achievements > 10 ? "Master Creator" : achievements > 5 ? "Creative Explorer" : "Rising Star",
+        }]);
+      }
+    } catch (err) {
+      console.error("Error fetching pikopals:", err);
+    }
+  }, [supabase]);
+
+  useEffect(() => {
+    fetchPikopals();
+  }, [fetchPikopals]);
 
   // Celebration animation
   const triggerCelebration = useCallback((text: string) => {
@@ -101,14 +195,181 @@ const CommunityPage = () => {
     setTimeout(() => setShowCelebration(false), 3000);
   }, []);
 
-  // Handle upload submission
+  // Handle like/unlike
+  const handleLike = useCallback(async (creationId: string) => {
+    try {
+      const creation = creations.find(c => c.id === creationId);
+      if (!creation) return;
+
+      const newLikeState = !creation.likedByUser;
+
+      // Optimistic update
+      setCreations(prev => prev.map(c => c.id === creationId ? {
+        ...c,
+        likedByUser: newLikeState,
+        likes: newLikeState ? c.likes + 1 : c.likes - 1
+      } : c));
+
+      if (newLikeState) {
+        await supabase.from("likes").insert({ creation_id: creationId, user_id: currentUser.id });
+      } else {
+        await supabase.from("likes").delete().eq("creation_id", creationId).eq("user_id", currentUser.id);
+      }
+
+      if (newLikeState && creation) {
+        triggerCelebration(`You liked ${creation.childName}'s creation!`);
+      }
+    } catch (err) {
+      console.error(err);
+      setError("Couldn't update like.");
+      fetchCreations(); // rollback
+    }
+  }, [creations, currentUser.id, fetchCreations, supabase, triggerCelebration]);
+
+  // Add comment
+  const handleAddComment = useCallback(async (creationId: string, content: string) => {
+    if (!content.trim()) return false;
+
+    const tempCommentId = generateUniqueId();
+    const creation = creations.find(c => c.id === creationId);
+    
+    try {
+      // Optimistic update
+      const newComment = {
+        id: tempCommentId,
+        creation_id: creationId,
+        author: currentUser.name,
+        author_avatar: currentUser.avatarUrl,
+        content,
+        created_at: new Date().toISOString()
+      };
+
+      setCreations(prev => prev.map(c => 
+        c.id === creationId 
+          ? { 
+              ...c, 
+              comments: [...(c.comments || []), newComment] 
+            } 
+          : c
+      ));
+
+      // Save to Supabase
+      const { data, error } = await supabase
+        .from('comments')
+        .insert({
+          creation_id: creationId,
+          author: currentUser.name,
+          author_avatar: currentUser.avatarUrl,
+          content
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // Replace temp comment with actual comment from DB
+      setCreations(prev => prev.map(c => 
+        c.id === creationId 
+          ? { 
+              ...c, 
+              comments: [
+                ...(c.comments?.filter(comment => comment.id !== tempCommentId) || []), 
+                data
+              ] 
+            } 
+          : c
+      ));
+
+      // Notify about the comment
+      if (creation) {
+        triggerCelebration(`You commented on ${creation.childName}'s creation!`);
+      }
+
+      return true;
+    } catch (err) {
+      // Rollback on error
+      setCreations(prev => prev.map(c => 
+        c.id === creationId 
+          ? { 
+              ...c, 
+              comments: c.comments?.filter(comment => comment.id !== tempCommentId) || [] 
+            } 
+          : c
+      ));
+      setError("Couldn't add comment. Try again!");
+      return false;
+    }
+  }, [currentUser, creations, supabase, triggerCelebration]);
+
+  // Share creation function with multiple platform options
+  const shareCreation = useCallback(async (creation: Creation, platform?: string) => {
+    try {
+      let shareableUrl = creation.imageUrl;
+      
+      if (!shareableUrl.startsWith('http')) {
+        const pathParts = shareableUrl.split('/creations/');
+        const fileName = pathParts[pathParts.length - 1];
+        const { data: { publicUrl } } = supabase.storage
+          .from('creations')
+          .getPublicUrl(fileName);
+        shareableUrl = publicUrl;
+      }
+  
+      const shareText = `${creation.description || "Check out this amazing creation!"}\n\nBy ${creation.childName} (age ${creation.age})`;
+      const shareTitle = `Art by ${creation.childName}`;
+  
+      // Platform-specific sharing
+      if (platform === 'whatsapp') {
+        const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText + '\n\n' + shareableUrl)}`;
+        window.open(whatsappUrl, '_blank');
+        return;
+      }
+      
+      if (platform === 'facebook') {
+        const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareableUrl)}&quote=${encodeURIComponent(shareText)}`;
+        window.open(facebookUrl, '_blank');
+        return;
+      }
+      
+      if (platform === 'twitter') {
+        const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareableUrl)}`;
+        window.open(twitterUrl, '_blank');
+        return;
+      }
+  
+      // Generic sharing
+      const shareData = {
+        title: shareTitle,
+        text: shareText,
+        url: shareableUrl
+      };
+  
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else if (navigator.clipboard) {
+        await navigator.clipboard.writeText(shareableUrl);
+        triggerCelebration("Link copied to clipboard!");
+      } else {
+        // Fallback: show share options
+        setCelebrationText("Share options: Copy the image URL to share");
+        setShowCelebration(true);
+        setTimeout(() => setShowCelebration(false), 3000);
+      }
+    } catch (err) {
+      console.error("Sharing failed:", err);
+      setError("Sharing didn't work. Try copying the link manually.");
+    }
+  }, [triggerCelebration, supabase]);
+
+  // Handle upload (public or WhatsApp)
   const handleUploadSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (uploadForm.shareMethod === 'whatsapp') {
       // Handle WhatsApp sharing
-      if (uploadForm.imageFile) {
-        const whatsappUrl = `https://wa.me/?text=Check%20out%20my%20creation!`;
+      if (uploadForm.imageFile && uploadForm.previewUrl) {
+        const text = `Check out ${uploadForm.childName}'s creation!${uploadForm.description ? `\n\n"${uploadForm.description}"` : ''}`;
+        const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
         window.open(whatsappUrl, '_blank');
       }
       setShowUploadModal(false);
@@ -156,19 +417,27 @@ const CommunityPage = () => {
         .from('creations')
         .getPublicUrl(filePath);
   
+      // Get current user's children to associate with creation
+      const { data: children } = await supabase
+        .from('children')
+        .select('id')
+        .eq('parent_id', currentUser.id)
+        .limit(1);
+  
+      const childId = children && children.length > 0 ? children[0].id : null;
+  
       // Insert record into database
       const { data: creation, error: insertError } = await supabase
         .from('creations')
         .insert({
+          child_id: childId,
           child_name: uploadForm.childName,
           age: parseInt(uploadForm.age),
           description: uploadForm.description,
           is_public: uploadForm.isPublic,
           image_url: publicUrl,
           type: 'art',
-          completion_status: 'completed',
-          likes: 0,
-          liked_by_user: false
+          completion_status: 'completed'
         })
         .select()
         .single();
@@ -177,12 +446,18 @@ const CommunityPage = () => {
   
       // Update local state
       setCreations(prev => [{
-        ...creation,
+        id: creation.id,
+        childId: creation.child_id,
         childName: creation.child_name,
-        createdAt: creation.created_at,
-        isPublic: creation.is_public,
+        age: creation.age,
+        description: creation.description,
         imageUrl: creation.image_url,
-        likedByUser: creation.liked_by_user,
+        likes: 0,
+        likedByUser: false,
+        isPublic: creation.is_public,
+        type: creation.type,
+        completionStatus: creation.completion_status,
+        createdAt: creation.created_at,
         comments: []
       }, ...prev]);
   
@@ -209,145 +484,6 @@ const CommunityPage = () => {
     }
   };
 
-  // Share creation function
-  const shareCreation = useCallback(async (creation: Creation) => {
-    try {
-      let shareableUrl = creation.imageUrl;
-      
-      if (!shareableUrl.startsWith('http')) {
-        const pathParts = shareableUrl.split('/creations/');
-        const fileName = pathParts[pathParts.length - 1];
-        const { data: { publicUrl } } = supabase.storage
-          .from('creations')
-          .getPublicUrl(fileName);
-        shareableUrl = publicUrl;
-      }
-  
-      const shareData = {
-        title: `Art by ${creation.childName}`,
-        text: `${creation.description || "Check out this amazing creation!"}\n\nBy ${creation.childName} (age ${creation.age})`,
-        url: shareableUrl
-      };
-  
-      if (navigator.share) {
-        await navigator.share(shareData);
-      } else if (navigator.clipboard) {
-        await navigator.clipboard.writeText(shareableUrl);
-        triggerCelebration("Link copied to clipboard!");
-      } else {
-        window.open(shareableUrl, '_blank');
-      }
-    } catch (err) {
-      console.error("Sharing failed:", err);
-      setError("Sharing didn't work. Try copying the link manually.");
-    }
-  }, [triggerCelebration]);
-
-  // Like functionality
-  const handleLike = useCallback(async (creationId: string) => {
-    try {
-      setCreations(prev => prev.map(c => {
-        if (c.id === creationId) {
-          const newLikeState = !c.likedByUser;
-          return {
-            ...c,
-            likes: newLikeState ? c.likes + 1 : c.likes - 1,
-            likedByUser: newLikeState
-          };
-        }
-        return c;
-      }));
-
-      const { error } = await supabase
-        .from('creations')
-        .update({ 
-          likes: creations.find(c => c.id === creationId)?.likes || 0,
-          liked_by_user: !creations.find(c => c.id === creationId)?.likedByUser
-        })
-        .eq('id', creationId);
-
-      if (error) throw error;
-    } catch (err) {
-      console.error("Like error:", err);
-      setError("Couldn't send like. Try again!");
-      setCreations(prev => prev.map(c => {
-        if (c.id === creationId) {
-          return {
-            ...c,
-            likes: c.likedByUser ? c.likes - 1 : c.likes + 1,
-            likedByUser: !c.likedByUser
-          };
-        }
-        return c;
-      }));
-    }
-  }, [creations, supabase]);
-
-  // Add comment functionality
-  const handleAddComment = useCallback(async (creationId: string, content: string) => {
-    const tempCommentId = generateUniqueId();
-    
-    try {
-      // Optimistic update
-      const newComment = {
-        id: tempCommentId,
-        creation_id: creationId,
-        author: currentUser.name,
-        content,
-        created_at: new Date().toISOString()
-      };
-
-      setCreations(prev => prev.map(c => 
-        c.id === creationId 
-          ? { 
-              ...c, 
-              comments: [...(c.comments || []), newComment] 
-            } 
-          : c
-      ));
-
-      // Save to Supabase
-      const { data, error } = await supabase
-        .from('comments')
-        .insert({
-          creation_id: creationId,
-          author: currentUser.name,
-          content
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      // Replace temp comment with actual comment from DB
-      setCreations(prev => prev.map(c => 
-        c.id === creationId 
-          ? { 
-              ...c, 
-              comments: [
-                ...(c.comments?.filter(comment => comment.id !== tempCommentId) || []), 
-                data
-              ] 
-            } 
-          : c
-      ));
-
-      return true;
-    } catch (err) {
-      // Rollback on error
-      setCreations(prev => prev.map(c => 
-        c.id === creationId 
-          ? { 
-              ...c, 
-              comments: c.comments?.filter(comment => comment.id !== tempCommentId) || [] 
-            } 
-          : c
-      ));
-      setError("Couldn't add comment. Try again!");
-      return false;
-    }
-  }, []);
-
   // Enhanced Nimi AI chat
   const handleNimiSend = async (message: string) => {
     setIsNimiTyping(true);
@@ -355,7 +491,7 @@ const CommunityPage = () => {
     
     try {
       // Add a temporary typing indicator
-      setNimiMessages(prev => [...prev, { sender: 'nimi', text: '' }]);
+      setNimiMessages(prev => [...prev, { sender: 'nimi', text: '...' }]);
       
       const response = await fetch('/api/nimi', {
         method: 'POST',
@@ -376,7 +512,7 @@ const CommunityPage = () => {
       let aiMessage = '';
       
       if (reader) {
-        // Remove the empty typing indicator
+        // Remove the typing indicator
         setNimiMessages(prev => prev.slice(0, -1));
         
         while (true) {
@@ -413,14 +549,25 @@ const CommunityPage = () => {
       }
     } catch (error) {
       console.error("Error:", error);
-      setNimiMessages(prev => [...prev, { 
-        sender: 'nimi', 
-        text: "Sorry, I'm having trouble thinking right now. Could you try again?" 
-      }]);
+      // Remove typing indicator and show error message
+      setNimiMessages(prev => {
+        const lastMessage = prev[prev.length - 1];
+        if (lastMessage?.text === '...') {
+          return [...prev.slice(0, -1), { 
+            sender: 'nimi', 
+            text: "Sorry, I'm having trouble thinking right now. Could you try again?" 
+          }];
+        }
+        return [...prev, { 
+          sender: 'nimi', 
+          text: "Sorry, I'm having trouble thinking right now. Could you try again?" 
+        }];
+      });
     } finally {
       setIsNimiTyping(false);
     }
   };
+
   // Clean up blob URLs
   useEffect(() => {
     return () => {
@@ -433,7 +580,7 @@ const CommunityPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
       <CelebrationBanner isVisible={showCelebration} text={celebrationText} />
-      <ErrorToast error={error} onDismiss={() => setError(null)} />
+      {error && <ErrorToast message={error} onDismiss={() => setError(null)} />}
 
       <UploadModal
         isOpen={showUploadModal}
@@ -441,6 +588,7 @@ const CommunityPage = () => {
         onSubmit={handleUploadSubmit}
         formState={uploadForm}
         setFormState={setUploadForm}
+        onShareMethodChange={(method) => setUploadForm(prev => ({ ...prev, shareMethod: method }))}
       />
 
       <Header />
@@ -471,6 +619,9 @@ const CommunityPage = () => {
             >
               <Camera className="w-8 h-8 mr-3" /> Share Your Work
             </Button>
+            <p className="text-sm text-gray-600 mt-4">
+              Share publicly or privately with friends on WhatsApp
+            </p>
           </CardContent>
         </Card>
 
@@ -486,10 +637,19 @@ const CommunityPage = () => {
             <CardContent>
               <div className="flex flex-col items-center">
                 <div className="text-8xl mb-4 animate-bounce">
-                  {pikopals[0].avatar}
+                  {pikopals[0].avatarUrl ? (
+                    <img 
+                      src={pikopals[0].avatarUrl} 
+                      alt={pikopals[0].name}
+                      className="w-24 h-24 rounded-full object-cover mx-auto"
+                    />
+                  ) : (
+                    <span>{pikopals[0].avatar}</span>
+                  )}
                 </div>
                 <h3 className="text-2xl font-bold text-gray-800 mb-2">{pikopals[0].name}</h3>
-                <p className="text-center text-gray-700 mb-4">
+                <p className="text-lg text-yellow-600 font-semibold mb-2">{pikopals[0].title}</p>
+                <p className="text-center text-gray-700">
                   Our featured creator this week! Say hello to {pikopals[0].name}! 👋
                 </p>
               </div>
@@ -532,9 +692,9 @@ const CommunityPage = () => {
                 <CreationCard 
                   key={`creation-${creation.id}`} 
                   creation={creation}
-                  onLike={handleLike}
-                  onAddComment={handleAddComment}
-                  onShare={shareCreation}
+                  onLike={() => handleLike(creation.id)}
+                  onAddComment={(content) => handleAddComment(creation.id, content)}
+                  onShare={(platform) => shareCreation(creation, platform)}
                   currentUser={currentUser}
                 />
               ))}
@@ -543,28 +703,28 @@ const CommunityPage = () => {
         </div>
 
         {/* Nimi Chat */}
-      <Card className="mb-8 bg-gradient-to-br from-indigo-50 to-purple-50 border border-purple-100 shadow-xl">
-        <CardHeader>
-          <CardTitle className="flex items-center text-2xl">
-            <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center mr-3 shadow-sm border border-purple-200">
-              <span className="text-2xl">🤖</span>
-            </div>
-            <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              Chat with Nimi
-            </span>
-          </CardTitle>
-        </CardHeader>
-        
-        <CardContent>
-          <NimiChat 
-            messages={nimiMessages}
-            isTyping={isNimiTyping}
-            onSend={handleNimiSend}
-            currentUser={currentUser}
-            voiceEnabled={true}
-          />
-        </CardContent>
-      </Card>
+        <Card className="mb-8 bg-gradient-to-br from-indigo-50 to-purple-50 border border-purple-100 shadow-xl">
+          <CardHeader>
+            <CardTitle className="flex items-center text-2xl">
+              <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center mr-3 shadow-sm border border-purple-200">
+                <span className="text-2xl">🤖</span>
+              </div>
+              <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                Chat with Nimi
+              </span>
+            </CardTitle>
+          </CardHeader>
+          
+          <CardContent>
+            <NimiChat 
+              messages={nimiMessages}
+              isTyping={isNimiTyping}
+              onSend={handleNimiSend}
+              currentUser={currentUser}
+              voiceEnabled={true}
+            />
+          </CardContent>
+        </Card>
   
         {/* Coming Soon */}
         <Card className="bg-gradient-to-r from-green-100 to-emerald-100 border-none shadow-xl">
@@ -572,12 +732,26 @@ const CommunityPage = () => {
             <div className="text-6xl mb-4">🚀</div>
             <h3 className="text-2xl font-bold text-gray-800 mb-4">More Features Coming!</h3>
             <p className="text-gray-700 mb-6">We're working on new ways to create and share together!</p>
+            <div className="flex justify-center gap-4">
+              <div className="flex items-center">
+                <MessageCircle className="w-5 h-5 text-green-600 mr-2" />
+                <span>Enhanced Comments</span>
+              </div>
+              <div className="flex items-center">
+                <Heart className="w-5 h-5 text-red-600 mr-2" />
+                <span>Reactions</span>
+              </div>
+              <div className="flex items-center">
+                <Share2 className="w-5 h-5 text-blue-600 mr-2" />
+                <span>More Sharing Options</span>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </main>
 
-      <Footer />
       <BottomNavigation />
+      <Footer />
     </div>
   );
 };
