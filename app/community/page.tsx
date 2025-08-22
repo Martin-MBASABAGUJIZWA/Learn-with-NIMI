@@ -361,21 +361,9 @@ const CommunityPage = () => {
     }
   }, [triggerCelebration, supabase]);
 
-  // Handle upload (public or WhatsApp)
   const handleUploadSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (uploadForm.shareMethod === 'whatsapp') {
-      // Handle WhatsApp sharing
-      if (uploadForm.imageFile && uploadForm.previewUrl) {
-        const text = `Check out ${uploadForm.childName}'s creation!${uploadForm.description ? `\n\n"${uploadForm.description}"` : ''}`;
-        const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
-        window.open(whatsappUrl, '_blank');
-      }
-      setShowUploadModal(false);
-      return;
-    }
-
+  
     if (!uploadForm.imageFile) {
       setError("Please select an image to upload");
       return;
@@ -383,25 +371,22 @@ const CommunityPage = () => {
   
     try {
       setUploadForm(prev => ({ ...prev, isUploading: true }));
-      
-      // File validation
+  
+      // ----------------------------
+      // 1️⃣ File validation
+      // ----------------------------
       const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
       const maxSize = 5 * 1024 * 1024; // 5MB
-      
-      if (!validTypes.includes(uploadForm.imageFile.type)) {
-        throw new Error('Only JPG, PNG, or GIF images are allowed');
-      }
-      
-      if (uploadForm.imageFile.size > maxSize) {
-        throw new Error('Image must be smaller than 5MB');
-      }
+      if (!validTypes.includes(uploadForm.imageFile.type)) throw new Error('Only JPG, PNG, or GIF images are allowed');
+      if (uploadForm.imageFile.size > maxSize) throw new Error('Image must be smaller than 5MB');
   
-      // Generate unique filename
+      // ----------------------------
+      // 2️⃣ Generate unique filename & upload
+      // ----------------------------
       const fileExt = uploadForm.imageFile.name.split('.').pop();
       const fileName = `${generateUniqueId()}.${fileExt}`;
       const filePath = `creations/${fileName}`;
   
-      // Upload file to storage
       const { error: uploadError } = await supabase.storage
         .from('creations')
         .upload(filePath, uploadForm.imageFile, {
@@ -409,24 +394,47 @@ const CommunityPage = () => {
           upsert: false,
           contentType: uploadForm.imageFile.type
         });
-  
       if (uploadError) throw uploadError;
   
-      // Get public URL
       const { data: { publicUrl } } = supabase.storage
         .from('creations')
         .getPublicUrl(filePath);
   
-      // Get current user's children to associate with creation
+      // ----------------------------
+      // 3️⃣ Private WhatsApp share (no DB insert)
+      // ----------------------------
+      if (uploadForm.shareMethod === 'whatsapp') {
+        const text = `Check out ${uploadForm.childName}'s creation!${uploadForm.description ? `\n\n"${uploadForm.description}"` : ''}\n\n${publicUrl}`;
+        const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
+        window.open(whatsappUrl, '_blank'); // Mobile app or desktop QR
+  
+        setShowUploadModal(false);
+        setUploadForm({
+          childName: "",
+          age: "",
+          description: "",
+          isPublic: true,
+          imageFile: null,
+          previewUrl: "",
+          uploadProgress: 0,
+          isUploading: false,
+          shareMethod: 'public'
+        });
+  
+        triggerCelebration("Shared privately via WhatsApp!");
+        return;
+      }
+  
+      // ----------------------------
+      // 4️⃣ Public community share (normal DB insert)
+      // ----------------------------
       const { data: children } = await supabase
         .from('children')
         .select('id')
         .eq('parent_id', currentUser.id)
         .limit(1);
+      const childId = children?.[0]?.id || null;
   
-      const childId = children && children.length > 0 ? children[0].id : null;
-  
-      // Insert record into database
       const { data: creation, error: insertError } = await supabase
         .from('creations')
         .insert({
@@ -441,7 +449,6 @@ const CommunityPage = () => {
         })
         .select()
         .single();
-  
       if (insertError) throw insertError;
   
       // Update local state
@@ -475,7 +482,7 @@ const CommunityPage = () => {
         shareMethod: 'public'
       });
   
-      triggerCelebration(`Your creation has been shared!`);
+      triggerCelebration("Your creation has been shared publicly!");
   
     } catch (err: any) {
       setError(err.message || "Failed to upload creation. Please try again.");
@@ -483,7 +490,7 @@ const CommunityPage = () => {
       setUploadForm(prev => ({ ...prev, isUploading: false }));
     }
   };
-
+  
   // Enhanced Nimi AI chat
   const handleNimiSend = async (message: string) => {
     setIsNimiTyping(true);
