@@ -8,46 +8,49 @@ function isEmoji(word: string) {
   return /[\p{Emoji_Presentation}\p{Emoji}\uFE0F]/u.test(word);
 }
 
-export default function NimiReaderButton() {
+interface NimiReaderButtonProps {
+  hide?: boolean;
+}
+
+export default function NimiReaderButton({ hide }: NimiReaderButtonProps) {
   const { language } = useLanguage();
   const [voicesLoaded, setVoicesLoaded] = useState(false);
   const [speaking, setSpeaking] = useState(false);
+  const [selectedVoice, setSelectedVoice] = useState<SpeechSynthesisVoice | null>(null);
 
   const wordSpansRef = useRef<HTMLSpanElement[]>([]);
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
 
-  // For draggable position
   const buttonRef = useRef<HTMLButtonElement | null>(null);
   const [position, setPosition] = useState({ x: 20, y: 500 });
   const isDragging = useRef(false);
   const offset = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      if (window.speechSynthesis.getVoices().length > 0) {
+    if (typeof window === "undefined") return;
+
+    const loadVoices = () => {
+      const voices = window.speechSynthesis.getVoices();
+      if (voices.length > 0) {
         setVoicesLoaded(true);
-      } else {
-        window.speechSynthesis.onvoiceschanged = () => {
-          setVoicesLoaded(true);
-        };
+        // pick a male voice (closest to a boy) — prioritize en-US
+        const boyVoice = voices.find(v => v.lang.includes("en") && v.name.toLowerCase().includes("male")) 
+                        || voices.find(v => v.lang.includes("en")) 
+                        || voices[0];
+        setSelectedVoice(boyVoice || null);
       }
-    }
+    };
+
+    loadVoices();
+    window.speechSynthesis.onvoiceschanged = loadVoices;
   }, []);
 
   const wrapWordsWithSpans = (element: HTMLElement) => {
-    const walker = document.createTreeWalker(
-      element,
-      NodeFilter.SHOW_TEXT,
-      null,
-      false
-    );
-
+    const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, null, false);
     const textNodes: Text[] = [];
     while (walker.nextNode()) {
-      const currentNode = walker.currentNode as Text;
-      if (currentNode.nodeValue?.trim().length > 0) {
-        textNodes.push(currentNode);
-      }
+      const node = walker.currentNode as Text;
+      if (node.nodeValue?.trim().length) textNodes.push(node);
     }
 
     wordSpansRef.current = [];
@@ -55,12 +58,11 @@ export default function NimiReaderButton() {
     textNodes.forEach((textNode) => {
       const parent = textNode.parentNode;
       if (!parent) return;
-
       const words = textNode.nodeValue!.split(/(\s+)/);
       const fragment = document.createDocumentFragment();
 
       words.forEach((word) => {
-        if (word.trim() === "") {
+        if (!word.trim()) {
           fragment.appendChild(document.createTextNode(word));
           return;
         }
@@ -75,13 +77,11 @@ export default function NimiReaderButton() {
   };
 
   const removeHighlights = () => {
-    wordSpansRef.current.forEach((span) =>
-      span.classList.remove("nimi-reader-highlight")
-    );
+    wordSpansRef.current.forEach(span => span.classList.remove("nimi-reader-highlight"));
   };
 
   const unwrapSpans = (element: HTMLElement) => {
-    wordSpansRef.current.forEach((span) => {
+    wordSpansRef.current.forEach(span => {
       const parent = span.parentNode;
       if (!parent) return;
       parent.replaceChild(document.createTextNode(span.textContent || ""), span);
@@ -105,39 +105,35 @@ export default function NimiReaderButton() {
 
     wrapWordsWithSpans(main);
 
-    const wordsToRead = wordSpansRef.current
-      .map((span) => span.textContent || "")
-      .filter((word) => !isEmoji(word.trim()));
-
-    if (wordsToRead.length === 0) {
+    const wordsToRead = wordSpansRef.current.map(s => s.textContent || "").filter(w => !isEmoji(w.trim()));
+    if (!wordsToRead.length) {
       unwrapSpans(main);
       return;
     }
 
     const textToSpeak = wordsToRead.join(" ");
     const utterance = new SpeechSynthesisUtterance(textToSpeak);
-    utterance.lang = language || "en-US";
-    utteranceRef.current = utterance;
 
+    utterance.lang = language || "en-US";
+    if (selectedVoice) utterance.voice = selectedVoice;
+
+    // 🟡 toddler boy effect
+    utterance.pitch = 1.4;  // higher pitch = childlike
+    utterance.rate = 0.8;   // slightly faster
+    utterance.volume = 1;
+
+    utteranceRef.current = utterance;
     let currentWordIndex = 0;
     setSpeaking(true);
 
     utterance.onboundary = (event) => {
       if (event.name === "word") {
         removeHighlights();
-
-        const wordSpan = wordSpansRef.current.find((span) => {
-          return (
-            (span.textContent || "").trim() ===
-            wordsToRead[currentWordIndex].trim()
-          );
-        });
-
+        const wordSpan = wordSpansRef.current.find(span => (span.textContent || "").trim() === wordsToRead[currentWordIndex].trim());
         if (wordSpan) {
           wordSpan.classList.add("nimi-reader-highlight");
           wordSpan.scrollIntoView({ behavior: "smooth", block: "center" });
         }
-
         currentWordIndex++;
       }
     };
@@ -158,39 +154,28 @@ export default function NimiReaderButton() {
     window.speechSynthesis.speak(utterance);
   };
 
-  // 🟡 Drag and move handlers
+  // 🟡 Drag & Drop
   const handleMouseDown = (e: React.MouseEvent | React.TouchEvent) => {
     isDragging.current = true;
     const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
     const clientY = "touches" in e ? e.touches[0].clientY : e.clientY;
-    offset.current = {
-      x: clientX - position.x,
-      y: clientY - position.y,
-    };
+    offset.current = { x: clientX - position.x, y: clientY - position.y };
   };
 
   const handleMouseMove = (e: MouseEvent | TouchEvent) => {
     if (!isDragging.current) return;
-    const clientX =
-      "touches" in e ? e.touches[0].clientX : (e as MouseEvent).clientX;
-    const clientY =
-      "touches" in e ? e.touches[0].clientY : (e as MouseEvent).clientY;
-    setPosition({
-      x: clientX - offset.current.x,
-      y: clientY - offset.current.y,
-    });
+    const clientX = "touches" in e ? e.touches[0].clientX : (e as MouseEvent).clientX;
+    const clientY = "touches" in e ? e.touches[0].clientY : (e as MouseEvent).clientY;
+    setPosition({ x: clientX - offset.current.x, y: clientY - offset.current.y });
   };
 
-  const handleMouseUp = () => {
-    isDragging.current = false;
-  };
+  const handleMouseUp = () => { isDragging.current = false; };
 
   useEffect(() => {
     document.addEventListener("mousemove", handleMouseMove);
     document.addEventListener("mouseup", handleMouseUp);
     document.addEventListener("touchmove", handleMouseMove);
     document.addEventListener("touchend", handleMouseUp);
-
     return () => {
       document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseup", handleMouseUp);
@@ -198,6 +183,8 @@ export default function NimiReaderButton() {
       document.removeEventListener("touchend", handleMouseUp);
     };
   }, []);
+
+  if (hide) return null;
 
   return (
     <>
@@ -215,13 +202,7 @@ export default function NimiReaderButton() {
         disabled={!voicesLoaded}
         onMouseDown={handleMouseDown}
         onTouchStart={handleMouseDown}
-        style={{
-          position: "fixed",
-          left: position.x,
-          top: position.y,
-          zIndex: 9999,
-          touchAction: "none",
-        }}
+        style={{ position: "fixed", left: position.x, top: position.y, zIndex: 9999, touchAction: "none" }}
         className="bg-purple-600 hover:bg-purple-700 text-white text-sm md:text-base font-bold px-5 py-3 rounded-full shadow-lg flex items-center gap-2 transition-all duration-300 cursor-grab active:cursor-grabbing"
       >
         <Volume2 className="w-5 h-5" />

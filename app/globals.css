@@ -115,3 +115,90 @@ body {
   to { opacity: 1; }
 }
 .animate-fadeIn { animation: fadeIn 0.5s forwards; }
+
+/* Improved responsive design for missions component */
+.mission-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.day-selector {
+  display: flex;
+  overflow-x: auto;
+  gap: 0.75rem;
+  padding-bottom: 0.5rem;
+  scrollbar-width: thin;
+}
+
+.day-button {
+  flex: 0 0 auto;
+  min-width: 90px;
+}
+
+/* Responsive book cards */
+.book-card-container {
+  width: 100%;
+  max-width: 280px;
+  height: 320px;
+}
+
+@media (max-width: 640px) {
+  .book-card-container {
+    max-width: 250px;
+    height: 280px;
+  }
+  
+  .mission-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .day-button {
+    min-width: 80px;
+  }
+}
+
+/* Medium screens */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .mission-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Large screens */
+@media (min-width: 1025px) {
+  .mission-grid {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+}
+
+/* Slide modal responsiveness */
+.slide-modal-content {
+  width: 95vw;
+  height: 80vh;
+  max-width: 1200px;
+}
+
+@media (max-width: 768px) {
+  .slide-modal-content {
+    width: 98vw;
+    height: 85vh;
+  }
+}
+
+/* Video modal responsiveness */
+.video-modal-container {
+  width: 95vw;
+  max-width: 1000px;
+  aspect-ratio: 16/9;
+}
+
+@media (max-width: 768px) {
+  .video-modal-container {
+    width: 98vw;
+  }
+}

@@ -5,7 +5,6 @@ import supabase from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import { syncGuestProgressToSupabase } from "@/lib/guestProgress";
 
-
 interface UserType {
   id: string;
   email?: string;
@@ -16,6 +15,7 @@ interface ProfileType {
   full_name?: string;
   language?: string;
   points?: number;
+  isAdmin?: boolean;
   [key: string]: any;
 }
 
@@ -34,32 +34,52 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<ProfileType | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+
   useEffect(() => {
     const fetchProfile = async (userId: string) => {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", userId);
-  
-      if (error) {
-        console.error("Failed to fetch profile:", error.message);
-        setProfile(null);
-      } else if (data && data.length === 1) {
-        setProfile(data[0]);
-      } else if (data && data.length > 1) {
-        console.warn("Multiple profiles found, using the first one.");
-        setProfile(data[0]);
-      } else {
+      try {
+        // Fetch profile from profiles table
+        const { data: profileData, error: profileError } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", userId)
+          .single();
+
+        if (profileError && profileError.code !== "PGRST116") {
+          console.error("Failed to fetch profile:", profileError.message);
+          setProfile(null);
+          return;
+        }
+
+        // Fetch admin record if exists
+        const { data: adminData, error: adminError } = await supabase
+          .from("admins")
+          .select("*")
+          .eq("id", userId)
+          .single();
+
+        if (adminError && adminError.code !== "PGRST116") {
+          console.error("Failed to fetch admin record:", adminError.message);
+        }
+
+        // Merge data
+        setProfile({
+          ...profileData,
+          isAdmin: !!adminData, // true if found in admins
+          ...(adminData || {}),
+        });
+      } catch (err) {
+        console.error("Unexpected error fetching profile:", err);
         setProfile(null);
       }
     };
-  
+
     // Listen for auth state changes
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         const currentUser = session?.user ?? null;
         setUser(currentUser);
-  
+
         if (currentUser) {
           await fetchProfile(currentUser.id);
           if (event === "SIGNED_IN") {
@@ -68,41 +88,40 @@ export function UserProvider({ children }: { children: ReactNode }) {
         } else {
           setProfile(null);
         }
-  
+
         if (event === "SIGNED_OUT") {
           router.push("/login");
         }
-  
+
         setLoading(false);
       }
     );
-  
+
     // Initial fetch
     const getSessionAndProfile = async () => {
       setLoading(true);
       const {
         data: { session },
       } = await supabase.auth.getSession();
-  
+
       const currentUser = session?.user ?? null;
       setUser(currentUser);
-  
+
       if (currentUser) {
         await fetchProfile(currentUser.id);
       } else {
         setProfile(null);
       }
-  
+
       setLoading(false);
     };
-  
+
     getSessionAndProfile();
-  
+
     return () => {
       authListener.subscription.unsubscribe();
     };
   }, [router]);
-  
 
   const updateUser = (newUser: UserType | null) => {
     setUser(newUser);
@@ -111,7 +130,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const updateProfile = (newProfile: ProfileType | null) => {
     setProfile(newProfile);
   };
-  const isGuestUser = !user;
 
   return (
     <UserContext.Provider value={{ user, profile, loading, updateUser, updateProfile }}>

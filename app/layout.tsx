@@ -5,6 +5,7 @@ import NimiReaderButton from "@/components/NimiReaderButton";
 import SupabaseProviderWrapper from "@/components/SupabaseProviderWrapper";
 import { UserProvider } from "@/contexts/UserContext"; // added
 
+
 export const metadata = {
   title: "Your Site",
   description: "Your description",

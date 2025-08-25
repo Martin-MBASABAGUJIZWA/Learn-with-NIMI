@@ -3,17 +3,28 @@
 import React, { useEffect, useState, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import supabase from "@/lib/supabaseClient";
-import { Howl } from "howler";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import NimiAssistant from "@/components/NimiAssistant";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { CheckCircle, Play, Trophy, Sparkles, Volume2, BookOpen, Palette, User, X } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import NimiReaderButton from "@/components/NimiReaderButton";
+
+
+// Import icons individually to avoid barrel import issues
+import { BookOpen } from "lucide-react";
+import { CheckCircle } from "lucide-react";
+import { Download } from "lucide-react";
+import { Image as ImageIcon } from "lucide-react";
+import { Palette } from "lucide-react";
+import { Play } from "lucide-react";
+import { Sparkles } from "lucide-react";
+import { Trophy } from "lucide-react";
+import { Video } from "lucide-react";
+import { X } from "lucide-react";
 
 // Translation dictionary for all supported languages
 const translations = {
@@ -30,7 +41,7 @@ const translations = {
     preparingMagic: "✨ Preparing tomorrow's magic... ✨",
     previousPage: "Previous Page",
     nextPage: "Next Page",
-    spreadCount: "Spread {current} of {total}",
+    pageCount: "Page {current} of {total}",
     loadingMissions: "Loading missions...",
     enterChildName: "Enter your child's name",
     childName: "Child's Name",
@@ -47,7 +58,9 @@ const translations = {
     missionCompleted: "Mission completed!",
     missionAlreadyCompleted: "Mission already completed!",
     watchVideoFirst: "Watch video first",
-    pleaseWatchVideo: "Please watch the video to completion before completing the mission"
+    pleaseWatchVideo: "Please watch the video to completion before completing the mission",
+    viewSlides: "View Slides",
+    downloadContent: "Download Content"
   },
   es: {
     magicalLearning: "Aprendizaje Mágico",
@@ -62,7 +75,7 @@ const translations = {
     preparingMagic: "✨ Preparando la magia de mañana... ✨",
     previousPage: "Página Anterior",
     nextPage: "Página Siguiente",
-    spreadCount: "Doble página {current} de {total}",
+    pageCount: "Página {current} de {total}",
     loadingMissions: "Cargando misiones...",
     enterChildName: "Ingrese el nombre de su hijo",
     childName: "Nombre del Niño",
@@ -79,7 +92,9 @@ const translations = {
     missionCompleted: "¡Misión completada!",
     missionAlreadyCompleted: "¡Misión ya completada!",
     watchVideoFirst: "Ver video primero",
-    pleaseWatchVideo: "Por favor mira el video completo antes de completar la misión"
+    pleaseWatchVideo: "Por favor mira el video completo antes de completar la misión",
+    viewSlides: "Ver Diapositivas",
+    downloadContent: "Descargar Contenido"
   },
   fr: {
     magicalLearning: "Apprentissage Magique",
@@ -94,7 +109,7 @@ const translations = {
     preparingMagic: "✨ Préparation de la magie de demain... ✨",
     previousPage: "Page Précédente",
     nextPage: "Page Suivante",
-    spreadCount: "Double page {current} sur {total}",
+    pageCount: "Page {current} sur {total}",
     loadingMissions: "Chargement des missions...",
     enterChildName: "Entrez le nombre de votre enfant",
     childName: "Nom de l'Enfant",
@@ -111,7 +126,9 @@ const translations = {
     missionCompleted: "Mission terminée!",
     missionAlreadyCompleted: "Mission déjà terminée!",
     watchVideoFirst: "Regarder la vidéo d'abord",
-    pleaseWatchVideo: "Veuillez regarder la vidéo jusqu'au bout avant de terminer la mission"
+    pleaseWatchVideo: "Veuillez regarder la vidéo jusqu'au bout avant de terminer la mission",
+    viewSlides: "Voir les Diapositivas",
+    downloadContent: "Télécharger le Contenido"
   },
   rw: {
     magicalLearning: "Kwiga Ubumenyi",
@@ -120,13 +137,13 @@ const translations = {
     completed: "Byarakozwe!",
     dayComplete: "Umunsi Warakomeje!",
     masteredDay: "Warakoze ubumenyi bwa {day}!",
-    awesome: "Nibyiza!",
+    awesome: "Nibbyiza!",
     readNow: "Soma None",
     colorNow: "Paka None",
     preparingMagic: "✨ Gutegura ubumenyi bwa ejo... ✨",
     previousPage: "Ipaji y'Ibanjirije",
     nextPage: "Ipaji Ikurikira",
-    spreadCount: "Ipaji {current} muri {total}",
+    pageCount: "Ipaji {current} muri {total}",
     loadingMissions: "Kuringaniza imirimo...",
     enterChildName: "Andika izina ry'umwana wawe",
     childName: "Izina ry'Umwana",
@@ -143,7 +160,9 @@ const translations = {
     missionCompleted: "Umurimo warangiye!",
     missionAlreadyCompleted: "Umurimo warangiye kera!",
     watchVideoFirst: "Reba video mbere",
-    pleaseWatchVideo: "Nyamuneka reba video ukomeza mbere y'uko ukomeza umurimo"
+    pleaseWatchVideo: "Nyamuneka reba video ukomeza mbere y'uko ukomeza umurimo",
+    viewSlides: "Reba Amapikisiki",
+    downloadContent: "Kuramo Ibirimo"
   },
   sw: {
     magicalLearning: "Kujifunza Kichawi",
@@ -158,7 +177,7 @@ const translations = {
     preparingMagic: "✨ Kuandaa uchawi wa kesho... ✨",
     previousPage: "Ukurasa Uliotangulia",
     nextPage: "Ukurasa Unaofuata",
-    spreadCount: "Ukurasa {current} kati ya {total}",
+    pageCount: "Ukurasa {current} kati ya {total}",
     loadingMissions: "Inapakia misheni...",
     enterChildName: "Weka jina la mtoto wako",
     childName: "Jina la Mtoto",
@@ -175,7 +194,9 @@ const translations = {
     missionCompleted: "Misheni imekamilika!",
     missionAlreadyCompleted: "Misheni tayari imekamilika!",
     watchVideoFirst: "Tazama video kwanza",
-    pleaseWatchVideo: "Tafadhali tazama video hadi mwisho kabla ya kukamilisha misheni"
+    pleaseWatchVideo: "Tafadhali tazama video hadi mwisho kabla ya kukamilisha misheni",
+    viewSlides: "Tazama Slaidi",
+    downloadContent: "Pakua Yaliyomo"
   }
 };
 
@@ -197,6 +218,7 @@ interface Mission {
   duration_minutes: number;
   points: number;
   video_url: string;
+  slides_url?: string;
   difficulty: number;
   mission_type: string;
 }
@@ -236,6 +258,163 @@ interface ColoringPage {
   page_number: number;
   image_url: string;
 }
+// Update the SlidesModal component to properly display images
+const SlidesModal = ({
+  slides,
+  onClose,
+  mission,
+  onMissionComplete,
+  t
+}: {
+  slides: { image_url: string; title?: string; description?: string }[];
+  onClose: () => void;
+  mission: Mission;
+  onMissionComplete: (mission: Mission) => void;
+  t: (key: string) => string;
+}) => {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [processedSlides, setProcessedSlides] = useState<typeof slides>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [imageError, setImageError] = useState(false);
+
+  // Process Supabase URLs
+  useEffect(() => {
+    const processSlideImages = async () => {
+      const processed = await Promise.all(
+        slides.map(async (slide) => {
+          if (slide.image_url.startsWith("supabase://")) {
+            const path = slide.image_url.replace("supabase://", "");
+            const [bucket, ...filePath] = path.split("/");
+            const { data: { publicUrl } } = await supabase.storage
+              .from("mission_slides")
+              .getPublicUrl(filePath.join("/"));
+            return { ...slide, image_url: publicUrl };
+          }
+          return slide;
+        })
+      );
+      setProcessedSlides(processed);
+      setIsLoading(false);
+    };
+    processSlideImages();
+  }, [slides]);
+
+  const nextSlide = () => {
+    if (currentSlide < processedSlides.length - 1) {
+      setCurrentSlide(currentSlide + 1);
+      setImageError(false);
+    } else {
+      onMissionComplete(mission);
+    }
+  };
+
+  const prevSlide = () => {
+    if (currentSlide > 0) {
+      setCurrentSlide(currentSlide - 1);
+      setImageError(false);
+    }
+  };
+
+  const handleImageError = () => setImageError(true);
+
+  const downloadSlide = async () => {
+    try {
+      const response = await fetch(processedSlides[currentSlide].image_url);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `slide-${currentSlide + 1}.jpg`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error("Download failed:", error);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black">
+        <div className="text-4xl animate-pulse text-white">✨</div>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center"
+      onClick={onClose}
+    >
+      {/* Blurred background */}
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-xl"></div>
+
+      {/* Image container */}
+      {imageError ? (
+        <div className="relative z-10 text-white text-center p-4">
+          <div className="text-4xl mb-2">📷</div>
+          <p>Failed to load image</p>
+        </div>
+      ) : (
+        <img
+          src={processedSlides[currentSlide]?.image_url}
+          alt={`Slide ${currentSlide + 1}`}
+          onClick={(e) => e.stopPropagation()}
+          onLoad={() => setImageError(false)}
+          onError={handleImageError}
+          className="relative z-10 max-w-full max-h-full object-contain"
+          style={{
+            display: "block",
+            margin: "0 auto",
+          }}
+        />
+      )}
+
+      {/* Navigation arrows */}
+      {processedSlides.length > 1 && !imageError && (
+        <>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              prevSlide();
+            }}
+            disabled={currentSlide === 0}
+            className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/80 p-3 rounded-full shadow hover:bg-white z-10"
+          >
+            ◀
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              nextSlide();
+            }}
+            className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/80 p-3 rounded-full shadow hover:bg-white z-10"
+          >
+            ▶
+          </button>
+        </>
+      )}
+
+      {/* Download button */}
+      {!imageError && (
+        <div className="absolute top-4 left-4 z-10">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              downloadSlide();
+            }}
+            className="bg-white/80 hover:bg-white p-3 rounded-full shadow-lg flex items-center justify-center"
+            title="Download Slide"
+          >
+            <Download className="w-6 h-6 text-black" />
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
 
 // Video Player Modal with disabled fast-forward and completion tracking
 const VideoPlayerModal = ({ 
@@ -298,6 +477,20 @@ const VideoPlayerModal = ({
     }
   };
 
+  const downloadVideo = async () => {
+    try {
+      const a = document.createElement('a');
+      a.href = videoUrl;
+      a.download = `mission-${mission.day}-${mission.title.replace(/\s+/g, '-')}.mp4`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error('Error downloading video:', error);
+      toast.error('Failed to download video');
+    }
+  };
+
   return (
     <motion.div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-2"
@@ -318,6 +511,16 @@ const VideoPlayerModal = ({
         >
           ✕
         </button>
+        
+        <button
+          onClick={downloadVideo}
+          className="absolute top-1 left-1 md:top-2 md:left-2 z-10 text-white text-2xl md:text-3xl bg-black/50 rounded-full p-1 md:p-2"
+          aria-label="Download video"
+          title="Download video"
+        >
+          <Download className="h-5 w-5 md:h-6 md:w-6" />
+        </button>
+        
         <video
           ref={videoRef}
           src={videoUrl}
@@ -424,9 +627,8 @@ const ChildNameModal = ({
     </Dialog>
   );
 };
-
-// ENHANCED RESPONSIVE REAL BOOK VIEWER
-const RealBookViewer = ({ 
+// SINGLE PAGE BOOK VIEWER - FIXED VERSION
+const SinglePageBookViewer = ({ 
   pages, 
   onClose, 
   type,
@@ -439,33 +641,10 @@ const RealBookViewer = ({
 }) => {
   const [processedPages, setProcessedPages] = useState<typeof pages>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [currentSpread, setCurrentSpread] = useState(0);
+  const [currentPage, setCurrentPage] = useState(0);
   const [isTurning, setIsTurning] = useState(false);
-  const [flipDirection, setFlipDirection] = useState<'left' | 'right'>('right');
   const [touchStart, setTouchStart] = useState<number | null>(null);
-  const [aspectRatio, setAspectRatio] = useState(1);
-  const [windowSize, setWindowSize] = useState({
-    width: typeof window !== 'undefined' ? window.innerWidth : 1200,
-    height: typeof window !== 'undefined' ? window.innerHeight : 800
-  });
-  const bookRef = useRef<HTMLDivElement>(null);
   
-  // Calculate total spreads (each spread = 2 pages)
-  const totalSpreads = Math.ceil(pages.length / 2);
-
-  // Track window size for responsiveness
-  useEffect(() => {
-    const handleResize = () => {
-      setWindowSize({
-        width: window.innerWidth,
-        height: window.innerHeight
-      });
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
   // Process images from Supabase storage
   useEffect(() => {
     const processImages = async () => {
@@ -488,46 +667,24 @@ const RealBookViewer = ({
     processImages();
   }, [pages]);
 
-  // Calculate aspect ratio when pages are processed
-  useEffect(() => {
-    if (processedPages.length > 0 && processedPages[0].image_url) {
-      const img = new Image();
-      img.src = processedPages[0].image_url;
-      img.onload = () => {
-        setAspectRatio(img.width / img.height);
-      };
-    }
-  }, [processedPages]);
-
-  // Get pages for current spread
-  const getSpreadPages = () => {
-    const startIndex = currentSpread * 2;
-    return [
-      processedPages[startIndex],
-      processedPages[startIndex + 1]
-    ].filter(Boolean);
-  };
-
-  const goToNextSpread = () => {
-    if (currentSpread < totalSpreads - 1 && !isTurning) {
-      setFlipDirection('right');
+  const goToNextPage = () => {
+    if (currentPage < processedPages.length - 1 && !isTurning) {
       setIsTurning(true);
       setTimeout(() => {
-        setCurrentSpread(prev => prev + 1);
+        setCurrentPage(prev => prev + 1);
         setIsTurning(false);
-      }, 600);
+      }, 300);
       playPageTurnSound();
     }
   };
 
-  const goToPrevSpread = () => {
-    if (currentSpread > 0 && !isTurning) {
-      setFlipDirection('left');
+  const goToPrevPage = () => {
+    if (currentPage > 0 && !isTurning) {
       setIsTurning(true);
       setTimeout(() => {
-        setCurrentSpread(prev => prev - 1);
+        setCurrentPage(prev => prev - 1);
         setIsTurning(false);
-      }, 600);
+      }, 300);
       playPageTurnSound();
     }
   };
@@ -555,26 +712,12 @@ const RealBookViewer = ({
     // Only consider significant swipes
     if (Math.abs(diff) > 50) {
       if (diff > 0) {
-        goToNextSpread();
+        goToNextPage();
       } else {
-        goToPrevSpread();
+        goToPrevPage();
       }
       setTouchStart(null);
     }
-  };
-
-  // Edge page handling
-  const getCursorStyle = () => {
-    if (currentSpread === 0 && currentSpread === totalSpreads - 1) {
-      return 'cursor-default';
-    }
-    if (currentSpread === 0) {
-      return 'cursor-e-resize';
-    }
-    if (currentSpread === totalSpreads - 1) {
-      return 'cursor-w-resize';
-    }
-    return 'cursor-grab';
   };
 
   if (isLoading) {
@@ -585,25 +728,7 @@ const RealBookViewer = ({
     );
   }
 
-  const currentPages = getSpreadPages();
-
-  // Calculate book dimensions based on aspect ratio and window size
-  const maxBookWidth = Math.min(800, windowSize.width * 0.95);
-  const maxBookHeight = Math.min(600, windowSize.height * 0.8);
-  
-  // Determine book height based on aspect ratio
-  let bookHeight = maxBookHeight;
-  let bookWidth = bookHeight * aspectRatio * 2;
-  
-  // If book is too wide for screen, adjust dimensions
-  if (bookWidth > maxBookWidth) {
-    bookWidth = maxBookWidth;
-    bookHeight = bookWidth / (aspectRatio * 2);
-  }
-  
-  // Mobile optimization
-  const isMobile = windowSize.width < 640;
-  const bookPadding = isMobile ? 'p-1' : 'p-4';
+  const currentPageData = processedPages[currentPage];
 
   return (
     <div 
@@ -613,166 +738,78 @@ const RealBookViewer = ({
     >
       <button
         onClick={onClose}
-        className="absolute top-2 right-2 sm:top-4 sm:right-4 z-50 text-white text-2xl bg-black/50 rounded-full p-1 sm:p-2"
+        className="absolute top-4 right-4 z-50 text-white text-2xl bg-black/50 rounded-full p-2"
       >
         ✕
       </button>
 
-      <div 
-        ref={bookRef} 
-        className={`relative flex justify-center perspective-1000 ${getCursorStyle()} ${bookPadding}`}
-        style={{
-          width: `${bookWidth}px`,
-          height: `${bookHeight}px`
-        }}
-      >
-        <div className="relative w-full h-full flex justify-center">
-          {/* Left Page */}
-          {currentPages[0] && (
-            <motion.div
-              className="absolute left-0 w-1/2 h-full bg-gray-100 shadow-lg rounded-l-lg overflow-hidden"
-              animate={isTurning && flipDirection === 'right' ? "flipLeft" : {}}
-              variants={{
-                flipLeft: {
-                  rotateY: -180,
-                  transition: { 
-                    duration: 0.6,
-                    ease: "easeInOut"
-                  }
-                }
-              }}
-              style={{ 
-                transformStyle: 'preserve-3d',
-                transformOrigin: 'right center'
-              }}
-            >
-              <div className="w-full h-full relative">
-                {/* Page Content */}
-                <div className="absolute inset-0 w-full h-full flex items-center justify-center bg-white">
-                  <img 
-                    src={currentPages[0].image_url} 
-                    alt={`Page ${currentPages[0].page_number}`}
-                    className="w-full h-full object-contain"
-                  />
-                </div>
-                
-                {/* Text Overlay */}
-                {type === 'story' && currentPages[0].text && (
-                  <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3 bg-white/80 text-center text-xs sm:text-sm">
-                    {currentPages[0].text}
-                  </div>
-                )}
+      <div className="relative w-full h-full flex justify-center items-center p-4">
+        {/* Current Page */}
+        {currentPageData && (
+          <motion.div
+            className="relative w-full h-full max-w-4xl max-h-[90vh] bg-white rounded-lg overflow-hidden flex items-center justify-center"
+            key={currentPage}
+            initial={{ opacity: 0, x: isTurning ? 100 : -100 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            {/* Page Content - Fixed to ensure proper image display */}
+            <div className="w-full h-full flex items-center justify-center bg-white p-4">
+              <img 
+                src={currentPageData.image_url} 
+                alt={`Page ${currentPageData.page_number}`}
+                className="max-w-full max-h-full object-contain"
+                onError={(e) => {
+                  console.error("Error loading image:", currentPageData.image_url);
+                  // Fallback to a placeholder
+                  e.currentTarget.src = "/placeholder-book.png";
+                }}
+              />
+            </div>
+            
+            {/* Text Overlay - Fixed positioning */}
+            {type === 'story' && currentPageData.text && (
+              <div className="absolute bottom-0 left-0 right-0 p-4 bg-white/90 text-center">
+                <p className="text-sm md:text-base">{currentPageData.text}</p>
               </div>
-            </motion.div>
-          )}
-          
-          {/* Right Page */}
-          {currentPages[1] && (
-            <motion.div
-              className={`absolute right-0 w-1/2 h-full bg-white shadow-lg rounded-r-lg overflow-hidden z-10 ${
-                isTurning ? 'pointer-events-none' : ''
-              }`}
-              animate={isTurning && flipDirection === 'right' ? "flipRight" : {}}
-              variants={{
-                flipRight: {
-                  rotateY: -180,
-                  transition: { 
-                    duration: 0.6,
-                    ease: "easeInOut"
-                  }
-                }
-              }}
-              style={{ 
-                transformStyle: 'preserve-3d',
-                transformOrigin: 'left center',
-                backfaceVisibility: 'hidden'
-              }}
-            >
-              <div className="w-full h-full relative">
-                {/* Page Content */}
-                <div className="absolute inset-0 w-full h-full flex items-center justify-center bg-white">
-                  <img 
-                    src={currentPages[1].image_url} 
-                    alt={`Page ${currentPages[1].page_number}`}
-                    className="w-full h-full object-contain"
-                  />
-                </div>
-                
-                {/* Text Overlay */}
-                {type === 'story' && currentPages[1].text && (
-                  <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3 bg-white/80 text-center text-xs sm:text-sm">
-                    {currentPages[1].text}
-                  </div>
-                )}
-                
-                {/* Page Shadow (during turn) */}
-                <AnimatePresence>
-                  {isTurning && flipDirection === 'right' && (
-                    <motion.div
-                      className="absolute inset-0 bg-black/30"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 0.3 }}
-                      exit={{ opacity: 0 }}
-                    />
-                  )}
-                </AnimatePresence>
-              </div>
-            </motion.div>
-          )}
-          
-          {/* Previous Spread Preview (peeking) */}
-          {currentSpread > 0 && (
-            <motion.div 
-              className="absolute left-0 w-[5%] h-full bg-gray-800 rounded-l-lg z-0"
-              animate={{ width: isTurning ? '5%' : '8%' }}
-              transition={{ duration: 0.3 }}
-            />
-          )}
-          
-          {/* Next Spread Preview (peeking) */}
-          {currentSpread < totalSpreads - 1 && (
-            <motion.div 
-              className="absolute right-0 w-[5%] h-full bg-gray-800 rounded-r-lg z-0"
-              animate={{ width: isTurning ? '5%' : '8%' }}
-              transition={{ duration: 0.3 }}
-            />
-          )}
-        </div>
+            )}
+          </motion.div>
+        )}
       </div>
 
       {/* Navigation Arrows */}
-      <div className="absolute top-1/2 left-1 sm:left-2 transform -translate-y-1/2 z-40">
+      <div className="absolute top-1/2 left-4 transform -translate-y-1/2 z-40">
         <button
-          onClick={goToPrevSpread}
-          disabled={currentSpread === 0 || isTurning}
-          className={`p-1 sm:p-2 rounded-full bg-black/50 ${currentSpread === 0 ? 'opacity-30' : 'hover:bg-black/70'}`}
+          onClick={goToPrevPage}
+          disabled={currentPage === 0 || isTurning}
+          className={`p-2 rounded-full bg-black/50 ${currentPage === 0 ? 'opacity-30' : 'hover:bg-black/70'}`}
           aria-label={t('previousPage')}
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 sm:h-8 sm:w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
       </div>
       
-      <div className="absolute top-1/2 right-1 sm:right-2 transform -translate-y-1/2 z-40">
+      <div className="absolute top-1/2 right-4 transform -translate-y-1/2 z-40">
         <button
-          onClick={goToNextSpread}
-          disabled={currentSpread === totalSpreads - 1 || isTurning}
-          className={`p-1 sm:p-2 rounded-full bg-black/50 ${currentSpread === totalSpreads - 1 ? 'opacity-30' : 'hover:bg-black/70'}`}
+          onClick={goToNextPage}
+          disabled={currentPage === processedPages.length - 1 || isTurning}
+          className={`p-2 rounded-full bg-black/50 ${currentPage === processedPages.length - 1 ? 'opacity-30' : 'hover:bg-black/70'}`}
           aria-label={t('nextPage')}
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 sm:h-8 sm:w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
         </button>
       </div>
       
-      {/* Spread Counter */}
-      <div className="absolute bottom-2 sm:bottom-4 left-0 right-0 flex justify-center z-40">
-        <div className="flex items-center justify-center text-xs sm:text-sm font-medium bg-white/90 px-3 py-1 sm:px-4 sm:py-2 rounded-full">
-          {t('spreadCount', {
-            current: currentSpread + 1,
-            total: totalSpreads
+      {/* Page Counter */}
+      <div className="absolute bottom-4 left-0 right-0 flex justify-center z-40">
+        <div className="bg-black/70 text-white px-4 py-2 rounded-full text-sm">
+          {t('pageCount', {
+            current: currentPage + 1,
+            total: processedPages.length
           })}
         </div>
       </div>
@@ -949,7 +986,110 @@ const BookCard = ({
     </motion.div>
   );
 };
+const MissionCard = ({ 
+  mission, 
+  completed, 
+  videoWatched, 
+  onVideoOpen, 
+  onManualComplete, 
+  t, 
+  index,
+  missionSlides,
+  setOpenSlides
+}: { 
+  mission: Mission; 
+  completed: boolean; 
+  videoWatched: boolean; 
+  onVideoOpen: (mission: Mission) => void; 
+  onManualComplete: (mission: Mission) => void; 
+  t: (key: string) => string; 
+  index: number;
+  missionSlides: Record<string, any[]>;
+  setOpenSlides: (slides: {slides: any[], mission: Mission}) => void;
+}) => {
+  const iconSrc = `/mission-icon-${index + 1}.png`;
+  const missionType = mission.mission_type || 'video';
+  const hasSlides = missionSlides[mission.id]?.length > 0;
+  const hasVideo = mission.video_url;
 
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, delay: index * 0.1 }}
+      whileHover={{ y: -5 }}
+      className="w-full"
+    >
+      <Card className={`relative overflow-hidden border-2 transition-all w-full h-full
+        ${completed ? "border-green-300 bg-green-50" : "border-purple-200 hover:border-purple-300"}`}
+      >
+        {completed && (
+          <div className="absolute top-3 right-3 bg-green-500 text-white p-1 rounded-full">
+            <CheckCircle className="h-5 w-5" />
+          </div>
+        )}
+
+        <CardHeader className="pb-2">
+          <div className="flex items-center gap-3">
+            <img src={iconSrc} alt="Mission icon" className="h-10 w-10 object-contain" />
+            <CardTitle className="text-xl">{mission.title}</CardTitle>
+          </div>
+        </CardHeader>
+
+        <CardContent className="grid gap-3">
+          {/* Content Buttons */}
+          <div className="grid gap-2">
+            {hasVideo && (
+              <Button
+                onClick={() => onVideoOpen(mission)}
+                className="w-full gap-2 py-4 text-lg bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
+              >
+                <Video className="h-5 w-5" />
+                <span>{t('watchMagic')}</span>
+              </Button>
+            )}
+
+            {hasSlides && (
+              <Button
+                onClick={() => setOpenSlides({ slides: missionSlides[mission.id] || [], mission })}
+                className="w-full gap-2 py-4 text-lg bg-gradient-to-r from-pink-600 to-orange-600 hover:from-pink-700 hover:to-orange-700 text-white"
+              >
+                <ImageIcon className="h-5 w-5" />
+                <span>{t('viewSlides')}</span>
+              </Button>
+            )}
+          </div>
+
+          {/* Complete Mission Button */}
+          {!completed ? (
+            <Button
+              onClick={() => onManualComplete(mission)}
+              variant="outline"
+              className={`w-full gap-2 py-4 text-lg ${
+                (missionType === 'video' && !videoWatched) 
+                  ? "border-gray-300 text-gray-400 cursor-not-allowed"
+                  : "border-yellow-400 text-yellow-600 hover:bg-yellow-50"
+              }`}
+              disabled={missionType === 'video' && !videoWatched}
+            >
+              <Sparkles className="h-5 w-5" />
+              <span>
+                {missionType === 'video' && !videoWatched 
+                  ? t('watchVideoFirst') 
+                  : t('completeMission')}
+              </span>
+            </Button>
+          ) : (
+            <div className="flex items-center justify-center gap-2 text-green-600 text-lg font-semibold p-4 bg-green-100 rounded-lg">
+              <Trophy className="h-5 w-5" />
+              <span>{t('completed')}</span>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </motion.div>
+  );
+};
 // Main Component with translations
 const MissionsComponent = () => {
   const [missionProgram, setMissionProgram] = useState<DayData[]>([]);
@@ -970,6 +1110,9 @@ const MissionsComponent = () => {
   const [childNotFound, setChildNotFound] = useState(false);
   const [videoProgress, setVideoProgress] = useState<Record<string, number>>({});
   const [videoCompletion, setVideoCompletion] = useState<Record<string, boolean>>({});
+  const [openSlides, setOpenSlides] = useState<{slides: any[], mission: Mission} | null>(null);
+  const [missionSlides, setMissionSlides] = useState<Record<string, any[]>>({});
+  const [nimiContent, setNimiContent] = useState<string>("");
   
   // Translation function
   const t = (key: string, params?: Record<string, any>) => {
@@ -1090,6 +1233,35 @@ const MissionsComponent = () => {
     fetchDayContent();
   }, [selectedDay]);
 
+ useEffect(() => {
+  if (!missionProgram.length) return;
+
+  const fetchMissionSlides = async () => {
+    const missionIds = missionProgram.flatMap(day => day.missions.map(m => m.id));
+
+    const { data, error } = await supabase
+      .from("mission_slides")
+      .select("*")
+      .in("mission_id", missionIds)
+      .order("slide_order", { ascending: true });
+
+    if (error) {
+      console.error("Failed to fetch slides:", error);
+      return;
+    }
+
+    const groupedSlides: Record<string, any[]> = {};
+    data?.forEach(slide => {
+      if (!groupedSlides[slide.mission_id]) groupedSlides[slide.mission_id] = [];
+      groupedSlides[slide.mission_id].push(slide);
+    });
+
+    setMissionSlides(groupedSlides);
+  };
+
+  fetchMissionSlides();
+}, [missionProgram]);
+  
   const groupMissionsByDay = (missions: Mission[]) => {
     const grouped: Record<number, DayData> = {};
 
@@ -1275,8 +1447,8 @@ const MissionsComponent = () => {
   };
 
   const handleManualCompletion = (mission: Mission) => {
-    // Check if video was watched to completion
-    if (!videoCompletion[mission.id]) {
+    // Check if video was watched to completion (for video missions)
+    if (mission.mission_type === 'video' && !videoCompletion[mission.id]) {
       toast.error(t('pleaseWatchVideo'));
       return;
     }
@@ -1290,6 +1462,22 @@ const MissionsComponent = () => {
     // Show child name modal
     setMissionToComplete(mission);
     setShowChildNameModal(true);
+  };
+
+  const handleOpenStorybook = () => {
+    setShowStorybook(true);
+  };
+
+  const handleCloseStorybook = () => {
+    setShowStorybook(false);
+  };
+
+  const handleOpenColoringBook = () => {
+    setShowColoringBook(true);
+  };
+
+  const handleCloseColoringBook = () => {
+    setShowColoringBook(false);
   };
 
   if (isLoading) {
@@ -1333,42 +1521,30 @@ const MissionsComponent = () => {
           {currentDayData?.theme}
         </h2>
 
-        <div className="flex overflow-x-auto pb-4 gap-4 px-4 scrollbar-thin w-full">
+        <div className="flex overflow-x-auto pb-4 gap-3 px-4 scrollbar-thin w-full max-w-6xl mx-auto">
           {missionProgram.slice(0, 7).map(day => (
             <motion.button
               key={day.day}
               onClick={() => setSelectedDay(day.day)}
               whileHover={{ y: -5 }}
               whileTap={{ scale: 0.95 }}
-              className={`flex flex-col items-center p-4 rounded-xl min-w-[100px] transition-all flex-shrink-0
+              className={`flex flex-col items-center p-3 md:p-4 rounded-xl min-w-[80px] md:min-w-[100px] transition-all flex-shrink-0
                 ${selectedDay === day.day
                   ? "bg-gradient-to-br from-purple-600 to-blue-600 text-white shadow-lg"
                   : "bg-white shadow-md hover:shadow-lg"}`}
             >
               <motion.span 
-                className="text-4xl"
+                className="text-3xl md:text-4xl"
                 animate={selectedDay === day.day ? { scale: [1, 1.1, 1] } : {}}
                 transition={{ duration: 1, repeat: Infinity }}
               >
                 {day.emoji}
               </motion.span>
-              <span className="text-lg font-bold">Day {day.day}</span>
+              <span className="text-base md:text-lg font-bold mt-1">Day {day.day}</span>
             </motion.button>
           ))}
         </div>
       </section>
-
-      {/* Morning Video & Nimi Assistant */}
-      <div className="max-w-md mx-auto mb-6 space-y-4 w-full px-4">
-        <MorningVideoCard video={audioTrack} t={t} />
-        <motion.div 
-          animate={{ y: [0, -5, 0] }}
-          transition={{ duration: 3, repeat: Infinity }}
-          className="w-full"
-        >
-          <NimiAssistant mood="happy" />
-        </motion.div>
-      </div>
 
       {/* Missions Grid */}
       {currentDayData?.missions.length ? (
@@ -1376,68 +1552,21 @@ const MissionsComponent = () => {
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 w-full">
             {currentDayData.missions.map((mission, index) => {
               const completed = completedIds.has(mission.id);
-              const icon = ["🧙", "🦄", "🌈", "🔮", "🎩", "🌟"][index % 6];
               const videoWatched = videoCompletion[mission.id];
 
               return (
-                <motion.div
+                <MissionCard
                   key={mission.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: index * 0.1 }}
-                  whileHover={{ y: -5 }}
-                  className="w-full"
-                >
-                  <Card className={`relative overflow-hidden border-2 transition-all w-full
-                    ${completed ? "border-green-300 bg-green-50" : "border-purple-200 hover:border-purple-300"}`}
-                  >
-                    {completed && (
-                      <div className="absolute top-3 right-3 bg-green-500 text-white p-1 rounded-full">
-                        <CheckCircle className="h-6 w-6" />
-                      </div>
-                    )}
-
-                    <CardHeader className="pb-2">
-                      <div className="flex items-center gap-3">
-                        <span className="text-5xl">{icon}</span>
-                        <CardTitle className="text-2xl">{mission.title}</CardTitle>
-                      </div>
-                    </CardHeader>
-
-                    <CardContent className="grid gap-3">
-                      <Button
-                        onClick={() => handleVideoOpen(mission)}
-                        className="w-full gap-3 py-4 text-xl min-h-[64px] bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
-                      >
-                        <Play className="h-7 w-7" />
-                        <span>{t('watchMagic')}</span>
-                      </Button>
-
-                      {!completed ? (
-                        <Button
-                          onClick={() => handleManualCompletion(mission)}
-                          variant="outline"
-                          className={`w-full gap-3 py-4 text-xl min-h-[64px] ${
-                            videoWatched 
-                              ? "border-yellow-400 text-yellow-600 hover:bg-yellow-50" 
-                              : "border-gray-300 text-gray-400 cursor-not-allowed"
-                          }`}
-                          disabled={!videoWatched}
-                        >
-                          <Sparkles className="h-7 w-7" />
-                          <span>
-                            {videoWatched ? t('completeMission') : t('watchVideoFirst')}
-                          </span>
-                        </Button>
-                      ) : (
-                        <div className="flex items-center justify-center gap-3 text-green-600 text-xl font-semibold p-4 bg-green-100 rounded-lg">
-                          <Trophy className="h-7 w-7" />
-                          <span>{t('completed')}</span>
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                </motion.div>
+                  mission={mission}
+                  completed={completed}
+                  videoWatched={videoWatched}
+                  onVideoOpen={handleVideoOpen}
+                  onManualComplete={handleManualCompletion}
+                  t={t}
+                  index={index}
+                  missionSlides={missionSlides}
+                  setOpenSlides={setOpenSlides}
+                />
               );
             })}
           </div>
@@ -1453,7 +1582,7 @@ const MissionsComponent = () => {
         {storyPages.length > 0 && (
           <BookCard 
             day={selectedDay} 
-            onOpen={() => setShowStorybook(true)}
+            onOpen={handleOpenStorybook}
             pageCount={storyPages.length}
             coverData={bookCovers.find(c => c.day === selectedDay && c.cover_type === 'story')}
             type="story"
@@ -1464,7 +1593,7 @@ const MissionsComponent = () => {
         {coloringPages.length > 0 && (
           <BookCard 
             day={selectedDay}
-            onOpen={() => setShowColoringBook(true)}
+            onOpen={handleOpenColoringBook}
             pageCount={coloringPages.length}
             coverData={bookCovers.find(c => c.day === selectedDay && c.cover_type === 'coloring')}
             type="coloring"
@@ -1556,13 +1685,13 @@ const MissionsComponent = () => {
       {/* Storybook Viewer */}
       <AnimatePresence>
         {showStorybook && storyPages.length > 0 && (
-          <RealBookViewer 
+          <SinglePageBookViewer 
             pages={storyPages.map(page => ({
               image_url: page.image_url,
               page_number: page.page_number,
               text: page.text
             }))}
-            onClose={() => setShowStorybook(false)}
+            onClose={handleCloseStorybook}
             type="story"
             t={t}
           />
@@ -1572,19 +1701,19 @@ const MissionsComponent = () => {
       {/* Coloring Book Viewer */}
       <AnimatePresence>
         {showColoringBook && coloringPages.length > 0 && (
-          <RealBookViewer 
+          <SinglePageBookViewer 
             pages={coloringPages.map(page => ({
               image_url: page.image_url,
               page_number: page.page_number
             }))}
-            onClose={() => setShowColoringBook(false)}
+            onClose={handleCloseColoringBook}
             type="coloring"
             t={t}
           />
         )}
       </AnimatePresence>
 
-      {/* Video Player */}
+    {/* Video Player */}
       <AnimatePresence>
         {openVideo && (
           <VideoPlayerModal 
@@ -1596,6 +1725,23 @@ const MissionsComponent = () => {
           />
         )}
       </AnimatePresence>
+
+   {/* Slides Modal */}
+    <AnimatePresence>
+      {openSlides && (
+        <SlidesModal
+          slides={openSlides.slides}
+          mission={openSlides.mission}
+          onClose={() => setOpenSlides(null)}
+          onMissionComplete={handleMissionComplete}
+          t={t}
+        />
+      )}
+    </AnimatePresence>
+{/* Nimi Reader Button */}
+<NimiReaderButton hide={!!openSlides || showStorybook || showColoringBook} />
+
+
     </>
   );
 };
