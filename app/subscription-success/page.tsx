@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useSession } from "@supabase/auth-helpers-react";
 import supabase from "@/lib/supabaseClient";
 import { useToast } from "@/hooks/use-toast";
@@ -9,7 +9,6 @@ import { t } from "@/lib/translations";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function SubscriptionSuccessPage() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
   const { language } = useLanguage();
@@ -19,12 +18,14 @@ export default function SubscriptionSuccessPage() {
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {
+    if (!session) return; // wait for session to load
+
     const verifyPayment = async () => {
       setLoading(true);
 
       try {
-        if (!session?.user?.id) throw new Error("User session not found");
         const parentId = session.user.id;
+        if (!parentId) throw new Error("User session not found");
 
         const stripeSessionId = searchParams.get("session_id");
         const flutterwaveTxRef = searchParams.get("tx_ref");
@@ -32,32 +33,26 @@ export default function SubscriptionSuccessPage() {
 
         let plan: "monthly" | "yearly" | null = null;
 
-        console.log("Starting payment verification...");
-        console.log({ stripeSessionId, flutterwaveTxRef, pesapalRef, parentId });
-
-        // 1️⃣ Verify Stripe
+        // 1️⃣ Stripe
         if (stripeSessionId) {
           const res = await fetch(`/api/subscription?session_id=${stripeSessionId}`);
           const data = await res.json();
-          console.log("Stripe response:", data);
           if (data.error) throw new Error(data.error);
           plan = data.plan ?? null;
         }
 
-        // 2️⃣ Verify Flutterwave
+        // 2️⃣ Flutterwave
         if (flutterwaveTxRef) {
           const res = await fetch(`/api/verify-flutterwave?tx_ref=${flutterwaveTxRef}`);
           const data = await res.json();
-          console.log("Flutterwave response:", data);
           if (!data.success) throw new Error(data.message || "Flutterwave verification failed");
           plan = data.plan ?? plan;
         }
 
-        // 3️⃣ Verify Pesapal
+        // 3️⃣ Pesapal
         if (pesapalRef) {
           const res = await fetch(`/api/verify-pesapal?reference=${pesapalRef}`);
           const data = await res.json();
-          console.log("Pesapal response:", data);
           if (!data.success) throw new Error(data.message || "Pesapal verification failed");
           plan = data.plan ?? plan;
         }
@@ -73,9 +68,8 @@ export default function SubscriptionSuccessPage() {
 
         setSuccess(true);
         toast({ title: t(language, "success"), description: t(language, "subscriptionUpdated") });
-        console.log("Payment verified and subscription updated successfully:", { plan, parentId });
       } catch (err: any) {
-        console.error("Payment verification failed:", err);
+        console.error(err);
         toast({ title: t(language, "error"), description: err.message });
       } finally {
         setLoading(false);
