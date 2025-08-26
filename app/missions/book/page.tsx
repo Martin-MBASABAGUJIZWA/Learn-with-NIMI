@@ -27,7 +27,7 @@ export default function MissionBookPage() {
     const fetchSummaries = async () => {
       setLoading(true);
       const { data, error } = await supabase
-        .from("daily_mission_summaries")
+        .from("missions")
         .select("*")
         .eq("user_id", user.id)
         .order("date", { ascending: false });

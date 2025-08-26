@@ -35,6 +35,7 @@ const CommunityPage = () => {
     avatar: "👤",
     avatarUrl: ""
   });
+  const [headerImageError, setHeaderImageError] = useState(false);
 
   // Upload form state
   const [uploadForm, setUploadForm] = useState({
@@ -131,7 +132,14 @@ const CommunityPage = () => {
         type: c.type || "art",
         completionStatus: c.completion_status || "completed",
         createdAt: c.created_at,
-        comments: c.comments || []
+        comments: (c.comments || []).map((comment: any) => ({
+          id: comment.id,
+          creation_id: comment.creation_id,
+          author: comment.author || "Anonymous",
+          author_avatar: comment.author_avatar || "👤",
+          content: comment.content,
+          created_at: comment.created_at
+        }))
       }));
 
       setCreations(formattedCreations);
@@ -234,11 +242,27 @@ const CommunityPage = () => {
     const creation = creations.find(c => c.id === creationId);
     
     try {
+      // Get the user's actual name from the users table
+      let authorName = currentUser.name;
+      
+      // If the current user name is just "User" or similar, try to get the real name
+      if (authorName === "User" || authorName === "Guest") {
+        const { data: userData } = await supabase
+          .from("users")
+          .select("full_name")
+          .eq("auth_user_id", currentUser.id)
+          .maybeSingle();
+        
+        if (userData && userData.full_name) {
+          authorName = userData.full_name;
+        }
+      }
+
       // Optimistic update
       const newComment = {
         id: tempCommentId,
         creation_id: creationId,
-        author: currentUser.name,
+        author: authorName,
         author_avatar: currentUser.avatarUrl,
         content,
         created_at: new Date().toISOString()
@@ -258,7 +282,7 @@ const CommunityPage = () => {
         .from('comments')
         .insert({
           creation_id: creationId,
-          author: currentUser.name,
+          author: authorName,
           author_avatar: currentUser.avatarUrl,
           content
         })
@@ -691,7 +715,19 @@ const CommunityPage = () => {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="text-center mb-8">
-          <div className="text-6xl mb-4">👥</div>
+          {/* Header image with fallback */}
+          <div className="mb-4 flex justify-center">
+            {headerImageError ? (
+              <div className="text-6xl">👥</div>
+            ) : (
+              <img 
+                src="/images/community-header.png" 
+                alt="Creative Community"
+                className="h-24 w-auto object-contain"
+                onError={() => setHeaderImageError(true)}
+              />
+            )}
+          </div>
           <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">
             Creative Community
           </h1>

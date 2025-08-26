@@ -1,15 +1,16 @@
+// app/api/nimi/route.ts
 import { NextRequest } from 'next/server';
 
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
-export const runtime = 'edge'; // Use Edge runtime for better performance
+export const runtime = 'edge';
 
 export async function POST(req: NextRequest) {
   if (!OPENROUTER_API_KEY) {
     return new Response(JSON.stringify({ error: 'Server configuration error' }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   }
 
@@ -19,26 +20,24 @@ export async function POST(req: NextRequest) {
     if (!messages || !Array.isArray(messages)) {
       return new Response(JSON.stringify({ error: 'Invalid request format' }), {
         status: 400,
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
       });
     }
 
-    // System message to guide the AI's behavior
+    // Enhanced system prompt for clear, concise, helpful answers
     const systemMessage = {
       role: 'system',
       content: `
-        You are Nimi, a friendly AI assistant for children aged 2-4 and their parents. 
-        You are talking to ${childName}. Follow these guidelines:
-        - Use simple, clear language appropriate for young children and parent too.
-        - Be encouraging, positive, and patient
-        - Keep responses concise (1-5 short sentences usually)
-        - Relate to the asked questions
-        - Use emojis occasionally to make it fun 🎨✨
-        - Respond in ${language} unless asked otherwise
-        - If unsure, ask a question to keep the conversation going
-        -ensure the answer you provide is clear and make sure the user is enjoyed from the chats
-        -some tim blague with a child to lough
-      `.trim()
+You are Nimi, a friendly and clear AI assistant for children aged 2-4 and their parents.
+Your replies must be:
+- Clear, concise, and to the point (1-3 short sentences)
+- Positive, encouraging, and fun
+- Easy for a young child to understand
+- Include emojis occasionally to make it lively 🎨✨
+- Ask a simple question to keep the conversation going if appropriate
+- Always respond in ${language}, unless asked otherwise
+- Avoid unnecessary long explanations or filler words
+      `.trim(),
     };
 
     const payload = {
@@ -46,48 +45,39 @@ export async function POST(req: NextRequest) {
       messages: [systemMessage, ...messages],
       temperature: 0.7,
       max_tokens: 150,
-      stream: true
+      stream: true,
     };
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
 
     const response = await fetch(OPENROUTER_API_URL, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+        Authorization: `Bearer ${OPENROUTER_API_KEY}`,
         'Content-Type': 'application/json',
-        'HTTP-Referer': req.nextUrl.origin,
-        'X-Title': 'PikoPal'
       },
       body: JSON.stringify(payload),
-      signal: controller.signal
+      signal: controller.signal,
     });
 
     clearTimeout(timeoutId);
 
     if (!response.ok) {
-      const errorData = await response.json();
-      console.error('OpenRouter API error:', errorData);
-      return new Response(JSON.stringify({ 
-        error: 'Error communicating with AI service',
-        details: errorData 
-      }), {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' }
-      });
+      const text = await response.text();
+      console.error('OpenRouter API error:', text);
+      return new Response(JSON.stringify({ error: 'AI service error', details: text }), { status: 500 });
     }
 
-    // Create a streaming response
+    // Streaming the response
     const stream = new ReadableStream({
       async start(controller) {
-        const encoder = new TextEncoder();
         const decoder = new TextDecoder();
-        
-        try {
-          const reader = response.body?.getReader();
-          if (!reader) throw new Error('No reader available');
+        const encoder = new TextEncoder();
+        const reader = response.body?.getReader();
+        if (!reader) { controller.close(); return; }
 
+        try {
           while (true) {
             const { done, value } = await reader.read();
             if (done) break;
@@ -100,18 +90,13 @@ export async function POST(req: NextRequest) {
                 try {
                   const data = JSON.parse(line.substring(5));
                   const content = data.choices?.[0]?.delta?.content;
-                  if (content) {
-                    controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content })}\n\n`));
-                  }
-                } catch (e) {
-                  console.error('Error parsing chunk:', e);
+                  if (content) controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content })}\n\n`));
+                } catch (err) {
+                  console.error("Error parsing chunk:", err);
                 }
               }
             }
           }
-        } catch (error) {
-          console.error('Stream error:', error);
-          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ error: "Stream error" })}\n\n`));
         } finally {
           controller.close();
         }
@@ -119,21 +104,11 @@ export async function POST(req: NextRequest) {
     });
 
     return new Response(stream, {
-      headers: {
-        'Content-Type': 'text/event-stream',
-        'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',
-      },
+      headers: { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', Connection: 'keep-alive' },
     });
 
   } catch (error) {
-    console.error('Unexpected error in /api/nimi:', error);
-    return new Response(JSON.stringify({ 
-      error: 'Internal server error',
-      details: error instanceof Error ? error.message : 'Unknown error'
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    console.error('Unexpected error:', error);
+    return new Response(JSON.stringify({ error: 'Internal server error', details: error instanceof Error ? error.message : 'Unknown' }), { status: 500 });
   }
 }

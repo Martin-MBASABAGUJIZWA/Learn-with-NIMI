@@ -53,7 +53,7 @@ const translations = {
     pages: "pages",
     pauseMusic: "Pause music",
     playMusic: "Play music",
-    morningSong: "Morning Song",
+    genericSong: "Generic Song",
     playVideo: "Play Video",
     missionCompleted: "Mission completed!",
     missionAlreadyCompleted: "Mission already completed!",
@@ -87,7 +87,7 @@ const translations = {
     pages: "páginas",
     pauseMusic: "Pausar música",
     playMusic: "Reproducir música",
-    morningSong: "Canción de la Mañana",
+    genericSong: "Canción Genérica",
     playVideo: "Reproducir Video",
     missionCompleted: "¡Misión completada!",
     missionAlreadyCompleted: "¡Misión ya completada!",
@@ -121,7 +121,7 @@ const translations = {
     pages: "pages",
     pauseMusic: "Pause musique",
     playMusic: "Lecture musique",
-    morningSong: "Chanson du Matin",
+    genericSong: "Chanson Générique",
     playVideo: "Lire la Vidéo",
     missionCompleted: "Mission terminée!",
     missionAlreadyCompleted: "Mission déjà terminée!",
@@ -155,7 +155,7 @@ const translations = {
     pages: "ipaji",
     pauseMusic: "Pause umuziki",
     playMusic: "Kina umuziki",
-    morningSong: "Indirimbo yo mu Gitondo",
+    genericSong:"Indirimbo Rusange",
     playVideo: "Videra Video",
     missionCompleted: "Umurimo warangiye!",
     missionAlreadyCompleted: "Umurimo warangiye kera!",
@@ -189,7 +189,7 @@ const translations = {
     pages: "kurasa",
     pauseMusic: "Pausa muziki",
     playMusic: "Cheza muziki",
-    morningSong: "Wimbo wa Asubuhi",
+    genericSong: "Wimbo wa Jumla",
     playVideo: "Cheza Video",
     missionCompleted: "Misheni imekamilika!",
     missionAlreadyCompleted: "Misheni tayari imekamilika!",
@@ -558,7 +558,7 @@ const MorningVideoCard = ({ video, t }: { video: AudioTrack | null; t: (key: str
           <div className="p-3 bg-white rounded-full shadow-md flex-shrink-0">
             <Play className="h-8 w-8 text-purple-600" />
           </div>
-          <span className="text-xl font-bold truncate">{t('morningSong')}</span>
+          <span className="text-xl font-bold truncate">{t('genericSong')}</span>
         </div>
       </motion.div>
 
@@ -627,7 +627,7 @@ const ChildNameModal = ({
     </Dialog>
   );
 };
-// SINGLE PAGE BOOK VIEWER - FIXED VERSION
+// SINGLE PAGE BOOK VIEWER - ENHANCED WITH FULL-SCREEN IMAGE DISPLAY
 const SinglePageBookViewer = ({ 
   pages, 
   onClose, 
@@ -644,6 +644,7 @@ const SinglePageBookViewer = ({
   const [currentPage, setCurrentPage] = useState(0);
   const [isTurning, setIsTurning] = useState(false);
   const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [imageError, setImageError] = useState(false);
   
   // Process images from Supabase storage
   useEffect(() => {
@@ -673,6 +674,7 @@ const SinglePageBookViewer = ({
       setTimeout(() => {
         setCurrentPage(prev => prev + 1);
         setIsTurning(false);
+        setImageError(false);
       }, 300);
       playPageTurnSound();
     }
@@ -684,6 +686,7 @@ const SinglePageBookViewer = ({
       setTimeout(() => {
         setCurrentPage(prev => prev - 1);
         setIsTurning(false);
+        setImageError(false);
       }, 300);
       playPageTurnSound();
     }
@@ -695,6 +698,75 @@ const SinglePageBookViewer = ({
     if (audio) {
       audio.currentTime = 0;
       audio.play().catch(e => console.log("Audio play failed:", e));
+    }
+  };
+
+  // Download current page
+  const downloadCurrentPage = async () => {
+    try {
+      const currentPageData = processedPages[currentPage];
+      if (!currentPageData) return;
+
+      const response = await fetch(currentPageData.image_url);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      
+      const fileName = type === 'story' 
+        ? `story-day${pages[0]?.day || '1'}-page${currentPageData.page_number}.jpg`
+        : `coloring-day${pages[0]?.day || '1'}-page${currentPageData.page_number}.jpg`;
+      
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      
+      // Cleanup
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      
+      toast.success(`Downloaded page ${currentPageData.page_number}`);
+    } catch (error) {
+      console.error('Error downloading page:', error);
+      toast.error('Failed to download page');
+    }
+  };
+
+  // Download all pages
+  const downloadAllPages = async () => {
+    try {
+      toast.info(`Starting download of ${processedPages.length} pages...`);
+      
+      for (let i = 0; i < processedPages.length; i++) {
+        const page = processedPages[i];
+        const response = await fetch(page.image_url);
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        
+        const fileName = type === 'story' 
+          ? `story-day${pages[0]?.day || '1'}-page${page.page_number}.jpg`
+          : `coloring-day${pages[0]?.day || '1'}-page${page.page_number}.jpg`;
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        
+        // Cleanup and small delay between downloads
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+        
+        // Add a small delay to avoid overwhelming the browser
+        if (i < processedPages.length - 1) {
+          await new Promise(resolve => setTimeout(resolve, 300));
+        }
+      }
+      
+      toast.success(`Downloaded all ${processedPages.length} pages!`);
+    } catch (error) {
+      console.error('Error downloading all pages:', error);
+      toast.error('Failed to download some pages');
     }
   };
 
@@ -720,6 +792,22 @@ const SinglePageBookViewer = ({
     }
   };
 
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowRight') {
+        goToNextPage();
+      } else if (e.key === 'ArrowLeft') {
+        goToPrevPage();
+      } else if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [currentPage, processedPages.length, isTurning]);
+
   if (isLoading) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90">
@@ -732,46 +820,75 @@ const SinglePageBookViewer = ({
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/90"
+      className="fixed inset-0 z-50 bg-black/90 backdrop-blur-xl"
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
     >
       <button
         onClick={onClose}
-        className="absolute top-4 right-4 z-50 text-white text-2xl bg-black/50 rounded-full p-2"
+        className="absolute top-4 right-4 z-50 text-white text-2xl bg-black/50 rounded-full p-3 hover:bg-black/70 transition-colors"
       >
         ✕
       </button>
+
+      {/* Download buttons */}
+      <div className="absolute top-4 left-4 z-50 flex gap-2">
+        <button
+          onClick={downloadCurrentPage}
+          className="text-white bg-blue-600/80 hover:bg-blue-700 rounded-full p-3 transition-colors"
+          title="Download current page"
+        >
+          <Download className="h-5 w-5" />
+        </button>
+        <button
+          onClick={downloadAllPages}
+          className="text-white bg-green-600/80 hover:bg-green-700 rounded-full p-3 transition-colors relative"
+          title="Download all pages"
+        >
+          <Download className="h-5 w-5" />
+          <span className="text-xs absolute -top-1 -right-1 bg-yellow-500 text-black rounded-full h-5 w-5 flex items-center justify-center">
+            {processedPages.length}
+          </span>
+        </button>
+      </div>
 
       <div className="relative w-full h-full flex justify-center items-center p-4">
         {/* Current Page */}
         {currentPageData && (
           <motion.div
-            className="relative w-full h-full max-w-4xl max-h-[90vh] bg-white rounded-lg overflow-hidden flex items-center justify-center"
+            className="relative w-full h-full max-w-6xl max-h-[90vh] flex items-center justify-center"
             key={currentPage}
             initial={{ opacity: 0, x: isTurning ? 100 : -100 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.3 }}
           >
-            {/* Page Content - Fixed to ensure proper image display */}
-            <div className="w-full h-full flex items-center justify-center bg-white p-4">
-              <img 
-                src={currentPageData.image_url} 
-                alt={`Page ${currentPageData.page_number}`}
-                className="max-w-full max-h-full object-contain"
-                onError={(e) => {
-                  console.error("Error loading image:", currentPageData.image_url);
-                  // Fallback to a placeholder
-                  e.currentTarget.src = "/placeholder-book.png";
-                }}
-              />
-            </div>
-            
-            {/* Text Overlay - Fixed positioning */}
-            {type === 'story' && currentPageData.text && (
-              <div className="absolute bottom-0 left-0 right-0 p-4 bg-white/90 text-center">
-                <p className="text-sm md:text-base">{currentPageData.text}</p>
+            {imageError ? (
+              <div className="text-white text-center">
+                <div className="text-6xl mb-4">🖼️</div>
+                <p>Failed to load image</p>
               </div>
+            ) : (
+              <>
+                {/* Main Image */}
+                <img 
+                  src={currentPageData.image_url} 
+                  alt={`Page ${currentPageData.page_number}`}
+                  className="max-w-full max-h-full object-contain"
+                  onError={(e) => {
+                    console.error("Error loading image:", currentPageData.image_url);
+                    setImageError(true);
+                  }}
+                />
+                
+                {/* Text Overlay for Story Pages */}
+                {type === 'story' && currentPageData.text && (
+                  <div className="absolute bottom-4 left-0 right-0 mx-auto max-w-2xl px-4">
+                    <div className="bg-black/70 text-white p-4 rounded-lg text-center backdrop-blur-sm">
+                      <p className="text-sm md:text-base">{currentPageData.text}</p>
+                    </div>
+                  </div>
+                )}
+              </>
             )}
           </motion.div>
         )}
@@ -782,10 +899,10 @@ const SinglePageBookViewer = ({
         <button
           onClick={goToPrevPage}
           disabled={currentPage === 0 || isTurning}
-          className={`p-2 rounded-full bg-black/50 ${currentPage === 0 ? 'opacity-30' : 'hover:bg-black/70'}`}
+          className={`p-3 rounded-full bg-black/50 text-white ${currentPage === 0 ? 'opacity-30 cursor-not-allowed' : 'hover:bg-black/70 cursor-pointer'} transition-colors`}
           aria-label={t('previousPage')}
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
@@ -795,10 +912,10 @@ const SinglePageBookViewer = ({
         <button
           onClick={goToNextPage}
           disabled={currentPage === processedPages.length - 1 || isTurning}
-          className={`p-2 rounded-full bg-black/50 ${currentPage === processedPages.length - 1 ? 'opacity-30' : 'hover:bg-black/70'}`}
+          className={`p-3 rounded-full bg-black/50 text-white ${currentPage === processedPages.length - 1 ? 'opacity-30 cursor-not-allowed' : 'hover:bg-black/70 cursor-pointer'} transition-colors`}
           aria-label={t('nextPage')}
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
         </button>
@@ -806,7 +923,7 @@ const SinglePageBookViewer = ({
       
       {/* Page Counter */}
       <div className="absolute bottom-4 left-0 right-0 flex justify-center z-40">
-        <div className="bg-black/70 text-white px-4 py-2 rounded-full text-sm">
+        <div className="bg-black/70 text-white px-4 py-2 rounded-full text-sm backdrop-blur-sm">
           {t('pageCount', {
             current: currentPage + 1,
             total: processedPages.length
@@ -823,7 +940,6 @@ const SinglePageBookViewer = ({
     </div>
   )
 };
-
 // ENHANCED BOOK CARD COMPONENT
 const BookCard = ({ 
   day, 
@@ -1545,7 +1661,7 @@ const MissionsComponent = () => {
           ))}
         </div>
       </section>
-
+      {audioTrack && <MorningVideoCard video={audioTrack} t={t} />}
       {/* Missions Grid */}
       {currentDayData?.missions.length ? (
         <section className="max-w-2xl mx-auto px-4 w-full">
