@@ -1,6 +1,6 @@
-// api/creation/[id]/comments/route.ts
-import { NextRequest, NextResponse } from 'next/server';
-import { v4 as uuidv4 } from 'uuid';
+// app/api/creations/[id]/comments/route.ts
+import { NextResponse } from "next/server";
+import { v4 as uuidv4 } from "uuid";
 
 interface Comment {
   id: string;
@@ -11,19 +11,19 @@ interface Comment {
 }
 
 // Persistent in-memory storage for dev session
-if (!global.comments) {
-  global.comments = [] as Comment[];
+if (!(global as any).comments) {
+  (global as any).comments = [] as Comment[];
 }
-const comments: Comment[] = global.comments;
+const comments: Comment[] = (global as any).comments;
 
 export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  request: Request, // 👈 use Request instead of NextRequest
+  context: { params: { id: string } }
 ) {
-  const { id } = params;
+  const { id } = context.params;
 
   const creationComments = comments
-    .filter(c => c.creationId === id)
+    .filter((c) => c.creationId === id)
     .sort(
       (a, b) =>
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -33,16 +33,16 @@ export async function GET(
 }
 
 export async function POST(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  request: Request, // 👈 same here
+  context: { params: { id: string } }
 ) {
-  const { id } = params;
+  const { id } = context.params;
   const { content } = await request.json();
 
   const newComment: Comment = {
     id: uuidv4(),
     creationId: id,
-    author: 'User',
+    author: "User",
     content,
     createdAt: new Date().toISOString(),
   };
