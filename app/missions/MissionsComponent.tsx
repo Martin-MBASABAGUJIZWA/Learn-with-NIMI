@@ -9,10 +9,10 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import HTMLFlipBook from "react-pageflip";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import NimiReaderButton from "@/components/NimiReaderButton";
-
 
 // Import icons individually to avoid barrel import issues
 import { BookOpen } from "lucide-react";
@@ -25,6 +25,7 @@ import { Sparkles } from "lucide-react";
 import { Trophy } from "lucide-react";
 import { Video } from "lucide-react";
 import { X } from "lucide-react";
+import { Clock } from "lucide-react";
 
 // Translation dictionary for all supported languages
 const translations = {
@@ -34,7 +35,7 @@ const translations = {
     completeMission: "Complete Mission",
     completed: "Completed!",
     dayComplete: "Day Complete!",
-    masteredDay: "You mastered Day {day}'s magic!",
+    masteredDay: "You mastered {date}'s magic!",
     awesome: "Awesome!",
     readNow: "Read Now",
     colorNow: "Color Now",
@@ -60,7 +61,12 @@ const translations = {
     watchVideoFirst: "Watch video first",
     pleaseWatchVideo: "Please watch the video to completion before completing the mission",
     viewSlides: "View Slides",
-    downloadContent: "Download Content"
+    downloadContent: "Download Content",
+    comingSoon: "Coming Soon",
+    availableAtMidnight: "New content available at midnight!",
+    flipbook: "Flipbook",
+    today: "Today",
+    tomorrow: "Tomorrow"
   },
   es: {
     magicalLearning: "Aprendizaje Mágico",
@@ -68,7 +74,7 @@ const translations = {
     completeMission: "Completar Misión",
     completed: "¡Completado!",
     dayComplete: "¡Día Completado!",
-    masteredDay: "¡Dominaste la magia del Día {day}!",
+    masteredDay: "¡Dominaste la magia del {date}!",
     awesome: "¡Increíble!",
     readNow: "Leer Ahora",
     colorNow: "Colorear Ahora",
@@ -94,7 +100,12 @@ const translations = {
     watchVideoFirst: "Ver video primero",
     pleaseWatchVideo: "Por favor mira el video completo antes de completar la misión",
     viewSlides: "Ver Diapositivas",
-    downloadContent: "Descargar Contenido"
+    downloadContent: "Descargar Contenido",
+    comingSoon: "Próximamente",
+    availableAtMidnight: "¡Nuevo contenido disponible a medianoche!",
+    flipbook: "Libro interactivo",
+    today: "Hoy",
+    tomorrow: "Mañana"
   },
   fr: {
     magicalLearning: "Apprentissage Magique",
@@ -102,7 +113,7 @@ const translations = {
     completeMission: "Terminer la Mission",
     completed: "Terminé!",
     dayComplete: "Jour Terminé!",
-    masteredDay: "Vous avez maîtrisé la magie du Jour {day}!",
+    masteredDay: "Vous avez maîtrisé la magie du {date}!",
     awesome: "Génial!",
     readNow: "Lire Maintenant",
     colorNow: "Colorier Maintenant",
@@ -128,7 +139,12 @@ const translations = {
     watchVideoFirst: "Regarder la vidéo d'abord",
     pleaseWatchVideo: "Veuillez regarder la vidéo jusqu'au bout avant de terminer la mission",
     viewSlides: "Voir les Diapositivas",
-    downloadContent: "Télécharger le Contenido"
+    downloadContent: "Télécharger le Contenido",
+    comingSoon: "Bientôt disponible",
+    availableAtMidnight: "Nouveau contenu disponible à minuit!",
+    flipbook: "Livre animé",
+    today: "Aujourd'hui",
+    tomorrow: "Demain"
   },
   rw: {
     magicalLearning: "Kwiga Ubumenyi",
@@ -136,7 +152,7 @@ const translations = {
     completeMission: "Komeza Umurimo",
     completed: "Byarakozwe!",
     dayComplete: "Umunsi Warakomeje!",
-    masteredDay: "Warakoze ubumenyi bwa {day}!",
+    masteredDay: "Warakoze ubumenyi bwa {date}!",
     awesome: "Nibbyiza!",
     readNow: "Soma None",
     colorNow: "Paka None",
@@ -162,7 +178,12 @@ const translations = {
     watchVideoFirst: "Reba video mbere",
     pleaseWatchVideo: "Nyamuneka reba video ukomeza mbere y'uko ukomeza umurimo",
     viewSlides: "Reba Amapikisiki",
-    downloadContent: "Kuramo Ibirimo"
+    downloadContent: "Kuramo Ibirimo",
+    comingSoon: "Biraza",
+    availableAtMidnight: "Ibirimo bishya bizaba hashize ijoro!",
+    flipbook: "Igito cy'igitendo",
+    today: "Uyu munsi",
+    tomorrow: "Ejo"
   },
   sw: {
     magicalLearning: "Kujifunza Kichawi",
@@ -170,7 +191,7 @@ const translations = {
     completeMission: "Kamilisha Kazi",
     completed: "Imekamilika!",
     dayComplete: "Siku Imekamilika!",
-    masteredDay: "Umeshinda uchawi wa Siku {day}!",
+    masteredDay: "Umeshinda uchawi wa {date}!",
     awesome: "Nzuri!",
     readNow: "Soma Sasa",
     colorNow: "Rangi Sasa",
@@ -196,7 +217,12 @@ const translations = {
     watchVideoFirst: "Tazama video kwanza",
     pleaseWatchVideo: "Tafadhali tazama video hadi mwisho kabla ya kukamilisha misheni",
     viewSlides: "Tazama Slaidi",
-    downloadContent: "Pakua Yaliyomo"
+    downloadContent: "Pakua Yaliyomo",
+    comingSoon: "Inakuja",
+    availableAtMidnight: "Yaliyomo mapya yatakuwapo saa sita usiku!",
+    flipbook: "Kitabu cha kurasa zinazogeuka",
+    today: "Leo",
+    tomorrow: "Kesho"
   }
 };
 
@@ -258,6 +284,7 @@ interface ColoringPage {
   page_number: number;
   image_url: string;
 }
+
 // Update the SlidesModal component to properly display images
 const SlidesModal = ({
   slides,
@@ -341,80 +368,85 @@ const SlidesModal = ({
       </div>
     );
   }
-
-  return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center"
-      onClick={onClose}
-    >
-      {/* Blurred background */}
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-xl"></div>
-
-      {/* Image container */}
-      {imageError ? (
-        <div className="relative z-10 text-white text-center p-4">
-          <div className="text-4xl mb-2">📷</div>
-          <p>Failed to load image</p>
-        </div>
-      ) : (
-        <img
-          src={processedSlides[currentSlide]?.image_url}
-          alt={`Slide ${currentSlide + 1}`}
-          onClick={(e) => e.stopPropagation()}
-          onLoad={() => setImageError(false)}
-          onError={handleImageError}
-          className="relative z-10 max-w-full max-h-full object-contain"
-          style={{
-            display: "block",
-            margin: "0 auto",
-          }}
-        />
-      )}
-
-      {/* Navigation arrows */}
-      {processedSlides.length > 1 && !imageError && (
-        <>
+    return (
+      <div className="fixed inset-0 z-50 bg-black/90 flex flex-col h-screen">
+        {/* Header */}
+        <div className="flex justify-between items-center p-4 bg-black/50 z-50">
+          <h2 className="text-white text-lg font-semibold">
+            {mission.title} - Slide {currentSlide + 1} of {processedSlides.length}
+          </h2>
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              prevSlide();
-            }}
-            disabled={currentSlide === 0}
-            className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/80 p-3 rounded-full shadow hover:bg-white z-10"
+            onClick={onClose}
+            className="text-white text-2xl bg-black/50 rounded-full p-2 hover:bg-black/70 transition-colors touch-target"
           >
-            ◀
-          </button>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              nextSlide();
-            }}
-            className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/80 p-3 rounded-full shadow hover:bg-white z-10"
-          >
-            ▶
-          </button>
-        </>
-      )}
-
-      {/* Download button */}
-      {!imageError && (
-        <div className="absolute top-4 left-4 z-10">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              downloadSlide();
-            }}
-            className="bg-white/80 hover:bg-white p-3 rounded-full shadow-lg flex items-center justify-center"
-            title="Download Slide"
-          >
-            <Download className="w-6 h-6 text-black" />
+            ✕
           </button>
         </div>
-      )}
-    </div>
-  );
-};
-
+  
+        {/* Main Image Area - Takes full height */}
+        <div className="flex-1 relative overflow-hidden">
+          {imageError ? (
+            <div className="absolute inset-0 flex items-center justify-center text-white text-center p-4">
+              <div className="text-4xl mb-2">📷</div>
+              <p>Failed to load image</p>
+            </div>
+          ) : (
+            <img
+              src={processedSlides[currentSlide]?.image_url}
+              alt={`Slide ${currentSlide + 1}`}
+              onLoad={() => setImageError(false)}
+              onError={handleImageError}
+              className="absolute inset-0 object-contain mx-auto"
+              style={{
+                maxHeight: '100%',
+                maxWidth: '100%',
+                margin: 'auto'
+              }}
+            />
+          )}
+        </div>
+  
+        {/* Bottom Controls */}
+        <div className="bg-black/70 p-4 backdrop-blur-sm">
+          {/* Navigation Controls */}
+          <div className="flex items-center justify-center gap-4 mb-4">
+            <button
+              onClick={prevSlide}
+              disabled={currentSlide === 0}
+              className={`p-3 rounded-full bg-white/20 text-white touch-target ${
+                currentSlide === 0 ? 'opacity-30 cursor-not-allowed' : 'hover:bg-white/30 cursor-pointer'
+              } transition-colors`}
+            >
+              ◀
+            </button>
+            
+            <div className="bg-white/20 text-white px-4 py-2 rounded-full text-sm">
+              Slide {currentSlide + 1} of {processedSlides.length}
+            </div>
+            
+            <button
+              onClick={nextSlide}
+              className="p-3 rounded-full bg-white/20 text-white hover:bg-white/30 cursor-pointer transition-colors touch-target"
+            >
+              {currentSlide === processedSlides.length - 1 ? '✓' : '▶'}
+            </button>
+          </div>
+  
+          {/* Download Button - Positioned at bottom right */}
+          <div className="flex justify-end">
+            <button
+              onClick={downloadSlide}
+              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors touch-target"
+              title="Download Slide"
+            >
+              <Download className="h-4 w-4" />
+              <span>Download Slide</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
 // Video Player Modal with disabled fast-forward and completion tracking
 const VideoPlayerModal = ({ 
@@ -627,37 +659,33 @@ const ChildNameModal = ({
     </Dialog>
   );
 };
-// SINGLE PAGE BOOK VIEWER - ENHANCED WITH FULL-SCREEN IMAGE DISPLAY
-const SinglePageBookViewer = ({ 
-  pages, 
-  onClose, 
+
+// BOOK FLIP VIEWER
+const FlipBookViewer = ({
+  pages,
+  onClose,
   type,
-  t
+  t,
 }: {
   pages: { image_url: string; page_number: number; text?: string }[];
   onClose: () => void;
-  type: 'story' | 'coloring';
+  type: "story" | "coloring";
   t: (key: string) => string;
 }) => {
   const [processedPages, setProcessedPages] = useState<typeof pages>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(0);
-  const [isTurning, setIsTurning] = useState(false);
-  const [touchStart, setTouchStart] = useState<number | null>(null);
-  const [imageError, setImageError] = useState(false);
-  
-  // Process images from Supabase storage
+
   useEffect(() => {
     const processImages = async () => {
       const processed = await Promise.all(
         pages.map(async (page) => {
-          if (page.image_url.startsWith('supabase://')) {
-            const path = page.image_url.replace('supabase://', '');
-            const [bucket, ...filePath] = path.split('/');
-            const { data: { publicUrl } } = await supabase.storage
+          if (page.image_url.startsWith("supabase://")) {
+            const path = page.image_url.replace("supabase://", "");
+            const [bucket, ...filePath] = path.split("/");
+            const { data } = await supabase.storage
               .from(bucket)
-              .getPublicUrl(filePath.join('/'));
-            return { ...page, image_url: publicUrl };
+              .getPublicUrl(filePath.join("/"));
+            return { ...page, image_url: data.publicUrl };
           }
           return page;
         })
@@ -668,146 +696,6 @@ const SinglePageBookViewer = ({
     processImages();
   }, [pages]);
 
-  const goToNextPage = () => {
-    if (currentPage < processedPages.length - 1 && !isTurning) {
-      setIsTurning(true);
-      setTimeout(() => {
-        setCurrentPage(prev => prev + 1);
-        setIsTurning(false);
-        setImageError(false);
-      }, 300);
-      playPageTurnSound();
-    }
-  };
-
-  const goToPrevPage = () => {
-    if (currentPage > 0 && !isTurning) {
-      setIsTurning(true);
-      setTimeout(() => {
-        setCurrentPage(prev => prev - 1);
-        setIsTurning(false);
-        setImageError(false);
-      }, 300);
-      playPageTurnSound();
-    }
-  };
-
-  // Play page turn sound
-  const playPageTurnSound = () => {
-    const audio = document.getElementById('pageTurnSound') as HTMLAudioElement;
-    if (audio) {
-      audio.currentTime = 0;
-      audio.play().catch(e => console.log("Audio play failed:", e));
-    }
-  };
-
-  // Download current page
-  const downloadCurrentPage = async () => {
-    try {
-      const currentPageData = processedPages[currentPage];
-      if (!currentPageData) return;
-
-      const response = await fetch(currentPageData.image_url);
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      
-      const fileName = type === 'story' 
-        ? `story-day${pages[0]?.day || '1'}-page${currentPageData.page_number}.jpg`
-        : `coloring-day${pages[0]?.day || '1'}-page${currentPageData.page_number}.jpg`;
-      
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = fileName;
-      document.body.appendChild(a);
-      a.click();
-      
-      // Cleanup
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-      
-      toast.success(`Downloaded page ${currentPageData.page_number}`);
-    } catch (error) {
-      console.error('Error downloading page:', error);
-      toast.error('Failed to download page');
-    }
-  };
-
-  // Download all pages
-  const downloadAllPages = async () => {
-    try {
-      toast.info(`Starting download of ${processedPages.length} pages...`);
-      
-      for (let i = 0; i < processedPages.length; i++) {
-        const page = processedPages[i];
-        const response = await fetch(page.image_url);
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        
-        const fileName = type === 'story' 
-          ? `story-day${pages[0]?.day || '1'}-page${page.page_number}.jpg`
-          : `coloring-day${pages[0]?.day || '1'}-page${page.page_number}.jpg`;
-        
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = fileName;
-        document.body.appendChild(a);
-        a.click();
-        
-        // Cleanup and small delay between downloads
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-        
-        // Add a small delay to avoid overwhelming the browser
-        if (i < processedPages.length - 1) {
-          await new Promise(resolve => setTimeout(resolve, 300));
-        }
-      }
-      
-      toast.success(`Downloaded all ${processedPages.length} pages!`);
-    } catch (error) {
-      console.error('Error downloading all pages:', error);
-      toast.error('Failed to download some pages');
-    }
-  };
-
-  // Swipe handling
-  const handleTouchStart = (e: React.TouchEvent) => {
-    setTouchStart(e.touches[0].clientX);
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (touchStart === null) return;
-    
-    const touchCurrent = e.touches[0].clientX;
-    const diff = touchStart - touchCurrent;
-    
-    // Only consider significant swipes
-    if (Math.abs(diff) > 50) {
-      if (diff > 0) {
-        goToNextPage();
-      } else {
-        goToPrevPage();
-      }
-      setTouchStart(null);
-    }
-  };
-
-  // Keyboard navigation
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowRight') {
-        goToNextPage();
-      } else if (e.key === 'ArrowLeft') {
-        goToPrevPage();
-      } else if (e.key === 'Escape') {
-        onClose();
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentPage, processedPages.length, isTurning]);
-
   if (isLoading) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90">
@@ -816,145 +704,99 @@ const SinglePageBookViewer = ({
     );
   }
 
-  const currentPageData = processedPages[currentPage];
-
   return (
-    <div 
-      className="fixed inset-0 z-50 bg-black/90 backdrop-blur-xl"
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-    >
-      <button
-        onClick={onClose}
-        className="absolute top-4 right-4 z-50 text-white text-2xl bg-black/50 rounded-full p-3 hover:bg-black/70 transition-colors"
-      >
-        ✕
-      </button>
-
-      {/* Download buttons */}
-      <div className="absolute top-4 left-4 z-50 flex gap-2">
+    <div className="fixed inset-0 z-50 flex flex-col bg-black/90">
+      {/* Header */}
+      <div className="flex justify-between items-center p-4 bg-black/50">
+        <h2 className="text-white text-lg font-semibold">
+          {type === "story" ? t("storyTime") : t("coloringBook")} -{" "}
+          {t("flipbook")}
+        </h2>
         <button
-          onClick={downloadCurrentPage}
-          className="text-white bg-blue-600/80 hover:bg-blue-700 rounded-full p-3 transition-colors"
-          title="Download current page"
+          onClick={onClose}
+          className="text-white text-2xl bg-black/50 rounded-full p-2 hover:bg-black/70 transition-colors"
         >
-          <Download className="h-5 w-5" />
-        </button>
-        <button
-          onClick={downloadAllPages}
-          className="text-white bg-green-600/80 hover:bg-green-700 rounded-full p-3 transition-colors relative"
-          title="Download all pages"
-        >
-          <Download className="h-5 w-5" />
-          <span className="text-xs absolute -top-1 -right-1 bg-yellow-500 text-black rounded-full h-5 w-5 flex items-center justify-center">
-            {processedPages.length}
-          </span>
+          ✕
         </button>
       </div>
 
-      <div className="relative w-full h-full flex justify-center items-center p-4">
-        {/* Current Page */}
-        {currentPageData && (
-          <motion.div
-            className="relative w-full h-full max-w-6xl max-h-[90vh] flex items-center justify-center"
-            key={currentPage}
-            initial={{ opacity: 0, x: isTurning ? 100 : -100 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.3 }}
+      {/* Flipbook */}
+      <div className="flex-1 flex items-center justify-center overflow-hidden">
+        <HTMLFlipBook
+          width={400}
+          height={550}
+          showCover={true}
+          className="shadow-2xl rounded-lg"
+          flippingTime={800}
+          usePortrait={true}
+          mobileScrollSupport={true} 
+        >
+          {processedPages.map((page, idx) => (
+          <div
+            key={idx}
+            className="relative bg-[url('/paper-texture.png')] bg-repeat bg-[length:300px_300px] flex flex-col justify-between p-6 rounded-[6px] shadow-sm"
+            style={{
+              backgroundColor: "#fdfaf4", // soft cream background
+              border: "1px solid rgba(0,0,0,0.08)", // faint border
+            }}
           >
-            {imageError ? (
-              <div className="text-white text-center">
-                <div className="text-6xl mb-4">🖼️</div>
-                <p>Failed to load image</p>
-              </div>
-            ) : (
+            {/* Spine shadows */}
+            {idx % 2 === 0 && (
               <>
-                {/* Main Image */}
-                <img 
-                  src={currentPageData.image_url} 
-                  alt={`Page ${currentPageData.page_number}`}
-                  className="max-w-full max-h-full object-contain"
-                  onError={(e) => {
-                    console.error("Error loading image:", currentPageData.image_url);
-                    setImageError(true);
-                  }}
-                />
-                
-                {/* Text Overlay for Story Pages */}
-                {type === 'story' && currentPageData.text && (
-                  <div className="absolute bottom-4 left-0 right-0 mx-auto max-w-2xl px-4">
-                    <div className="bg-black/70 text-white p-4 rounded-lg text-center backdrop-blur-sm">
-                      <p className="text-sm md:text-base">{currentPageData.text}</p>
-                    </div>
-                  </div>
-                )}
+                <div className="absolute right-0 top-0 h-full w-3 bg-gradient-to-l from-black/20 to-transparent pointer-events-none"></div>
+                <div className="absolute right-0 top-0 h-full w-8 bg-gradient-to-l from-black/10 to-transparent blur-md opacity-70 pointer-events-none"></div>
               </>
             )}
-          </motion.div>
-        )}
-      </div>
+            {idx % 2 === 1 && (
+              <>
+                <div className="absolute left-0 top-0 h-full w-3 bg-gradient-to-r from-black/20 to-transparent pointer-events-none"></div>
+                <div className="absolute left-0 top-0 h-full w-8 bg-gradient-to-r from-black/10 to-transparent blur-md opacity-70 pointer-events-none"></div>
+              </>
+            )}
 
-      {/* Navigation Arrows */}
-      <div className="absolute top-1/2 left-4 transform -translate-y-1/2 z-40">
-        <button
-          onClick={goToPrevPage}
-          disabled={currentPage === 0 || isTurning}
-          className={`p-3 rounded-full bg-black/50 text-white ${currentPage === 0 ? 'opacity-30 cursor-not-allowed' : 'hover:bg-black/70 cursor-pointer'} transition-colors`}
-          aria-label={t('previousPage')}
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-        </button>
+            {/* Page content */}
+            <img
+              src={page.image_url}
+              alt={`Page ${idx + 1}`}
+              className="rounded-md shadow-md object-contain max-h-[75%] mx-auto"
+            />
+
+            {type === "story" && page.text && (
+              <p className="mt-4 text-center text-lg font-serif text-gray-800 leading-relaxed">
+                {page.text}
+              </p>
+            )}
+
+            {/* Page edge shadow */}
+            <div className="absolute inset-0 rounded-[6px] shadow-inner pointer-events-none"></div>
+          </div>
+        ))}
+        </HTMLFlipBook>
       </div>
       
-      <div className="absolute top-1/2 right-4 transform -translate-y-1/2 z-40">
-        <button
-          onClick={goToNextPage}
-          disabled={currentPage === processedPages.length - 1 || isTurning}
-          className={`p-3 rounded-full bg-black/50 text-white ${currentPage === processedPages.length - 1 ? 'opacity-30 cursor-not-allowed' : 'hover:bg-black/70 cursor-pointer'} transition-colors`}
-          aria-label={t('nextPage')}
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
-        </button>
-      </div>
-      
-      {/* Page Counter */}
-      <div className="absolute bottom-4 left-0 right-0 flex justify-center z-40">
-        <div className="bg-black/70 text-white px-4 py-2 rounded-full text-sm backdrop-blur-sm">
-          {t('pageCount', {
-            current: currentPage + 1,
-            total: processedPages.length
-          })}
-        </div>
-      </div>
-
-      {/* Page turning sound effect */}
-      <audio 
-        id="pageTurnSound" 
-        src="/sounds/page-turn.mp3" 
-        preload="auto"
-      />
     </div>
-  )
+  );
 };
-// ENHANCED BOOK CARD COMPONENT
-const BookCard = ({ 
-  day, 
-  onOpen, 
+
+// =====================
+// BOOK CARD
+// =====================
+const BookCard = ({
+  day,
+  onOpen,
   pageCount,
   coverData,
   type,
-  t
-}: { 
-  day: number; 
-  onOpen: () => void; 
+  t,
+  isAvailable,
+}: {
+  day: number;
+  onOpen: () => void;
   pageCount: number;
-  coverData?: BookCover;
-  type: 'story' | 'coloring';
+  coverData?: { cover_url?: string; title?: string; spine_color?: string };
+  type: "story" | "coloring";
   t: (key: string) => string;
+  isAvailable: boolean;
 }) => {
   const [coverUrl, setCoverUrl] = useState<string | null>(null);
   const [isHovered, setIsHovered] = useState(false);
@@ -963,145 +805,231 @@ const BookCard = ({
   useEffect(() => {
     const fetchCoverImage = async () => {
       if (coverData?.cover_url) {
-        if (coverData.cover_url.startsWith('supabase://')) {
-          const path = coverData.cover_url.replace('supabase://', '');
-          const [bucket, ...filePath] = path.split('/');
-          const { data: { publicUrl } } = await supabase.storage
-            .from('book-covers')
-            .getPublicUrl(filePath.join('/'));
-          setCoverUrl(publicUrl);
+        if (coverData.cover_url.startsWith("supabase://")) {
+          const path = coverData.cover_url.replace("supabase://", "");
+          const [bucket, ...filePath] = path.split("/");
+          const { data } = await supabase.storage
+            .from(bucket)
+            .getPublicUrl(filePath.join("/"));
+          setCoverUrl(data.publicUrl);
         } else {
           setCoverUrl(coverData.cover_url);
         }
       }
     };
     fetchCoverImage();
-    
-    // Add periodic animation
+
+    // Periodic animation
     const interval = setInterval(() => {
       setIsAnimating(true);
       setTimeout(() => setIsAnimating(false), 1000);
     }, 15000);
-    
     return () => clearInterval(interval);
   }, [coverData]);
 
-  const defaultSpineColor = type === 'story' 
-    ? 'linear-gradient(to bottom, #6b46c1, #553c9a)' 
-    : 'linear-gradient(to bottom, #3182ce, #2c5282)';
+  const defaultSpineColor =
+    type === "story"
+      ? "linear-gradient(to bottom, #6b46c1, #553c9a)"
+      : "linear-gradient(to bottom, #3182ce, #2c5282)";
 
-  const defaultBorderColor = type === 'story' 
-    ? 'border-purple-300' 
-    : 'border-yellow-300';
+  const defaultBorderColor =
+    type === "story" ? "border-purple-300" : "border-yellow-300";
 
-  const defaultButtonGradient = type === 'story'
-    ? 'from-purple-500 to-pink-500'
-    : 'from-blue-500 to-green-500';
+  const defaultButtonGradient =
+    type === "story" ? "from-purple-500 to-pink-500" : "from-blue-500 to-green-500";
 
-  const defaultIcon = type === 'story' ? '📖' : '✏️';
+  const defaultIcon = type === "story" ? "📖" : "✏️";
 
   return (
     <motion.div
       className="relative w-full max-w-[280px] mx-auto h-[320px] perspective-1000 mb-8"
-      initial={{ rotateY: type === 'story' ? -5 : 5 }}
-      whileHover={{ 
-        y: -10,
-        rotateY: type === 'story' ? 5 : -5,
-        transition: { duration: 0.3 }
-      }}
+      initial={{ rotateY: type === "story" ? -5 : 5 }}
+      whileHover={
+        isAvailable
+          ? {
+              y: -10,
+              rotateY: type === "story" ? 5 : -5,
+              transition: { duration: 0.3 },
+            }
+          : {}
+      }
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
     >
-      {/* Book Spine */}
-      <motion.div 
-        className={`absolute ${type === 'story' ? 'left-0 rounded-l-lg' : 'right-0 rounded-r-lg'} w-8 h-full shadow-lg z-10`}
-        style={{ 
-          background: coverData?.spine_color || defaultSpineColor
-        }}
-        animate={isAnimating ? { 
-          rotateY: [0, type === 'story' ? -5 : 5, 0],
-          transition: { duration: 0.8 }
-        } : {}}
-      />
-      
-      {/* Book Cover */}
+      {/* Spine */}
       <motion.div
-        className={`absolute inset-0 rounded-lg shadow-xl border-4 ${defaultBorderColor} p-6 flex flex-col items-center text-center overflow-hidden`}
-        style={{ transformStyle: 'preserve-3d' }}
-        animate={isAnimating ? { 
-          rotateY: [0, type === 'story' ? -10 : 10, 0],
-          transition: { duration: 0.8 }
-        } : {}}
+        className={`absolute ${
+          type === "story" ? "left-0 rounded-l-lg" : "right-0 rounded-r-lg"
+        } w-8 h-full shadow-lg z-10`}
+        style={{
+          background: coverData?.spine_color || defaultSpineColor,
+          opacity: isAvailable ? 1 : 0.7,
+        }}
+        animate={
+          isAnimating && isAvailable
+            ? {
+                rotateY: [0, type === "story" ? -5 : 5, 0],
+                transition: { duration: 0.8 },
+              }
+            : {}
+        }
+      />
+
+      {/* Cover */}
+      <motion.div
+        className={`absolute inset-0 rounded-lg shadow-xl border-4 ${defaultBorderColor} p-6 flex flex-col items-center text-center overflow-hidden ${
+          !isAvailable ? "grayscale opacity-70" : ""
+        }`}
+        style={{ transformStyle: "preserve-3d" }}
+        animate={
+          isAnimating && isAvailable
+            ? {
+                rotateY: [0, type === "story" ? -10 : 10, 0],
+                transition: { duration: 0.8 },
+              }
+            : {}
+        }
       >
-        {/* Dynamic Book Cover Image */}
         {coverUrl ? (
-          <div className="absolute inset-0 bg-cover bg-center z-0" 
-               style={{ backgroundImage: `url(${coverUrl})` }} />
+          <div
+            className="absolute inset-0 bg-cover bg-center z-0"
+            style={{ backgroundImage: `url(${coverUrl})` }}
+          />
         ) : (
-          <div className={`absolute inset-0 bg-gradient-to-br ${
-            type === 'story' ? 'from-yellow-100 to-pink-100' : 'from-blue-100 to-green-100'
-          } z-0`} />
+          <div
+            className={`absolute inset-0 bg-gradient-to-br ${
+              type === "story"
+                ? "from-yellow-100 to-pink-100"
+                : "from-blue-100 to-green-100"
+            } z-0`}
+          />
         )}
         
-        {/* Overlay for better text visibility */}
         <div className="absolute inset-0 bg-black/10 z-1" />
-        
-        {/* Book Content */}
+
+        {/* Content */}
         <div className="relative z-10 w-full h-full flex flex-col">
-          <motion.div 
+          <motion.div
             className="text-5xl mb-4"
-            animate={{ 
-              rotate: [0, type === 'story' ? 5 : -5, type === 'story' ? -5 : 5, 0],
-              y: [0, -5, 0]
-            }}
-            transition={{ repeat: Infinity, duration: type === 'story' ? 8 : 6 }}
+            animate={
+              isAvailable
+                ? {
+                    rotate: [0, type === "story" ? 5 : -5, type === "story" ? -5 : 5, 0],
+                    y: [0, -5, 0],
+                  }
+                : {}
+            }
+            transition={{ repeat: Infinity, duration: type === "story" ? 8 : 6 }}
           >
             {defaultIcon}
           </motion.div>
-          
+
           <h3 className="text-xl font-bold text-white drop-shadow-md">
-            {coverData?.title || (type === 'story' ? t('storyTime') : t('coloringBook'))}
+            {coverData?.title ||
+              (type === "story" ? t("storyTime") : t("coloringBook"))}
           </h3>
-          
+
           <p className="text-sm mb-4 text-white/90 drop-shadow-md">
-            {pageCount} {t('pages')}
+            {pageCount} {t("pages")}
           </p>
-          
-          {/* Book Pages Edge */}
-          <div className={`absolute ${type === 'story' ? 'left-0' : 'right-0'} top-0 w-1 h-full bg-gray-200 shadow-md`} />
-          
-          <motion.button
-            onClick={onOpen}
-            className={`mt-auto gap-2 py-3 px-4 bg-gradient-to-r ${defaultButtonGradient} text-white w-full rounded-lg font-bold`}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            {type === 'story' ? (
-              <BookOpen className="h-5 w-5 inline mr-2" />
-            ) : (
-              <Palette className="h-5 w-5 inline mr-2" />
-            )}
-            {type === 'story' ? t('readNow') : t('colorNow')}
-          </motion.button>
+
+          {!isAvailable ? (
+            <motion.div
+              className="mt-auto gap-2 py-3 px-4 bg-gradient-to-r from-gray-400 to-gray-600 text-white w-full rounded-lg font-bold text-center"
+            >
+              <Clock className="h-5 w-5 inline mr-2" />
+              {t("comingSoon")}
+            </motion.div>
+          ) : (
+            <motion.button
+              onClick={onOpen}
+              className={`mt-auto gap-2 py-3 px-4 bg-gradient-to-r ${defaultButtonGradient} text-white w-full rounded-lg font-bold`}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              {type === "story" ? (
+                <BookOpen className="h-5 w-5 inline mr-2" />
+              ) : (
+                <Palette className="h-5 w-5 inline mr-2" />
+              )}
+              {type === "story" ? t("readNow") : t("colorNow")}
+            </motion.button>
+          )}
         </div>
       </motion.div>
 
-      {/* Subtle page curl effect on hover */}
-      <AnimatePresence>
-        {isHovered && (
-          <motion.div
-            className={`absolute ${type === 'story' ? 'right-0' : 'left-0'} top-0 w-4 h-full z-20`}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.1 }}
-            exit={{ opacity: 0 }}
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-black/20 to-transparent"></div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+    {/* Hover Curl */}
+    <AnimatePresence>
+      {isHovered && isAvailable && (
+        <motion.div
+          className={`absolute ${
+            type === "story" ? "right-0" : "left-0"
+          } top-0 w-4 h-full z-20`}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.1 }}
+          exit={{ opacity: 0 }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-black/20 to-transparent"></div>
+        </motion.div>
+      )}
+    </AnimatePresence>
     </motion.div>
   );
 };
+
+// =====================
+// DATE SELECTOR BUTTON
+// =====================
+const DateButton = ({
+  date,
+  isSelected,
+  isAvailable,
+  onClick,
+  emoji,
+  t
+}: {
+  date: { dayOfWeek: string, day: number, month: string, isToday: boolean, isTomorrow: boolean };
+  isSelected: boolean;
+  isAvailable: boolean;
+  onClick: () => void;
+  emoji: string;
+  t: (key: string) => string;
+}) => {
+  return (
+    <motion.button
+      onClick={isAvailable ? onClick : undefined}
+      whileHover={isAvailable ? { y: -5 } : {}}
+      whileTap={isAvailable ? { scale: 0.95 } : {}}
+      className={`flex flex-col items-center p-3 md:p-4 rounded-xl min-w-[90px] md:min-w-[110px] transition-all flex-shrink-0 relative
+        ${isSelected
+          ? "bg-gradient-to-br from-purple-600 to-blue-600 text-white shadow-lg"
+          : isAvailable 
+            ? "bg-white shadow-md hover:shadow-lg" 
+            : "bg-gray-100 text-gray-400 cursor-not-allowed"}`}
+    >
+      <motion.span 
+        className="text-2xl md:text-3xl mb-1"
+        animate={isSelected && isAvailable ? { scale: [1, 1.1, 1] } : {}}
+        transition={{ duration: 1, repeat: Infinity }}
+      >
+        {isAvailable ? emoji : "⏳"}
+      </motion.span>
+      
+      <span className="text-xs font-medium uppercase tracking-wide">
+        {date.isToday ? t('today') : date.isTomorrow ? t('tomorrow') : date.dayOfWeek}
+      </span>
+      
+      <span className="text-xl md:text-2xl font-bold my-1">{date.day}</span>
+      
+      <span className="text-xs font-medium uppercase tracking-wide">{date.month}</span>
+      
+      {!isAvailable && (
+        <Clock className="h-3 w-3 mt-1" />
+      )}
+    </motion.button>
+  );
+};
+
 const MissionCard = ({ 
   mission, 
   completed, 
@@ -1206,6 +1134,7 @@ const MissionCard = ({
     </motion.div>
   );
 };
+
 // Main Component with translations
 const MissionsComponent = () => {
   const [missionProgram, setMissionProgram] = useState<DayData[]>([]);
@@ -1239,6 +1168,58 @@ const MissionsComponent = () => {
       });
     }
     return translation;
+  };
+
+  // Generate dates for the mission program
+  const dates = useMemo(() => {
+    const now = new Date();
+    return missionProgram.map(day => {
+      const date = new Date(now);
+      date.setDate(date.getDate() + (day.day - 1));
+      
+      const isToday = day.day === 1;
+      const isTomorrow = day.day === 2;
+      
+      return {
+        dayOfWeek: date.toLocaleDateString(language, { weekday: 'short' }),
+        day: date.getDate(),
+        month: date.toLocaleDateString(language, { month: 'short' }),
+        isToday,
+        isTomorrow
+      };
+    });
+  }, [missionProgram, language]);
+
+  // Calculate available days based on time (unlock at midnight)
+  const availableDays = useMemo(() => {
+    const available = new Set<number>();
+    const now = new Date();
+    const currentDay = now.getDate();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+    
+    // Always make day 1 available
+    available.add(1);
+    
+    // For each subsequent day, check if current date is past the unlock date
+    missionProgram.forEach(day => {
+      if (day.day === 1) return; // Already added
+      
+      // Calculate unlock date (midnight after day-1 days)
+      const unlockDate = new Date(currentYear, currentMonth, currentDay - (day.day - 1));
+      unlockDate.setHours(0, 0, 0, 0);
+      
+      if (now >= unlockDate) {
+        available.add(day.day);
+      }
+    });
+    
+    return available;
+  }, [missionProgram]);
+
+  // Check if a day is available
+  const isDayAvailable = (day: number) => {
+    return availableDays.has(day);
   };
 
   // Fetch all data
@@ -1346,37 +1327,39 @@ const MissionsComponent = () => {
       }
     };
 
-    fetchDayContent();
+    if (isDayAvailable(selectedDay)) {
+      fetchDayContent();
+    }
   }, [selectedDay]);
 
- useEffect(() => {
-  if (!missionProgram.length) return;
+  useEffect(() => {
+    if (!missionProgram.length) return;
 
-  const fetchMissionSlides = async () => {
-    const missionIds = missionProgram.flatMap(day => day.missions.map(m => m.id));
+    const fetchMissionSlides = async () => {
+      const missionIds = missionProgram.flatMap(day => day.missions.map(m => m.id));
 
-    const { data, error } = await supabase
-      .from("mission_slides")
-      .select("*")
-      .in("mission_id", missionIds)
-      .order("slide_order", { ascending: true });
+      const { data, error } = await supabase
+        .from("mission_slides")
+        .select("*")
+        .in("mission_id", missionIds)
+        .order("slide_order", { ascending: true });
 
-    if (error) {
-      console.error("Failed to fetch slides:", error);
-      return;
-    }
+      if (error) {
+        console.error("Failed to fetch slides:", error);
+        return;
+      }
 
-    const groupedSlides: Record<string, any[]> = {};
-    data?.forEach(slide => {
-      if (!groupedSlides[slide.mission_id]) groupedSlides[slide.mission_id] = [];
-      groupedSlides[slide.mission_id].push(slide);
-    });
+      const groupedSlides: Record<string, any[]> = {};
+      data?.forEach(slide => {
+        if (!groupedSlides[slide.mission_id]) groupedSlides[slide.mission_id] = [];
+        groupedSlides[slide.mission_id].push(slide);
+      });
 
-    setMissionSlides(groupedSlides);
-  };
+      setMissionSlides(groupedSlides);
+    };
 
-  fetchMissionSlides();
-}, [missionProgram]);
+    fetchMissionSlides();
+  }, [missionProgram]);
   
   const groupMissionsByDay = (missions: Mission[]) => {
     const grouped: Record<number, DayData> = {};
@@ -1596,6 +1579,12 @@ const MissionsComponent = () => {
     setShowColoringBook(false);
   };
 
+  const handleDaySelect = (day: number) => {
+    if (isDayAvailable(day)) {
+      setSelectedDay(day);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen p-4">
@@ -1624,9 +1613,9 @@ const MissionsComponent = () => {
 
   return (
     <>
-      {/* Day Selection */}
-      <section className="mb-6 w-full">
-        <h2 className="text-4xl font-bold text-center mb-6 select-none">
+      {/* Date Selection */}
+      <section className="mb-6 w-full px-2">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 md:mb-6 select-none">
           <motion.span 
             animate={{ rotate: [0, 10, -10, 0] }}
             transition={{ repeat: Infinity, duration: 5 }}
@@ -1637,35 +1626,31 @@ const MissionsComponent = () => {
           {currentDayData?.theme}
         </h2>
 
-        <div className="flex overflow-x-auto pb-4 gap-3 px-4 scrollbar-thin w-full max-w-6xl mx-auto">
-          {missionProgram.slice(0, 7).map(day => (
-            <motion.button
-              key={day.day}
-              onClick={() => setSelectedDay(day.day)}
-              whileHover={{ y: -5 }}
-              whileTap={{ scale: 0.95 }}
-              className={`flex flex-col items-center p-3 md:p-4 rounded-xl min-w-[80px] md:min-w-[100px] transition-all flex-shrink-0
-                ${selectedDay === day.day
-                  ? "bg-gradient-to-br from-purple-600 to-blue-600 text-white shadow-lg"
-                  : "bg-white shadow-md hover:shadow-lg"}`}
-            >
-              <motion.span 
-                className="text-3xl md:text-4xl"
-                animate={selectedDay === day.day ? { scale: [1, 1.1, 1] } : {}}
-                transition={{ duration: 1, repeat: Infinity }}
-              >
-                {day.emoji}
-              </motion.span>
-              <span className="text-base md:text-lg font-bold mt-1">Day {day.day}</span>
-            </motion.button>
-          ))}
+        <div className="flex overflow-x-auto pb-4 gap-2 md:gap-3 px-2 scrollbar-thin w-full max-w-6xl mx-auto">
+          {missionProgram.map((day, index) => {
+            const date = dates[index];
+            
+            return (
+              <DateButton
+                key={day.day}
+                date={date}
+                isSelected={selectedDay === day.day}
+                isAvailable={isDayAvailable(day.day)}
+                onClick={() => handleDaySelect(day.day)}
+                emoji={day.emoji}
+                t={t}
+              />
+            );
+          })}
         </div>
       </section>
+      
       {audioTrack && <MorningVideoCard video={audioTrack} t={t} />}
+      
       {/* Missions Grid */}
-      {currentDayData?.missions.length ? (
-        <section className="max-w-2xl mx-auto px-4 w-full">
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 w-full">
+      {isDayAvailable(selectedDay) && currentDayData?.missions.length ? (
+        <section className="max-w-6xl mx-auto px-2 md:px-4 w-full">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 w-full">
             {currentDayData.missions.map((mission, index) => {
               const completed = completedIds.has(mission.id);
               const videoWatched = videoCompletion[mission.id];
@@ -1688,13 +1673,15 @@ const MissionsComponent = () => {
           </div>
         </section>
       ) : (
-        <div className="text-center py-20 text-gray-600 text-lg w-full">
-          {t('preparingMagic')}
+        <div className="text-center py-12 md:py-20 text-gray-600 text-lg w-full">
+          {!isDayAvailable(selectedDay) 
+            ? t('availableAtMidnight') 
+            : t('preparingMagic')}
         </div>
       )}
 
       {/* Storybook and Coloring Book Cards */}
-      <div className="flex flex-col md:flex-row justify-center items-center gap-8 mt-8">
+      <div className="flex flex-col md:flex-row justify-center items-center gap-6 md:gap-8 mt-6 md:mt-8 px-2">
         {storyPages.length > 0 && (
           <BookCard 
             day={selectedDay} 
@@ -1703,6 +1690,7 @@ const MissionsComponent = () => {
             coverData={bookCovers.find(c => c.day === selectedDay && c.cover_type === 'story')}
             type="story"
             t={t}
+            isAvailable={isDayAvailable(selectedDay)}
           />
         )}
         
@@ -1714,6 +1702,7 @@ const MissionsComponent = () => {
             coverData={bookCovers.find(c => c.day === selectedDay && c.cover_type === 'coloring')}
             type="coloring"
             t={t}
+            isAvailable={isDayAvailable(selectedDay)}
           />
         )}
       </div>
@@ -1759,7 +1748,7 @@ const MissionsComponent = () => {
             exit={{ opacity: 0 }}
           >
             <motion.div
-              className="bg-gradient-to-br from-blue-100 to-purple-100 rounded-xl p-8 shadow-xl text-center w-full max-w-md border-2 border-blue-300 relative overflow-hidden"
+              className="bg-gradient-to-br from-blue-100 to-purple-100 rounded-xl p-6 md:p-8 shadow-xl text-center w-full max-w-md border-2 border-blue-300 relative overflow-hidden"
               initial={{ scale: 0.9 }}
               animate={{ scale: 1 }}
               exit={{ scale: 0.9 }}
@@ -1781,9 +1770,9 @@ const MissionsComponent = () => {
                 🏅
               </motion.div>
 
-              <h2 className="text-2xl font-bold mb-4 text-blue-800">{t('dayComplete')}</h2>
-              <p className="text-lg mb-6">
-                {t('masteredDay', { day: selectedDay })}
+              <h2 className="text-xl md:text-2xl font-bold mb-4 text-blue-800">{t('dayComplete')}</h2>
+              <p className="text-base md:text-lg mb-6">
+                {t('masteredDay', { date: dates[selectedDay - 1] ? `${dates[selectedDay - 1].dayOfWeek}, ${dates[selectedDay - 1].month} ${dates[selectedDay - 1].day}` : `Day ${selectedDay}` })}
               </p>
 
               <Button
@@ -1801,7 +1790,7 @@ const MissionsComponent = () => {
       {/* Storybook Viewer */}
       <AnimatePresence>
         {showStorybook && storyPages.length > 0 && (
-          <SinglePageBookViewer 
+          <FlipBookViewer 
             pages={storyPages.map(page => ({
               image_url: page.image_url,
               page_number: page.page_number,
@@ -1817,7 +1806,7 @@ const MissionsComponent = () => {
       {/* Coloring Book Viewer */}
       <AnimatePresence>
         {showColoringBook && coloringPages.length > 0 && (
-          <SinglePageBookViewer 
+          <FlipBookViewer  
             pages={coloringPages.map(page => ({
               image_url: page.image_url,
               page_number: page.page_number
@@ -1854,10 +1843,9 @@ const MissionsComponent = () => {
         />
       )}
     </AnimatePresence>
-{/* Nimi Reader Button */}
-<NimiReaderButton hide={!!openSlides || showStorybook || showColoringBook} />
-
-
+    
+    {/* Nimi Reader Button */}
+    <NimiReaderButton hide={!!openSlides || showStorybook || showColoringBook} />
     </>
   );
 };

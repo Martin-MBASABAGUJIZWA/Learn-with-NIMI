@@ -8,7 +8,7 @@ body {
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 0 0% 97%; /* softened white */
     --foreground: 222 47% 11%;
     --card: 0 0% 100%;
     --card-foreground: 0 0% 3.9%;
@@ -43,41 +43,6 @@ body {
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
-  .dark {
-    --background: 0 0% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 9%;
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 0 0% 14.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 0 0% 83.1%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-
   * {
     @apply border-border;
   }
@@ -96,11 +61,13 @@ body {
     border-color: hsl(var(--border));
   }
 }
+
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;900&display=swap');
 
 body {
   font-family: 'Poppins', sans-serif;
 }
+
 @keyframes floating {
   0% { transform: translateY(0px); }
   50% { transform: translateY(-20px); }
@@ -114,6 +81,7 @@ body {
 @keyframes fadeIn {
   to { opacity: 1; }
 }
+
 .animate-fadeIn { animation: fadeIn 0.5s forwards; }
 
 /* Improved responsive design for missions component */
@@ -200,5 +168,71 @@ body {
 @media (max-width: 768px) {
   .video-modal-container {
     width: 98vw;
+  }
+}
+
+/* Ensure full height on mobile */
+@supports (height: 100dvh) {
+  .h-mobile-full {
+    height: 100dvh;
+  }
+}
+
+/* Enhanced touch targets for mobile */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Improved mobile scrolling */
+.mobile-scroll {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* Ensure full height on all devices */
+html, body, #root, #root > div {
+  height: 100% !important;
+}
+
+/* Mobile-first full height utility classes */
+.h-mobile-full {
+  height: 100vh;
+  height: 100dvh; /* Dynamic viewport height for mobile browsers */
+}
+
+/* Enhanced touch targets for mobile */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Improved mobile scrolling */
+.mobile-scroll {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* Prevent image dragging */
+img {
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+  user-drag: none;
+}
+
+/* Mobile optimization for controls */
+@media (max-width: 768px) {
+  .mobile-controls {
+    padding: 0.5rem;
+  }
+  
+  .mobile-controls button {
+    font-size: 0.875rem;
+    padding: 0.5rem 0.75rem;
   }
 }

@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { messages, childName = "friend", language = "en" } = await req.json();
+    const { messages, language = 'en' } = await req.json();
 
     if (!messages || !Array.isArray(messages)) {
       return new Response(JSON.stringify({ error: 'Invalid request format' }), {
@@ -24,19 +24,21 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Enhanced system prompt for clear, concise, helpful answers
+    // Cool, kid-friendly, curious system prompt
     const systemMessage = {
       role: 'system',
       content: `
-You are Nimi, a friendly and clear AI assistant for children aged 2-4 and their parents.
-Your replies must be:
-- Clear, concise, and to the point (1-3 short sentences)
-- Positive, encouraging, and fun
-- Easy for a young child to understand
-- Include emojis occasionally to make it lively 🎨✨
-- Ask a simple question to keep the conversation going if appropriate
-- Always respond in ${language}, unless asked otherwise
-- Avoid unnecessary long explanations or filler words
+You are Nimi, a super fun and friendly AI assistant for children aged 2-4.
+Rules:
+- Always respond in simple words a toddler can understand (1–3 short sentences).
+- Be playful, curious, and encouraging.
+- Use fun emojis 🎨✨ occasionally.
+- Introduce new ideas, animals, colors, planets, or tiny facts in a fun way.
+- Ask simple questions to keep the conversation going.
+- Never repeat generic greetings like "Hello!" unless appropriate.
+- Remember the conversation context to give personalized replies.
+- Never give adult content or complex explanations.
+- Always respond in ${language}, unless asked otherwise.
       `.trim(),
     };
 
@@ -49,7 +51,7 @@ Your replies must be:
     };
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000);
+    const timeoutId = setTimeout(() => controller.abort(), 20000); // more generous timeout
 
     const response = await fetch(OPENROUTER_API_URL, {
       method: 'POST',
@@ -69,7 +71,6 @@ Your replies must be:
       return new Response(JSON.stringify({ error: 'AI service error', details: text }), { status: 500 });
     }
 
-    // Streaming the response
     const stream = new ReadableStream({
       async start(controller) {
         const decoder = new TextDecoder();
@@ -109,6 +110,9 @@ Your replies must be:
 
   } catch (error) {
     console.error('Unexpected error:', error);
-    return new Response(JSON.stringify({ error: 'Internal server error', details: error instanceof Error ? error.message : 'Unknown' }), { status: 500 });
+    return new Response(JSON.stringify({
+      error: 'Internal server error',
+      details: error instanceof Error ? error.message : 'Unknown'
+    }), { status: 500 });
   }
 }

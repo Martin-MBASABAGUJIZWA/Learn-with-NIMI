@@ -11,7 +11,7 @@ import BottomNavigation from "@/components/BottomNavigation";
 import Confetti from "react-confetti";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { speak, loadVoices } from "@/lib/speak";
-import { Play, Star, Gift, Fire } from "lucide-react";
+import { Play, Star, Gift, Flame, Heart, Download, Share, RotateCw } from "lucide-react";
 import { motion } from "framer-motion";
 
 /* 🌍 Translation dictionary (5 languages) */
@@ -22,7 +22,8 @@ const translations: Record<
     | "letsLearn" | "funTogether" | "greatJob" | "daysInRow" | "keepGoing" | "youreAwesome"
     | "todaysActivity" | "loading" | "startLearning"
     | "yourStars" | "youHave" | "stars" | "learnToEarn"
-    | "surprise" | "unlockedReward" | "seeReward" | "dayStreak",
+    | "surprise" | "unlockedReward" | "seeReward" | "dayStreak"
+    | "todaysVideo" | "watchAndLearn" | "playVideo" | "watchAgain" | "download" | "share",
     string
   >
 > = {
@@ -48,6 +49,12 @@ const translations: Record<
     unlockedReward: "You unlocked a reward!",
     seeReward: "See Reward",
     dayStreak: "day streak",
+    todaysVideo: "Today's Video",
+    watchAndLearn: "Watch and learn!",
+    playVideo: "Play Video",
+    watchAgain: "Watch Again",
+    download: "Download",
+    share: "Share",
   },
   es: {
     goodMorning: "Buenos días",
@@ -71,6 +78,12 @@ const translations: Record<
     unlockedReward: "¡Has desbloqueado una recompensa!",
     seeReward: "Ver recompensa",
     dayStreak: "racha de días",
+    todaysVideo: "Video de Hoy",
+    watchAndLearn: "¡Mira y aprende!",
+    playVideo: "Reproducir Video",
+    watchAgain: "Ver de Nuevo",
+    download: "Descargar",
+    share: "Compartir",
   },
   fr: {
     goodMorning: "Bonjour",
@@ -94,6 +107,12 @@ const translations: Record<
     unlockedReward: "Tu as débloqué une récompense !",
     seeReward: "Voir la récompense",
     dayStreak: "série de jours",
+    todaysVideo: "Vidéo du Jour",
+    watchAndLearn: "Regarde et apprends !",
+    playVideo: "Lire la Vidéo",
+    watchAgain: "Regarder à Nouveau",
+    download: "Télécharger",
+    share: "Partager",
   },
   rw: {
     goodMorning: "Mwaramutse",
@@ -106,7 +125,7 @@ const translations: Record<
     daysInRow: "iminsi ikurikirana",
     keepGoing: "Komeza!",
     youreAwesome: "Uri intyoza!",
-    todaysActivity: "Isomo ry’uyu munsi",
+    todaysActivity: "Isomo ry'uyu munsi",
     loading: "Birimo gupakira...",
     startLearning: "Tangira kwiga!",
     yourStars: "Inyenyeri zawe",
@@ -117,6 +136,12 @@ const translations: Record<
     unlockedReward: "Wafunguye igihembo!",
     seeReward: "Reba igihembo",
     dayStreak: "iminsi ikurikirana",
+    todaysVideo: "Video yo uyu munsi",
+    watchAndLearn: "Reba undize!",
+    playVideo: "Videwo Gusakaza",
+    watchAgain: "Subiramo",
+    download: "Kurotsa",
+    share: "Sangiza",
   },
   sw: {
     goodMorning: "Habari za asubuhi",
@@ -140,16 +165,48 @@ const translations: Record<
     unlockedReward: "Umefungua zawadi!",
     seeReward: "Ona zawadi",
     dayStreak: "mfululizo wa siku",
+    todaysVideo: "Video ya Leo",
+    watchAndLearn: "Tazama na ujifunze!",
+    playVideo: "Cheza Video",
+    watchAgain: "Tazama Tenna",
+    download: "Pakua",
+    share: "Shiriki",
   },
 };
 
-/* 🐥 Friendly buddy phrases (spoken on tap) */
+// Buddy phrases in different languages
 const buddyPhrases: Record<string, string[]> = {
-  en: ["Yay, you found me!", "Let’s learn together!", "High five!", "You’re amazing!", "Hehe, that tickles!"],
-  es: ["¡Bien! ¡Me encontraste!", "¡Aprendamos juntos!", "¡Chócala!", "¡Eres increíble!", "¡Jeje, me haces cosquillas!"],
-  fr: ["Youpi, tu m’as trouvé !", "Apprenons ensemble !", "Tape m’en cinq !", "Tu es génial !", "Hi hi, ça chatouille !"],
-  rw: ["Yego, wanyibonye!", "Twige hamwe!", "Tampa agatoki!", "Uri intyoza!", "Hihi, biransha umushyitsi!"],
-  sw: ["Yaay, umenipata!", "Tujifunze pamoja!", "Nipe tano!", "Wewe ni hodari!", "Hihi, inanichekesha!"],
+  en: ["Let's learn together!", "You're doing great!", "Learning is fun!", "Keep it up!"],
+  es: ["¡Aprendamos juntos!", "¡Lo estás haciendo genial!", "¡Aprender es divertido!", "¡Sigue así!"],
+  fr: ["Apprenons ensemble!", "Vous vous débrouillez bien!", "Apprendre est amusant!", "Continuez comme ça!"],
+  rw: ["Reka twige hamwe!", "Ukora neza!", "Kwiga biryoshye!", "Komeza!"],
+  sw: ["Tujifunze pamoja!", "Unafanya vizuri!", "Kujifunza ni raha!", "Endelea!"]
+};
+
+// Sparkle component for the magical effect
+const Sparkle = () => {
+  return (
+    <motion.div
+      className="absolute w-2 h-2 rounded-full bg-white"
+      initial={{ 
+        opacity: 0, 
+        scale: 0,
+        x: Math.random() * 40 - 20,
+        y: Math.random() * 40 - 20
+      }}
+      animate={{ 
+        opacity: [0, 1, 0],
+        scale: [0, 1, 0],
+        x: Math.random() * 60 - 30,
+        y: Math.random() * 60 - 30
+      }}
+      transition={{ 
+        duration: 1.5 + Math.random() * 2,
+        repeat: Infinity,
+        delay: Math.random() * 2
+      }}
+    />
+  );
 };
 
 export default function HomePage() {
@@ -163,10 +220,19 @@ export default function HomePage() {
   const [starsEarned, setStarsEarned] = useState(0);
   const [showCelebration, setShowCelebration] = useState(false);
   const [todaysMission, setTodaysMission] = useState<any>(null);
+  const [todaysVideo, setTodaysVideo] = useState<any>(null);
   const [streak, setStreak] = useState(0);
   const [showSurprise, setShowSurprise] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [buddyAction, setBuddyAction] = useState<"idle" | "wave" | "dance">("idle");
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [videoProgress, setVideoProgress] = useState(0);
+  const [isVideoCompleted, setIsVideoCompleted] = useState(false);
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
+  const [showRewardConfetti, setShowRewardConfetti] = useState(false);
+  const [giftAnimation, setGiftAnimation] = useState<"idle" | "shake" | "open">("idle");
 
   /* 🔄 Load data on mount */
   useEffect(() => {
@@ -174,6 +240,7 @@ export default function HomePage() {
     loadVoices();
     void fetchUserData();
     void fetchTodaysMission();
+    void fetchTodaysVideo();
   }, []);
 
   /* 🗣️ Greet child when data is ready / language changes */
@@ -211,6 +278,50 @@ export default function HomePage() {
     setTodaysMission(data);
   };
 
+  /* 📹 Fetch today's video from database */
+  const fetchTodaysVideo = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("videos")
+        .select("*")
+        .eq("is_today", true)
+        .limit(1)
+        .single();
+      
+      if (error) {
+        console.error("Error fetching today's video:", error);
+        return;
+      }
+      
+      setTodaysVideo(data);
+      
+      // If the video has a path in storage, get the public URL
+      if (data.video_path) {
+        const { data: urlData } = supabase.storage
+          .from('videos')
+          .getPublicUrl(data.video_path);
+        
+        setVideoUrl(urlData.publicUrl);
+      } else if (data.video_url) {
+        // If it's already a full URL, use it directly
+        setVideoUrl(data.video_url);
+      }
+      
+      // Get thumbnail from the same bucket
+      if (data.thumbnail_path) {
+        const { data: thumbData } = supabase.storage
+          .from('videos')
+          .getPublicUrl(data.thumbnail_path);
+        
+        setThumbnailUrl(thumbData.publicUrl);
+      } else if (data.thumbnail_url) {
+        setThumbnailUrl(data.thumbnail_url);
+      }
+    } catch (error) {
+      console.error("Error in fetchTodaysVideo:", error);
+    }
+  };
+
   /* 👋 Greeting helper */
   const getGreeting = (name: string | null) => {
     const hour = new Date().getHours();
@@ -230,7 +341,16 @@ export default function HomePage() {
       const newStars = starsEarned + 1;
       await supabase.from("users").update({ completed_missions: newStars }).eq("id", user.id);
       setStarsEarned(newStars);
-      if (newStars >= 3) setShowSurprise(true);
+      if (newStars >= 3) {
+        setShowSurprise(true);
+        // Animate the gift box
+        setGiftAnimation("shake");
+        setTimeout(() => {
+          setGiftAnimation("open");
+          setShowRewardConfetti(true);
+          setTimeout(() => setShowRewardConfetti(false), 3000);
+        }, 1000);
+      }
     }
 
     setTimeout(() => {
@@ -239,6 +359,110 @@ export default function HomePage() {
     }, 3000);
 
     router.push("/missions");
+  };
+
+  /* 🎥 Handle video play */
+  const handleVideoPlay = () => {
+    setIsPlaying(true);
+    speak(t("watchAndLearn"), language);
+  };
+
+  /* 🎥 Handle video completion */
+  const handleVideoComplete = () => {
+    setIsVideoCompleted(true);
+    setIsPlaying(false);
+    
+    // Award a star for completing the video
+    if (!todaysVideo?.completed) {
+      const awardStarForVideo = async () => {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const newStars = starsEarned + 1;
+          await supabase.from("users").update({ completed_missions: newStars }).eq("id", user.id);
+          setStarsEarned(newStars);
+          
+          // Mark video as completed in the database
+          await supabase.from("videos")
+            .update({ completed: true })
+            .eq("id", todaysVideo.id);
+            
+          if (newStars >= 3) {
+            setShowSurprise(true);
+            // Animate the gift box
+            setGiftAnimation("shake");
+            setTimeout(() => {
+              setGiftAnimation("open");
+              setShowRewardConfetti(true);
+              setTimeout(() => setShowRewardConfetti(false), 3000);
+            }, 1000);
+          }
+        }
+      };
+      awardStarForVideo();
+    }
+  };
+
+  /* 🎥 Handle video progress */
+  const handleVideoProgress = (e: any) => {
+    const progress = (e.target.currentTime / e.target.duration) * 100;
+    setVideoProgress(progress);
+  };
+
+  /* 📥 Handle video download */
+  const handleDownload = async () => {
+    if (!videoUrl) return;
+    
+    setIsDownloading(true);
+    
+    try {
+      // Fetch the video file
+      const response = await fetch(videoUrl);
+      const blob = await response.blob();
+      
+      // Create a download link
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = `nimi-video-${todaysVideo.title || 'today'}.mp4`;
+      
+      // Trigger download
+      document.body.appendChild(a);
+      a.click();
+      
+      // Clean up
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error('Download failed:', error);
+      // Fallback: Open in new tab if download fails
+      window.open(videoUrl, '_blank');
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
+  /* 📤 Handle video sharing */
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: todaysVideo.title,
+          text: todaysVideo.description,
+          url: window.location.href,
+        });
+      } catch (error) {
+        console.log('Sharing was cancelled');
+      }
+    } else {
+      // Fallback: Copy to clipboard
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        alert('Link copied to clipboard!');
+      } catch (error) {
+        console.error('Failed to copy:', error);
+      }
+    }
   };
 
   /* 🐥 Buddy tap interaction */
@@ -254,7 +478,10 @@ export default function HomePage() {
   if (!mounted) return null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex flex-col pb-24">
+    <div className="min-h-screen flex flex-col pb-24 relative overflow-hidden">
+      {/* Animated Gradient Background */}
+      <div className="fixed inset-0 -z-10 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 animate-gradient-xy"></div>
+      
       <Header simple />
 
       {showCelebration && (
@@ -264,8 +491,23 @@ export default function HomePage() {
           colors={["#FF9E9E", "#FFD6A5", "#CBFFA9", "#A0C4FF", "#BDB2FF"]}
         />
       )}
+      
+      {showRewardConfetti && (
+        <Confetti
+          recycle={false}
+          numberOfPieces={200}
+          colors={["#FFD700", "#FFA500", "#FF6347", "#FF69B4", "#9370DB"]}
+        />
+      )}
 
-      <main className="flex-grow max-w-md mx-auto px-4 py-8 w-full">
+      <main className="flex-grow max-w-md mx-auto px-4 py-8 w-full relative z-10">
+        {/* Floating Sparkles around the Nimi Buddy */}
+        <div className="absolute top-0 left-0 right-0 h-80 flex justify-center items-center pointer-events-none">
+          {[...Array(15)].map((_, i) => (
+            <Sparkle key={i} />
+          ))}
+        </div>
+
         {/* 🐥 Interactive Nimi Buddy */}
         <div className="text-center mb-8">
           <motion.div
@@ -285,13 +527,23 @@ export default function HomePage() {
               repeat: buddyAction === "idle" ? Infinity : 2,
             }}
           >
+            {/* Glow/ripple effect when buddy waves/dances */}
+            {buddyAction !== "idle" && (
+              <motion.div 
+                className="absolute inset-0 rounded-full bg-purple-200 opacity-50"
+                initial={{ scale: 1, opacity: 0.5 }}
+                animate={{ scale: 1.5, opacity: 0 }}
+                transition={{ duration: 0.8 }}
+              />
+            )}
+            
             <motion.img
               src="/nimi-logo.jpg"
               alt="NIMI Buddy"
-              className="w-full h-full rounded-full object-cover shadow-lg border-4 border-white"
+              className="w-full h-full rounded-full object-cover shadow-lg border-4 border-white relative z-10"
               draggable={false}
             />
-            <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-white px-4 py-1.5 rounded-full shadow-md border-2 border-pink-200">
+            <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-white px-4 py-1.5 rounded-full shadow-md border-2 border-pink-200 z-20">
               <p className="text-sm font-semibold text-gray-700 whitespace-nowrap">
                 {getGreeting(childName)}
               </p>
@@ -303,48 +555,189 @@ export default function HomePage() {
           </h1>
           {streak > 0 && (
             <p className="text-lg text-pink-500 flex items-center justify-center gap-1">
-              <Fire className="w-5 h-5 text-orange-500" /> {streak} {t("dayStreak")}!
+              <Flame className="w-5 h-5 text-orange-500" /> {streak} {t("dayStreak")}!
             </p>
           )}
         </div>
 
-        {/* 🎯 Today's Learning */}
-        <Card className="bg-gradient-to-r from-pink-100 to-purple-100 border-none shadow-xl mb-8">
+        {/* 🎥 Today's Video Card - Enhanced for toddlers */}
+        {todaysVideo && videoUrl && (
+          <Card className="bg-gradient-to-r from-blue-100 to-purple-100 border-4 border-purple-300 shadow-xl mb-8 overflow-hidden">
+            <CardContent className="p-0">
+              <div className="relative">
+                {/* Video thumbnail with play button */}
+                {!isPlaying ? (
+                  <div className="relative">
+                    <img 
+                      src={thumbnailUrl || "/video-placeholder.jpg"} 
+                      alt={todaysVideo.title}
+                      className="w-full h-48 object-cover"
+                    />
+                    <div className="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center">
+                      <motion.div
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        <Button
+                          onClick={handleVideoPlay}
+                          className="rounded-full p-4 bg-purple-500 hover:bg-purple-600 text-white shadow-lg"
+                          aria-label={t("playVideo")}
+                        >
+                          <Play className="w-8 h-8 fill-white" />
+                        </Button>
+                      </motion.div>
+                    </div>
+                  </div>
+                ) : (
+                  /* Video player */
+                  <div className="relative">
+                    <video
+                      className="w-full h-48 object-cover"
+                      controls
+                      autoPlay
+                      onEnded={handleVideoComplete}
+                      onTimeUpdate={handleVideoProgress}
+                    >
+                      <source src={videoUrl} type="video/mp4" />
+                      Your browser does not support the video tag.
+                    </video>
+                    
+                    {/* Custom progress bar */}
+                    <div className="absolute bottom-0 left-0 right-0 h-3 bg-gray-200">
+                      <div 
+                        className="h-full bg-purple-500 rounded-r-full" 
+                        style={{ width: `${videoProgress}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Video info */}
+                <div className="p-4">
+                  <h3 className="text-xl font-bold text-purple-700 mb-2 flex items-center">
+                    <span className="mr-2">📺</span> {t("todaysVideo")}
+                  </h3>
+                  <h4 className="text-lg font-semibold text-gray-800 mb-3">{todaysVideo.title}</h4>
+                  <p className="text-gray-600 text-sm mb-4">{todaysVideo.description}</p>
+                  
+                  {/* Video actions - larger buttons for toddlers */}
+                  <div className="flex space-x-3 justify-center">
+                    {isVideoCompleted && (
+                      <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                        <Button
+                          variant="outline"
+                          size="lg"
+                          onClick={() => {
+                            setIsPlaying(true);
+                            setIsVideoCompleted(false);
+                          }}
+                          className="text-purple-600 border-purple-300 hover:bg-purple-50"
+                        >
+                          <RotateCw className="w-5 h-5 mr-2" />
+                          {t("watchAgain")}
+                        </Button>
+                      </motion.div>
+                    )}
+                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                      <Button 
+                        variant="outline" 
+                        size="lg"
+                        onClick={handleDownload}
+                        disabled={isDownloading}
+                        className="text-blue-600 border-blue-300 hover:bg-blue-50"
+                      >
+                        <Download className="w-5 h-5 mr-2" />
+                        {isDownloading ? "..." : t("download")}
+                      </Button>
+                    </motion.div>
+                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                      <Button 
+                        variant="outline" 
+                        size="lg"
+                        onClick={handleShare}
+                        className="text-green-600 border-green-300 hover:bg-green-50"
+                      >
+                        <Share className="w-5 h-5 mr-2" />
+                        {t("share")}
+                      </Button>
+                    </motion.div>
+                  </div>
+                </div>
+                
+                {/* Completion badge */}
+                {isVideoCompleted && (
+                  <motion.div 
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="absolute top-2 right-2 bg-green-500 text-white text-xs font-bold px-3 py-2 rounded-full shadow-md"
+                  >
+                    Completed! 🎉
+                  </motion.div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* 🎯 Today's Learning - Enhanced for toddlers */}
+        <Card className="bg-gradient-to-r from-pink-100 to-purple-100 border-4 border-pink-300 shadow-xl mb-8">
           <CardContent className="p-6 text-center">
-            <div className="w-20 h-20 bg-gradient-to-br from-pink-400 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+            <motion.div 
+              className="w-20 h-20 bg-gradient-to-br from-pink-400 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg"
+              whileHover={{ rotate: 10, scale: 1.1 }}
+            >
               <Star className="w-10 h-10 text-white" />
-            </div>
+            </motion.div>
             <h2 className="text-2xl font-bold text-gray-800 mb-2">
               {t("todaysActivity")}
             </h2>
             <h3 className="text-xl font-bold text-purple-600 mb-6">
               {todaysMission?.title || t("loading")}
             </h3>
-            <Button
-              onClick={handleMissionStart}
-              className="bg-gradient-to-r from-pink-500 to-purple-500 text-white px-10 py-6 rounded-full text-2xl font-bold shadow-lg hover:shadow-xl"
-              size="lg"
-              aria-label={t("startLearning")}
+            
+            {/* Pulsing Call-to-Action Button */}
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              animate={{ scale: [1, 1.03, 1] }}
+              transition={{ 
+                repeat: Infinity, 
+                duration: 1.5,
+                repeatType: "reverse"
+              }}
             >
-              <Play className="w-8 h-8 mr-3" />
-              {t("startLearning")}
-            </Button>
+              <Button
+                onClick={handleMissionStart}
+                className="bg-gradient-to-r from-pink-500 to-purple-500 text-white px-10 py-6 rounded-full text-2xl font-bold shadow-lg hover:shadow-xl"
+                size="lg"
+                aria-label={t("startLearning")}
+              >
+                <Play className="w-8 h-8 mr-3" />
+                {t("startLearning")}
+              </Button>
+            </motion.div>
           </CardContent>
         </Card>
 
-        {/* ⭐ Stars Progress */}
-        <Card className="bg-white border-none shadow-md mb-8">
+        {/* ⭐ Stars Progress - Enhanced for toddlers */}
+        <Card className="bg-gradient-to-r from-yellow-50 to-orange-50 border-4 border-yellow-200 shadow-md mb-8">
           <CardContent className="p-6">
-            <h3 className="text-xl font-bold text-center mb-4">{t("yourStars")} ⭐</h3>
+            <h3 className="text-xl font-bold text-center mb-4 flex items-center justify-center">
+              <Star className="w-6 h-6 mr-2 text-yellow-500 fill-yellow-500" /> 
+              {t("yourStars")}
+            </h3>
             <div className="flex justify-center space-x-4 mb-4">
               {[1, 2, 3, 4, 5].map((star) => (
                 <motion.div
                   key={star}
                   className={`w-12 h-12 rounded-full flex items-center justify-center text-3xl ${
-                    star <= starsEarned ? "bg-yellow-400 text-white" : "bg-gray-200 text-gray-400"
+                    star <= starsEarned 
+                      ? "bg-yellow-400 text-white shadow-md" 
+                      : "bg-gray-200 text-gray-400"
                   }`}
                   animate={star <= starsEarned ? { scale: [1, 1.3, 1] } : {}}
                   transition={{ duration: 0.6 }}
+                  whileHover={{ scale: 1.2 }}
                 >
                   {star <= starsEarned ? "⭐" : "☆"}
                 </motion.div>
@@ -352,34 +745,68 @@ export default function HomePage() {
             </div>
             <p className="text-lg text-center text-gray-600">
               {starsEarned > 0
-                ? `${t("youHave")} ${starsEarned} ${t("stars")}!`
+                ? `${t("youHave")} ${starsEarned} ${t("stars")}! ${starsEarned >= 3 ? "🎉" : ""}`
                 : t("learnToEarn")}
             </p>
           </CardContent>
         </Card>
 
-        {/* 🎁 Surprise Reward */}
+        {/* 🎁 Surprise Reward - Enhanced for toddlers */}
         {showSurprise && (
-          <Card className="bg-gradient-to-r from-yellow-100 to-orange-100 border-none shadow-xl mb-8 animate-wiggle">
-            <CardContent className="p-6 text-center">
-              <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
-                <Gift className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-xl font-bold text-orange-600 mb-2">
-                {t("surprise")} 🎁
-              </h3>
-              <p className="text-gray-700 mb-4">{t("unlockedReward")}</p>
-              <Link href="/rewards">
-                <Button variant="outline" className="border-orange-300 text-orange-600 hover:bg-orange-50">
-                  {t("seeReward")}
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
+          <motion.div 
+            initial={{ scale: 0.5, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: "spring", stiffness: 200 }}
+          >
+            <Card className="bg-gradient-to-r from-yellow-100 to-orange-100 border-4 border-yellow-300 shadow-xl mb-8">
+              <CardContent className="p-6 text-center">
+                <motion.div 
+                  className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg"
+                  animate={giftAnimation === "shake" ? 
+                    { rotate: [0, -10, 10, -10, 10, 0] } : 
+                    giftAnimation === "open" ? 
+                    { scale: [1, 1.2, 1], rotate: [0, 15, 0] } : 
+                    { rotate: [0, -5, 5, 0] }
+                  }
+                  transition={{ 
+                    duration: giftAnimation === "shake" ? 0.5 : 1,
+                    repeat: giftAnimation === "idle" ? Infinity : 0,
+                    repeatDelay: 2
+                  }}
+                >
+                  <Gift className="w-8 h-8 text-white" />
+                </motion.div>
+                <h3 className="text-xl font-bold text-orange-600 mb-2">
+                  {t("surprise")} 🎁
+                </h3>
+                <p className="text-gray-700 mb-4">{t("unlockedReward")}</p>
+                <Link href="/rewards">
+                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                    <Button className="bg-orange-500 hover:bg-orange-600 text-white border-2 border-orange-600">
+                      {t("seeReward")}
+                    </Button>
+                  </motion.div>
+                </Link>
+              </CardContent>
+            </Card>
+          </motion.div>
         )}
       </main>
 
       {mounted && <BottomNavigation />}
+      
+      {/* Add CSS for animated gradient */}
+      <style jsx>{`
+        @keyframes gradientXY {
+          0% { background-position: 0% 0%; }
+          50% { background-position: 100% 100%; }
+          100% { background-position: 0% 0%; }
+        }
+        .animate-gradient-xy {
+          background-size: 200% 200%;
+          animation: gradientXY 15s ease infinite;
+        }
+      `}</style>
     </div>
   );
 }
