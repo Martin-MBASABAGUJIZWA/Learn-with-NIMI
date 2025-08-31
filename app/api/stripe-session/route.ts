@@ -1,7 +1,10 @@
-// /app/api/stripe-session/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { handleError } from "@/lib/apiHelpers";
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: "2023-10-16",
+});
 
 // Create a checkout session
 export async function POST(req: NextRequest) {
@@ -46,7 +49,6 @@ export async function GET(req: NextRequest) {
       expand: ["line_items"],
     });
 
-    // Determine the plan type based on the price ID
     let plan: "monthly" | "yearly" | null = null;
     const priceId = session.line_items?.data?.[0]?.price?.id;
 
