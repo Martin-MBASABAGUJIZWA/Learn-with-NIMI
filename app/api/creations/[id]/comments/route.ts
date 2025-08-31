@@ -2,7 +2,6 @@
 import { NextResponse } from "next/server";
 import { v4 as uuidv4 } from "uuid";
 
-// Comment interface
 interface Comment {
   id: string;
   creationId: string;
@@ -11,39 +10,29 @@ interface Comment {
   createdAt: string;
 }
 
-// Persistent in-memory storage for dev session
+// In-memory storage
 if (!(global as any).comments) {
-  console.warn(
-    "⚠️ Comments are stored in-memory and will reset on deploy/restart!"
-  );
+  console.warn("⚠️ Comments are ephemeral and reset on deploy/restart!");
   (global as any).comments = [] as Comment[];
 }
 const comments: Comment[] = (global as any).comments;
 
-// GET handler: fetch all comments for a creation
-export async function GET(request: Request, context: any) {
-  const { id } = context.params; // ✅ use context.params without strict typing
+export async function GET(req: Request, context: any) {
+  const { id } = context.params;
 
   const creationComments = comments
     .filter((c) => c.creationId === id)
-    .sort(
-      (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   return NextResponse.json(creationComments);
 }
 
-// POST handler: add a new comment
-export async function POST(request: Request, context: any) {
+export async function POST(req: Request, context: any) {
   const { id } = context.params;
-  const { content } = await request.json();
+  const { content } = await req.json();
 
   if (!content || typeof content !== "string") {
-    return NextResponse.json(
-      { error: "Content must be a non-empty string." },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Content must be a non-empty string." }, { status: 400 });
   }
 
   const newComment: Comment = {
