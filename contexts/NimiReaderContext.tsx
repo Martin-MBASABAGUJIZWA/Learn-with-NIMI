@@ -15,43 +15,75 @@ interface NimiReaderContextType {
 const NimiReaderContext = createContext<NimiReaderContextType | undefined>(undefined);
 
 export function NimiReaderProvider({ children }: { children: React.ReactNode }) {
-  const [isReaderActive, setIsReaderActive] = useState(false);
+  const [isReaderActive, setIsReaderActive] = useState(true);
   const [currentContent, setCurrentContent] = useState("");
   const [isReading, setIsReading] = useState(false);
 
   const toggleReader = () => setIsReaderActive((prev) => !prev);
-  
+
   const startReading = () => {
-    if (currentContent && isReaderActive) {
-      setIsReading(true);
-      // Here you would integrate with your text-to-speech API
-      console.log("Starting to read:", currentContent);
+    if (!currentContent || !isReaderActive) return;
+
+    const utterance = new SpeechSynthesisUtterance(currentContent);
+
+    // Toddler-style voice
+    const voices = window.speechSynthesis.getVoices();
+    const childVoice = voices.find(
+      (v) =>
+        v.name.toLowerCase().includes("child") ||
+        v.name.toLowerCase().includes("boy") ||
+        v.name.toLowerCase().includes("kid")
+    );
+
+    if (childVoice) {
+      utterance.voice = childVoice;
+      utterance.pitch = 1.0;
+      utterance.rate = 0.8;
+    } else {
+      // fallback to higher pitch
+      utterance.pitch = 1.5;
+      utterance.rate = 0.8;
     }
-  };
-  
-  const stopReading = () => {
-    setIsReading(false);
-    // Stop the text-to-speech here
-    console.log("Stopping reading");
+
+    utterance.lang = "en-US";
+    utterance.onend = () => setIsReading(false);
+
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(utterance);
+    setIsReading(true);
   };
 
-  // Auto-read when content changes and reader is active
+  const stopReading = () => {
+    window.speechSynthesis.cancel();
+    setIsReading(false);
+  };
+
+  // Preload voices
   useEffect(() => {
-    if (isReaderActive && currentContent) {
-      startReading();
+    if (typeof window !== "undefined" && window.speechSynthesis) {
+      window.speechSynthesis.onvoiceschanged = () => {
+        window.speechSynthesis.getVoices();
+      };
     }
+  }, []);
+
+  // Auto-read when content changes
+  useEffect(() => {
+    if (isReaderActive && currentContent) startReading();
   }, [currentContent, isReaderActive]);
 
   return (
-    <NimiReaderContext.Provider value={{ 
-      isReaderActive, 
-      toggleReader, 
-      currentContent, 
-      setCurrentContent,
-      isReading,
-      startReading,
-      stopReading
-    }}>
+    <NimiReaderContext.Provider
+      value={{
+        isReaderActive,
+        toggleReader,
+        currentContent,
+        setCurrentContent,
+        isReading,
+        startReading,
+        stopReading,
+      }}
+    >
       {children}
     </NimiReaderContext.Provider>
   );
@@ -59,9 +91,6 @@ export function NimiReaderProvider({ children }: { children: React.ReactNode }) 
 
 export function useNimiReader() {
   const context = useContext(NimiReaderContext);
-  if (!context) {
-    throw new Error("useNimiReader must be used within a NimiReaderProvider");
-  }
+  if (!context) throw new Error("useNimiReader must be used within a NimiReaderProvider");
   return context;
 }
-

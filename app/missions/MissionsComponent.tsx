@@ -11,10 +11,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Input } from "@/components/ui/input";
 import HTMLFlipBook from "react-pageflip";
 import { Label } from "@/components/ui/label";
+import { useNimiReader } from "@/contexts/NimiReaderContext"; 
 import { toast } from "sonner";
+import Tesseract from "tesseract.js";
 import NimiReaderButton from "@/components/NimiReaderButton";
-
-// Import icons individually to avoid barrel import issues
 import { BookOpen } from "lucide-react";
 import { CheckCircle } from "lucide-react";
 import { Download } from "lucide-react";
@@ -27,7 +27,7 @@ import { Video } from "lucide-react";
 import { X } from "lucide-react";
 import { Clock } from "lucide-react";
 
-// Translation dictionary for all supported languages
+
 const translations = {
   en: {
     magicalLearning: "Magical Learning",
@@ -284,6 +284,18 @@ interface ColoringPage {
   page_number: number;
   image_url: string;
 }
+interface Page {
+    image_url: string;
+    page_number: number;
+    caption?: string; 
+}
+
+type FlipBookViewerProps = {
+  pages: Page[];
+  onClose: () => void;
+  type: "story" | "coloring";
+  t: (key: string) => string;
+};
 
 // Update the SlidesModal component to properly display images
 const SlidesModal = ({
@@ -659,42 +671,84 @@ const ChildNameModal = ({
     </Dialog>
   );
 };
-
-// BOOK FLIP VIEWER
-const FlipBookViewer = ({
-  pages,
-  onClose,
-  type,
-  t,
-}: {
-  pages: { image_url: string; page_number: number; text?: string }[];
-  onClose: () => void;
-  type: "story" | "coloring";
-  t: (key: string) => string;
-}) => {
-  const [processedPages, setProcessedPages] = useState<typeof pages>([]);
+const FlipBookViewer: React.FC<FlipBookViewerProps> = ({ pages, onClose, type, t }) => {
+  const [processedPages, setProcessedPages] = useState<Page[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(0);
 
+  const { setCurrentContent, isReading, stopReading, startReading } = useNimiReader();
+
+  // Helper to build consistent narration
+  const getNarrationForPage = (page: Page) => {
+    let narration = "";
+    if (page?.ocrText) narration += page.ocrText + " ";
+    if (page?.text) narration += page.text + " ";
+    if (page?.caption) narration += page.caption;
+    return narration.trim();
+  };
+
+  // Preprocess pages: image URL + OCR + narration
   useEffect(() => {
-    const processImages = async () => {
-      const processed = await Promise.all(
+    const processPages = async () => {
+      const newPages = await Promise.all(
         pages.map(async (page) => {
-          if (page.image_url.startsWith("supabase://")) {
-            const path = page.image_url.replace("supabase://", "");
+          let imageUrl = page.image_url;
+
+          // Supabase public URL
+          if (imageUrl.startsWith("supabase://")) {
+            const path = imageUrl.replace("supabase://", "");
             const [bucket, ...filePath] = path.split("/");
             const { data } = await supabase.storage
               .from(bucket)
               .getPublicUrl(filePath.join("/"));
-            return { ...page, image_url: data.publicUrl };
+            imageUrl = data.publicUrl;
           }
-          return page;
+
+          // OCR
+          let ocrText = "";
+          try {
+            const { data } = await Tesseract.recognize(imageUrl, "eng");
+            ocrText = data.text.trim();
+          } catch (err) {
+            console.error("OCR failed for page", page.page_number, err);
+          }
+
+          return {
+            ...page,
+            image_url: imageUrl,
+            ocrText,
+          };
         })
       );
-      setProcessedPages(processed);
+
+      setProcessedPages(newPages);
       setIsLoading(false);
+
+      // Read first spread
+      const leftPage = newPages[0];
+      const rightPage = newPages[1];
+      const narration = [getNarrationForPage(leftPage), getNarrationForPage(rightPage)]
+        .filter(Boolean)
+        .join(" ");
+      setCurrentContent(narration);
     };
-    processImages();
-  }, [pages]);
+
+    processPages();
+  }, [pages, setCurrentContent]);
+
+  // Flip pages: read spread
+  const handlePageChange = (newIndex: number) => {
+    setCurrentPage(newIndex);
+
+    const leftPage = processedPages[newIndex];
+    const rightPage = processedPages[newIndex + 1];
+
+    const narration = [getNarrationForPage(leftPage), getNarrationForPage(rightPage)]
+      .filter(Boolean)
+      .join(" ");
+
+    if (narration) setCurrentContent(narration);
+  };
 
   if (isLoading) {
     return (
@@ -709,15 +763,29 @@ const FlipBookViewer = ({
       {/* Header */}
       <div className="flex justify-between items-center p-4 bg-black/50">
         <h2 className="text-white text-lg font-semibold">
-          {type === "story" ? t("storyTime") : t("coloringBook")} -{" "}
-          {t("flipbook")}
+          {type === "story" ? t("storyTime") : t("coloringBook")} - {t("flipbook")}
         </h2>
-        <button
-          onClick={onClose}
-          className="text-white text-2xl bg-black/50 rounded-full p-2 hover:bg-black/70 transition-colors"
-        >
-          ✕
-        </button>
+
+        <div className="flex gap-2">
+          {/* Close */}
+          <button
+            onClick={onClose}
+            className="text-white text-2xl bg-black/50 rounded-full p-2 hover:bg-black/70 transition-colors"
+          >
+            ✕
+          </button>
+
+          {/* Pause/Resume */}
+          <button
+            onClick={() => {
+              if (isReading) stopReading();
+              else startReading();
+            }}
+            className="bg-yellow-500 text-black px-4 py-2 rounded-lg"
+          >
+            {isReading ? "⏸ Pause" : "▶️ Resume"}
+          </button>
+        </div>
       </div>
 
       {/* Flipbook */}
@@ -725,59 +793,41 @@ const FlipBookViewer = ({
         <HTMLFlipBook
           width={400}
           height={550}
-          showCover={true}
+          showCover
           className="shadow-2xl rounded-lg"
           flippingTime={800}
-          usePortrait={true}
-          mobileScrollSupport={true} 
+          usePortrait
+          mobileScrollSupport
+          onFlip={(e) => handlePageChange(e.data)}
         >
           {processedPages.map((page, idx) => (
-          <div
-            key={idx}
-            className="relative bg-[url('/paper-texture.png')] bg-repeat bg-[length:300px_300px] flex flex-col justify-between p-6 rounded-[6px] shadow-sm"
-            style={{
-              backgroundColor: "#fdfaf4", // soft cream background
-              border: "1px solid rgba(0,0,0,0.08)", // faint border
-            }}
-          >
-            {/* Spine shadows */}
-            {idx % 2 === 0 && (
-              <>
-                <div className="absolute right-0 top-0 h-full w-3 bg-gradient-to-l from-black/20 to-transparent pointer-events-none"></div>
-                <div className="absolute right-0 top-0 h-full w-8 bg-gradient-to-l from-black/10 to-transparent blur-md opacity-70 pointer-events-none"></div>
-              </>
-            )}
-            {idx % 2 === 1 && (
-              <>
-                <div className="absolute left-0 top-0 h-full w-3 bg-gradient-to-r from-black/20 to-transparent pointer-events-none"></div>
-                <div className="absolute left-0 top-0 h-full w-8 bg-gradient-to-r from-black/10 to-transparent blur-md opacity-70 pointer-events-none"></div>
-              </>
-            )}
+            <div
+              key={idx}
+              className="relative bg-[url('/paper-texture.png')] bg-repeat bg-[length:300px_300px] flex flex-col justify-between p-6 rounded-[6px] shadow-sm"
+              style={{
+                backgroundColor: "#fdfaf4",
+                border: "1px solid rgba(0,0,0,0.08)",
+              }}
+            >
+              <img
+                src={page.image_url}
+                alt={page.image_alt || `Page ${idx + 1}`}
+                className="rounded-md shadow-md object-contain max-h-[75%] mx-auto"
+              />
 
-            {/* Page content */}
-            <img
-              src={page.image_url}
-              alt={`Page ${idx + 1}`}
-              className="rounded-md shadow-md object-contain max-h-[75%] mx-auto"
-            />
-
-            {type === "story" && page.text && (
-              <p className="mt-4 text-center text-lg font-serif text-gray-800 leading-relaxed">
-                {page.text}
-              </p>
-            )}
-
-            {/* Page edge shadow */}
-            <div className="absolute inset-0 rounded-[6px] shadow-inner pointer-events-none"></div>
-          </div>
-        ))}
+              {type === "story" && page.text && (
+                <p className="mt-4 text-center text-lg font-serif text-gray-800 leading-relaxed">
+                  {page.text}
+                </p>
+              )}
+            </div>
+          ))}
         </HTMLFlipBook>
       </div>
-      
     </div>
   );
 };
-
+  
 // =====================
 // BOOK CARD
 // =====================
@@ -1851,3 +1901,7 @@ const MissionsComponent = () => {
 };
 
 export default MissionsComponent;
+
+function setCurrentPage(newPageIndex: number) {
+  throw new Error("Function not implemented.");
+}
