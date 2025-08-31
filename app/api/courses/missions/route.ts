@@ -5,8 +5,7 @@ import supabase from '@/lib/supabaseClient';
 export async function GET() {
   try {
     // Get today's day number (1-8 as per your schema)
-    // You'll need to implement your day rotation logic here
-    const currentDayNumber = getCurrentDayNumber(); // Implement this function
+    const currentDayNumber = getCurrentDayNumber(); // Implemented below
     
     const { data, error } = await supabase
       .from('daily_missions')
@@ -28,12 +27,15 @@ export async function GET() {
     
     return NextResponse.json(data || []);
 
-  } catch (error) {
-    console.error('API Error:', error);
+  } catch (err) {
+    console.error('API Error:', err);
+
+    const message = err instanceof Error ? err.message : 'Unknown error';
+
     return NextResponse.json(
       { 
         error: 'Failed to fetch missions',
-        details: error.message,
+        details: message,
         suggestion: "Verify day_number exists in your table"
       },
       { status: 500 }
@@ -46,6 +48,6 @@ function getCurrentDayNumber(): number {
   // Example: Cycle through days 1-8 based on actual date
   const startDate = new Date('2023-01-01'); // Your program start date
   const today = new Date();
-  const diffDays = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
+  const diffDays = Math.floor((today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
   return (diffDays % 8) + 1; // Returns 1-8
 }
