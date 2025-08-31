@@ -1,5 +1,5 @@
 // app/api/nimi/route.ts
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
@@ -115,4 +115,5 @@ Rules:
       details: error instanceof Error ? error.message : 'Unknown'
     }), { status: 500 });
   }
+
 }
