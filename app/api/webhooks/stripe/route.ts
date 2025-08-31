@@ -4,8 +4,9 @@ import Stripe from "stripe";
 import supabase from "@/lib/supabaseClient";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-    apiVersion: "2023-10-16", // ✅ latest supported version
-  });
+  apiVersion: "2025-08-27.basil", // Stripe types version
+});
+
 export async function POST(req: Request) {
   const sig = req.headers.get("stripe-signature")!;
   const body = await req.text();
