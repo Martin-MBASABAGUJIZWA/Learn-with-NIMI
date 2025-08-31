@@ -29,12 +29,10 @@ export default function DynamicForm({ table, row = {}, onClose, onSave }: Dynami
     fetchColumns()
   }, [table])
 
-  // Initialize form data
   useEffect(() => {
     if (columns.length > 0) {
       const initialData: any = {}
       columns.forEach(col => {
-        // Skip auto-increment/serial columns
         if (!col.column_default?.includes('nextval')) {
           initialData[col.column_name] = row[col.column_name] ?? ''
         }
@@ -51,11 +49,16 @@ export default function DynamicForm({ table, row = {}, onClose, onSave }: Dynami
     e.preventDefault()
     try {
       const primaryKey = columns.find(c => c.column_default?.includes('nextval') || c.column_name === 'id')?.column_name || 'id'
+
+      // ✅ Important: cast Supabase table reference to any
+      const tableRef = supabase.from(table) as any
+
       if (row && row[primaryKey]) {
-        await supabase.from(table).update(formData).eq(primaryKey, row[primaryKey])
+        await tableRef.update(formData).eq(primaryKey, row[primaryKey])
       } else {
-        await supabase.from(table).insert([formData])
+        await tableRef.insert([formData])
       }
+
       onSave()
       onClose()
     } catch (err) {
@@ -68,7 +71,6 @@ export default function DynamicForm({ table, row = {}, onClose, onSave }: Dynami
   return (
     <form onSubmit={handleSubmit} className="p-4 border rounded mb-4 bg-gray-50">
       {columns.map(col => {
-        // Skip auto-increment column in new row
         if (col.column_default?.includes('nextval') && !row[col.column_name]) return null
         const value = formData[col.column_name] ?? ''
         switch (col.data_type) {
