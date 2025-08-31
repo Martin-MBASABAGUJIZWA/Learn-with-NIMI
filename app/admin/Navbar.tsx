@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import supabase from './supabaseClient'
 import { LogOut, User, Search, ChevronDown } from 'lucide-react'
 
@@ -14,11 +14,12 @@ export default function Navbar({ onNavigate, tables, setCurrentTable }: NavbarPr
   const [search, setSearch] = useState('')
   const [filteredTables, setFilteredTables] = useState<string[]>([])
   const [profileOpen, setProfileOpen] = useState(false)
+  const profileRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
-      if (user) setUserEmail(user.email)
+      if (user) setUserEmail(user.email ?? null) // ✅ Fix undefined typing
     }
     getUser()
   }, [])
@@ -46,6 +47,21 @@ export default function Navbar({ onNavigate, tables, setCurrentTable }: NavbarPr
     if (action === 'dashboard') setCurrentTable('Dashboard')
     if (action === 'logout') handleLogout()
   }
+
+  // ✅ Close profile menu on outside click
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
+        setProfileOpen(false)
+      }
+    }
+    if (profileOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [profileOpen])
 
   return (
     <header className="w-full bg-gray-800 text-white flex items-center justify-between px-6 py-3 shadow-md relative z-50">
@@ -93,7 +109,7 @@ export default function Navbar({ onNavigate, tables, setCurrentTable }: NavbarPr
       </div>
 
       {/* Right: Profile menu */}
-      <div className="relative flex items-center gap-4">
+      <div className="relative flex items-center gap-4" ref={profileRef}>
         <div 
           className="flex items-center gap-2 bg-gray-700 px-3 py-1 rounded-full cursor-pointer relative"
           onClick={() => setProfileOpen(!profileOpen)}
@@ -117,6 +133,12 @@ export default function Navbar({ onNavigate, tables, setCurrentTable }: NavbarPr
                 onClick={() => handleProfileAction('profile')}
               >
                 Profile
+              </li>
+              <li 
+                className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-red-600"
+                onClick={() => handleProfileAction('logout')}
+              >
+                Logout
               </li>
             </ul>
           </div>
