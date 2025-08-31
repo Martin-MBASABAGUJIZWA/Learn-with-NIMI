@@ -21,11 +21,8 @@ if (!(global as any).comments) {
 const comments: Comment[] = (global as any).comments;
 
 // GET handler: fetch all comments for a creation
-export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
-  const { id } = params;
+export async function GET(request: Request, context: any) {
+  const { id } = context.params; // ✅ use context.params without strict typing
 
   const creationComments = comments
     .filter((c) => c.creationId === id)
@@ -38,11 +35,8 @@ export async function GET(
 }
 
 // POST handler: add a new comment
-export async function POST(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
-  const { id } = params;
+export async function POST(request: Request, context: any) {
+  const { id } = context.params;
   const { content } = await request.json();
 
   if (!content || typeof content !== "string") {
@@ -55,7 +49,7 @@ export async function POST(
   const newComment: Comment = {
     id: uuidv4(),
     creationId: id,
-    author: "User", // placeholder author
+    author: "User",
     content,
     createdAt: new Date().toISOString(),
   };
