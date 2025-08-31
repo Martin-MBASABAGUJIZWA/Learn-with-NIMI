@@ -1,7 +1,16 @@
+// /lib/apiHelpers.ts
 import { NextResponse } from "next/server";
 
-export function handleError(err: unknown, msg = "Internal server error") {
-  const message = err instanceof Error ? err.message : String(err);
-  console.error(msg, err);
-  return NextResponse.json({ error: msg, details: message }, { status: 500 });
+export function handleError(error: unknown, message = "Unexpected error") {
+  let errorMessage = message;
+
+  if (error instanceof Error) {
+    errorMessage = `${message}: ${error.message}`;
+  } else if (typeof error === "string") {
+    errorMessage = `${message}: ${error}`;
+  }
+
+  console.error(error); // ✅ useful for debugging in logs
+
+  return NextResponse.json({ error: errorMessage }, { status: 500 });
 }
