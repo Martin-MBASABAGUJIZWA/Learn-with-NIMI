@@ -44,8 +44,13 @@ export default function TableView({ table }: TableViewProps) {
             created_at: p.created_at,
             updated_at: p.updated_at,
             owner:
-              p.users?.email ??
-              p.admins?.email ??
+              // if there are multiple, join their emails with commas
+              (p.users && Array.isArray(p.users) && p.users.length > 0
+                ? p.users.map((u: any) => u.email).join(", ")
+                : null) ??
+              (p.admins && Array.isArray(p.admins) && p.admins.length > 0
+                ? p.admins.map((a: any) => a.email).join(", ")
+                : null) ??
               "⚠️ Orphan (no linked user/admin)",
           }));
         } else {
