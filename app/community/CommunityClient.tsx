@@ -192,14 +192,20 @@ function CreationCard({
           {t(meta.labelKey)}
         </span>
 
-        {/* Actions (report / delete) */}
-        <div className="flex items-center gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 focus-within:opacity-100 transition-all ml-1">
+        {/* Actions — delete always visible on own posts; report hover-only on others */}
+        <div className={`flex items-center gap-1 transition-all ml-1 ${
+          isOwn ? "opacity-100" : "opacity-100 sm:opacity-0 sm:group-hover:opacity-100 focus-within:opacity-100"
+        }`}>
           {isOwn ? (
             <button
               onClick={e => { e.stopPropagation(); onDelete(creation.id); }}
               title="Delete post"
-              className="w-7 h-7 rounded-full flex items-center justify-center text-[11px] text-ds-muted hover:bg-red-50 hover:text-red-500 transition-all"
-            >🗑️</button>
+              className="w-7 h-7 rounded-full flex items-center justify-center text-ds-muted hover:bg-red-50 hover:text-red-500 transition-all"
+            >
+              <svg viewBox="0 0 24 24" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
+              </svg>
+            </button>
           ) : (
             <button
               onClick={e => { e.stopPropagation(); onReport(creation.id); }}
