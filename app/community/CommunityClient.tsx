@@ -211,45 +211,46 @@ function CreationCard({
       </div>
 
       {/* ── IMAGE ── */}
-      <div className="relative w-full overflow-hidden bg-ds-border" style={{ aspectRatio:"3/4" }}>
+      <div className="relative w-full overflow-hidden bg-ds-border" style={{ aspectRatio:"4/3" }}>
         {isProgress ? (
-          /* Story-progress: styled card with progress ring */
-          <div className="absolute inset-0 bg-gradient-to-br from-sky-400 to-blue-600 flex flex-col items-center justify-center gap-5 p-6">
+          /* Story-progress: horizontal layout for 4:3 landscape frame */
+          <div className="absolute inset-0 bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center gap-6 px-6">
             {/* Cover thumbnail */}
-            {hasImg ? (
-              <div className="w-24 h-24 rounded-2xl overflow-hidden shadow-xl border-[3px] border-white/40 shrink-0">
-                <img src={imgUrl!} alt="" className="w-full h-full object-cover" />
-              </div>
-            ) : (
-              <div className="w-24 h-24 rounded-2xl overflow-hidden shadow-xl border-[3px] border-white/40 shrink-0 bg-white/20 flex items-center justify-center">
-                {creation.childAvatar
-                  ? <ChildAvatar avatarUrl={creation.childAvatar} name={creation.childName} size={96} className="w-full h-full" />
-                  : <span className="text-5xl">📖</span>
-                }
-              </div>
-            )}
+            <div className="shrink-0">
+              {hasImg ? (
+                <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-xl border-[3px] border-white/40">
+                  <img src={imgUrl!} alt="" className="w-full h-full object-cover" />
+                </div>
+              ) : (
+                <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-xl border-[3px] border-white/40 bg-white/20 flex items-center justify-center">
+                  {creation.childAvatar
+                    ? <ChildAvatar avatarUrl={creation.childAvatar} name={creation.childName} size={80} className="w-full h-full" />
+                    : <span className="text-4xl">📖</span>
+                  }
+                </div>
+              )}
+            </div>
             {/* Progress ring */}
-            <div className="relative w-28 h-28 shrink-0">
+            <div className="relative w-24 h-24 shrink-0">
               <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="9" />
-                <circle cx="50" cy="50" r="40" fill="none" stroke="white" strokeWidth="9"
+                <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="10" />
+                <circle cx="50" cy="50" r="40" fill="none" stroke="white" strokeWidth="10"
                   strokeDasharray={circumference}
                   strokeDashoffset={circumference * (1 - progressPct / 100)}
                   strokeLinecap="round"
                 />
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-white font-black text-[22px] leading-none">{progressPct}%</span>
-                <span className="text-white/70 text-[10px] font-semibold mt-0.5">{t("communityProgressDone")}</span>
+                <span className="text-white font-black text-[20px] leading-none">{progressPct}%</span>
+                <span className="text-white/70 text-[9px] font-semibold mt-0.5">{t("communityProgressDone")}</span>
               </div>
             </div>
-            <p className="text-white font-black text-[13px] text-center drop-shadow-sm">{t("communityOnAdventureLabel")}</p>
           </div>
         ) : hasImg ? (
           <img
             src={imgUrl!}
             alt={creation.description ?? `${creation.childName}'s creation`}
-            className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+            className="absolute inset-0 w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]"
             loading="lazy"
           />
         ) : (
@@ -312,8 +313,8 @@ function CreationCard({
               <motion.span
                 key={creation.likes}
                 initial={{ scale:1.4, opacity:0 }}
-                animate={{ scale:1,   opacity:1 }}
-                className="text-[11px] font-black px-1.5 py-0.5 rounded-full"
+                animate={{ scale:1, opacity:1 }}
+                className="text-[11px] font-black min-w-[20px] text-center px-1.5 py-0.5 rounded-full"
                 style={creation.likedByUser
                   ? { background:"rgba(255,255,255,0.22)", color:"white" }
                   : { background:"var(--ds-border-primary)", color:"var(--ds-text-muted)" }
@@ -758,7 +759,7 @@ function ShareFAB({ onClick, cv }: { onClick: () => void; cv: ComponentVariant }
       whileHover={{ scale: 1.06, y: -2 }}
       whileTap={{ scale: 0.93 }}
       onClick={onClick}
-      className={`fixed bottom-[88px] right-4 z-40 flex items-center gap-2.5 pl-4 pr-5 py-3.5 rounded-2xl text-white font-baloo font-black text-[14px] shadow-[0_8px_28px_rgba(5,150,105,0.45)] bg-gradient-to-br ${cv.zoneGradients.communitySquare}`}
+      className={`fixed bottom-[100px] right-4 z-40 flex items-center gap-2 sm:gap-2.5 pl-3 pr-4 sm:pl-4 sm:pr-5 py-2.5 sm:py-3.5 rounded-2xl text-white font-baloo font-black text-[13px] sm:text-[14px] shadow-[0_8px_28px_rgba(5,150,105,0.45)] bg-gradient-to-br ${cv.zoneGradients.communitySquare}`}
       aria-label="Share your adventure"
     >
       {/* Pulse ring */}
@@ -767,11 +768,11 @@ function ShareFAB({ onClick, cv }: { onClick: () => void; cv: ComponentVariant }
         animate={{ scale: [1, 1.22, 1.22], opacity: [0.55, 0, 0] }}
         transition={{ duration: 2.2, repeat: Infinity, ease: "easeOut" }}
       />
-      <div className="w-7 h-7 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
-        <Plus className="w-4 h-4" strokeWidth={3} />
+      <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+        <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" strokeWidth={3} />
       </div>
       <span className="relative">{t("communityShareFAB")}</span>
-      <span className="text-[17px] leading-none">⭐</span>
+      <span className="text-[15px] sm:text-[17px] leading-none">⭐</span>
     </motion.button>
   );
 }
@@ -1143,56 +1144,37 @@ export default function CommunityClient({ initialUserId, initialHasSubscription 
             >⭐</motion.span>
           ))}
 
-          <div className="relative z-10 px-5 pt-12 pb-6 sm:px-8 sm:pb-7">
+          <div className="relative z-10 px-5 pt-10 pb-5 sm:px-8 sm:pt-12 sm:pb-6">
             {/* Title row */}
-            <div className="flex items-center gap-4 mb-5">
+            <div className="flex items-center gap-3 sm:gap-4 mb-4">
               <motion.img src={assets.nimiCircle} alt="NIMI"
-                className="w-16 h-16 sm:w-20 sm:h-20 rounded-full border-[3px] border-white/50 shadow-2xl shrink-0"
+                className="w-14 h-14 sm:w-20 sm:h-20 rounded-full border-[3px] border-white/50 shadow-2xl shrink-0"
                 animate={{ y:[0,-6,0] }} transition={{ duration:2.8, repeat:Infinity }} />
               <div className="min-w-0">
-                <p className="text-white/60 text-[10px] font-bold uppercase tracking-[0.18em] mb-1">
-                  {t("communityEyebrow")}
-                </p>
-                <h1 className="font-baloo font-black text-white text-[26px] sm:text-[32px] leading-tight drop-shadow-lg">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="bg-white/25 text-white text-[9px] font-black px-2 py-0.5 rounded-full tracking-wider uppercase">
+                    {t("communityEyebrow")}
+                  </span>
+                  {communityTotal > 0 && (
+                    <span className="flex items-center gap-1 bg-white/15 text-white text-[10px] font-black px-2 py-0.5 rounded-full">
+                      <Sparkles className="w-3 h-3" /> {communityTotal}
+                    </span>
+                  )}
+                </div>
+                <h1 className="font-baloo font-black text-white text-[24px] sm:text-[30px] leading-tight drop-shadow-lg">
                   {t("communityHeroTitle")}
                 </h1>
-                <p className="text-white/70 text-[12px] font-semibold mt-0.5">
+                <p className="text-white/75 text-[12px] font-semibold">
                   {t("communityHeroSubtitle")}
                 </p>
               </div>
             </div>
 
-            {/* Stats row */}
-            <div className="flex items-center gap-2 mb-5 flex-wrap">
-              {communityTotal > 0 && (
-                <motion.div
-                  initial={{ opacity:0, y:6 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.3 }}
-                  className="flex items-center gap-1.5 bg-white/20 backdrop-blur-sm border border-white/30 rounded-full px-3 py-1.5"
-                >
-                  <Sparkles className="w-3.5 h-3.5 text-white/90" />
-                  <span className="text-white text-[12px] font-black">
-                    {communityTotal} {t("communityAdventureCount")}
-                  </span>
-                </motion.div>
-              )}
-              {friends.length > 0 && (
-                <motion.div
-                  initial={{ opacity:0, y:6 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.4 }}
-                  className="flex items-center gap-1.5 bg-white/20 backdrop-blur-sm border border-white/30 rounded-full px-3 py-1.5"
-                >
-                  <span className="text-white/90 text-[13px]">👥</span>
-                  <span className="text-white text-[12px] font-black">
-                    {friends.length} {t("communityLearnerCount")}
-                  </span>
-                </motion.div>
-              )}
-            </div>
-
-            {/* Friend bubbles */}
+            {/* Friend bubbles + learner count in one row */}
             {friends.length > 0 && (
               <div className="flex items-center gap-3">
-                <div className="flex -space-x-2.5">
-                  {friends.slice(0, 8).map((f, i) => {
+                <div className="flex -space-x-2">
+                  {friends.slice(0, 7).map((f, i) => {
                     const FRIEND_GRADS = [
                       "from-violet-400 to-purple-500","from-pink-400 to-rose-500",
                       "from-blue-400 to-indigo-500","from-emerald-400 to-teal-500",
@@ -1204,20 +1186,22 @@ export default function CommunityClient({ initialUserId, initialHasSubscription 
                       initial={{ scale:0, opacity:0 }}
                       animate={{ scale:1, opacity:1 }}
                       transition={{ delay:0.06 + i * 0.045, type:"spring", stiffness:380 }}
-                      className={`w-9 h-9 rounded-full border-2 border-white/70 overflow-hidden flex items-center justify-center text-[15px] font-bold text-white shadow-md bg-gradient-to-br ${grad}`}
+                      className={`w-8 h-8 rounded-full border-2 border-white/70 overflow-hidden flex items-center justify-center font-bold text-white shadow-md bg-gradient-to-br ${grad}`}
                       title={f.name}
                     >
-                      <ChildAvatar avatarUrl={f.avatar} name={f.name} size={36} className="w-full h-full" />
+                      <ChildAvatar avatarUrl={f.avatar} name={f.name} size={32} className="w-full h-full" />
                     </motion.div>
                     );
                   })}
-                  {friends.length > 8 && (
-                    <div className="w-9 h-9 rounded-full bg-white/20 border-2 border-white/40 flex items-center justify-center text-[10px] font-black text-white">
-                      +{friends.length - 8}
+                  {friends.length > 7 && (
+                    <div className="w-8 h-8 rounded-full bg-white/20 border-2 border-white/40 flex items-center justify-center text-[10px] font-black text-white">
+                      +{friends.length - 7}
                     </div>
                   )}
                 </div>
-                <p className="text-white/70 text-[12px] font-semibold">{t("communityActiveNow")}</p>
+                <p className="text-white/75 text-[12px] font-semibold">
+                  {friends.length} {t("communityLearnerCount")} {t("communityActiveNow")}
+                </p>
               </div>
             )}
           </div>
@@ -1249,7 +1233,8 @@ export default function CommunityClient({ initialUserId, initialHasSubscription 
             </button>
           </div>
 
-          {/* Row 2: type filter chips */}
+          {/* Row 2: type filter chips — fades right on mobile to hint scrollability */}
+          <div className="relative">
           <div className="flex items-center gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
             {([
               { key: "all",           label: "All" },
@@ -1269,6 +1254,9 @@ export default function CommunityClient({ initialUserId, initialHasSubscription 
                 }`}
               >{f.label}</button>
             ))}
+          </div>
+          {/* Right fade hint — hidden on desktop where all chips are visible */}
+          <div className="pointer-events-none absolute right-0 top-0 h-full w-10 bg-gradient-to-l from-ds-page to-transparent sm:hidden" />
           </div>
         </div>
 
