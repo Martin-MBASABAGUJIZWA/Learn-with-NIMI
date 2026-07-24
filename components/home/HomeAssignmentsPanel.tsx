@@ -414,14 +414,26 @@ function PanelSkeleton() {
 function NoMissionsCard() {
   return (
     <div
-      className="px-5 py-6 flex flex-col items-center text-center gap-2"
-      style={{ background: "#F0FDF4", borderRadius: "18px 18px 18px 5px", border: "1px dashed #bbf7d0" }}
+      className="px-5 py-5 flex flex-col items-center text-center gap-3"
+      style={{ background: "linear-gradient(135deg,#f0fdf4,#dcfce7)", borderRadius: "18px 18px 18px 5px", border: "1px solid #bbf7d0" }}
     >
-      <span className="text-[28px]">🌱</span>
-      <p className="font-baloo font-black text-[14px] text-emerald-700">No missions yet</p>
-      <p className="font-nunito text-[12px] text-gray-400 max-w-[200px]">
-        Your teacher will send class adventures here.
-      </p>
+      <motion.span
+        className="text-[40px] leading-none"
+        animate={{ y: [0, -6, 0] }}
+        transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+      >
+        🌱
+      </motion.span>
+      <div>
+        <p className="font-baloo font-black text-[15px] text-emerald-800 leading-tight">Adventures on their way!</p>
+        <p className="font-nunito text-[12px] text-emerald-700/70 mt-1 max-w-[200px] leading-relaxed">
+          Your teacher will send class missions here. Check back soon!
+        </p>
+      </div>
+      <div className="flex items-center gap-1.5 bg-emerald-100/60 px-3 py-1.5 rounded-full">
+        <span className="text-[11px]">✉️</span>
+        <span className="font-nunito font-bold text-[11px] text-emerald-700">Waiting for a mission…</span>
+      </div>
     </div>
   );
 }

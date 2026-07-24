@@ -9,24 +9,6 @@ import { getStorageUrl } from "@/lib/queries";
 import { ZoneDecorations } from "@/components/campus/ZoneDecorations";
 import type { StoryLibraryItem } from "@/lib/story-types";
 
-// Stepping-stone path marker between campus zones (purely decorative)
-function CampusConnector() {
-  return (
-    <div className="-mt-2 flex items-center justify-center gap-2 mb-5 pointer-events-none select-none" aria-hidden>
-      <div className="w-6 h-px bg-emerald-200 rounded-full opacity-50" />
-      <motion.span className="text-[11px] opacity-25" animate={{ y: [0, -3, 0] }} transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}>🌿</motion.span>
-      <div className="flex items-center gap-1 opacity-30">
-        <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-        <div className="w-5 h-px bg-emerald-300 rounded-full" />
-        <div className="w-2 h-2 rounded-full bg-emerald-300" />
-        <div className="w-5 h-px bg-emerald-300 rounded-full" />
-        <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-      </div>
-      <motion.span className="text-[11px] opacity-25" animate={{ y: [0, -3, 0] }} transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut", delay: 0.8 }}>🌿</motion.span>
-      <div className="w-6 h-px bg-emerald-200 rounded-full opacity-50" />
-    </div>
-  );
-}
 
 interface Props {
   stories: StoryLibraryItem[];
@@ -103,7 +85,6 @@ export default function HomeStoryLibrarySection({ stories, curStory, hasSubscrip
     <motion.section initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-40px" }} variants={stagger} className="relative">
       <div className="leaf-lg border border-white/80 bg-gradient-to-br from-sky-50/80 via-white to-indigo-50/60 p-4 shadow-[0_16px_36px_rgba(15,23,42,0.06)] sm:p-5">
         <ZoneDecorations zone="library" />
-        <CampusConnector />
 
         {/* Section header */}
         <motion.div variants={up} className="flex items-center justify-between gap-3 mb-5">
