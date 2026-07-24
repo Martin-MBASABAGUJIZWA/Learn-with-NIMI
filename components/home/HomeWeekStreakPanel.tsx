@@ -52,7 +52,7 @@ export default function HomeWeekStreakPanel({ weekStreak, consecutiveStreak, tot
           </div>
           <div>
             <p className={`font-nunito text-[10px] uppercase tracking-widest leading-none mb-0.5 ${eyebrow}`}>
-              {isBroke ? "Fresh start" : "Daily streak"}
+              {isBroke ? "Fresh start" : noStreak ? "Your streak" : "Daily streak"}
             </p>
             <h3 className="font-baloo font-black text-gray-900 text-[17px] leading-tight">
               {heading}
@@ -61,7 +61,7 @@ export default function HomeWeekStreakPanel({ weekStreak, consecutiveStreak, tot
         </div>
 
         {/* Stars pill */}
-        <div className="flex items-center gap-1 bg-sunshine-50 bg-amber-50 rounded-full px-2.5 py-1 border border-amber-100">
+        <div className="flex items-center gap-1 bg-amber-50 rounded-full px-2.5 py-1 border border-amber-100">
           <span className="text-[12px] leading-none">⭐</span>
           <span className="font-baloo font-black text-amber-600 text-[13px] leading-none">{totalStars}</span>
         </div>

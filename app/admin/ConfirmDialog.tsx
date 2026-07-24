@@ -93,6 +93,7 @@ function ConfirmDialog({ title, message, confirmLabel, cancelLabel = 'Cancel', d
         <div className="flex items-center justify-end gap-2 mt-5">
           {!alertOnly && (
             <button
+              type="button"
               onClick={onCancel}
               className="px-4 py-2 rounded-full text-sm font-bold text-gray-600 hover:bg-gray-100 transition"
             >
@@ -100,8 +101,8 @@ function ConfirmDialog({ title, message, confirmLabel, cancelLabel = 'Cancel', d
             </button>
           )}
           <button
+            type="button"
             onClick={onConfirm}
-            autoFocus
             className={`px-4 py-2 rounded-full text-sm font-bold text-white transition ${tint === 'red' ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'}`}
           >
             {resolvedConfirmLabel}

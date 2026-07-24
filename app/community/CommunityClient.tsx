@@ -115,13 +115,12 @@ const STATUS_BADGE: Record<string, { label: string; cls: string }> = {
 };
 
 function CreationCard({
-  creation, index, onCheer, onReport, onDelete, isOwn, showStatus,
+  creation, index, onCheer, onReport, isOwn, showStatus,
 }: {
   creation: Creation;
   index: number;
   onCheer: (id: string) => void;
   onReport: (id: string) => void;
-  onDelete: (id: string) => void;
   isOwn: boolean;
   showStatus?: boolean;
 }) {
@@ -192,28 +191,16 @@ function CreationCard({
           {t(meta.labelKey)}
         </span>
 
-        {/* Actions — delete always visible on own posts; report hover-only on others */}
-        <div className={`flex items-center gap-1 transition-all ml-1 ${
-          isOwn ? "opacity-100" : "opacity-100 sm:opacity-0 sm:group-hover:opacity-100 focus-within:opacity-100"
-        }`}>
-          {isOwn ? (
-            <button
-              onClick={e => { e.stopPropagation(); onDelete(creation.id); }}
-              title="Delete post"
-              className="w-7 h-7 rounded-full flex items-center justify-center text-ds-muted hover:bg-red-50 hover:text-red-500 transition-all"
-            >
-              <svg viewBox="0 0 24 24" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
-              </svg>
-            </button>
-          ) : (
+        {/* Actions — report button (own posts have no client-side delete) */}
+        {!isOwn && (
+          <div className="flex items-center gap-1 transition-all ml-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 focus-within:opacity-100">
             <button
               onClick={e => { e.stopPropagation(); onReport(creation.id); }}
               title="Report post"
               className="w-7 h-7 rounded-full flex items-center justify-center text-[11px] text-ds-muted hover:bg-ds-border transition-all"
             >🚩</button>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
       {/* ── IMAGE ── */}
@@ -334,44 +321,6 @@ function CreationCard({
         )}
       </div>
     </motion.div>
-  );
-}
-
-// ── Delete confirm sheet ─────────────────────────────────────────
-function DeleteConfirmSheet({ onConfirm, onCancel }: { onConfirm: () => void; onCancel: () => void }) {
-  return (
-    <>
-      <motion.div initial={{ opacity:0 }} animate={{ opacity:1 }} exit={{ opacity:0 }}
-        className="fixed inset-0 bg-black/60 z-50 backdrop-blur-sm" onClick={onCancel} />
-      <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
-        <motion.div
-          initial={{ opacity:0, y:60 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0, y:40 }}
-          transition={{ type:"spring", stiffness:340, damping:30 }}
-          className="w-full sm:max-w-sm bg-ds-card shadow-2xl p-6 pb-8 sm:pb-6 border border-ds-border rounded-t-3xl sm:rounded-3xl sm:mx-4"
-        >
-          <div className="w-10 h-1 bg-ds-border rounded-full mx-auto mb-5 sm:hidden" />
-          <div className="text-center mb-5">
-            <div className="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-3">
-              <span className="text-3xl">🗑️</span>
-            </div>
-            <h3 className="font-black text-ds-text text-[18px]">Delete this post?</h3>
-            <p className="text-ds-muted text-[12px] mt-1 leading-relaxed">
-              This can&apos;t be undone. Your post will be permanently removed from the community.
-            </p>
-          </div>
-          <div className="flex gap-2.5">
-            <button onClick={onCancel}
-              className="flex-1 bg-ds-border/40 text-ds-muted font-black text-[14px] py-3 rounded-2xl hover:bg-ds-border/70 transition">
-              Keep it
-            </button>
-            <button onClick={onConfirm}
-              className="flex-1 bg-red-500 hover:bg-red-600 text-white font-black text-[14px] py-3 rounded-2xl shadow-md transition">
-              Delete
-            </button>
-          </div>
-        </motion.div>
-      </div>
-    </>
   );
 }
 
@@ -807,7 +756,6 @@ export default function CommunityClient({ initialUserId, initialHasSubscription 
   const [friends, setFriends]         = useState<{ name: string; avatar: string }[]>([]);
   const [liking, setLiking]           = useState<Record<string, boolean>>({});
   const [reportingId, setReportingId] = useState<string | null>(null);
-  const [deletingId, setDeletingId]   = useState<string | null>(null);
   const [totalCount, setTotalCount]   = useState(0);
   const [communityTotal, setCommunityTotal] = useState(0);
   const [toast, setToast]             = useState<string | null>(null);
@@ -990,16 +938,6 @@ export default function CommunityClient({ initialUserId, initialHasSubscription 
     } else {
       showToast(t("communityReportConfirm"));
     }
-  };
-
-  const confirmDelete = async () => {
-    if (!deletingId) return;
-    const id = deletingId;
-    setDeletingId(null);
-    const snapshot = creations;
-    setCreations(prev => prev.filter(c => c.id !== id));
-    const { error } = await supabase.from("creations").delete().eq("id", id).eq("parent_id", userId);
-    if (error) setCreations(snapshot);
   };
 
   const openPicker = async () => {
@@ -1348,7 +1286,6 @@ export default function CommunityClient({ initialUserId, initialHasSubscription 
                       index={i}
                       onCheer={handleCheer}
                       onReport={setReportingId}
-                      onDelete={setDeletingId}
                       isOwn={c.parentId === userId}
                       showStatus={myPostsOnly}
                     />
@@ -1429,17 +1366,6 @@ export default function CommunityClient({ initialUserId, initialHasSubscription 
         posting={!!sharingKey}
         cv={v}
       />
-
-      {/* ── Delete confirm sheet ────────────────────────────────── */}
-      <AnimatePresence>
-        {deletingId && (
-          <DeleteConfirmSheet
-            key="delete-confirm"
-            onConfirm={confirmDelete}
-            onCancel={() => setDeletingId(null)}
-          />
-        )}
-      </AnimatePresence>
 
       {/* ── Report modal ────────────────────────────────────────── */}
       <AnimatePresence>

@@ -456,17 +456,12 @@ export default function AppShell({ children }: AppShellProps) {
                       <div className="w-px h-5 bg-gray-200 rounded-full" />
                     </>
                   )}
-                  {/* XP */}
+                  {/* Stars */}
                   <div className="flex items-center gap-1.5 px-3 py-0.5">
-                    <svg viewBox="0 0 32 32" className="w-[18px] h-[18px] shrink-0" fill="none">
-                      <path d="M16 3L28 13L16 29L4 13Z" fill="#F59E0B" />
-                      <path d="M16 3L28 13H4L16 3Z" fill="#FCD34D" />
-                      <path d="M4 13L16 29L8 13H4Z" fill="#D97706" />
-                      <path d="M28 13L16 29L24 13H28Z" fill="#D97706" />
-                    </svg>
+                    <span className="text-[18px] leading-none">⭐</span>
                     <div className="leading-none">
-                      <p className="font-baloo font-black text-gray-900 text-[15px] leading-none">{totalStars * 10}</p>
-                      <p className="font-nunito text-gray-400 text-[10px] mt-0.5">XP</p>
+                      <p className="font-baloo font-black text-gray-900 text-[15px] leading-none">{totalStars}</p>
+                      <p className="font-nunito text-gray-400 text-[10px] mt-0.5">stars</p>
                     </div>
                   </div>
                 </div>

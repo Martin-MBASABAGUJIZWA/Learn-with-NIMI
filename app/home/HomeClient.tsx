@@ -43,11 +43,11 @@ import { SHOP_ITEM_MAP } from "@/components/shop/_shopData";
 const ACTIVE_CHILD_KEY = "nimipiko_active_child";
 
 const LEVELS = [
-  { labelKey: "levelNameSeed",      icon: "🌱", maxXp: 100  },
-  { labelKey: "levelNameExplorer",  icon: "🚶", maxXp: 250  },
-  { labelKey: "levelNameCreator",   icon: "✏️",  maxXp: 500  },
-  { labelKey: "levelNameScientist", icon: "🔬", maxXp: 800  },
-  { labelKey: "levelNameHero",      icon: "⭐", maxXp: 1200 },
+  { labelKey: "levelNameSeed",      icon: "🌱", maxXp: 10   },
+  { labelKey: "levelNameExplorer",  icon: "🚶", maxXp: 25   },
+  { labelKey: "levelNameCreator",   icon: "✏️",  maxXp: 50   },
+  { labelKey: "levelNameScientist", icon: "🔬", maxXp: 80   },
+  { labelKey: "levelNameHero",      icon: "⭐", maxXp: 120  },
 ];
 
 const ACTIVITIES = [
@@ -569,8 +569,8 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
   const doneSlots  = slots.filter(s => s.completed).length;
   const totalSlots = slots.length;
   const pct        = totalSlots > 0 ? Math.round((doneSlots / totalSlots) * 100) : 0;
-  const xp         = totalStars * 10;
-  // Derive XP-bar level: first bucket whose maxXp >= xp; -1 means xp exceeds all → last level.
+  const xp         = totalStars;
+  // Derive star-level: first bucket whose maxXp >= stars; -1 means stars exceeds all → last level.
   const xpLvlIdxFinal = (() => {
     const i = LEVELS.findIndex(l => xp <= l.maxXp);
     return i === -1 ? LEVELS.length - 1 : i;
@@ -838,7 +838,7 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
                       <div className="mt-3">
                         <div className="flex items-center justify-between mb-1">
                           <span className="font-nunito font-bold text-gray-400 text-[10px]">{levelInfo?.icon} Lv.{xpLevel} · {levelInfo ? t(levelInfo.labelKey) : ""}</span>
-                          <span className="font-baloo font-black text-emerald-600 text-[10px]">{xpIn}/{xpNeeded} XP</span>
+                          <span className="font-baloo font-black text-emerald-600 text-[10px]">{xpIn}/{xpNeeded} ⭐</span>
                         </div>
                         <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
                           <motion.div key={`xp-${activeChild?.id}`} className="h-full rounded-full"
@@ -852,8 +852,10 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
                     {/* Stats footer — 3-cell divided bar */}
                     <div className="flex items-stretch divide-x divide-gray-100 bg-gray-50/70 border-t border-gray-100">
                       <div className="flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5">
-                        <Flame className="w-[15px] h-[15px] fill-orange-400 text-orange-400" />
-                        <span className="font-baloo font-black text-orange-500 text-[14px] leading-none">{consecutiveStreak}</span>
+                        <Flame className={`w-[15px] h-[15px] ${consecutiveStreak > 0 ? "fill-orange-400 text-orange-400" : "fill-gray-300 text-gray-300"}`} />
+                        <span className={`font-baloo font-black text-[14px] leading-none ${consecutiveStreak > 0 ? "text-orange-500" : "text-gray-400"}`}>
+                          {consecutiveStreak > 0 ? consecutiveStreak : "–"}
+                        </span>
                         <span className="font-nunito text-gray-400 text-[9px] leading-none">{t("homeStatStreak")}</span>
                       </div>
                       <div className="flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5">
