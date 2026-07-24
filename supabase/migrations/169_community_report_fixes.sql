@@ -22,6 +22,8 @@ alter table creations
   add column if not exists report_reason text;
 
 -- 3. Replace admin RPC with JOIN-based likes count + new columns
+--    Must drop first because return type changed (added report_reason)
+drop function if exists admin_get_all_creations();
 create or replace function admin_get_all_creations()
 returns table (
   id uuid, child_name text, description text, image_url text,

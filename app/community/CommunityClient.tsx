@@ -173,10 +173,17 @@ function CreationCard({
           }
         </div>
 
-        {/* Name + timestamp */}
+        {/* Name + timestamp + status badge */}
         <div className="flex-1 min-w-0">
           <p className="font-black text-ds-text text-[14px] leading-tight truncate">{creation.childName}</p>
-          <p className="text-ds-muted text-[11px] font-medium mt-0.5">{timeAgo(creation.createdAt, t)}</p>
+          <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+            <p className="text-ds-muted text-[11px] font-medium">{timeAgo(creation.createdAt, t)}</p>
+            {showStatus && creation.status && STATUS_BADGE[creation.status] && (
+              <span className={`text-[9px] font-black px-1.5 py-0.5 rounded-full border ${STATUS_BADGE[creation.status].cls}`}>
+                {STATUS_BADGE[creation.status].label}
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Type badge */}
@@ -184,13 +191,6 @@ function CreationCard({
           <span className="text-[11px] leading-none">{meta.emoji}</span>
           {t(meta.labelKey)}
         </span>
-
-        {/* Status badge — shown in My Posts mode */}
-        {showStatus && creation.status && STATUS_BADGE[creation.status] && (
-          <span className={`shrink-0 text-[9px] font-black px-2 py-0.5 rounded-full border ${STATUS_BADGE[creation.status].cls}`}>
-            {STATUS_BADGE[creation.status].label}
-          </span>
-        )}
 
         {/* Actions (report / delete) */}
         <div className="flex items-center gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 focus-within:opacity-100 transition-all ml-1">
@@ -277,14 +277,14 @@ function CreationCard({
           </p>
         )}
 
-        {/* Cheer row — hidden for own non-approved posts */}
+        {/* Cheer row — hidden for own non-approved posts and own approved posts */}
         {showStatus && creation.status !== "approved" ? (
           <p className="text-ds-muted text-[11px] font-semibold text-center py-2">
             {creation.status === "pending" ? "⏳ Awaiting admin review before going live" :
              creation.status === "reported" ? "🔍 Being reviewed by our team" :
              "This post has been removed from the community."}
           </p>
-        ) : (
+        ) : isOwn ? null : (
         <div className="relative flex items-center gap-2">
           <AnimatePresence>
             {bursting && <CheerBurst key="burst" onDone={() => setBursting(false)} />}
@@ -327,6 +327,44 @@ function CreationCard({
         )}
       </div>
     </motion.div>
+  );
+}
+
+// ── Delete confirm sheet ─────────────────────────────────────────
+function DeleteConfirmSheet({ onConfirm, onCancel }: { onConfirm: () => void; onCancel: () => void }) {
+  return (
+    <>
+      <motion.div initial={{ opacity:0 }} animate={{ opacity:1 }} exit={{ opacity:0 }}
+        className="fixed inset-0 bg-black/60 z-50 backdrop-blur-sm" onClick={onCancel} />
+      <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+        <motion.div
+          initial={{ opacity:0, y:60 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0, y:40 }}
+          transition={{ type:"spring", stiffness:340, damping:30 }}
+          className="w-full sm:max-w-sm bg-ds-card shadow-2xl p-6 pb-8 sm:pb-6 border border-ds-border rounded-t-3xl sm:rounded-3xl sm:mx-4"
+        >
+          <div className="w-10 h-1 bg-ds-border rounded-full mx-auto mb-5 sm:hidden" />
+          <div className="text-center mb-5">
+            <div className="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-3">
+              <span className="text-3xl">🗑️</span>
+            </div>
+            <h3 className="font-black text-ds-text text-[18px]">Delete this post?</h3>
+            <p className="text-ds-muted text-[12px] mt-1 leading-relaxed">
+              This can&apos;t be undone. Your post will be permanently removed from the community.
+            </p>
+          </div>
+          <div className="flex gap-2.5">
+            <button onClick={onCancel}
+              className="flex-1 bg-ds-border/40 text-ds-muted font-black text-[14px] py-3 rounded-2xl hover:bg-ds-border/70 transition">
+              Keep it
+            </button>
+            <button onClick={onConfirm}
+              className="flex-1 bg-red-500 hover:bg-red-600 text-white font-black text-[14px] py-3 rounded-2xl shadow-md transition">
+              Delete
+            </button>
+          </div>
+        </motion.div>
+      </div>
+    </>
   );
 }
 
@@ -753,14 +791,18 @@ export default function CommunityClient({ initialUserId, initialHasSubscription 
 
   const [creations, setCreations]     = useState<Creation[]>([]);
   const [loading, setLoading]         = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [hasMore, setHasMore]         = useState(false);
   const [page, setPage]               = useState(0);
+  const pageRef                       = useRef(0);
   const [userId, setUserId]           = useState("");
   const [hasSubscription, setHasSubscription] = useState(false);
   const [friends, setFriends]         = useState<{ name: string; avatar: string }[]>([]);
   const [liking, setLiking]           = useState<Record<string, boolean>>({});
   const [reportingId, setReportingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId]   = useState<string | null>(null);
   const [totalCount, setTotalCount]   = useState(0);
+  const [communityTotal, setCommunityTotal] = useState(0);
   const [toast, setToast]             = useState<string | null>(null);
   const observerTarget = useRef<HTMLDivElement>(null);
 
@@ -794,6 +836,14 @@ export default function CommunityClient({ initialUserId, initialHasSubscription 
 
   useEffect(() => {
     void (async () => {
+      // Fetch unfiltered community total once for the hero stat
+      const { count } = await supabase
+        .from("creations")
+        .select("id", { count: "exact", head: true })
+        .eq("status", "approved")
+        .eq("is_public", true);
+      setCommunityTotal(count ?? 0);
+
       if (initialUserId !== undefined) {
         setUserId(initialUserId);
         setHasSubscription(!!initialHasSubscription);
@@ -816,8 +866,12 @@ export default function CommunityClient({ initialUserId, initialHasSubscription 
   }, []);
 
   const fetchCreations = useCallback(async (pageNum: number, refresh: boolean) => {
-    if (refresh) setPage(0);
-    setLoading(true);
+    if (refresh) {
+      setIsRefreshing(creations.length > 0);
+      setLoading(creations.length === 0);
+      pageRef.current = 0;
+      setPage(0);
+    }
     const from = pageNum * PAGE_SIZE;
     const to   = from + PAGE_SIZE - 1;
 
@@ -831,7 +885,13 @@ export default function CommunityClient({ initialUserId, initialHasSubscription 
       q = q.eq("status", "approved").eq("is_public", true);
     }
 
-    if (typeFilter !== "all") q = q.eq("type", typeFilter);
+    // "certificate" filter includes legacy "story" type rows — both render identically
+    if (typeFilter === "certificate") {
+      q = q.or("type.eq.certificate,type.eq.story");
+    } else if (typeFilter !== "all") {
+      q = q.eq("type", typeFilter);
+    }
+
     if (debouncedSearch.trim()) {
       const s = debouncedSearch.trim();
       q = q.or(`description.ilike.%${s}%,child_name.ilike.%${s}%`);
@@ -848,7 +908,10 @@ export default function CommunityClient({ initialUserId, initialHasSubscription 
     setCreations(prev => refresh ? mapped : [...prev, ...mapped]);
     if (refresh) setTotalCount(count ?? 0);
     setHasMore((count || 0) > to + 1);
+    pageRef.current = pageNum;
     setLoading(false);
+    setIsRefreshing(false);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId, myPostsOnly, typeFilter, debouncedSearch]);
 
   useEffect(() => { void fetchCreations(0, true); }, [fetchCreations]);
@@ -874,7 +937,12 @@ export default function CommunityClient({ initialUserId, initialHasSubscription 
   }, [userId]);
 
   useInfiniteScroll(observerTarget as RefObject<HTMLElement>, () => {
-    if (!loading && hasMore) { const n = page + 1; setPage(n); void fetchCreations(n, false); }
+    if (!loading && hasMore) {
+      const n = pageRef.current + 1;
+      pageRef.current = n;
+      setPage(n);
+      void fetchCreations(n, false);
+    }
   });
 
   const handleCheer = async (id: string) => {
@@ -903,17 +971,24 @@ export default function CommunityClient({ initialUserId, initialHasSubscription 
     if (!reportingId) return;
     const id = reportingId;
     setReportingId(null);
+    const snapshot = creations;
+    setCreations(prev => prev.filter(c => c.id !== id));
     const { error } = await supabase
       .from("creations")
       .update({ status: "reported", report_reason: reason })
       .eq("id", id);
-    if (!error) {
-      setCreations(prev => prev.filter(c => c.id !== id));
+    if (error) {
+      setCreations(snapshot);
+      showToast("Couldn't submit report — please try again.");
+    } else {
       showToast(t("communityReportConfirm"));
     }
   };
 
-  const handleDelete = async (id: string) => {
+  const confirmDelete = async () => {
+    if (!deletingId) return;
+    const id = deletingId;
+    setDeletingId(null);
     const snapshot = creations;
     setCreations(prev => prev.filter(c => c.id !== id));
     const { error } = await supabase.from("creations").delete().eq("id", id).eq("parent_id", userId);
@@ -1022,8 +1097,8 @@ export default function CommunityClient({ initialUserId, initialHasSubscription 
       story_key:        item.key,
       description:      captionText.trim() || defaultCaption(item),
       type:             shareType,
-      status:           "approved",
-      is_public:        true,
+      status:           "pending",
+      is_public:        false,
       image_url:        shareImg,
     });
 
@@ -1089,14 +1164,14 @@ export default function CommunityClient({ initialUserId, initialHasSubscription 
 
             {/* Stats row */}
             <div className="flex items-center gap-2 mb-5 flex-wrap">
-              {totalCount > 0 && (
+              {communityTotal > 0 && (
                 <motion.div
                   initial={{ opacity:0, y:6 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.3 }}
                   className="flex items-center gap-1.5 bg-white/20 backdrop-blur-sm border border-white/30 rounded-full px-3 py-1.5"
                 >
                   <Sparkles className="w-3.5 h-3.5 text-white/90" />
                   <span className="text-white text-[12px] font-black">
-                    {totalCount} {t("communityAdventureCount")}
+                    {communityTotal} {t("communityAdventureCount")}
                   </span>
                 </motion.div>
               )}
@@ -1156,14 +1231,14 @@ export default function CommunityClient({ initialUserId, initialHasSubscription 
               <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ds-muted pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
               <input
                 type="search"
-                placeholder="Search by child name or description…"
+                placeholder="Search posts…"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 className="w-full pl-9 pr-4 py-2.5 bg-ds-card border border-ds-border rounded-2xl text-[13px] text-ds-text placeholder:text-ds-muted focus:outline-none focus:border-[var(--nimi-green)] transition-colors"
               />
             </div>
             <button
-              onClick={() => setMyPostsOnly(p => !p)}
+              onClick={() => { setMyPostsOnly(p => !p); setSearch(""); setTypeFilter("all"); }}
               className={`shrink-0 flex items-center gap-1.5 px-4 py-2.5 rounded-2xl text-[12px] font-black border transition-all ${
                 myPostsOnly
                   ? "bg-[var(--nimi-green)] text-white border-[var(--nimi-green)]"
@@ -1198,7 +1273,7 @@ export default function CommunityClient({ initialUserId, initialHasSubscription 
         </div>
 
         {/* ── FEED ──────────────────────────────────────────────── */}
-        {loading ? (
+        {loading && creations.length === 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-2">
             {Array.from({ length: 6 }).map((_, i) => (
               <div key={i} className="leaf-lg overflow-hidden border border-ds-border">
@@ -1214,7 +1289,7 @@ export default function CommunityClient({ initialUserId, initialHasSubscription 
               </div>
             ))}
           </div>
-        ) : visible.length === 0 ? (
+        ) : !loading && creations.length === 0 ? (
           <motion.div
             initial={{ opacity:0, scale:0.96 }} animate={{ opacity:1, scale:1 }}
             className="border border-ds-border bg-ds-card rounded-3xl px-6 py-16 text-center"
@@ -1270,7 +1345,7 @@ export default function CommunityClient({ initialUserId, initialHasSubscription 
           </motion.div>
         ) : (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div className={`grid grid-cols-1 sm:grid-cols-2 gap-5 transition-opacity duration-200 ${isRefreshing ? "opacity-40 pointer-events-none" : "opacity-100"}`}>
               <AnimatePresence mode="popLayout">
                 {visible.map((c, i) => (
                   <React.Fragment key={c.id}>
@@ -1279,7 +1354,7 @@ export default function CommunityClient({ initialUserId, initialHasSubscription 
                       index={i}
                       onCheer={handleCheer}
                       onReport={setReportingId}
-                      onDelete={handleDelete}
+                      onDelete={setDeletingId}
                       isOwn={c.parentId === userId}
                       showStatus={myPostsOnly}
                     />
@@ -1360,6 +1435,17 @@ export default function CommunityClient({ initialUserId, initialHasSubscription 
         posting={!!sharingKey}
         cv={v}
       />
+
+      {/* ── Delete confirm sheet ────────────────────────────────── */}
+      <AnimatePresence>
+        {deletingId && (
+          <DeleteConfirmSheet
+            key="delete-confirm"
+            onConfirm={confirmDelete}
+            onCancel={() => setDeletingId(null)}
+          />
+        )}
+      </AnimatePresence>
 
       {/* ── Report modal ────────────────────────────────────────── */}
       <AnimatePresence>
