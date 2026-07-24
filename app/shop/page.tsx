@@ -9,7 +9,7 @@ import { useLanguage, type Language } from "@/contexts/LanguageContext";
 import { useAppTheme } from "@/contexts/AppThemeProvider";
 import { getThemeAssets } from "@/lib/design-system/assetRegistry";
 import {
-  getChildren, getTotalStars, getChildBadges,
+  getChildren, getTotalStars,
   getShopPurchases, purchaseShopItem, getChildCosmetics, equipItem,
   type Child, type ShopPurchase, type ChildCosmetics,
 } from "@/lib/queries";
@@ -113,7 +113,6 @@ export default function RewardShopPage() {
   const [filter, setFilter] = useState<ShopFilter>("all");
   const [activeChild, setActiveChild] = useState<Child | null>(null);
   const [totalStars, setTotalStars] = useState(0);
-  const [gems, setGems] = useState(0);
   const [purchases, setPurchases] = useState<ShopPurchase[]>([]);
   const [cosmetics, setCosmetics] = useState<ChildCosmetics>({ ...EMPTY_COSMETICS });
   const [loading, setLoading] = useState(true);
@@ -127,12 +126,8 @@ export default function RewardShopPage() {
   }, []);
 
   const loadStarsAndGems = useCallback(async (childId: string, language: Language) => {
-    const [stars, badges] = await Promise.all([
-      getTotalStars(childId, language),
-      getChildBadges(childId, language),
-    ]);
+    const stars = await getTotalStars(childId, language);
     setTotalStars(stars);
-    setGems(badges.length);
   }, []);
 
   useEffect(() => {
@@ -241,7 +236,7 @@ export default function RewardShopPage() {
               transition={{ duration: 0.3 }}
             >
               {/* Header */}
-              <ShopHeader balance={balance ?? 0} gems={gems} />
+              <ShopHeader balance={balance ?? 0} />
 
               {/* Currently Wearing */}
               <CurrentlyWearing

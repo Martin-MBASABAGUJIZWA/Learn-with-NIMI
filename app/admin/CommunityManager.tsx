@@ -119,8 +119,18 @@ export default function CommunityManager({ onNavigate, onOpenSidebar }: Props) {
     })
     if (!ok) return
     try {
-      const { error } = await supabase.from('creations').delete().eq('id', id)
-      if (error) throw error
+      const { data: { session } } = await supabase.auth.getSession()
+      const token = session?.access_token
+      if (!token) throw new Error('Not authenticated')
+      const res = await fetch('/api/admin/community/delete-post', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ id }),
+      })
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}))
+        throw new Error((body as { error?: string }).error ?? 'Delete failed')
+      }
       setPosts(prev => prev.filter(p => p.id !== id))
       toastOk('Post deleted.')
       void logAdminAction({ action: 'delete_post', entityType: 'post', entityId: id, entityLabel: child_name })

@@ -10,10 +10,9 @@ import { HeroBanner } from "@/components/layout/primitives";
 
 interface Props {
   balance: number;
-  gems: number;
 }
 
-export default function ShopHeader({ balance, gems }: Props) {
+export default function ShopHeader({ balance }: Props) {
   const { t } = useLanguage();
   const { themeId } = useAppTheme();
   const assets = getThemeAssets(themeId);
@@ -29,7 +28,7 @@ export default function ShopHeader({ balance, gems }: Props) {
       {/* Floating emoji decorations */}
       {([
         { top: "15%", left: "5%",  emoji: "⭐", size: 16, delay: 0 },
-        { top: "70%", left: "10%", emoji: "💎", size: 14, delay: 0.5 },
+        { top: "70%", left: "10%", emoji: "⭐", size: 14, delay: 0.5 },
         { top: "20%", right: "5%", emoji: "🎁", size: 18, delay: 0.3 },
         { top: "65%", right: "8%", emoji: "⭐", size: 12, delay: 0.9 },
       ] as Array<{ top: string; emoji: string; size: number; delay: number; left?: string; right?: string }>).map((d, i) => (
@@ -97,16 +96,6 @@ export default function ShopHeader({ balance, gems }: Props) {
             <span className="text-[18px]">⭐</span>
             <span>{balance}</span>
             <span className="text-[10px] uppercase font-bold text-white/70 tracking-wide">{t("shopStarsAvailable")}</span>
-          </motion.div>
-          <motion.div
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.25, type: "spring", stiffness: 260 }}
-            className="flex items-center gap-2 bg-white/20 border border-white/30 text-white font-baloo font-black text-[14px] px-4 py-2 rounded-full backdrop-blur-sm"
-          >
-            <span className="text-[18px]">💎</span>
-            <span>{gems}</span>
-            <span className="text-[10px] uppercase font-bold text-white/70 tracking-wide">{t("shopBadgesEarned")}</span>
           </motion.div>
         </div>
       </div>
