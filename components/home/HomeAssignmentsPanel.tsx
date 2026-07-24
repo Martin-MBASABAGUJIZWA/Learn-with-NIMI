@@ -442,7 +442,7 @@ function NoMissionsCard() {
 export default function HomeAssignmentsPanel({ childId, language }: Props) {
   const [cards,   setCards]   = useState<MissionCard[]>([]);
   const [loading, setLoading] = useState(true);
-  const [open,    setOpen]    = useState(true);
+  const [open,    setOpen]    = useState(false);
 
   async function fetchSlots(assignment: Assignment): Promise<MissionCard> {
     if (!assignment.story_id) return { ...assignment, slots: [], slotsLoaded: true, slotsError: false };
@@ -471,6 +471,8 @@ export default function HomeAssignmentsPanel({ childId, language }: Props) {
       // Fetch slot state for story missions in parallel
       const filled = await Promise.all(assignments.map(fetchSlots));
       setCards(filled);
+      // Auto-open if there are pending missions worth showing
+      if (assignments.some(a => !a.completed_at)) setOpen(true);
     }
     void load();
   // fetchSlots is defined in render scope; listing childId/language covers its deps
@@ -505,30 +507,19 @@ export default function HomeAssignmentsPanel({ childId, language }: Props) {
   const completed = cards.filter(c =>  c.completed_at);
 
   return (
-    <div
-      className="overflow-hidden"
-      style={{
-        background: "#fff",
-        borderRadius: "var(--leaf-r, 20px 20px 20px 5px)",
-        border: "1px solid #E5E7EB",
-      }}
-    >
+    <div className="overflow-hidden leaf-lg border border-gray-100 bg-white shadow-[0_8px_24px_rgba(15,23,42,0.07)]">
       {/* Panel header */}
       <button
         onClick={() => setOpen(o => !o)}
-        className="w-full flex items-center justify-between px-5 py-4 hover:bg-gray-50/60 transition-colors"
+        className="w-full flex items-center justify-between px-4 pt-4 pb-3 hover:bg-gray-50/60 transition-colors"
       >
         <div className="flex items-center gap-3">
-          <div
-            className="w-8 h-8 flex items-center justify-center text-[16px]"
-            style={{ background: "#F0FDF4", borderRadius: "14px 14px 14px 4px" }}
-          >
+          <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center text-[18px] shadow-sm shrink-0">
             🌟
           </div>
           <div className="text-left">
-            <p className="font-baloo font-black text-[14px] leading-none text-gray-900">
-              Class Adventures
-            </p>
+            <p className="font-nunito text-emerald-500 text-[10px] uppercase tracking-widest leading-none mb-0.5">Class</p>
+            <p className="font-baloo font-black text-gray-900 text-[17px] leading-tight">Adventures</p>
             <p className="font-nunito text-[11px] mt-0.5 text-gray-400">
               {pending.length > 0
                 ? `${pending.length} mission${pending.length !== 1 ? "s" : ""} in progress`
@@ -543,6 +534,8 @@ export default function HomeAssignmentsPanel({ childId, language }: Props) {
           : <ChevronDown className="w-4 h-4 text-gray-400" />}
       </button>
 
+      <div className="h-px bg-gray-100 mx-4" />
+
       {/* Body */}
       <AnimatePresence initial={false}>
         {open && (
@@ -553,10 +546,7 @@ export default function HomeAssignmentsPanel({ childId, language }: Props) {
             transition={{ duration: 0.22, ease: "easeInOut" }}
             style={{ overflow: "hidden" }}
           >
-            <div
-              className="px-4 pb-4 space-y-3"
-              style={{ borderTop: "1px solid #E5E7EB", paddingTop: 14 }}
-            >
+            <div className="px-4 pt-3.5 pb-4 space-y-3">
               {/* No assignments at all */}
               {cards.length === 0 && <NoMissionsCard />}
 

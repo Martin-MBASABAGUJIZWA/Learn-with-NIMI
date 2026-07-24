@@ -9,7 +9,7 @@ import {
   getWeekStreak, getWeekActivityCounts, getTotalStars,
   getActivityDates, getChildBadges, getChildCertificates, updateChild,
   getConsecutiveStreak, getCompletedStoriesCount, awardMilestoneBadges,
-  getBadgeImages,
+  getBadgeImages, getCurrentLevel,
   type Child,
 } from "@/lib/queries";
 import type { ChildAchievement } from "@/lib/queries/types";
@@ -295,6 +295,7 @@ export default function UserProfileClient({ initialChildren, initialHasSubscript
   const [totalStars, setTotalStars] = useState(0);
   const [storiesCompleted, setStoriesCompleted] = useState(0);
   const [currentStreak, setCurrentStreak] = useState(0);
+  const [curriculumLevel, setCurriculumLevel] = useState(1);
   const [earnedBadgeSlugs, setEarnedBadgeSlugs] = useState<string[]>([]);
   const [badgeImageMap, setBadgeImageMap] = useState<Record<string, string>>({});
   const [certificates, setCertificates] = useState<ChildAchievement[]>([]);
@@ -337,7 +338,7 @@ export default function UserProfileClient({ initialChildren, initialHasSubscript
     const authData = prefetchedSub !== undefined && !targetChildId && !silent
       ? { data: { user: null } }
       : await supabase.auth.getUser();
-    const [wStreak, wCounts, stars, dates, badges, streak, stories, imageMap, certs, sub] = await Promise.all([
+    const [wStreak, wCounts, stars, dates, badges, streak, stories, imageMap, certs, curLevel, sub] = await Promise.all([
       getWeekStreak(child.id, child.language),
       getWeekActivityCounts(child.id, child.language),
       getTotalStars(child.id, child.language),
@@ -347,6 +348,7 @@ export default function UserProfileClient({ initialChildren, initialHasSubscript
       getCompletedStoriesCount(child.id, child.language),
       getBadgeImages(),
       getChildCertificates(child.id, child.language),
+      getCurrentLevel(child.id, child.language as "en" | "fr" | "rw"),
       prefetchedSub !== undefined && !targetChildId && !silent
         ? Promise.resolve(prefetchedSub ? {} : null)
         : authData.data.user ? getActiveSubscription(authData.data.user.id) : Promise.resolve(null),
@@ -369,6 +371,7 @@ export default function UserProfileClient({ initialChildren, initialHasSubscript
     setCertificates(certs);
     setCurrentStreak(streak);
     setStoriesCompleted(stories);
+    setCurriculumLevel(curLevel);
     if (silent) setRefreshing(false); else setLoading(false);
 
     // Silently refresh badges if any milestones just landed.
@@ -495,7 +498,7 @@ export default function UserProfileClient({ initialChildren, initialHasSubscript
             childName={childName}
             avatarUrl={activeChild?.avatar_url}
             onEditProfile={() => setEditOpen(true)}
-            level={starsToLevel(totalStars)}
+            level={curriculumLevel}
             totalStars={totalStars}
             lastActiveDaysAgo={computeLastActiveDaysAgo(activityDates)}
           />

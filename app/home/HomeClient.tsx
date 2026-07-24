@@ -35,14 +35,9 @@ import HomeAdventureSection  from "@/components/home/HomeAdventureSection";
 import HomeStoryLibrarySection from "@/components/home/HomeStoryLibrarySection";
 import HomeStoryJourneyPanel from "@/components/home/HomeStoryJourneyPanel";
 import HomeWeekStreakPanel   from "@/components/home/HomeWeekStreakPanel";
-import HomeAchievementsPanel from "@/components/home/HomeAchievementsPanel";
-import HomeCommunityPanel    from "@/components/home/HomeCommunityPanel";
-import HomeMasterpiecePanel  from "@/components/home/HomeMasterpiecePanel";
-import HomeAssignmentsPanel  from "@/components/home/HomeAssignmentsPanel";
 import NotificationOptInPrompt from "@/components/home/NotificationOptInPrompt";
 import WelcomeBackOverlay      from "@/components/home/WelcomeBackOverlay";
-import NimiProactiveBanner        from "@/components/home/NimiProactiveBanner";
-import NimiRecommendationsPanel   from "@/components/home/NimiRecommendationsPanel";
+import NimiProactiveBanner     from "@/components/home/NimiProactiveBanner";
 import { SHOP_ITEM_MAP } from "@/components/shop/_shopData";
 
 const ACTIVE_CHILD_KEY = "nimipiko_active_child";
@@ -708,27 +703,24 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
               <motion.img src="/themes/default/decorations/floating-1.png" alt="" aria-hidden
                 className="absolute top-10 left-[36%] w-12 pointer-events-none select-none"
                 animate={{ y: [0, -10, 0], rotate: [0, 6, 0] }}
-                transition={{ duration: 4.2, repeat: Infinity, ease: "easeInOut" }} />
+                transition={{ duration: 4.2, repeat: Infinity, ease: "easeInOut" }}
+                onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
               <motion.img src="/themes/default/decorations/floating-2.png" alt="" aria-hidden
                 className="absolute top-14 right-[36%] w-10 pointer-events-none select-none"
                 animate={{ y: [0, -8, 0], rotate: [0, -5, 0] }}
-                transition={{ duration: 3.6, repeat: Infinity, ease: "easeInOut", delay: 0.8 }} />
+                transition={{ duration: 3.6, repeat: Infinity, ease: "easeInOut", delay: 0.8 }}
+                onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
               <motion.img src="/themes/default/decorations/floating-3.png" alt="" aria-hidden
                 className="absolute top-7 left-1/2 -translate-x-1/2 w-9 pointer-events-none select-none"
                 animate={{ y: [0, -13, 0] }}
-                transition={{ duration: 5.1, repeat: Infinity, ease: "easeInOut", delay: 1.4 }} />
+                transition={{ duration: 5.1, repeat: Infinity, ease: "easeInOut", delay: 1.4 }}
+                onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
 
-              {/* ── Confetti — kept inside the safe center band [33%–67%] ── */}
-              <div className="absolute top-6  left-[34%]  w-2   h-6  bg-rose-400    rounded-sm rotate-12  opacity-90 pointer-events-none" />
-              <div className="absolute top-4  left-[40%]  w-1.5 h-5  bg-yellow-300  rounded-sm -rotate-8  opacity-85 pointer-events-none" />
-              <div className="absolute top-10 left-[46%]  w-3   h-3  bg-emerald-300 rounded-full           opacity-85 pointer-events-none" />
-              <div className="absolute top-5  right-[34%] w-2   h-7  bg-pink-300    rounded-sm rotate-18  opacity-85 pointer-events-none" />
-              <div className="absolute top-9  right-[40%] w-3   h-3  bg-orange-300  rounded-full           opacity-80 pointer-events-none" />
-              <div className="absolute top-7  right-[46%] w-1.5 h-5  bg-cyan-300    rounded-sm -rotate-10 opacity-85 pointer-events-none" />
+              {/* ── Sparkles only — confetti strips removed (too noisy) ── */}
               <Image src="/themes/default/decorations/sparkle.png" alt="" aria-hidden
-                width={32} height={32} className="absolute top-5 left-[38%] opacity-80 pointer-events-none select-none" />
+                width={28} height={28} className="absolute top-5 left-[38%] opacity-55 pointer-events-none select-none" />
               <Image src="/themes/default/decorations/sparkle.png" alt="" aria-hidden
-                width={24} height={24} className="absolute top-8 right-[38%] opacity-70 pointer-events-none select-none" />
+                width={20} height={20} className="absolute top-8 right-[38%] opacity-45 pointer-events-none select-none" />
 
               {/* ══════════════════════════════════════════════════════════════
                    Layer 3 — CONTENT (3 columns, items aligned to bottom)
@@ -825,8 +817,8 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
 
                   {/* Greeting */}
                   <motion.div variants={up}
-                    className="mb-4 w-full max-w-[360px] rounded-2xl border border-white/50 shadow-2xl overflow-hidden text-center"
-                    style={{ background: "rgba(255,255,255,0.85)", backdropFilter: "blur(20px)" }}>
+                    className="mb-4 w-full max-w-[420px] rounded-2xl border border-white/50 shadow-2xl overflow-hidden text-center"
+                    style={{ background: "rgba(255,255,255,0.88)", backdropFilter: "blur(20px)" }}>
 
                     {/* Name + XP section */}
                     <div className="px-5 pt-4 pb-3">
@@ -1029,8 +1021,8 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
           </motion.div>
 
           {/* ── Campus Welcome Strip ──────────────────────────────────────── */}
-          <div className="relative z-10 -mt-5 px-4 sm:px-6 pb-2 max-w-[1400px] mx-auto">
-            <div className="flex items-center gap-2.5 px-4 py-2.5 bg-white/85 backdrop-blur-sm rounded-2xl shadow-sm border border-emerald-100 w-fit">
+          <div className="relative z-30 -mt-3 px-4 sm:px-6 pb-2 max-w-[1400px] mx-auto">
+            <div className="flex items-center gap-2.5 px-4 py-2.5 bg-white/95 backdrop-blur-sm rounded-2xl shadow-sm border border-emerald-100 w-fit">
               <motion.img
                 src={assets.nimiCircle}
                 alt="Nimi"
@@ -1145,7 +1137,8 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
 
               {/* ══ RIGHT PANEL ════════════════════════════════════════════════ */}
               <aside className="w-full xl:w-[284px] xl:shrink-0 xl:self-start xl:sticky xl:top-[80px]">
-                <div className="flex flex-col gap-5 xl:max-h-[calc(100vh-100px)] xl:overflow-y-auto" style={{ scrollbarWidth: "none" }}>
+                <div className="flex flex-col gap-3 xl:max-h-[calc(100vh-96px)] xl:overflow-y-auto xl:pb-6 xl:pr-0.5"
+                  style={{ scrollbarWidth: "thin", scrollbarColor: "#d1d5db transparent" }}>
 
                   {/* ── Trial Countdown ─────────────────────────────────────── */}
                   {isTrial && (
@@ -1193,27 +1186,10 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
                   {/* ── Story Journey ───────────────────────────────────────── */}
                   <HomeStoryJourneyPanel curStory={curStory} slots={slots} pct={pct} hasSubscription={hasSubscription} nextPremiumStory={nextPremiumStory} />
 
-                  {/* ── Assignments ─────────────────────────────────────────── */}
-                  {activeChild?.teacher_id && (
-                    <HomeAssignmentsPanel childId={activeChild.id} language={activeChild.language} />
-                  )}
-
                   {/* ── Week Streak ─────────────────────────────────────────── */}
                   <HomeWeekStreakPanel weekStreak={weekStreak} consecutiveStreak={consecutiveStreak} totalStars={totalStars} streakBroke={streakBroke} />
 
-                  {/* ── Nimi Recommendations ────────────────────────────────── */}
-                  {activeChild && (
-                    <NimiRecommendationsPanel childId={activeChild.id} language={activeChild.language} />
-                  )}
-
-                  {/* ── My Achievements ─────────────────────────────────────── */}
-                  <HomeAchievementsPanel achievements={achievements} />
-
-                  {/* ── Community Creations ─────────────────────────────────── */}
-                  <HomeCommunityPanel communityCreations={communityCreations} />
-
-                  {/* ── Masterpiece Studio ──────────────────────────────── */}
-                  <HomeMasterpiecePanel />
+                  {/* Achievements, Community, Masterpiece → accessible from nav, not sidebar */}
 
                 </div>
               </aside>

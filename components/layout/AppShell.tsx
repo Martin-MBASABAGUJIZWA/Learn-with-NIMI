@@ -443,15 +443,19 @@ export default function AppShell({ children }: AppShellProps) {
 
                 {/* Stats pill — desktop only */}
                 <div className="hidden md:flex items-center bg-white/90 border border-gray-200/70 rounded-full shadow-sm px-1 py-1 gap-0">
-                  {/* Streak */}
-                  <div className="flex items-center gap-1.5 px-3 py-0.5">
-                    <Flame className="w-[18px] h-[18px] shrink-0" fill="#f97316" strokeWidth={0} />
-                    <div className="leading-none">
-                      <p className="font-baloo font-black text-gray-900 text-[15px] leading-none">{streakCount}</p>
-                      <p className="font-nunito text-gray-400 text-[10px] mt-0.5">streak</p>
-                    </div>
-                  </div>
-                  <div className="w-px h-5 bg-gray-200 rounded-full" />
+                  {/* Streak — only shown when active */}
+                  {streakCount > 0 && (
+                    <>
+                      <div className="flex items-center gap-1.5 px-3 py-0.5">
+                        <Flame className="w-[18px] h-[18px] shrink-0" fill="#f97316" strokeWidth={0} />
+                        <div className="leading-none">
+                          <p className="font-baloo font-black text-gray-900 text-[15px] leading-none">{streakCount}</p>
+                          <p className="font-nunito text-gray-400 text-[10px] mt-0.5">streak</p>
+                        </div>
+                      </div>
+                      <div className="w-px h-5 bg-gray-200 rounded-full" />
+                    </>
+                  )}
                   {/* XP */}
                   <div className="flex items-center gap-1.5 px-3 py-0.5">
                     <svg viewBox="0 0 32 32" className="w-[18px] h-[18px] shrink-0" fill="none">

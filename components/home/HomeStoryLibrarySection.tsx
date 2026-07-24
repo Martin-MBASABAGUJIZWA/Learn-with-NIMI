@@ -102,6 +102,30 @@ export default function HomeStoryLibrarySection({ stories, curStory, hasSubscrip
 
         {/* Card scroll row */}
         <motion.div variants={stagger} className="flex gap-3.5 overflow-x-auto pb-3" style={{ scrollbarWidth: "none" }}>
+          {/* "What's next?" teaser — shown when child has only 1 story so far */}
+          {stories.length === 1 && (
+            <motion.div variants={pop} className="shrink-0 w-[148px] sm:w-[164px]">
+              <Link href="/stories">
+                <div className="rounded-2xl overflow-hidden h-full group cursor-pointer border-2 border-dashed border-sky-200 bg-gradient-to-br from-sky-50 to-indigo-50 hover:border-sky-400 transition-all">
+                  <div className="flex flex-col items-center justify-center gap-2 px-3 pt-5 pb-3" style={{ aspectRatio: "3/4" }}>
+                    <motion.span className="text-[44px] leading-none"
+                      animate={{ y: [0, -6, 0] }}
+                      transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut" }}>
+                      🔭
+                    </motion.span>
+                    <div className="text-center">
+                      <p className="font-baloo font-black text-sky-700 text-[13px] leading-tight">What's next?</p>
+                      <p className="font-nunito text-sky-500 text-[10px] mt-1 leading-snug">More adventures are waiting for you!</p>
+                    </div>
+                  </div>
+                  <div className="px-2.5 py-2 bg-sky-100/60 border-t border-sky-100 group-hover:bg-sky-200/60 transition">
+                    <p className="font-baloo font-black text-sky-600 text-[11px] text-center">Explore Stories →</p>
+                  </div>
+                </div>
+              </Link>
+            </motion.div>
+          )}
+
           {stories.map((story, idx) => {
             const isActive = !story.complete && story.unlocked && story.sid === curStory?.sid;
             const pctDone  = Math.round((story.progress ?? 0) * 100);
