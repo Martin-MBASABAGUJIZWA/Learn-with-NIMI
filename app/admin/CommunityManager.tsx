@@ -31,6 +31,7 @@ const PAGE_SIZE = 5
 export default function CommunityManager({ onNavigate, onOpenSidebar }: Props) {
   const [posts, setPosts] = useState<PostRow[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const [tab, setTab] = useState<TabKey>('all')
   const [page, setPage] = useState(1)
@@ -40,12 +41,18 @@ export default function CommunityManager({ onNavigate, onOpenSidebar }: Props) {
 
   const load = async () => {
     setLoading(true)
+    setLoadError(null)
     try {
       const { data, error } = await supabase.rpc('admin_get_all_creations')
-      if (error) toastErr('[Community] RPC error: ' + error.message)
-      setPosts((data ?? []) as PostRow[])
+      if (error) {
+        setLoadError(error.message)
+        setPosts([])
+      } else {
+        setPosts((data ?? []) as PostRow[])
+      }
     } catch (err) {
-      toastErr('Failed to load community posts.')
+      setLoadError(err instanceof Error ? err.message : 'Unknown error')
+      setPosts([])
     } finally {
       setLoading(false)
     }
@@ -131,9 +138,9 @@ export default function CommunityManager({ onNavigate, onOpenSidebar }: Props) {
         const body = await res.json().catch(() => ({}))
         throw new Error((body as { error?: string }).error ?? 'Delete failed')
       }
-      setPosts(prev => prev.filter(p => p.id !== id))
       toastOk('Post deleted.')
       void logAdminAction({ action: 'delete_post', entityType: 'post', entityId: id, entityLabel: child_name })
+      void load()
     } catch (err) {
       toastErr('Failed to delete post.')
     }
@@ -233,6 +240,12 @@ export default function CommunityManager({ onNavigate, onOpenSidebar }: Props) {
       <div className="flex-1 overflow-auto px-6 py-4">
         {loading ? (
           <div className="space-y-3">{Array.from({ length: 5 }).map((_, i) => <div key={i} className="h-14 bg-gray-100 rounded-xl animate-pulse" />)}</div>
+        ) : loadError ? (
+          <div className="bg-red-50 border border-red-200 rounded-2xl px-6 py-8 text-center">
+            <p className="font-bold text-red-700 text-[14px] mb-1">Failed to load posts</p>
+            <p className="text-red-500 text-[12px] font-mono mb-4">{loadError}</p>
+            <button onClick={() => void load()} className="px-4 py-2 bg-red-600 text-white text-[13px] font-bold rounded-xl hover:bg-red-700 transition">Retry</button>
+          </div>
         ) : (
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
             <table className="w-full text-left">

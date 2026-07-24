@@ -52,7 +52,7 @@ export default function HomeWeekStreakPanel({ weekStreak, consecutiveStreak, tot
           </div>
           <div>
             <p className={`font-nunito text-[10px] uppercase tracking-widest leading-none mb-0.5 ${eyebrow}`}>
-              {isBroke ? "Fresh start" : noStreak ? "Your streak" : "Daily streak"}
+              {isBroke ? "Fresh start" : noStreak ? "Start a streak" : "Daily streak"}
             </p>
             <h3 className="font-baloo font-black text-gray-900 text-[17px] leading-tight">
               {heading}

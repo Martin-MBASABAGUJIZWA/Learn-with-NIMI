@@ -147,7 +147,7 @@ export default function Sidebar({ activeChild, isOpen, onClose, onLogoutClick }:
         </div>
       )}
 
-      {isClub === null && (
+      {isClub === false && (
         <div className="mt-10 border border-gray-100 bg-gradient-to-br from-white/95 via-[var(--ds-brand-soft)]/80 to-white/95 leaf p-4 text-center shadow-[0_12px_28px_rgba(15,23,42,0.06)]">
           <p className="font-baloo font-black text-gray-800 text-[13px]">{t("keepGoingLabel")}</p>
           <p className="font-nunito text-gray-500 text-[9px] leading-snug mt-0.5">{t("keepGoingBody")}</p>
