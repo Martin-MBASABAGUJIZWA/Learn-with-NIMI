@@ -102,8 +102,8 @@ export default function HomeAdventureSection({ curStory, doneSlots, totalSlots, 
                 )}
               </div>
 
-              {/* Play button */}
-              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+              {/* Play button — always visible on mobile, hover-reveal on desktop */}
+              <div className="absolute inset-0 flex items-center justify-center opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200">
                 <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center shadow-2xl">
                   <Play className="w-6 h-6 fill-emerald-600 text-emerald-600 ml-0.5" />
                 </div>

@@ -762,14 +762,14 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
                           {SHOP_ITEM_MAP[cosmetics.title_badge].emoji} {t(SHOP_ITEM_MAP[cosmetics.title_badge].nameKey)}
                         </span>
                       )}
-                      {/* XP bar */}
+                      {/* XP bar — key resets fill animation when child switches */}
                       <div className="mt-3">
                         <div className="flex items-center justify-between mb-1">
                           <span className="font-nunito font-bold text-gray-400 text-[10px]">{levelInfo?.icon} Lv.{xpLevel} · {levelInfo ? t(levelInfo.labelKey) : ""}</span>
                           <span className="font-baloo font-black text-emerald-600 text-[10px]">{xpIn}/{xpNeeded} XP</span>
                         </div>
                         <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                          <motion.div className="h-full rounded-full"
+                          <motion.div key={`xp-${activeChild?.id}`} className="h-full rounded-full"
                             style={{ background: "linear-gradient(90deg,#34d399,#059669)" }}
                             initial={{ width: 0 }} animate={{ width: `${xpPct}%` }}
                             transition={{ duration: 1.2, ease: "easeOut", delay: 0.4 }} />
@@ -974,7 +974,7 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
               {ACTIVITIES.map(({ img, labelKey, subKey, href }) => (
                 <motion.div key={labelKey} variants={pop}>
                   <Link href={href}
-                    className="group flex flex-col items-center gap-1.5 bg-white/90 backdrop-blur-sm border border-white hover:border-emerald-200 rounded-2xl px-2 py-3 sm:py-4 shadow-sm hover:shadow-md hover:-translate-y-1 active:scale-95 transition-all">
+                    className="group flex flex-col items-center gap-1.5 bg-white/90 backdrop-blur-sm border border-white hover:border-emerald-200 rounded-2xl px-2 py-3.5 sm:py-4 shadow-sm hover:shadow-md hover:-translate-y-1 active:scale-95 transition-all">
                     <img src={img} alt={t(labelKey)} className="w-10 h-10 sm:w-11 sm:h-11 object-contain drop-shadow-sm group-hover:scale-110 transition-transform duration-200" />
                     <p className="font-baloo font-black text-gray-800 text-[12px] sm:text-[13px] leading-tight text-center">{t(labelKey)}</p>
                     <p className="font-nunito text-gray-400 text-[9px] sm:text-[10px] text-center hidden sm:block leading-tight">{t(subKey)}</p>

@@ -41,9 +41,16 @@ export default function HomeWeekStreakPanel({ weekStreak, consecutiveStreak, tot
             <p className={`font-nunito text-[10px] uppercase tracking-widest leading-none mb-0.5 ${isBroke ? "text-emerald-500" : "text-orange-500"}`}>
               {message}
             </p>
-            <h3 className="font-baloo font-black text-gray-900 text-[17px] leading-tight">
-              {consecutiveStreak} {consecutiveStreak === 1 ? t("homeStreakDayLabel") : t("homeStreakDaysLabel")}
-            </h3>
+            {/* Hide the number when streak is 0 — "0 days" is discouraging */}
+            {consecutiveStreak > 0 || isBroke ? (
+              <h3 className="font-baloo font-black text-gray-900 text-[17px] leading-tight">
+                {consecutiveStreak} {consecutiveStreak === 1 ? t("homeStreakDayLabel") : t("homeStreakDaysLabel")}
+              </h3>
+            ) : (
+              <h3 className="font-baloo font-black text-orange-400 text-[15px] leading-tight">
+                {t("homeStreakFirstFlame")}
+              </h3>
+            )}
           </div>
         </div>
         <div className="flex items-center gap-1.5 bg-amber-50 border border-amber-200 rounded-full px-2.5 py-1.5">
@@ -78,15 +85,11 @@ export default function HomeWeekStreakPanel({ weekStreak, consecutiveStreak, tot
             );
           })}
         </div>
-        {isBroke ? (
+        {isBroke && (
           <p className="text-center font-nunito text-emerald-600 text-[11px] mt-3 leading-snug">
             {t("homeStreakBrokeHint")}
           </p>
-        ) : consecutiveStreak === 0 ? (
-          <p className="text-center font-nunito text-gray-400 text-[11px] mt-3">
-            {t("homeStreakFirstFlame")}
-          </p>
-        ) : null}
+        )}
       </div>
     </div>
   );
