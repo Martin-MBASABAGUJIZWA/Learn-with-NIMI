@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useThemeMotion } from "@/hooks/useThemeMotion";
 import { Heart, Star, Flame, Play, ChevronRight, Check, Crown } from "lucide-react";
 import supabase from "@/lib/supabaseClient";
@@ -141,6 +141,22 @@ interface Props {
   initialHasSubscription?: boolean;
 }
 
+function InlineToast({ message, onDone }: { message: string; onDone: () => void }) {
+  useEffect(() => { const t = setTimeout(onDone, 3500); return () => clearTimeout(t); }, [onDone]);
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 48, scale: 0.9 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: 24, scale: 0.9 }}
+      transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+      className="fixed bottom-24 left-1/2 -translate-x-1/2 z-[120] flex items-center gap-2.5 bg-gray-900/90 backdrop-blur-sm text-white px-4 py-2.5 rounded-2xl shadow-2xl pointer-events-none"
+    >
+      <span className="text-[15px] leading-none">⚠️</span>
+      <span className="font-nunito font-semibold text-[13px] leading-snug max-w-[220px]">{message}</span>
+    </motion.div>
+  );
+}
+
 /* ═══════════════════════════════════════════════════════════════════════════ */
 export default function HomeClient({ initialChildren, initialHasSubscription }: Props = {}) {
   const router = useRouter();
@@ -178,6 +194,8 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
   const [favorites,          setFavorites]          = useState<Set<string>>(new Set());
   const [cosmetics,          setCosmetics]          = useState<ChildCosmetics>({ nimi_outfit: null, piko_outfit: null, frame: null, title_badge: null });
   const [welcomeBack,        setWelcomeBack]        = useState<{ show: boolean; daysAway: number }>({ show: false, daysAway: 0 });
+  const [langToast,          setLangToast]          = useState<string | null>(null);
+  const langToastKey = useRef(0);
 
   useEffect(() => { void init(); }, []);
 
@@ -200,33 +218,39 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
       activeChildRef.current = updated;
       setActiveChild(updated);
       setRefreshing(true);
-      const [lib, lvl, stars, streak, ach, actDates, popular, cos] = await Promise.all([
-        getStoryLibrary(updated.id, lang),
-        getCurrentLevel(updated.id, lang),
-        getTotalStars(updated.id, lang),
-        getWeekStreak(updated.id, lang),
-        getChildAchievements(updated.id),
-        getActivityDates(updated.id, lang),
-        getPopularStories(),
-        getChildCosmetics(updated.id),
-        getStreakShieldsPurchased(updated.id),
-        getUsedShieldDates(updated.id, lang),
-      ]);
-      if (gen !== switchGenRef.current) return;
-      const { usedDates: homeDates3 } = await resolveShields(updated.id, lang, actDates);
-      if (gen !== switchGenRef.current) return;
-      setStories(lib);
-      setLevel(lvl);
-      setTotalStars(stars);
-      setWeekStreak(streak);
-      setAchievements(ach);
-      setConsecutiveStreak(computeStreaks(actDates, new Date(), homeDates3).current);
-      setPopularStories(popular);
-      setCosmetics(cos);
-      setRefreshing(false);
-      const cur = lib.find(s => s.unlocked && !s.complete) ?? lib[0];
-      if (cur) getStorySlots(updated.id, cur.sid, lang).then(setSlots).catch(() => {});
-      else setSlots([]);
+      try {
+        const [lib, lvl, stars, streak, ach, actDates, popular, cos] = await Promise.all([
+          getStoryLibrary(updated.id, lang),
+          getCurrentLevel(updated.id, lang),
+          getTotalStars(updated.id, lang),
+          getWeekStreak(updated.id, lang),
+          getChildAchievements(updated.id),
+          getActivityDates(updated.id, lang),
+          getPopularStories(),
+          getChildCosmetics(updated.id),
+          getStreakShieldsPurchased(updated.id),
+          getUsedShieldDates(updated.id, lang),
+        ]);
+        if (gen !== switchGenRef.current) return;
+        const { usedDates: homeDates3 } = await resolveShields(updated.id, lang, actDates);
+        if (gen !== switchGenRef.current) return;
+        setStories(lib);
+        setLevel(lvl);
+        setTotalStars(stars);
+        setWeekStreak(streak);
+        setAchievements(ach);
+        setConsecutiveStreak(computeStreaks(actDates, new Date(), homeDates3).current);
+        setPopularStories(popular);
+        setCosmetics(cos);
+        const cur = lib.find(s => s.unlocked && !s.complete) ?? lib[0];
+        if (cur) getStorySlots(updated.id, cur.sid, lang).then(setSlots).catch(() => {});
+        else setSlots([]);
+      } catch {
+        langToastKey.current++;
+        setLangToast("Couldn't load content for this language. Please try again.");
+      } finally {
+        if (gen === switchGenRef.current) setRefreshing(false);
+      }
       }, 200);
     };
     window.addEventListener("app:languageChange", handler as EventListener);
@@ -376,53 +400,62 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
     }
     if (hasCachedData) setRefreshing(true);
 
-    const [lib, lvl, stars, streak, ach, actDates, popular, cos] = await Promise.all([
-      getStoryLibrary(child.id, child.language),
-      getCurrentLevel(child.id, child.language),
-      getTotalStars(child.id, child.language),
-      getWeekStreak(child.id, child.language),
-      getChildAchievements(child.id),
-      getActivityDates(child.id, child.language),
-      getPopularStories(),
-      getChildCosmetics(child.id),
-      // Pre-warm resolveShields inputs so the await below is a cache-hit
-      getStreakShieldsPurchased(child.id),
-      getUsedShieldDates(child.id, child.language),
-    ]);
-    // Discard if a newer child selection was triggered while we were fetching
-    if (gen !== selectGenRef.current) return;
-    const { usedDates: homeDates1 } = await resolveShields(child.id, child.language, actDates);
-    if (gen !== selectGenRef.current) return;
-    const cStreak = computeStreaks(actDates, new Date(), homeDates1).current;
-    setStories(lib);
-    setLevel(lvl);
-    setTotalStars(stars);
-    setWeekStreak(streak);
-    setAchievements(ach);
-    setConsecutiveStreak(cStreak);
-    setPopularStories(popular);
-    setCosmetics(cos);
-    if (hasCachedData) setRefreshing(false); else setLoading(false);
+    try {
+      const [lib, lvl, stars, streak, ach, actDates, popular, cos] = await Promise.all([
+        getStoryLibrary(child.id, child.language),
+        getCurrentLevel(child.id, child.language),
+        getTotalStars(child.id, child.language),
+        getWeekStreak(child.id, child.language),
+        getChildAchievements(child.id),
+        getActivityDates(child.id, child.language),
+        getPopularStories(),
+        getChildCosmetics(child.id),
+        // Pre-warm resolveShields inputs so the await below is a cache-hit
+        getStreakShieldsPurchased(child.id),
+        getUsedShieldDates(child.id, child.language),
+      ]);
+      // Discard if a newer child selection was triggered while we were fetching
+      if (gen !== selectGenRef.current) return;
+      const { usedDates: homeDates1 } = await resolveShields(child.id, child.language, actDates);
+      if (gen !== selectGenRef.current) return;
+      const cStreak = computeStreaks(actDates, new Date(), homeDates1).current;
+      setStories(lib);
+      setLevel(lvl);
+      setTotalStars(stars);
+      setWeekStreak(streak);
+      setAchievements(ach);
+      setConsecutiveStreak(cStreak);
+      setPopularStories(popular);
+      setCosmetics(cos);
+      if (hasCachedData) setRefreshing(false); else setLoading(false);
 
-    // Fetch slots and save complete snapshot once slots are known.
-    const cur = lib.find(s => s.unlocked && !s.complete) ?? lib[0];
-    if (cur) {
-      getStorySlots(child.id, cur.sid, child.language).then(freshSlots => {
-        if (gen !== selectGenRef.current) return;
-        setSlots(freshSlots);
-        saveHomeSnapshot(snapshotKey, { stories: lib, slots: freshSlots, level: lvl,
+      // Fetch slots and save complete snapshot once slots are known.
+      const cur = lib.find(s => s.unlocked && !s.complete) ?? lib[0];
+      if (cur) {
+        getStorySlots(child.id, cur.sid, child.language).then(freshSlots => {
+          if (gen !== selectGenRef.current) return;
+          setSlots(freshSlots);
+          saveHomeSnapshot(snapshotKey, { stories: lib, slots: freshSlots, level: lvl,
+            totalStars: stars, weekStreak: streak, achievements: ach,
+            consecutiveStreak: cStreak, popularStories: popular, cosmetics: cos });
+        }).catch(() => {});
+      } else {
+        setSlots([]);
+        saveHomeSnapshot(snapshotKey, { stories: lib, slots: [], level: lvl,
           totalStars: stars, weekStreak: streak, achievements: ach,
           consecutiveStreak: cStreak, popularStories: popular, cosmetics: cos });
-      }).catch(() => {});
-    } else {
-      setSlots([]);
-      saveHomeSnapshot(snapshotKey, { stories: lib, slots: [], level: lvl,
-        totalStars: stars, weekStreak: streak, achievements: ach,
-        consecutiveStreak: cStreak, popularStories: popular, cosmetics: cos });
-    }
+      }
 
-    // Community creations — best-effort, never blocks
-    void loadCommunityCreations();
+      // Community creations — best-effort, never blocks
+      void loadCommunityCreations();
+    } catch (err) {
+      console.error("[home] select failed:", err);
+      // Restore picker so the user can choose again rather than getting a stuck skeleton
+      setActiveChild(null);
+      setShowPicker(true);
+      setLoading(false);
+      setRefreshing(false);
+    }
   }
 
   async function silentRefresh(child: Child) {
@@ -1206,6 +1239,12 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
       {activeChild && (
         <NotificationOptInPrompt childId={activeChild.id} childName={activeChild.name} />
       )}
+
+      <AnimatePresence>
+        {langToast && (
+          <InlineToast key={`lang-toast-${langToastKey.current}`} message={langToast} onDone={() => setLangToast(null)} />
+        )}
+      </AnimatePresence>
     </AppShell>
   );
 }
