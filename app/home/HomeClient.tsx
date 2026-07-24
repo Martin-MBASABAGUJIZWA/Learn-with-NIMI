@@ -149,9 +149,13 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
   const { themeId } = useAppTheme();
   const assets = getThemeAssets(themeId);
 
-  const activeChildRef  = useRef<Child | null>(null);
-  const switchGenRef    = useRef(0);
+  const activeChildRef       = useRef<Child | null>(null);
+  const switchGenRef         = useRef(0);
+  const selectGenRef         = useRef(0);          // guards child-switch race
+  const subscriptionLoadedRef = useRef(initialChildren !== undefined); // RSC path resolves immediately
+  const silentRefreshingRef  = useRef(false);      // prevents concurrent silentRefresh calls
   const [loading,         setLoading]         = useState(true);
+  const [initError,       setInitError]       = useState(false);
   const [refreshing,      setRefreshing]      = useState(false);
   const [children,        setChildren]        = useState<Child[]>([]);
   const [activeChild,     setActiveChild]     = useState<Child | null>(null);
@@ -221,7 +225,7 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
       setCosmetics(cos);
       setRefreshing(false);
       const cur = lib.find(s => s.unlocked && !s.complete) ?? lib[0];
-      if (cur) getStorySlots(updated.id, cur.sid, lang).then(setSlots);
+      if (cur) getStorySlots(updated.id, cur.sid, lang).then(setSlots).catch(() => {});
       else setSlots([]);
       }, 200);
     };
@@ -233,63 +237,77 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
   }, []);
 
   useEffect(() => {
+    let visTimer: ReturnType<typeof setTimeout> | null = null;
     const handleVisibility = () => {
-      if (document.visibilityState === "visible" && activeChildRef.current) {
-        void silentRefresh(activeChildRef.current);
-      }
+      if (document.visibilityState !== "visible" || !activeChildRef.current) return;
+      if (visTimer) clearTimeout(visTimer);
+      visTimer = setTimeout(() => {
+        if (activeChildRef.current) void silentRefresh(activeChildRef.current);
+      }, 300);
     };
     document.addEventListener("visibilitychange", handleVisibility);
-    return () => document.removeEventListener("visibilitychange", handleVisibility);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibility);
+      if (visTimer) clearTimeout(visTimer);
+    };
   }, []);
 
   async function init() {
-    if (initialChildren !== undefined) {
-      setChildren(initialChildren);
-      setHasSubscription(!!initialHasSubscription);
-      if (initialChildren.length === 0) { router.replace("/onboarding"); return; }
-      const savedId = typeof window !== "undefined" ? localStorage.getItem(ACTIVE_CHILD_KEY) : null;
-      const saved = initialChildren.find(c => c.id === savedId);
-      if (saved) await select(saved, initialChildren);
-      else { setShowPicker(true); setLoading(false); }
-      return;
-    }
-
-    // Fire auth validation, parent-row upsert, and children fetch all in parallel.
-    // All three internally call auth.getUser() which the Supabase client deduplicates.
-    const [{ data: { user } }, , list] = await Promise.all([
-      supabase.auth.getUser(),
-      ensureParentRow(),
-      getChildren(),
-    ]);
-    if (!user) { router.replace("/loginpage"); return; }
-    setChildren(list);
-    getActiveSubscription(user.id).then(async (sub) => {
-      setHasSubscription(!!sub);
-      if (sub?.payment_provider === "trial" && sub.current_period_end) {
-        setIsTrial(true);
-        const msLeft = new Date(sub.current_period_end).getTime() - Date.now();
-        setTrialDaysLeft(Math.max(0, Math.ceil(msLeft / 86_400_000)));
-      } else if (!sub) {
-        const dismissed = typeof window !== "undefined"
-          && localStorage.getItem("nimipiko_trial_expiry_seen") === "1";
-        if (!dismissed) {
-          const { data } = await supabase
-            .from("nimipiko_subscriptions")
-            .select("id")
-            .eq("parent_id", user.id)
-            .eq("payment_provider", "trial")
-            .eq("status", "expired")
-            .limit(1)
-            .maybeSingle();
-          if (data) setTrialJustExpired(true);
-        }
+    try {
+      if (initialChildren !== undefined) {
+        setChildren(initialChildren);
+        setHasSubscription(!!initialHasSubscription);
+        // subscriptionLoadedRef already true (initialised from prop)
+        if (initialChildren.length === 0) { router.replace("/onboarding"); return; }
+        const savedId = typeof window !== "undefined" ? localStorage.getItem(ACTIVE_CHILD_KEY) : null;
+        const saved = initialChildren.find(c => c.id === savedId);
+        if (saved) await select(saved, initialChildren);
+        else { setShowPicker(true); setLoading(false); }
+        return;
       }
-    });
-    if (list.length === 0) { router.replace("/onboarding"); return; }
-    const savedId = typeof window !== "undefined" ? localStorage.getItem(ACTIVE_CHILD_KEY) : null;
-    const saved   = list.find(c => c.id === savedId);
-    if (saved) await select(saved, list);
-    else       { setShowPicker(true); setLoading(false); }
+
+      // Fire auth validation, parent-row upsert, and children fetch all in parallel.
+      // All three internally call auth.getUser() which the Supabase client deduplicates.
+      const [{ data: { user } }, , list] = await Promise.all([
+        supabase.auth.getUser(),
+        ensureParentRow(),
+        getChildren(),
+      ]);
+      if (!user) { router.replace("/loginpage"); return; }
+      setChildren(list);
+      getActiveSubscription(user.id).then(async (sub) => {
+        subscriptionLoadedRef.current = true;
+        setHasSubscription(!!sub);
+        if (sub?.payment_provider === "trial" && sub.current_period_end) {
+          setIsTrial(true);
+          const msLeft = new Date(sub.current_period_end).getTime() - Date.now();
+          setTrialDaysLeft(Math.max(0, Math.ceil(msLeft / 86_400_000)));
+        } else if (!sub) {
+          const dismissed = typeof window !== "undefined"
+            && localStorage.getItem("nimipiko_trial_expiry_seen") === "1";
+          if (!dismissed) {
+            const { data } = await supabase
+              .from("nimipiko_subscriptions")
+              .select("id")
+              .eq("parent_id", user.id)
+              .eq("payment_provider", "trial")
+              .eq("status", "expired")
+              .limit(1)
+              .maybeSingle();
+            if (data) setTrialJustExpired(true);
+          }
+        }
+      }).catch(() => { subscriptionLoadedRef.current = true; }); // failure → treat as free plan
+      if (list.length === 0) { router.replace("/onboarding"); return; }
+      const savedId = typeof window !== "undefined" ? localStorage.getItem(ACTIVE_CHILD_KEY) : null;
+      const saved   = list.find(c => c.id === savedId);
+      if (saved) await select(saved, list);
+      else       { setShowPicker(true); setLoading(false); }
+    } catch (err) {
+      console.error("[home] init failed:", err);
+      setInitError(true);
+      setLoading(false);
+    }
   }
 
   async function loadCommunityCreations() {
@@ -308,6 +326,7 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
   }
 
   async function select(child: Child, list?: Child[]) {
+    const gen = ++selectGenRef.current;
     setActiveChild(child);
     setShowPicker(false);
     if (typeof window !== "undefined") {
@@ -370,7 +389,10 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
       getStreakShieldsPurchased(child.id),
       getUsedShieldDates(child.id, child.language),
     ]);
+    // Discard if a newer child selection was triggered while we were fetching
+    if (gen !== selectGenRef.current) return;
     const { usedDates: homeDates1 } = await resolveShields(child.id, child.language, actDates);
+    if (gen !== selectGenRef.current) return;
     const cStreak = computeStreaks(actDates, new Date(), homeDates1).current;
     setStories(lib);
     setLevel(lvl);
@@ -386,11 +408,12 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
     const cur = lib.find(s => s.unlocked && !s.complete) ?? lib[0];
     if (cur) {
       getStorySlots(child.id, cur.sid, child.language).then(freshSlots => {
+        if (gen !== selectGenRef.current) return;
         setSlots(freshSlots);
         saveHomeSnapshot(snapshotKey, { stories: lib, slots: freshSlots, level: lvl,
           totalStars: stars, weekStreak: streak, achievements: ach,
           consecutiveStreak: cStreak, popularStories: popular, cosmetics: cos });
-      });
+      }).catch(() => {});
     } else {
       setSlots([]);
       saveHomeSnapshot(snapshotKey, { stories: lib, slots: [], level: lvl,
@@ -403,7 +426,10 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
   }
 
   async function silentRefresh(child: Child) {
+    if (silentRefreshingRef.current) return;
+    silentRefreshingRef.current = true;
     setRefreshing(true);
+    try {
     const lang = child.language;
     const [lib, lvl, stars, streak, ach, actDates, popular, cos] = await Promise.all([
       getStoryLibrary(child.id, lang),
@@ -427,7 +453,6 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
     setConsecutiveStreak(cStreak);
     setPopularStories(popular);
     setCosmetics(cos);
-    setRefreshing(false);
     const cur = lib.find(s => s.unlocked && !s.complete) ?? lib[0];
     const snapshotKey = `nimipiko_home_${child.id}_${lang}`;
     if (cur) {
@@ -436,12 +461,16 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
         saveHomeSnapshot(snapshotKey, { stories: lib, slots: freshSlots, level: lvl,
           totalStars: stars, weekStreak: streak, achievements: ach,
           consecutiveStreak: cStreak, popularStories: popular, cosmetics: cos });
-      });
+      }).catch(() => {});
     } else {
       setSlots([]);
       saveHomeSnapshot(snapshotKey, { stories: lib, slots: [], level: lvl,
         totalStars: stars, weekStreak: streak, achievements: ach,
         consecutiveStreak: cStreak, popularStories: popular, cosmetics: cos });
+    }
+    } finally {
+      setRefreshing(false);
+      silentRefreshingRef.current = false;
     }
   }
 
@@ -451,11 +480,32 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
     await select(child, [...children, child]);
   }
 
+  if (initError) return (
+    <AppShell>
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4 px-6 text-center">
+        <span className="text-5xl leading-none">😕</span>
+        <div>
+          <p className="font-baloo font-black text-gray-800 text-xl mb-1">Couldn&apos;t load your dashboard</p>
+          <p className="font-nunito text-gray-500 text-sm">Check your connection and try again.</p>
+        </div>
+        <button
+          onClick={() => { setInitError(false); setLoading(true); void init(); }}
+          className="font-baloo font-black text-white px-8 py-3.5 leaf shadow-lg hover:-translate-y-0.5 active:scale-95 transition-all"
+          style={{ background: "linear-gradient(135deg,#059669,#047857)", boxShadow: "0 6px 22px rgba(5,150,105,0.4)" }}
+        >
+          Try Again
+        </button>
+      </div>
+    </AppShell>
+  );
+
   if (noChildrenYet) return <AppShell><CreateExplorerProfile onCreated={handleCreated} /></AppShell>;
   if (showPicker) return (
     <>
       <WhoIsPlaying children={children} onSelect={c => select(c)}
         onAddChild={() => {
+          // Wait until subscription status is known so Club members aren't falsely redirected
+          if (children.length >= 1 && !subscriptionLoadedRef.current) return;
           if (children.length >= 1 && !hasSubscription) { router.push("/pricing?reason=add-child"); return; }
           setShowPicker(false);
           setShowCreateModal(true);
@@ -492,14 +542,11 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
   const totalSlots = slots.length;
   const pct        = totalSlots > 0 ? Math.round((doneSlots / totalSlots) * 100) : 0;
   const xp         = totalStars * 10;
-  // Derive the XP-bar level from XP directly so the bracket always matches the earned XP.
-  // The DB `level` value (story-completion based) is kept for the footer stat only.
-  const xpLvlIdx  = Math.min(
-    Math.max(0, LEVELS.findIndex(l => xp <= l.maxXp)),
-    LEVELS.length - 1,
-  );
-  // findIndex returns -1 when xp > all maxXp thresholds → clamp to last level
-  const xpLvlIdxFinal = xp > LEVELS[LEVELS.length - 1].maxXp ? LEVELS.length - 1 : xpLvlIdx;
+  // Derive XP-bar level: first bucket whose maxXp >= xp; -1 means xp exceeds all → last level.
+  const xpLvlIdxFinal = (() => {
+    const i = LEVELS.findIndex(l => xp <= l.maxXp);
+    return i === -1 ? LEVELS.length - 1 : i;
+  })();
   const levelInfo  = LEVELS[xpLvlIdxFinal];
   const prevMax    = xpLvlIdxFinal > 0 ? LEVELS[xpLvlIdxFinal - 1].maxXp : 0;
   const xpIn       = Math.max(0, xp - prevMax);
