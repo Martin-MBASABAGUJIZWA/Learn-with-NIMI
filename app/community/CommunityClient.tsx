@@ -35,7 +35,7 @@ function timeAgo(dateStr: string, t: (k: string) => string): string {
   return d < 7 ? `${d}${t("communityTimeDayAgo")}` : `${Math.floor(d / 7)}${t("communityTimeWeekAgo")}`;
 }
 
-type CreationRow = { id: string; parent_id?: string | null; child_name?: string | null; child_avatar_url?: string | null; age?: number | null; description?: string | null; image_url?: string | null; likes?: { user_id: string }[] | null; type?: string | null; created_at: string };
+type CreationRow = { id: string; parent_id?: string | null; child_name?: string | null; child_avatar_url?: string | null; age?: number | null; description?: string | null; image_url?: string | null; likes?: { user_id: string }[] | null; type?: string | null; status?: string | null; created_at: string };
 
 interface PickerItem {
   key: string;
@@ -43,6 +43,7 @@ interface PickerItem {
   childName: string;
   childAvatar: string;
   childLanguage: string;
+  childAge: number | null;
   storyTitle: string;
   storySlug: string;
   coverUrl: string | null;
@@ -65,7 +66,7 @@ function mapCreation(c: CreationRow, uid: string): Creation {
     isPublic: true,
     type: c.type || "art",
     createdAt: c.created_at,
-    status: "approved",
+    status: (c.status ?? "approved") as Creation["status"],
   };
 }
 
@@ -106,8 +107,15 @@ function CheerBurst({ onDone }: { onDone: () => void }) {
 }
 
 // ── Creation card ────────────────────────────────────────────────
+const STATUS_BADGE: Record<string, { label: string; cls: string }> = {
+  pending:  { label: "Pending review", cls: "bg-amber-100 text-amber-700 border-amber-200" },
+  approved: { label: "Live",           cls: "bg-emerald-100 text-emerald-700 border-emerald-200" },
+  rejected: { label: "Rejected",       cls: "bg-red-100 text-red-600 border-red-200" },
+  reported: { label: "Under review",   cls: "bg-orange-100 text-orange-600 border-orange-200" },
+};
+
 function CreationCard({
-  creation, index, onCheer, onReport, onDelete, isOwn,
+  creation, index, onCheer, onReport, onDelete, isOwn, showStatus,
 }: {
   creation: Creation;
   index: number;
@@ -115,6 +123,7 @@ function CreationCard({
   onReport: (id: string) => void;
   onDelete: (id: string) => void;
   isOwn: boolean;
+  showStatus?: boolean;
 }) {
   const { t } = useLanguage();
   const [bursting, setBursting] = useState(false);
@@ -175,6 +184,13 @@ function CreationCard({
           <span className="text-[11px] leading-none">{meta.emoji}</span>
           {t(meta.labelKey)}
         </span>
+
+        {/* Status badge — shown in My Posts mode */}
+        {showStatus && creation.status && STATUS_BADGE[creation.status] && (
+          <span className={`shrink-0 text-[9px] font-black px-2 py-0.5 rounded-full border ${STATUS_BADGE[creation.status].cls}`}>
+            {STATUS_BADGE[creation.status].label}
+          </span>
+        )}
 
         {/* Actions (report / delete) */}
         <div className="flex items-center gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 focus-within:opacity-100 transition-all ml-1">
@@ -261,7 +277,14 @@ function CreationCard({
           </p>
         )}
 
-        {/* Cheer row */}
+        {/* Cheer row — hidden for own non-approved posts */}
+        {showStatus && creation.status !== "approved" ? (
+          <p className="text-ds-muted text-[11px] font-semibold text-center py-2">
+            {creation.status === "pending" ? "⏳ Awaiting admin review before going live" :
+             creation.status === "reported" ? "🔍 Being reviewed by our team" :
+             "This post has been removed from the community."}
+          </p>
+        ) : (
         <div className="relative flex items-center gap-2">
           <AnimatePresence>
             {bursting && <CheerBurst key="burst" onDone={() => setBursting(false)} />}
@@ -301,6 +324,7 @@ function CreationCard({
             )}
           </motion.button>
         </div>
+        )}
       </div>
     </motion.div>
   );
@@ -740,6 +764,12 @@ export default function CommunityClient({ initialUserId, initialHasSubscription 
   const [toast, setToast]             = useState<string | null>(null);
   const observerTarget = useRef<HTMLDivElement>(null);
 
+  // Filters
+  const [search, setSearch]           = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [typeFilter, setTypeFilter]   = useState("all");
+  const [myPostsOnly, setMyPostsOnly] = useState(false);
+
   // Share picker
   const [pickerOpen, setPickerOpen]     = useState(false);
   const [pickerItems, setPickerItems]   = useState<PickerItem[]>([]);
@@ -755,6 +785,12 @@ export default function CommunityClient({ initialUserId, initialHasSubscription 
     setToast(msg);
     setTimeout(() => setToast(null), 3000);
   };
+
+  // Debounce search input by 400 ms
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(search), 400);
+    return () => clearTimeout(t);
+  }, [search]);
 
   useEffect(() => {
     void (async () => {
@@ -780,14 +816,29 @@ export default function CommunityClient({ initialUserId, initialHasSubscription 
   }, []);
 
   const fetchCreations = useCallback(async (pageNum: number, refresh: boolean) => {
+    if (refresh) setPage(0);
+    setLoading(true);
     const from = pageNum * PAGE_SIZE;
     const to   = from + PAGE_SIZE - 1;
-    const { data, count } = await supabase
+
+    let q = supabase
       .from("creations")
-      .select(`id, parent_id, child_name, child_avatar_url, age, description, image_url, type, created_at, likes:likes(id, user_id)`, { count:"exact" })
-      .eq("status", "approved")
-      .order("created_at", { ascending: false })
-      .range(from, to);
+      .select(`id, parent_id, child_name, child_avatar_url, age, description, image_url, type, status, created_at, likes:likes(id, user_id)`, { count: "exact" });
+
+    if (myPostsOnly && userId) {
+      q = q.eq("parent_id", userId);
+    } else {
+      q = q.eq("status", "approved").eq("is_public", true);
+    }
+
+    if (typeFilter !== "all") q = q.eq("type", typeFilter);
+    if (debouncedSearch.trim()) {
+      const s = debouncedSearch.trim();
+      q = q.or(`description.ilike.%${s}%,child_name.ilike.%${s}%`);
+    }
+
+    const { data, count } = await q.order("created_at", { ascending: false }).range(from, to);
+
     const mapped = (data ?? [])
       .filter(c => {
         const url = (c.image_url as string | null) ?? "";
@@ -798,7 +849,7 @@ export default function CommunityClient({ initialUserId, initialHasSubscription 
     if (refresh) setTotalCount(count ?? 0);
     setHasMore((count || 0) > to + 1);
     setLoading(false);
-  }, [userId]);
+  }, [userId, myPostsOnly, typeFilter, debouncedSearch]);
 
   useEffect(() => { void fetchCreations(0, true); }, [fetchCreations]);
 
@@ -884,10 +935,10 @@ export default function CommunityClient({ initialUserId, initialHasSubscription 
 
       const { data: kids } = await supabase
         .from("children")
-        .select("id, name, avatar_url, language");
+        .select("id, name, avatar_url, language, age");
 
       // Load all children's story libraries in parallel
-      const kidList = (kids ?? []) as { id: string; name: string | null; avatar_url: string | null; language: string | null }[];
+      const kidList = (kids ?? []) as { id: string; name: string | null; avatar_url: string | null; language: string | null; age: number | null }[];
       const libs = await Promise.all(
         kidList.map(kid => getStoryLibrary(kid.id, (kid.language ?? "en") as Language))
       );
@@ -908,6 +959,7 @@ export default function CommunityClient({ initialUserId, initialHasSubscription 
             childName: kid.name ?? "Friend",
             childAvatar: kid.avatar_url ?? "🌟",
             childLanguage: lang,
+            childAge: kid.age ?? null,
             storyTitle: s.title,
             storySlug: s.slug,
             coverUrl: s.cover_url,
@@ -966,6 +1018,7 @@ export default function CommunityClient({ initialUserId, initialHasSubscription 
       child_id:         item.childId,
       child_name:       item.childName,
       child_avatar_url: item.childAvatar ?? null,
+      age:              item.childAge ?? null,
       story_key:        item.key,
       description:      captionText.trim() || defaultCaption(item),
       type:             shareType,
@@ -1095,6 +1148,55 @@ export default function CommunityClient({ initialUserId, initialHasSubscription 
           </div>
         </HeroBanner>
 
+        {/* ── FILTER BAR ────────────────────────────────────────── */}
+        <div className="flex flex-col gap-3 mb-5">
+          {/* Row 1: search + My Posts toggle */}
+          <div className="flex items-center gap-2">
+            <div className="relative flex-1">
+              <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ds-muted pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              <input
+                type="search"
+                placeholder="Search by child name or description…"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                className="w-full pl-9 pr-4 py-2.5 bg-ds-card border border-ds-border rounded-2xl text-[13px] text-ds-text placeholder:text-ds-muted focus:outline-none focus:border-[var(--nimi-green)] transition-colors"
+              />
+            </div>
+            <button
+              onClick={() => setMyPostsOnly(p => !p)}
+              className={`shrink-0 flex items-center gap-1.5 px-4 py-2.5 rounded-2xl text-[12px] font-black border transition-all ${
+                myPostsOnly
+                  ? "bg-[var(--nimi-green)] text-white border-[var(--nimi-green)]"
+                  : "bg-ds-card border-ds-border text-ds-muted hover:border-[var(--nimi-green)] hover:text-[var(--nimi-green)]"
+              }`}
+            >
+              <span className="text-[13px]">👤</span> My Posts
+            </button>
+          </div>
+
+          {/* Row 2: type filter chips */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
+            {([
+              { key: "all",           label: "All" },
+              { key: "art",           label: "🎨 Art" },
+              { key: "coloring",      label: "🖍️ Coloring" },
+              { key: "certificate",   label: "🏆 Completed" },
+              { key: "story_progress",label: "📖 In Progress" },
+              { key: "challenge",     label: "💪 Challenge" },
+            ] as const).map(f => (
+              <button
+                key={f.key}
+                onClick={() => setTypeFilter(f.key)}
+                className={`shrink-0 px-3 py-1.5 rounded-full text-[11px] font-black border transition-all whitespace-nowrap ${
+                  typeFilter === f.key
+                    ? "bg-[var(--nimi-green)] text-white border-[var(--nimi-green)]"
+                    : "bg-ds-card border-ds-border text-ds-muted hover:border-[var(--nimi-green)]"
+                }`}
+              >{f.label}</button>
+            ))}
+          </div>
+        </div>
+
         {/* ── FEED ──────────────────────────────────────────────── */}
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-2">
@@ -1115,28 +1217,56 @@ export default function CommunityClient({ initialUserId, initialHasSubscription 
         ) : visible.length === 0 ? (
           <motion.div
             initial={{ opacity:0, scale:0.96 }} animate={{ opacity:1, scale:1 }}
-            className="border border-ds-border bg-ds-card rounded-3xl px-6 py-20 text-center"
+            className="border border-ds-border bg-ds-card rounded-3xl px-6 py-16 text-center"
           >
             <motion.div
               animate={{ y:[0,-10,0] }} transition={{ duration:2.4, repeat:Infinity }}
-              className="text-7xl mb-5"
+              className="text-6xl mb-5"
             >
-              🌟
+              {myPostsOnly ? "📭" : search || typeFilter !== "all" ? "🔍" : "🌟"}
             </motion.div>
             <h2 className="font-baloo font-black text-ds-text text-[20px] mb-2">
-              {t("communityEmptyTitle")}
+              {myPostsOnly ? "No posts yet" : search || typeFilter !== "all" ? "No results found" : t("communityEmptyTitle")}
             </h2>
-            <p className="text-ds-muted text-[13px] max-w-[240px] mx-auto leading-relaxed mb-6">
-              {t("communityEmptyDesc")}
+            <p className="text-ds-muted text-[13px] max-w-[280px] mx-auto leading-relaxed mb-6">
+              {myPostsOnly
+                ? "Start reading a story, then tap the Share button below to celebrate your child's progress with the community!"
+                : search || typeFilter !== "all"
+                ? "Try a different search term or remove the filter to see all posts."
+                : t("communityEmptyDesc")}
             </p>
-            <motion.button
-              whileTap={{ scale:0.95 }}
-              onClick={() => router.push("/stories")}
-              className="inline-flex items-center gap-2 font-baloo font-black text-white text-[13px] px-5 py-2.5 rounded-2xl shadow-md"
-              style={{ background:"var(--nimi-green)" }}
-            >
-              <span>{t("communityStartStory")}</span> <span className="text-[15px]">📖</span>
-            </motion.button>
+            {myPostsOnly ? (
+              <motion.button
+                whileTap={{ scale:0.95 }}
+                onClick={openPicker}
+                className="inline-flex items-center gap-2 font-baloo font-black text-white text-[13px] px-5 py-2.5 rounded-2xl shadow-md"
+                style={{ background:"var(--nimi-green)" }}
+              >
+                <Plus className="w-4 h-4" strokeWidth={3} /> Share your first post ⭐
+              </motion.button>
+            ) : search || typeFilter !== "all" ? (
+              <motion.button
+                whileTap={{ scale:0.95 }}
+                onClick={() => { setSearch(""); setTypeFilter("all"); }}
+                className="inline-flex items-center gap-2 font-baloo font-black text-ds-muted text-[13px] px-5 py-2.5 rounded-2xl border border-ds-border"
+              >
+                Clear filters
+              </motion.button>
+            ) : (
+              <div className="space-y-3">
+                <motion.button
+                  whileTap={{ scale:0.95 }}
+                  onClick={() => router.push("/stories")}
+                  className="inline-flex items-center gap-2 font-baloo font-black text-white text-[13px] px-5 py-2.5 rounded-2xl shadow-md"
+                  style={{ background:"var(--nimi-green)" }}
+                >
+                  {t("communityStartStory")} <span className="text-[15px]">📖</span>
+                </motion.button>
+                <p className="text-ds-muted text-[11px]">
+                  Then tap the <strong>Share ⭐</strong> button to post here!
+                </p>
+              </div>
+            )}
           </motion.div>
         ) : (
           <>
@@ -1151,6 +1281,7 @@ export default function CommunityClient({ initialUserId, initialHasSubscription 
                       onReport={setReportingId}
                       onDelete={handleDelete}
                       isOwn={c.parentId === userId}
+                      showStatus={myPostsOnly}
                     />
                     {i === 3 && !hasSubscription && (
                       <motion.div

@@ -2,7 +2,7 @@
 import React, { useEffect, useState, useMemo } from 'react'
 import supabase from '@/lib/supabaseClient'
 import { getStorageUrl } from '@/lib/queries'
-import { Search, Menu, ChevronLeft, ChevronRight, Heart, CheckCircle2, XCircle, Trash2 } from 'lucide-react'
+import { Search, Menu, ChevronLeft, ChevronRight, Heart, CheckCircle2, XCircle, Trash2, X, ZoomIn } from 'lucide-react'
 import { useToast } from './Toast'
 import { useConfirmDialog } from './ConfirmDialog'
 import { logAdminAction } from '@/lib/adminAuditLog'
@@ -34,6 +34,7 @@ export default function CommunityManager({ onNavigate, onOpenSidebar }: Props) {
   const [search, setSearch] = useState('')
   const [tab, setTab] = useState<TabKey>('all')
   const [page, setPage] = useState(1)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const { success: toastOk, error: toastErr } = useToast()
   const { confirm, dialog } = useConfirmDialog()
 
@@ -163,6 +164,27 @@ export default function CommunityManager({ onNavigate, onOpenSidebar }: Props) {
   return (
     <div className="flex-1 flex flex-col overflow-hidden bg-gray-50">
       {dialog}
+
+      {/* Image preview lightbox */}
+      {previewUrl && (
+        <div
+          className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"
+          onClick={() => setPreviewUrl(null)}
+        >
+          <button
+            onClick={() => setPreviewUrl(null)}
+            className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-white transition"
+          >
+            <X size={20} />
+          </button>
+          <img
+            src={previewUrl}
+            alt="Full-size preview"
+            className="max-w-full max-h-[90vh] rounded-2xl shadow-2xl object-contain"
+            onClick={e => e.stopPropagation()}
+          />
+        </div>
+      )}
       <div className="bg-white border-b border-gray-100 px-6 py-5 flex-shrink-0">
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <div className="flex items-center gap-3">
@@ -221,8 +243,19 @@ export default function CommunityManager({ onNavigate, onOpenSidebar }: Props) {
                       <td className="px-5 py-3.5">
                         <div className="flex items-center gap-3">
                           {p.image_url ? (
-                            <img src={p.image_url.startsWith('/') ? p.image_url : getStorageUrl(p.image_url)}
-                              alt="" className="w-10 h-10 rounded-lg object-cover border border-gray-100" loading="lazy" />
+                            <button
+                              onClick={() => setPreviewUrl(p.image_url!.startsWith('/') ? p.image_url! : getStorageUrl(p.image_url!))}
+                              className="relative group flex-shrink-0"
+                              title="View full image"
+                            >
+                              <img
+                                src={p.image_url.startsWith('/') ? p.image_url : getStorageUrl(p.image_url)}
+                                alt=""
+                                className="w-10 h-10 rounded-lg object-cover border border-gray-100 group-hover:opacity-75 transition"
+                                loading="lazy"
+                              />
+                              <ZoomIn size={12} className="absolute bottom-0.5 right-0.5 text-white drop-shadow opacity-0 group-hover:opacity-100 transition" />
+                            </button>
                           ) : (
                             <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center text-gray-300 text-lg">
                               {p.type === 'challenge' ? '🏆' : p.type === 'certificate' ? '📜' : '🎨'}

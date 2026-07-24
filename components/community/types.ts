@@ -24,7 +24,7 @@ export interface Comment {
   createdAt: string;
 }
 
-export type ModerationStatus = "pending" | "approved" | "rejected";
+export type ModerationStatus = "pending" | "approved" | "rejected" | "reported";
 
 export interface Creation {
   id: string;
