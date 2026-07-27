@@ -1,8 +1,9 @@
 export const runtime = "nodejs";
 
 import { NextRequest, NextResponse } from "next/server";
-import { sendRenewalConfirmation } from "@/lib/email";
+import { sendRenewalConfirmation, sendRenewalFailed } from "@/lib/email";
 import { getServiceClient } from "@/lib/supabase/serviceClient";
+import { addMonths, addYears } from "@/lib/dateUtils";
 
 
 
@@ -30,12 +31,13 @@ export async function GET(req: NextRequest) {
     if (!tokenRes.ok) return NextResponse.json({ error: "MoMo token failed" }, { status: 500 });
     const { access_token } = await tokenRes.json();
 
-  // Find pending MoMo renewals
+  // Find pending MoMo renewals — cap at 50 to avoid timeout under backlog
   const { data: pending } = await supabase
     .from("subscription_renewals")
     .select("*, nimipiko_subscriptions(*)")
     .eq("status", "pending")
-    .not("provider_transaction_id", "is", null);
+    .not("provider_transaction_id", "is", null)
+    .limit(50);
 
   let confirmed = 0, failed = 0;
 
@@ -73,15 +75,23 @@ export async function GET(req: NextRequest) {
       const sub = renewal.nimipiko_subscriptions;
       let newPeriodEnd: Date | null = null;
       if (sub) {
-        newPeriodEnd = new Date(sub.current_period_end);
-        newPeriodEnd.setMonth(newPeriodEnd.getMonth() + (sub.billing_interval === "year" ? 12 : 1));
+        const _base = new Date(sub.current_period_end);
+        newPeriodEnd = sub.billing_interval === "year" ? addYears(_base, 1) : addMonths(_base, 1);
 
+        // CAS guard: only reactivate if the subscription hasn't been manually
+        // cancelled between when the MoMo request was sent and now.
         await supabase.from("nimipiko_subscriptions").update({
           current_period_start: sub.current_period_end,
           current_period_end: newPeriodEnd.toISOString(),
           renewal_attempts: 0,
           status: "active",
-        }).eq("id", sub.id);
+          grace_ends_at: null,
+        }).eq("id", sub.id).in("status", ["active", "past_due"]);
+
+        // Re-enable content access in case it was deactivated during the grace period
+        await supabase.from("content_access")
+          .update({ is_active: true })
+          .eq("subscription_id", sub.id);
       }
 
       // Send renewal receipt email (best-effort)
@@ -104,6 +114,23 @@ export async function GET(req: NextRequest) {
         status: "failed",
         error_message: data.reason || "MoMo payment declined",
       }).eq("id", renewal.id);
+
+      // Notify parent — MoMo decline is silent otherwise
+      const sub = renewal.nimipiko_subscriptions;
+      if (sub) {
+        const { data: parent } = await supabase
+          .from("parents").select("email, name").eq("id", sub.parent_id).maybeSingle();
+        if (parent?.email) {
+          void sendRenewalFailed({
+            to: parent.email,
+            parentName: parent.name ?? "there",
+            amount: String(sub.amount),
+            currency: sub.currency,
+            provider: "mtn_momo",
+          });
+        }
+      }
+
       failed++;
     }
     // PENDING — do nothing, check again next run

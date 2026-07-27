@@ -384,44 +384,84 @@ export default function PricingPaymentModal({ product, currency, effectiveAmount
           )}
 
           {/* ── Success ──────────────────────────────────────────────── */}
-          {step === "success" && (
-            <div className="text-center py-6">
-              <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 260, damping: 20 }}
-                className="text-6xl mb-3">🎉</motion.div>
-              <motion.h3 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
-                className="font-baloo font-black text-ds-text text-[24px]">
-                Welcome to Club! 👑
-              </motion.h3>
-              <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
-                className="text-gray-500 text-[13px] mt-1">
-                {product.name} is now active on your account.
-              </motion.p>
+          {step === "success" && (() => {
+            const tier = product.tier;
+            const isClub         = tier === "club";
+            const isPersonalized = tier === "personalized";
+            const isChallenge    = tier === "champion_pack";
+            const isBundle       = tier === "family_bundle";
 
-              {/* Feature unlock list */}
-              <motion.div
-                initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
-                className="mt-4 mx-auto max-w-xs text-left space-y-2 bg-ds-club-subtle border border-ds-club rounded-2xl p-4"
-              >
-                {[
-                  { emoji: "📚", text: "All premium stories unlocked" },
-                  { emoji: "🤖", text: "Unlimited Nimi AI chats, every day" },
-                  { emoji: "🏆", text: "Certificate downloads for every story" },
-                  { emoji: "👨‍👩‍👦", text: "Multiple learner profiles" },
-                ].map(f => (
-                  <div key={f.text} className="flex items-center gap-2.5 text-xs font-semibold text-ds-club-text">
-                    <span className="text-base shrink-0">{f.emoji}</span>
-                    {f.text}
-                  </div>
-                ))}
-              </motion.div>
+            const heading = isClub         ? "Welcome to Club! 👑"
+              : isPersonalized             ? "Your Masterpiece is Ready! 🎨"
+              : isChallenge                ? "Challenges Unlocked! 🏆"
+              : isBundle                   ? "Family Bundle Active! 👨‍👩‍👧"
+              : "Purchase Complete! 🎉";
 
-              <motion.a href={successRedirectUrl ?? "/stories"} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }}
-                className="inline-flex items-center gap-2 mt-5 px-8 py-3.5 leaf bg-gradient-to-r from-yellow-400 to-orange-500 text-white font-black text-[15px] shadow-xl">
-                {successRedirectUrl === "/masterpiece" ? "👑 Create My Masterpiece" : successRedirectUrl ? "▶ Continue Story" : "📖 Go to Stories"}
-                <span className="bg-white/30 rounded-full text-[11px] font-black px-2 py-0.5">{countdown}s</span>
-              </motion.a>
-            </div>
-          )}
+            const features: { emoji: string; text: string }[] = isClub ? [
+              { emoji: "📚", text: "All premium stories unlocked" },
+              { emoji: "🤖", text: "Unlimited Nimi AI chats, every day" },
+              { emoji: "🏆", text: "Certificate downloads for every story" },
+              { emoji: "👨‍👩‍👦", text: "Multiple learner profiles" },
+            ] : isPersonalized ? [
+              { emoji: "🎨", text: "Your child's personalized hero story" },
+              { emoji: "📄", text: "Downloadable PDF keepsake" },
+              { emoji: "🏆", text: "Champion Certificate included" },
+              { emoji: "✨", text: "A memory that lasts forever" },
+            ] : isChallenge ? [
+              { emoji: "🏆", text: "All Champion Challenges unlocked" },
+              { emoji: "🎖️", text: "Exclusive challenge badges" },
+              { emoji: "📊", text: "Progress tracked in your profile" },
+            ] : isBundle ? [
+              { emoji: "👨‍👩‍👧", text: "Up to 4 learner profiles" },
+              { emoji: "📚", text: "All stories for every child" },
+              { emoji: "🤖", text: "Nimi AI for the whole family" },
+            ] : [
+              { emoji: "📚", text: "Your story is now available" },
+              { emoji: "🎤", text: "Practice reading with Nimi AI" },
+              { emoji: "🏆", text: "Certificate when you finish" },
+            ];
+
+            const ctaLabel = successRedirectUrl === "/masterpiece" ? "👑 Create My Masterpiece"
+              : successRedirectUrl ? "▶ Continue"
+              : isClub ? "📖 Go to Stories"
+              : isPersonalized ? "👑 View Masterpiece"
+              : "📖 Start Reading";
+
+            const ctaHref = successRedirectUrl ?? (isPersonalized ? "/masterpiece" : "/stories");
+
+            return (
+              <div className="text-center py-6">
+                <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 260, damping: 20 }}
+                  className="text-6xl mb-3">🎉</motion.div>
+                <motion.h3 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+                  className="font-baloo font-black text-ds-text text-[24px]">
+                  {heading}
+                </motion.h3>
+                <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
+                  className="text-gray-500 text-[13px] mt-1">
+                  {product.name} is now active on your account.
+                </motion.p>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
+                  className="mt-4 mx-auto max-w-xs text-left space-y-2 bg-ds-club-subtle border border-ds-club rounded-2xl p-4"
+                >
+                  {features.map(f => (
+                    <div key={f.text} className="flex items-center gap-2.5 text-xs font-semibold text-ds-club-text">
+                      <span className="text-base shrink-0">{f.emoji}</span>
+                      {f.text}
+                    </div>
+                  ))}
+                </motion.div>
+
+                <motion.a href={ctaHref} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }}
+                  className="inline-flex items-center gap-2 mt-5 px-8 py-3.5 leaf bg-gradient-to-r from-yellow-400 to-orange-500 text-white font-black text-[15px] shadow-xl">
+                  {ctaLabel}
+                  <span className="bg-white/30 rounded-full text-[11px] font-black px-2 py-0.5">{countdown}s</span>
+                </motion.a>
+              </div>
+            );
+          })()}
 
           {/* ── Error ────────────────────────────────────────────────── */}
           {step === "error" && (

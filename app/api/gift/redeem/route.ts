@@ -6,10 +6,9 @@ import { NextRequest, NextResponse } from "next/server";
 type GiftProduct = { name: string | null; tier: string | null; billing_interval: string | null };
 type GiftGiver = { name: string | null; email?: string | null };
 import { getAuthUser } from "@/lib/supabaseRouteAuth";
-
-
 import { sendGiftRedeemed } from "@/lib/email";
 import { getServiceClient } from "@/lib/supabase/serviceClient";
+import { addMonths, addYears } from "@/lib/dateUtils";
 
 export async function POST(req: NextRequest) {
   const serviceSupabase = getServiceClient();
@@ -74,9 +73,7 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  const periodEnd = new Date();
-  if (billingInterval === "year") periodEnd.setFullYear(periodEnd.getFullYear() + 1);
-  else periodEnd.setMonth(periodEnd.getMonth() + 1);
+  const periodEnd = billingInterval === "year" ? addYears(new Date(), 1) : addMonths(new Date(), 1);
 
   // Atomically claim the gift — exactly one concurrent request can succeed here.
   // Both requests may pass the fast-path `if (gift.redeemed_at)` check above,
@@ -128,7 +125,7 @@ export async function POST(req: NextRequest) {
   if (accessErr) {
     console.error("[gift/redeem] content_access insert failed:", accessErr.message);
     // Roll back: un-redeem the gift so the user can try again
-    await serviceSupabase.from("gifts")
+    await serviceSupabase.from("gift_subscriptions")
       .update({ redeemed_at: null, redeemed_by: null })
       .eq("id", gift.id);
     return NextResponse.json({ error: "Failed to grant access. Please try again." }, { status: 500 });

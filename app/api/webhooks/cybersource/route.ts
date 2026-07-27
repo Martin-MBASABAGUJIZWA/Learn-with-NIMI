@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { getServiceClient } from "@/lib/supabase/serviceClient";
+import { verifyCybersourceTransaction } from "@/lib/cybersource/verify";
+import { sendPaymentReceipt } from "@/lib/email";
+import { addMonths, addYears } from "@/lib/dateUtils";
 
 
 
@@ -89,6 +92,133 @@ export async function POST(req: NextRequest) {
         }
 
         console.warn("[Webhook] Chargeback — access revoked:", txId);
+      }
+    }
+
+    // ── Browser-close recovery ─────────────────────────────────────────────
+    // CyberSource fires one of these events when a Flex Microform payment is
+    // captured. If the user closed the browser before /api/confirm-payment ran,
+    // the order is still "pending". We verify and provision here so the parent
+    // gets access even without the client completing the flow.
+    if (
+      eventType === "payments.capture.completed" ||
+      eventType === "payments.payments.updated" ||
+      eventType === "payments.order.completed"
+    ) {
+      const txId: string | undefined = event.payload?.id;
+      const mdi: Array<{ key: string; value: string }> | undefined =
+        event.payload?.orderInformation?.merchantDefinedInformation;
+      const orderId: string | undefined = mdi?.find(
+        (m: { key: string; value: string }) => m.key === "orderId"
+      )?.value;
+
+      if (txId && orderId) {
+        type OrderProduct = {
+          tier: string | null;
+          story_id: string | null;
+          billing_interval: string | null;
+          product_type: string | null;
+          name: string | null;
+        };
+
+        const { data: order } = await supabase
+          .from("orders")
+          .select("*, products(tier, story_id, billing_interval, product_type, name)")
+          .eq("id", orderId)
+          .eq("payment_provider", "cybersource")
+          .maybeSingle();
+
+        if (order && order.payment_status === "pending") {
+          let isAuthorized: boolean;
+          let authorizedAmount: number;
+          let customerToken: string | null;
+          try {
+            ({ isAuthorized, authorizedAmount, customerToken } =
+              await verifyCybersourceTransaction(txId));
+          } catch (verifyErr) {
+            console.error("[Webhook] verifyCybersourceTransaction failed:", verifyErr);
+            // Return 200 so CyberSource doesn't keep retrying a transient error
+            return NextResponse.json({ received: true });
+          }
+
+          const expectedAmount = Number(order.amount);
+          if (!isAuthorized || authorizedAmount < expectedAmount * 0.99) {
+            await supabase.from("orders")
+              .update({ payment_status: "failed", provider_transaction_id: txId })
+              .eq("id", orderId)
+              .eq("payment_status", "pending");
+          } else {
+            // Atomic CAS — skip if confirm-payment already landed concurrently
+            const { data: claimed } = await supabase.from("orders")
+              .update({
+                payment_status: "completed",
+                provider_transaction_id: txId,
+                completed_at: new Date().toISOString(),
+              })
+              .eq("id", orderId)
+              .eq("payment_status", "pending")
+              .select("id")
+              .maybeSingle();
+
+            if (claimed) {
+              const product = order.products as OrderProduct | null;
+              if (product) {
+                const accessType =
+                  product.tier === "club"           ? "club"
+                  : product.tier === "personalized" ? "personalized"
+                  : product.tier === "champion_pack"? "challenge_pack"
+                  : product.tier === "family_bundle"? "bundle"
+                  : "story";
+
+                if (product.product_type === "subscription" || product.tier === "club") {
+                  const billingInterval = (product.billing_interval ?? "month") as "month" | "year";
+                  const periodEnd = billingInterval === "year" ? addYears(new Date(), 1) : addMonths(new Date(), 1);
+
+                  const { error: provisionErr } = await supabase.rpc("provision_subscription", {
+                    p_parent_id:        order.parent_id,
+                    p_product_id:       order.product_id,
+                    p_order_id:         orderId,
+                    p_provider:         "cybersource",
+                    p_token:            customerToken ?? null,
+                    p_phone:            null,
+                    p_amount:           Number(order.amount),
+                    p_currency:         order.currency,
+                    p_billing_interval: billingInterval,
+                    p_period_start:     new Date().toISOString(),
+                    p_period_end:       periodEnd.toISOString(),
+                    p_access_type:      accessType,
+                    p_story_id:         product.story_id ?? null,
+                  });
+
+                  if (provisionErr) {
+                    console.error("[Webhook] provision_subscription failed:", provisionErr.message);
+                  } else {
+                    const { data: parent } = await supabase
+                      .from("parents").select("email, name").eq("id", order.parent_id).maybeSingle();
+                    if (parent?.email) {
+                      void sendPaymentReceipt({
+                        to: parent.email,
+                        parentName: parent.name ?? "there",
+                        amount: String(order.amount),
+                        currency: order.currency,
+                        provider: "cybersource",
+                        periodEnd: periodEnd.toISOString(),
+                      });
+                    }
+                    console.log("[Webhook] Browser-close recovery: provisioned order", orderId);
+                  }
+                } else {
+                  await supabase.from("content_access").insert({
+                    parent_id: order.parent_id,
+                    access_type: accessType,
+                    story_id: product.story_id,
+                    order_id: orderId,
+                  });
+                }
+              }
+            }
+          }
+        }
       }
     }
 

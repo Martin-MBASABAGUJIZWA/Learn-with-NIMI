@@ -76,6 +76,9 @@ export async function POST(request: NextRequest) {
       data: {
         orderInformation: {
           amountDetails: { totalAmount: formattedAmount, currency },
+          // Embed orderId so the CyberSource webhook can recover abandoned sessions
+          // (browser closed after card entry but before /api/confirm-payment was called).
+          merchantDefinedInformation: [{ key: "orderId", value: orderId }],
         },
       },
     };

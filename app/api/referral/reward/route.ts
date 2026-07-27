@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { sendPushToParent } from "@/lib/push";
 import { sendReferralRewardGranted } from "@/lib/email";
 import { getServiceClient } from "@/lib/supabase/serviceClient";
+import { addMonths } from "@/lib/dateUtils";
 
 // Called internally (from confirm-payment and mtn-momo) after a Club sub is created.
 // Grants the referrer 1 free month if their referred user just subscribed.
@@ -66,8 +67,7 @@ export async function POST(req: Request) {
 
   if (!product) return NextResponse.json({ error: "Product not found" }, { status: 500 });
 
-  const periodEnd = new Date();
-  periodEnd.setMonth(periodEnd.getMonth() + 1);
+  const periodEnd = addMonths(new Date(), 1);
 
   const { data: newSub } = await supabase.from("nimipiko_subscriptions").insert({
     parent_id: redemption.referrer_id,

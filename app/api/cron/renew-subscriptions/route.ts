@@ -4,8 +4,9 @@ export const maxDuration = 60;
 import { NextRequest, NextResponse } from "next/server";
 import * as crypto from "crypto";
 import { v4 as uuidv4 } from "uuid";
-import { sendRenewalConfirmation, sendRenewalFailed, sendAdminAlert } from "@/lib/email";
+import { sendRenewalConfirmation, sendRenewalFailed, sendNoTokenRenewalFailed, sendSubscriptionExpired, sendAdminAlert } from "@/lib/email";
 import { getServiceClient } from "@/lib/supabase/serviceClient";
+import { addMonths, addYears } from "@/lib/dateUtils";
 
 type CyberSourceResult = { ok: boolean; transactionId: string | null; error: string | null };
 type MoMoResult        = { ok: boolean; referenceId: string | null;   error: string | null };
@@ -200,8 +201,20 @@ export async function GET(req: NextRequest) {
           status: "past_due",
           grace_ends_at: new Date(now.getTime() + GRACE_DAYS * 86400000).toISOString(),
         }).eq("id", sub.id);
-        if (pm.provider === "cybersource" && !pm.token) results.no_token++;
-        else results.failed++;
+        if (pm.provider === "cybersource" && !pm.token) {
+          results.no_token++;
+          // Parent email: can't promise retries, must resubscribe manually
+          const { data: noTokenParent } = await supabase
+            .from("parents").select("email, name").eq("id", sub.parent_id).maybeSingle();
+          if (noTokenParent?.email) {
+            void sendNoTokenRenewalFailed({
+              to: noTokenParent.email,
+              parentName: noTokenParent.name ?? "there",
+            });
+          }
+        } else {
+          results.failed++;
+        }
         continue;
       }
 
@@ -225,12 +238,9 @@ export async function GET(req: NextRequest) {
 
       if (chargeResult.ok && pm.provider === "cybersource") {
         // Card charged — extend period. Reset renewal_attempts since charge succeeded.
-        const newEnd = new Date(sub.current_period_end);
-        if (sub.billing_interval === "year") {
-          newEnd.setFullYear(newEnd.getFullYear() + 1);
-        } else {
-          newEnd.setMonth(newEnd.getMonth() + 1);
-        }
+        const newEnd = sub.billing_interval === "year"
+          ? addYears(new Date(sub.current_period_end), 1)
+          : addMonths(new Date(sub.current_period_end), 1);
 
         await supabase.from("nimipiko_subscriptions").update({
           current_period_start: sub.current_period_end,
@@ -269,6 +279,7 @@ export async function GET(req: NextRequest) {
             parentName: failedParent.name ?? "there",
             amount: String(sub.amount),
             currency: sub.currency,
+            provider: pm.provider,
           });
         }
 
@@ -279,17 +290,28 @@ export async function GET(req: NextRequest) {
     // 2. Expire past-due subscriptions after grace period
     const { data: expiredSubs } = await supabase
       .from("nimipiko_subscriptions")
-      .select("id, parent_id")
+      .select("id, parent_id, amount, currency")
       .eq("status", "past_due")
       .lte("grace_ends_at", now.toISOString());
 
     await Promise.allSettled(
-      (expiredSubs ?? []).map(sub =>
-        Promise.all([
+      (expiredSubs ?? []).map(async sub => {
+        await Promise.all([
           supabase.from("nimipiko_subscriptions").update({ status: "expired" }).eq("id", sub.id),
           supabase.from("content_access").update({ is_active: false }).eq("subscription_id", sub.id),
-        ])
-      )
+        ]);
+        // Terminal email — one-time notification that access has ended
+        const { data: expiredParent } = await supabase
+          .from("parents").select("email, name").eq("id", sub.parent_id).maybeSingle();
+        if (expiredParent?.email) {
+          void sendSubscriptionExpired({
+            to: expiredParent.email,
+            parentName: expiredParent.name ?? "there",
+            amount: String(sub.amount),
+            currency: sub.currency,
+          });
+        }
+      })
     );
     results.expired += (expiredSubs ?? []).length;
 

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { sendPushToParent } from "@/lib/push";
 import { sendReferralRewardGranted } from "@/lib/email";
 import { getServiceClient } from "@/lib/supabase/serviceClient";
+import { addMonths } from "@/lib/dateUtils";
 
 // Cron fallback: finds referral redemptions where the referred user now has an
 // active paid subscription but the reward was never granted (e.g. the real-time
@@ -48,8 +49,7 @@ export async function GET(req: Request) {
 
     if (!claimed) return false;
 
-    const periodEnd = new Date();
-    periodEnd.setMonth(periodEnd.getMonth() + 1);
+    const periodEnd = addMonths(new Date(), 1);
 
     // Insert subscription + content_access in parallel
     const [{ data: newSub }, , [referrerRow, refereeRow]] = await Promise.all([

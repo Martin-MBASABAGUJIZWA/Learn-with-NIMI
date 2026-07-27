@@ -28,6 +28,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { PageSurface, HeroBanner } from "@/components/layout/primitives";
 import ChildAvatar from "@/components/avatar/ChildAvatar";
 import EditProfileSheet from "@/components/profile/EditProfileSheet";
+import UpdateCardModal from "@/components/parents/UpdateCardModal";
 
 // Lazy-loaded tab panels — only downloaded when the user opens that tab
 const LearningBrainTab    = dynamic(() => import("@/components/parents/LearningBrainTab"),    { ssr: false });
@@ -136,6 +137,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
   const [cancellingSubscription, setCancellingSubscription] = useState(false);
   const [cancelSubError, setCancelSubError] = useState<string | null>(null);
   const [confirmCancel, setConfirmCancel] = useState(false);
+  const [showUpdateCard, setShowUpdateCard] = useState(false);
   const [showSwitchMenu, setShowSwitchMenu] = useState(false);
   const [feelings, setFeelings] = useState<{ story_id: string; title: string; feeling: string; felt_at: string }[]>([]);
   const [referralCode, setReferralCode] = useState<string | null>(null);
@@ -534,7 +536,30 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
 
           {/* Subscription banner — full on mobile, hidden on desktop (in sidebar) */}
           <div className="lg:hidden mb-5">
-            {hasSubscription && !isTrial ? (
+            {hasSubscription && !isTrial && subscription?.status === "past_due" ? (
+              <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+                className="overflow-hidden border border-red-200 bg-red-50 shadow-ds-card" style={{ borderRadius: 'var(--leaf-r-lg)' }}>
+                <div className="p-4 flex items-center gap-3">
+                  <div className="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center text-xl shrink-0">⚠️</div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-baloo font-black text-red-800 text-[15px]">Payment failed</p>
+                    <p className="text-red-600 text-[11px] font-bold">Your Club access is on hold — please update your payment to continue</p>
+                  </div>
+                </div>
+                <div className="px-4 pb-4 border-t border-red-100 pt-3 flex gap-2">
+                  <a href="/pricing" className="flex-1 text-center py-2 text-[12px] font-black text-white rounded-xl transition"
+                    style={{ backgroundColor: "var(--nimi-green)" }}>
+                    Resubscribe →
+                  </a>
+                  {subscription?.payment_provider === "cybersource" && (
+                    <button onClick={() => setShowUpdateCard(true)}
+                      className="flex-1 py-2 text-[12px] font-black text-red-700 bg-white border border-red-200 rounded-xl hover:bg-red-50 transition">
+                      Update card
+                    </button>
+                  )}
+                </div>
+              </motion.div>
+            ) : hasSubscription && !isTrial ? (
               <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
                 className="overflow-hidden border border-ds-club bg-ds-club-subtle shadow-ds-card" style={{ borderRadius: 'var(--leaf-r-lg)' }}>
                 <div className="p-4 flex items-center gap-3">
@@ -723,7 +748,29 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
             <aside className="hidden lg:flex lg:flex-col lg:w-64 xl:w-72 shrink-0 gap-4 sticky top-20">
 
               {/* Subscription */}
-              {hasSubscription && !isTrial ? (
+              {hasSubscription && !isTrial && subscription?.status === "past_due" ? (
+                <div className="overflow-hidden border border-red-200 bg-red-50 shadow-ds-card" style={{ borderRadius: 'var(--leaf-r-lg)' }}>
+                  <div className="p-3 flex items-center gap-2.5">
+                    <div className="w-9 h-9 bg-red-100 rounded-xl flex items-center justify-center text-base shrink-0">⚠️</div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-black text-red-800 text-[13px]">Payment failed</p>
+                      <p className="text-red-600 text-[10px] font-bold leading-tight">Club access on hold</p>
+                    </div>
+                  </div>
+                  <div className="px-3 pb-3 border-t border-red-100 pt-2 space-y-1.5">
+                    <a href="/pricing" className="block text-center py-1.5 text-[11px] font-black text-white rounded-xl transition"
+                      style={{ backgroundColor: "var(--nimi-green)" }}>
+                      Resubscribe →
+                    </a>
+                    {subscription?.payment_provider === "cybersource" && (
+                      <button onClick={() => setShowUpdateCard(true)}
+                        className="w-full py-1.5 text-[11px] font-black text-red-700 bg-white border border-red-200 rounded-xl hover:bg-red-50 transition">
+                        Update card
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ) : hasSubscription && !isTrial ? (
                 <div className="overflow-hidden border border-ds-club bg-ds-club-subtle shadow-ds-card" style={{ borderRadius: 'var(--leaf-r-lg)' }}>
                   <div className="p-4 flex items-center gap-3">
                     <div className="w-9 h-9 bg-ds-club rounded-xl flex items-center justify-center text-lg shadow-sm shrink-0">👑</div>
@@ -2145,6 +2192,15 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
               setSelectedChild(child.id);
             }}
             onClose={() => setShowAddChild(false)}
+          />
+        )}
+        {showUpdateCard && (
+          <UpdateCardModal
+            onClose={() => setShowUpdateCard(false)}
+            onSuccess={() => {
+              // Refresh subscription status after card update
+              setSubscription(prev => prev ? { ...prev, status: "active" } : null);
+            }}
           />
         )}
       </PageSurface>

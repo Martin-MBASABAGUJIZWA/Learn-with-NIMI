@@ -8,6 +8,7 @@ import { getAuthUser } from "@/lib/supabaseRouteAuth";
 import { verifyCybersourceTransaction } from "@/lib/cybersource/verify";
 import { sendPaymentReceipt, sendGiftNotification, sendGiftConfirmation, sendWelcomeToClub } from "@/lib/email";
 import { getServiceClient } from "@/lib/supabase/serviceClient";
+import { addMonths, addYears } from "@/lib/dateUtils";
 
 // Shared helper used by confirm-payment (immediate) and the send-gift-emails cron (scheduled).
 // Checks send_at: if null or in the past, fires email + marks email_sent_at.
@@ -152,12 +153,7 @@ export async function POST(req: NextRequest) {
         // For subscriptions — atomically provision payment_method + subscription + content_access.
         if (product.product_type === "subscription" || product.tier === "club") {
           const billingInterval = (product.billing_interval ?? "month") as "month" | "year";
-          const periodEnd = new Date();
-          if (billingInterval === "year") {
-            periodEnd.setFullYear(periodEnd.getFullYear() + 1);
-          } else {
-            periodEnd.setMonth(periodEnd.getMonth() + 1);
-          }
+          const periodEnd = billingInterval === "year" ? addYears(new Date(), 1) : addMonths(new Date(), 1);
 
           // customerToken is the reusable CyberSource customer ID for recurring charges.
           // Requires Token Management Service (TMS) to be enabled in Business Center →

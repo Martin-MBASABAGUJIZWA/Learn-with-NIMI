@@ -6,6 +6,7 @@ type OrderProduct = { tier: string | null; story_id: string | null; billing_inte
 type PersonalizationData = { discount_code_id?: string; gift?: boolean; phone?: string };
 import { sendPaymentReceipt, sendGiftNotification, sendGiftConfirmation, sendWelcomeToClub } from "@/lib/email";
 import { getServiceClient } from "@/lib/supabase/serviceClient";
+import { addMonths, addYears } from "@/lib/dateUtils";
 
 
 
@@ -180,12 +181,7 @@ export async function GET(req: NextRequest) {
           if (product.product_type === "subscription" || product.tier === "club") {
             const phone = order.personalization_data?.phone ?? null;
             const billingInterval = (product.billing_interval ?? "month") as "month" | "year";
-            const periodEnd = new Date();
-            if (billingInterval === "year") {
-              periodEnd.setFullYear(periodEnd.getFullYear() + 1);
-            } else {
-              periodEnd.setMonth(periodEnd.getMonth() + 1);
-            }
+            const periodEnd = billingInterval === "year" ? addYears(new Date(), 1) : addMonths(new Date(), 1);
 
             // Atomically provision payment_method + subscription + content_access.
             const { error: provisionErr } = await supabase.rpc("provision_subscription", {

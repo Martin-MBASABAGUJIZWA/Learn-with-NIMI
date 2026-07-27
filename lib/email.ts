@@ -261,21 +261,26 @@ export async function sendRenewalConfirmation(opts: {
   await send(
     to,
     "NIMIPIKO Club renewed ✓",
-    `
-<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;color:#111827">
-  <div style="background:#15803d;padding:24px;text-align:center;border-radius:12px 12px 0 0">
-    <h1 style="color:#fff;margin:0;font-size:22px">✓ Membership Renewed</h1>
-  </div>
-  <div style="background:#fff;padding:24px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 12px 12px">
-    <p style="font-size:15px">Hi ${parentName}, your NIMIPIKO Club membership has been renewed for another month.</p>
-    <table style="width:100%;border-collapse:collapse;font-size:14px;margin:16px 0">
-      <tr><td style="padding:8px 0;color:#6b7280">Charged</td><td style="font-weight:700;text-align:right">${amount} ${currency}</td></tr>
-      <tr><td style="padding:8px 0;color:#6b7280">Next renewal</td><td style="font-weight:700;text-align:right">${renewDate}</td></tr>
-    </table>
-    <p style="font-size:13px;color:#6b7280">To cancel, visit <a href="https://nimipiko.com/settings" style="color:#15803d">Account Settings</a>.</p>
-  </div>
-</div>
-    `.trim(),
+    authBase(
+      "Membership renewed",
+      `<p style="margin:0 0 6px;font-size:22px;font-weight:900;color:#14532d;text-align:center;">All renewed — thank you! 🌿</p>
+      <p style="margin:0 0 20px;font-size:15px;color:#4b5563;text-align:center;line-height:1.6;">Hi ${parentName} — your NIMIPIKO Club is active for another month. Your child's adventures continue uninterrupted.</p>
+      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:14px;padding:16px 20px;margin-bottom:22px">
+        <table style="width:100%;border-collapse:collapse;font-size:14px;">
+          <tr>
+            <td style="padding:9px 0;color:#6b7280;border-bottom:1px solid #dcfce7;">Amount charged</td>
+            <td style="padding:9px 0;font-weight:800;color:#166534;text-align:right;border-bottom:1px solid #dcfce7;">${amount} ${currency}</td>
+          </tr>
+          <tr>
+            <td style="padding:9px 0;color:#6b7280;">Next renewal</td>
+            <td style="padding:9px 0;font-weight:800;color:#166534;text-align:right;">${renewDate}</td>
+          </tr>
+        </table>
+      </div>
+      <p style="margin:0 0 18px;font-size:14px;color:#4b5563;text-align:center;line-height:1.6;">Everything is still unlocked — all stories, Nimi AI, and certificates. Keep exploring!</p>
+      ${ctaButton("https://nimipiko.com/stories", "📖 Continue exploring")}
+      <p style="margin:0;font-size:12px;color:#9ca3af;text-align:center;">You can cancel any time from <a href="https://nimipiko.com/settings" style="color:#22c55e;text-decoration:none;">Account Settings</a>. Questions? Reply here — we're happy to help.</p>`,
+    ),
   );
 }
 
@@ -618,18 +623,23 @@ export async function sendCancellationConfirmation(opts: {
   await send(
     to,
     "Your NIMIPIKO Club has been cancelled",
-    `
-<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;color:#111827">
-  <div style="background:#6b7280;padding:24px;text-align:center;border-radius:12px 12px 0 0">
-    <h1 style="color:#fff;margin:0;font-size:22px">Subscription Cancelled</h1>
-  </div>
-  <div style="background:#fff;padding:24px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 12px 12px">
-    <p style="font-size:15px">Hi ${parentName}, we've cancelled your NIMIPIKO Club subscription as requested.</p>
-    <p style="font-size:15px">You and your child still have full access until <strong>${untilDate}</strong>. After that, you'll move to the free plan — your child's progress and certificates are saved forever.</p>
-    <p style="font-size:14px;color:#6b7280">Changed your mind? You can resubscribe at any time from <a href="https://nimipiko.com/pricing" style="color:#15803d">Pricing</a>.</p>
-  </div>
-</div>
-    `.trim(),
+    authBase(
+      "Subscription cancelled",
+      `<p style="margin:0 0 6px;font-size:22px;font-weight:900;color:#374151;text-align:center;">All done, ${parentName} 👋</p>
+      <p style="margin:0 0 20px;font-size:15px;color:#4b5563;text-align:center;line-height:1.6;">Your NIMIPIKO Club subscription has been cancelled. No future charges will be made.</p>
+      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:14px;padding:16px 20px;margin-bottom:22px">
+        <p style="margin:0 0 8px;font-size:14px;font-weight:700;color:#15803d;">What's still there for you:</p>
+        <ul style="margin:0;padding-left:18px;font-size:14px;color:#166534;line-height:1.9">
+          <li>Full Club access until <strong>${untilDate}</strong> ✓</li>
+          <li>All of your child's progress and stars — saved forever ✓</li>
+          <li>Every certificate already earned ✓</li>
+          <li>Free plan (3 stories + 10 Nimi chats/day) after that ✓</li>
+        </ul>
+      </div>
+      <p style="margin:0 0 18px;font-size:14px;color:#6b7280;text-align:center;line-height:1.6;">Changed your mind? You can rejoin at any time — your child's progress picks up right where it left off.</p>
+      ${ctaButton("https://nimipiko.com/pricing", "Rejoin Club →")}
+      <p style="margin:0;font-size:12px;color:#9ca3af;text-align:center;">Questions? Reply to this email — we're always happy to help.</p>`,
+    ),
   );
 }
 
@@ -639,11 +649,27 @@ export async function sendRenewalFailed(opts: {
   parentName: string;
   amount: string;
   currency: string;
+  provider?: string; // "cybersource" | "mtn_momo" — controls CTA copy and retry bullet
 }): Promise<void> {
-  const { to, parentName, amount, currency } = opts;
+  const { to, parentName, amount, currency, provider } = opts;
+  const isMoMo = provider === "mtn_momo";
   const formattedAmount = currency === "RWF"
     ? `${Math.round(Number(amount)).toLocaleString()} RWF`
     : `${currency} ${Number(amount).toFixed(2)}`;
+
+  const retryBullet = isMoMo
+    ? "We'll send a new Mobile Money request to your phone over the next few days"
+    : "We'll retry the charge automatically over the next few days";
+
+  const actionText = isMoMo
+    ? "To avoid any interruption, you can resubscribe now with your preferred payment method."
+    : "To avoid any interruption, please update your card details or resubscribe now.";
+
+  const ctaHref  = isMoMo ? "https://nimipiko.com/pricing" : "https://nimipiko.com/parents";
+  const ctaLabel = isMoMo ? "Resubscribe to Club →" : "Update my card →";
+
+  const secondaryLink = isMoMo ? "" :
+    `<p style="margin:8px 0 16px;font-size:13px;color:#6b7280;text-align:center;">or <a href="https://nimipiko.com/pricing" style="color:#22c55e;font-weight:700;text-decoration:none;">resubscribe from the pricing page</a> if you prefer to start fresh</p>`;
 
   await send(
     to,
@@ -655,14 +681,76 @@ export async function sendRenewalFailed(opts: {
       <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:14px;padding:16px 20px;margin-bottom:22px">
         <p style="margin:0 0 8px;font-size:14px;font-weight:700;color:#9a3412">What happens next?</p>
         <ul style="margin:0;padding-left:18px;font-size:14px;color:#78350f;line-height:1.8">
-          <li>Your subscription stays active while we retry the charge</li>
-          <li>We'll try up to 3 times over the next few days</li>
+          <li>Your Club access stays active while we retry</li>
+          <li>${retryBullet}</li>
           <li>If payment isn't collected, access to Club will pause</li>
         </ul>
       </div>
-      <p style="margin:0 0 18px;font-size:14px;color:#6b7280;text-align:center;line-height:1.6;">To avoid any interruption, please update your payment details now.</p>
-      ${ctaButton("https://nimipiko.com/parents", "Update payment details")}
+      <p style="margin:0 0 18px;font-size:14px;color:#6b7280;text-align:center;line-height:1.6;">${actionText}</p>
+      ${ctaButton(ctaHref, ctaLabel)}
+      ${secondaryLink}
+      <p style="margin:0;font-size:12px;color:#9ca3af;text-align:center;">Questions? Reply to this email and we'll help right away.</p>`,
+    ),
+  );
+}
+
+// ── Renewal: no auto-retry possible (TMS token missing) ─────────────────────
+// Unlike sendRenewalFailed, we cannot promise retries here — there is no stored
+// payment token. The parent must resubscribe manually to restore automatic billing.
+export async function sendNoTokenRenewalFailed(opts: {
+  to: string;
+  parentName: string;
+}): Promise<void> {
+  const { to, parentName } = opts;
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://nimipiko.com";
+  await send(
+    to,
+    "Action required: your NIMIPIKO Club subscription needs renewal",
+    authBase(
+      "Subscription renewal needed",
+      `<p style="margin:0 0 6px;font-size:22px;font-weight:900;color:#7c2d12;text-align:center;">Subscription renewal needed ⚠️</p>
+      <p style="margin:0 0 20px;font-size:15px;color:#4b5563;text-align:center;line-height:1.6;">Hi ${parentName} — your NIMIPIKO Club membership has reached its renewal date, and we were unable to process an automatic payment.</p>
+      <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:14px;padding:16px 20px;margin-bottom:22px">
+        <p style="margin:0 0 8px;font-size:14px;font-weight:700;color:#9a3412">What this means:</p>
+        <ul style="margin:0;padding-left:18px;font-size:14px;color:#78350f;line-height:1.8">
+          <li>Your Club access remains active during the grace period</li>
+          <li>We are unable to retry automatically — a quick resubscribe is needed</li>
+          <li>Your child's progress and stories are saved safely</li>
+        </ul>
+      </div>
+      <p style="margin:0 0 18px;font-size:14px;color:#6b7280;text-align:center;line-height:1.6;">Resubscribing takes less than a minute and restores continuous automatic billing.</p>
+      ${ctaButton(`${siteUrl}/pricing`, "Resubscribe to Club →")}
       <p style="margin:12px 0 0;font-size:12px;color:#9ca3af;text-align:center;">Questions? Reply to this email and we'll help right away.</p>`,
+    ),
+  );
+}
+
+// ── Checkout: session expired (browser closed mid-payment) ───────────────────
+// Sent when a CyberSource order stays "pending" for >3 hours — the user likely
+// closed the browser before card entry completed. No charge was taken.
+export async function sendExpiredCheckoutSession(opts: {
+  to: string;
+  parentName: string;
+}): Promise<void> {
+  const { to, parentName } = opts;
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://nimipiko.com";
+  await send(
+    to,
+    "Your NIMIPIKO payment session expired — please try again",
+    authBase(
+      "Payment session expired",
+      `<p style="margin:0 0 6px;font-size:22px;font-weight:900;color:#1e40af;text-align:center;">Almost there! 💙</p>
+      <p style="margin:0 0 20px;font-size:15px;color:#4b5563;text-align:center;line-height:1.6;">Hi ${parentName} — it looks like your NIMIPIKO payment session expired before it completed. Your card was <strong>not charged</strong>.</p>
+      <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:14px;padding:16px 20px;margin-bottom:22px">
+        <p style="margin:0 0 8px;font-size:14px;font-weight:700;color:#1e40af">Good news:</p>
+        <ul style="margin:0;padding-left:18px;font-size:14px;color:#1d4ed8;line-height:1.8">
+          <li>No payment was taken from your card</li>
+          <li>It only takes a moment to try again</li>
+          <li>Your selected plan is still available</li>
+        </ul>
+      </div>
+      ${ctaButton(`${siteUrl}/pricing`, "Complete my subscription →")}
+      <p style="margin:12px 0 0;font-size:12px;color:#9ca3af;text-align:center;">If you have any trouble, just reply to this email — we're happy to help.</p>`,
     ),
   );
 }
@@ -745,6 +833,44 @@ export async function sendReferralAppliedToReferee(opts: {
       ${ctaButton("https://nimipiko.com/pricing", "👑 Subscribe to Club")}
       <p style="margin:0;font-size:12px;color:#9ca3af;text-align:center;line-height:1.6;">Your 7-day free trial is already running. Subscribing before it ends keeps full access without interruption.</p>
     `),
+  );
+}
+
+// ── Subscription expired — terminal access ended email ───────────────────────
+// Sent once when the grace period ends and content_access is deactivated.
+// This is the final notification in the renewal failure chain:
+// sendRenewalFailed (×up to 3) → sendSubscriptionExpired (×1, access is now gone).
+export async function sendSubscriptionExpired(opts: {
+  to: string;
+  parentName: string;
+  amount: string;
+  currency: string;
+}): Promise<void> {
+  const { to, parentName, amount, currency } = opts;
+  const formattedAmount = currency === "RWF"
+    ? `${Math.round(Number(amount)).toLocaleString()} RWF`
+    : `${currency} ${Number(amount).toFixed(2)}`;
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://nimipiko.com";
+
+  await send(
+    to,
+    "Your NIMIPIKO Club access has ended",
+    authBase(
+      "Club access ended",
+      `<p style="margin:0 0 6px;font-size:22px;font-weight:900;color:#7c2d12;text-align:center;">Your Club access has ended 😔</p>
+      <p style="margin:0 0 20px;font-size:15px;color:#4b5563;text-align:center;line-height:1.6;">Hi ${parentName} — we were unable to collect payment of <strong>${formattedAmount}</strong> after multiple attempts, so your NIMIPIKO Club access has now paused.</p>
+      <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:14px;padding:16px 20px;margin-bottom:22px">
+        <p style="margin:0 0 8px;font-size:14px;font-weight:700;color:#374151">What's still saved:</p>
+        <ul style="margin:0;padding-left:18px;font-size:14px;color:#4b5563;line-height:1.8">
+          <li>Your child's progress and stars ✓</li>
+          <li>All certificates already earned ✓</li>
+          <li>Your account and settings ✓</li>
+        </ul>
+      </div>
+      <p style="margin:0 0 18px;font-size:14px;color:#6b7280;text-align:center;line-height:1.6;">Resubscribing takes less than a minute — everything picks up right where you left off.</p>
+      ${ctaButton(`${siteUrl}/pricing`, "Resubscribe to Club →")}
+      <p style="margin:12px 0 0;font-size:12px;color:#9ca3af;text-align:center;">Questions? Reply to this email — we're here to help.</p>`,
+    ),
   );
 }
 

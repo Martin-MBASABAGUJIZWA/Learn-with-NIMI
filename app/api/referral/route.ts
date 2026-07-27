@@ -80,12 +80,20 @@ export async function POST(req: NextRequest) {
 
   if (existing) return NextResponse.json({ ok: true, message: "Already applied" });
 
-  // Record redemption
-  await serviceSupabase.from("referral_redemptions").insert({
+  // Record redemption — unique constraint on referred_id prevents duplicates from
+  // concurrent requests that both passed the existence check above.
+  const { error: insertErr } = await serviceSupabase.from("referral_redemptions").insert({
     referrer_id: referralRow.parent_id,
     referred_id: user.id,
     code,
   });
+  // 23505 = unique_violation: another concurrent request already recorded this redemption
+  if (insertErr) {
+    if ((insertErr as { code?: string }).code === "23505") {
+      return NextResponse.json({ ok: true, message: "Already applied" });
+    }
+    return NextResponse.json({ error: "Failed to record referral" }, { status: 500 });
+  }
 
   // Look up both parties for email notifications
   const [referrerRow, refereeRow] = await Promise.all([

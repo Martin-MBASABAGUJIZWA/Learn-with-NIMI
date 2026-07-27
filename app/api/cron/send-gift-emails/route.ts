@@ -13,8 +13,13 @@ import { getServiceClient } from "@/lib/supabase/serviceClient";
 
 export async function GET(req: NextRequest) {
   const supabase = getServiceClient();
-  const secret = req.headers.get("x-cron-secret");
-  if (secret !== process.env.CRON_SECRET) {
+  const cronSecret = process.env.CRON_SECRET;
+  const authHeader  = req.headers.get("authorization");
+  const legacyHeader = req.headers.get("x-cron-secret");
+  const authorized =
+    cronSecret &&
+    (authHeader === `Bearer ${cronSecret}` || legacyHeader === cronSecret);
+  if (!authorized) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -52,7 +57,16 @@ export async function GET(req: NextRequest) {
 
     if (!claimed) continue; // another run got there first
 
-    await dispatchGiftEmail(supabase, row.order_id, giver, null);
+    // Fetch product name now (after claim) so the email shows the right plan name.
+    // The top-level query joins orders but not products, so we look it up here.
+    const { data: orderWithProduct } = await supabase
+      .from("orders")
+      .select("product_id, products(name)")
+      .eq("id", row.order_id)
+      .maybeSingle();
+    const productName = (orderWithProduct?.products as { name?: string } | null)?.name ?? null;
+
+    await dispatchGiftEmail(supabase, row.order_id, giver, productName);
     sent++;
   }
 

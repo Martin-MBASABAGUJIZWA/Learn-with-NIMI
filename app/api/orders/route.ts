@@ -8,6 +8,7 @@ export const runtime = "nodejs";
 // passed directly to createOrder which wrote it verbatim to the DB).
 
 import { NextRequest, NextResponse } from "next/server";
+import { addMonths, addYears } from "@/lib/dateUtils";
 import { getAuthUser } from "@/lib/supabaseRouteAuth";
 import type { Currency } from "@/lib/payments/types";
 import { rwfToUsd } from "@/lib/payments/rwfConvert";
@@ -124,9 +125,7 @@ export async function POST(req: NextRequest) {
 
     if (product.product_type === "subscription" || product.tier === "club") {
       const billingInterval = (product.billing_interval ?? "month") as "month" | "year";
-      const periodEnd = new Date();
-      if (billingInterval === "year") periodEnd.setFullYear(periodEnd.getFullYear() + 1);
-      else periodEnd.setMonth(periodEnd.getMonth() + 1);
+      const periodEnd = billingInterval === "year" ? addYears(new Date(), 1) : addMonths(new Date(), 1);
 
       const { error: provisionErr } = await supabase.rpc("provision_subscription", {
         p_parent_id:        user.id,

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServiceClient } from "@/lib/supabase/serviceClient";
 import { sendReferralRewardGranted } from "@/lib/email";
 import { sendPushToParent } from "@/lib/push";
+import { addMonths } from "@/lib/dateUtils";
 
 // POST /api/admin/referral/grant
 // Admin action: grant a referral reward by redemption ID.
@@ -83,8 +84,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Grant 1 free month to the referrer
-  const periodEnd = new Date();
-  periodEnd.setMonth(periodEnd.getMonth() + 1);
+  const periodEnd = addMonths(new Date(), 1);
 
   const { data: newSub } = await supabase
     .from("nimipiko_subscriptions")

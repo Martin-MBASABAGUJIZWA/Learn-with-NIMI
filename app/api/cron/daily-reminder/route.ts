@@ -23,8 +23,8 @@ export async function GET(req: NextRequest) {
   );
 
   try {
-    // Expire any trials whose 7-day window has passed (fire-and-forget, non-fatal)
-    void sb.rpc("expire_trial_subscriptions");
+    // Expire any trials whose 7-day window has passed before reading subscription state below
+    try { await sb.rpc("expire_trial_subscriptions"); } catch { /* non-fatal */ }
 
     // ── Trial lifecycle emails ────────────────────────────────────────────────
     // Run in parallel; failures are non-fatal so the push loop still runs.
@@ -43,11 +43,9 @@ export async function GET(req: NextRequest) {
           .select("parent_id, current_period_end")
           .eq("payment_provider", "trial")
           .eq("status", "active")
-          .or(
-            // 3-day window: expires between now+2.5d and now+3.5d
-            `current_period_end.gte.${new Date(in3days.getTime() - 12 * 3600_000).toISOString()},` +
-            `current_period_end.lte.${new Date(in3days.getTime() + 12 * 3600_000).toISOString()}`,
-          );
+          // ±12h window around the 3-day mark — must be AND (chained), not OR
+          .gte("current_period_end", new Date(in3days.getTime() - 12 * 3600_000).toISOString())
+          .lte("current_period_end", new Date(in3days.getTime() + 12 * 3600_000).toISOString());
 
         const { data: endingTomorrow } = await sb
           .from("nimipiko_subscriptions")

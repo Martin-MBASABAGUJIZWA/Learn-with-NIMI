@@ -115,6 +115,21 @@ export async function getActiveSubscription(parentId: string): Promise<Subscript
     .maybeSingle();
   if (data) return data;
 
+  // Return past_due subscriptions that are still within their grace period so
+  // the UI can show a "payment failed — update your card" warning banner.
+  // Once grace_ends_at passes the cron expires them; until then the user still
+  // has access and needs to see the warning.
+  const { data: pastDue } = await supabase
+    .from("nimipiko_subscriptions")
+    .select("*")
+    .eq("parent_id", parentId)
+    .eq("status", "past_due")
+    .gte("grace_ends_at", new Date().toISOString())
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (pastDue) return pastDue;
+
   // 24-hour grace period for recently-expired trials — lets the user finish
   // their session and see a clear "your trial ended" message rather than an
   // abrupt content lockout at the exact expiry second.

@@ -9,6 +9,7 @@ import { getActiveSubscription } from "@/lib/payments/products";
 import type { Subscription } from "@/lib/payments/types";
 import ChangePasswordModal from "./ChangePasswordModal";
 import DeleteAccountModal from "./DeleteAccountModal";
+import UpdateCardModal from "@/components/parents/UpdateCardModal";
 import supabase from "@/lib/supabaseClient";
 
 function formatDate(iso: string) {
@@ -30,6 +31,7 @@ export default function SettingsAccountCard() {
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   const [cancelling, setCancelling] = useState(false);
   const [cancelError, setCancelError] = useState<string | null>(null);
+  const [showUpdateCard, setShowUpdateCard] = useState(false);
 
   useEffect(() => {
     void (async () => {
@@ -78,21 +80,23 @@ export default function SettingsAccountCard() {
   async function handleCancelSubscription() {
     setCancelling(true);
     setCancelError(null);
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) { setCancelling(false); return; }
-    const res = await fetch("/api/account/cancel-subscription", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${session.access_token}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ subscriptionId: subscription?.id }),
-    });
-    if (!res.ok) {
-      setCancelError("Something went wrong. Please try again.");
+    try {
+      const res = await fetch("/api/account/subscription", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "cancel" }),
+        credentials: "include",
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        setCancelError((body as { error?: string }).error ?? "Something went wrong. Please try again.");
+        return;
+      }
+      setSubscription(prev => prev ? { ...prev, cancel_at_period_end: true } : null);
+      setShowCancelConfirm(false);
+    } finally {
       setCancelling(false);
-      return;
     }
-    setSubscription(prev => prev ? { ...prev, cancel_at_period_end: true } : null);
-    setCancelling(false);
-    setShowCancelConfirm(false);
   }
 
   return (
@@ -101,7 +105,40 @@ export default function SettingsAccountCard() {
 
       {/* Plan status */}
       <div className="mb-3 pb-3 border-b border-ds-border">
-        {subscription ? (
+        {subscription?.status === "past_due" ? (
+          <div className="space-y-2">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 bg-red-100 rounded-full flex items-center justify-center shrink-0">
+                <Crown className="w-4 h-4 text-red-500" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <span className="font-bold text-[13px] text-ds-text">NIMIPIKO Club</span>
+                  <span className="inline-flex items-center gap-0.5 bg-red-100 text-red-700 text-[10px] font-black px-1.5 py-0.5 rounded-full">
+                    <XCircle className="w-3 h-3" /> Payment failed
+                  </span>
+                </div>
+                <p className="text-[11px] text-red-500 mt-0.5 font-medium">
+                  Your access is on hold — please update your payment to continue
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-2 pt-0.5">
+              <Link href="/pricing"
+                className="flex-1 text-center py-1.5 text-[11px] font-black text-white rounded-lg transition"
+                style={{ backgroundColor: "var(--nimi-green, #22c55e)" }}>
+                Resubscribe →
+              </Link>
+              {subscription?.payment_provider === "cybersource" && (
+                <button
+                  onClick={() => setShowUpdateCard(true)}
+                  className="flex-1 py-1.5 text-[11px] font-black text-red-600 bg-red-50 border border-red-100 rounded-lg hover:bg-red-100 transition">
+                  Update card
+                </button>
+              )}
+            </div>
+          </div>
+        ) : subscription ? (
           <div className="space-y-2">
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 bg-yellow-100 rounded-full flex items-center justify-center shrink-0">
@@ -226,6 +263,12 @@ export default function SettingsAccountCard() {
 
       {showPasswordModal && <ChangePasswordModal onClose={() => setShowPasswordModal(false)} />}
       {showDeleteModal && email && <DeleteAccountModal email={email} onClose={() => setShowDeleteModal(false)} />}
+      {showUpdateCard && (
+        <UpdateCardModal
+          onClose={() => setShowUpdateCard(false)}
+          onSuccess={() => setSubscription(prev => prev ? { ...prev, status: "active" } : null)}
+        />
+      )}
     </div>
   );
 }

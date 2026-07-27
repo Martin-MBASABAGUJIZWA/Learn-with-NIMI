@@ -1,6 +1,7 @@
 // Drop-in replacement for fetch() that injects the Supabase access token
-// as "Authorization: Bearer <token>" so server route handlers can authenticate
-// the caller without relying on cookies (session is in localStorage, not cookies).
+// as "Authorization: Bearer <token>".  Route handlers that use getAuthUser()
+// also accept cookie-based sessions, but this explicit header works in both
+// cookie and non-cookie environments.
 
 import supabase from "@/lib/supabaseClient";
 
