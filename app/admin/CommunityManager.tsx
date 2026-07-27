@@ -28,6 +28,15 @@ interface PostRow {
 type TabKey = 'all' | 'pending' | 'approved' | 'reported'
 const PAGE_SIZE = 5
 
+const REPORT_REASON_LABELS: Record<string, string> = {
+  communityReportReason1: 'Not kind or respectful',
+  communityReportReason2: 'Inappropriate content',
+  communityReportReason3: 'Makes me uncomfortable',
+  communityReportReason4: 'Something else',
+}
+const formatReportReason = (r: string | null) =>
+  r ? (REPORT_REASON_LABELS[r] ?? r) : '—'
+
 export default function CommunityManager({ onNavigate, onOpenSidebar }: Props) {
   const [posts, setPosts] = useState<PostRow[]>([])
   const [loading, setLoading] = useState(true)
@@ -126,18 +135,8 @@ export default function CommunityManager({ onNavigate, onOpenSidebar }: Props) {
     })
     if (!ok) return
     try {
-      const { data: { session } } = await supabase.auth.getSession()
-      const token = session?.access_token
-      if (!token) throw new Error('Not authenticated')
-      const res = await fetch('/api/admin/community/delete-post', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ id }),
-      })
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}))
-        throw new Error((body as { error?: string }).error ?? 'Delete failed')
-      }
+      const { error } = await supabase.from('creations').delete().eq('id', id)
+      if (error) throw error
       toastOk('Post deleted.')
       void logAdminAction({ action: 'delete_post', entityType: 'post', entityId: id, entityLabel: child_name })
       void load()
@@ -297,8 +296,8 @@ export default function CommunityManager({ onNavigate, onOpenSidebar }: Props) {
                       <td className="px-5 py-3.5 text-[12px] text-gray-400">
                         {new Date(p.created_at).toLocaleDateString('en', { month: 'short', day: 'numeric', year: 'numeric' })}
                       </td>
-                      <td className="px-5 py-3.5 text-[12px] text-orange-600 max-w-[140px] truncate" title={p.report_reason ?? ''}>
-                        {p.report_reason ?? <span className="text-gray-300">—</span>}
+                      <td className="px-5 py-3.5 text-[12px] text-orange-600 max-w-[140px] truncate" title={formatReportReason(p.report_reason)}>
+                        {p.report_reason ? formatReportReason(p.report_reason) : <span className="text-gray-300">—</span>}
                       </td>
                       <td className="px-5 py-3.5">
                         <div className="flex items-center gap-1">
