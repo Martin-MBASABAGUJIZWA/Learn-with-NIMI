@@ -268,6 +268,7 @@ export async function GET(req: NextRequest) {
                 currency: order.currency,
                 provider: "mtn_momo",
                 periodEnd: periodEnd.toISOString(),
+                billingInterval,
               });
               if (product?.tier === "club" || product?.tier === "club_annual") {
                 void sendWelcomeToClub({

@@ -241,6 +241,7 @@ export async function POST(req: NextRequest) {
               currency: order.currency,
               provider: "cybersource",
               periodEnd: periodEnd.toISOString(),
+              billingInterval,
             });
             // Welcome-to-Club email for new Club subscriptions (tier = "club" or "club_annual")
             if (product?.tier === "club" || product?.tier === "club_annual") {

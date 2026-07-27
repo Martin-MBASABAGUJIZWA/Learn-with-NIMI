@@ -19,7 +19,8 @@ export async function GET(req: Request) {
     supabase
       .from("referral_redemptions")
       .select("id, referrer_id, referred_id")
-      .is("reward_granted_at", null),
+      .is("reward_granted_at", null)
+      .limit(50),
     supabase.from("products").select("id").eq("slug", "nimipiko-club").maybeSingle(),
   ]);
 
@@ -28,12 +29,13 @@ export async function GET(req: Request) {
 
   async function processRow(row: { id: string; referrer_id: string; referred_id: string }) {
     // Check if referred user has an active paid subscription
+    // Only trigger on real paid subscriptions — exclude free grants and trials
     const { data: sub } = await supabase
       .from("nimipiko_subscriptions")
       .select("id")
       .eq("parent_id", row.referred_id)
       .eq("status", "active")
-      .not("payment_provider", "eq", "admin_grant")
+      .not("payment_provider", "in", '("admin_grant","trial")')
       .maybeSingle();
 
     if (!sub) return false;

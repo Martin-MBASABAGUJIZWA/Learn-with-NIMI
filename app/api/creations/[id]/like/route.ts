@@ -20,7 +20,9 @@ export async function POST(req: NextRequest, ctx: RouteContext) {
 
     const user_id = user.id;
 
-    // Check existing like
+    // Check existing like then toggle atomically.
+    // Two concurrent requests can both read existing=null and both attempt insert;
+    // handle the unique-constraint violation (23505) as a graceful "already liked".
     const { data: existing } = await supabase
       .from("likes")
       .select("id")
@@ -31,7 +33,10 @@ export async function POST(req: NextRequest, ctx: RouteContext) {
     if (existing) {
       await supabase.from("likes").delete().eq("id", existing.id);
     } else {
-      await supabase.from("likes").insert({ creation_id, user_id });
+      const { error: insertErr } = await supabase.from("likes").insert({ creation_id, user_id });
+      if (insertErr && (insertErr as { code?: string }).code !== "23505") {
+        throw insertErr;
+      }
     }
 
     const { count } = await supabase

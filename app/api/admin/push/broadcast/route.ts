@@ -45,12 +45,13 @@ export async function POST(req: NextRequest) {
   if (target_parent_id) {
     parentIds = [target_parent_id];
   } else {
-    const { data: subs } = await sb.from("push_subscriptions").select("parent_id");
+    // Use service client so RLS on push_subscriptions doesn't filter to just the admin's row
+    const { data: subs } = await adminCheck.from("push_subscriptions").select("parent_id");
     parentIds = Array.from(new Set((subs ?? []).map((s) => s.parent_id as string)));
   }
 
   // Write audit record FIRST — if push fails mid-loop, at least we have a record of intent
-  const { data: broadcast, error } = await sb
+  const { data: broadcast, error } = await adminCheck
     .from("push_broadcasts")
     .insert({
       sent_by: user.id,
@@ -69,16 +70,16 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: _emsg }, { status: 500 });
   }
 
-  // Send all pushes in parallel
+  // Use service client so sendPushToParent can read other parents' subscriptions
   const results = await Promise.allSettled(
-    parentIds.map(parentId => sendPushToParent(sb, parentId, payload))
+    parentIds.map(parentId => sendPushToParent(adminCheck, parentId, payload))
   );
   const recipientDevices = results.reduce((sum, r) =>
     sum + (r.status === "fulfilled" ? r.value.sent : 0), 0
   );
 
   // Best-effort update with actual device count
-  void sb.from("push_broadcasts")
+  void adminCheck.from("push_broadcasts")
     .update({ recipient_devices: recipientDevices })
     .eq("id", broadcast.id)
     .then(() => {}, () => {});

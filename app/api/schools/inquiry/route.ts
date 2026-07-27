@@ -25,8 +25,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid email address" }, { status: 400 });
     }
 
-    // Store inquiry in DB
-    await supabase.from("school_inquiries").insert({
+    // Store inquiry in DB — fail fast if this doesn't work; without a DB record
+    // the inquiry is lost even if the team email goes out.
+    const { error: insertErr } = await supabase.from("school_inquiries").insert({
       name,
       school,
       email,
@@ -34,6 +35,10 @@ export async function POST(req: NextRequest) {
       learner_count: size || null,
       message: message || null,
     });
+    if (insertErr) {
+      console.error("[schools/inquiry] DB insert failed:", insertErr.message);
+      return NextResponse.json({ error: "Failed to submit inquiry. Please try again." }, { status: 500 });
+    }
 
     // Notify internal team via email (best-effort)
     if (process.env.RESEND_API_KEY) {

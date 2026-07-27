@@ -54,10 +54,10 @@ export async function GET(req: NextRequest) {
     const { data: parent } = await supabase
       .from("parents").select("email, name").eq("id", order.parent_id).maybeSingle();
     if (parent?.email) {
-      void sendExpiredCheckoutSession({
+      sendExpiredCheckoutSession({
         to: parent.email,
         parentName: parent.name ?? "there",
-      });
+      }).catch(err => console.error("[expire-checkouts] email failed for", order.parent_id, err));
     }
     expired++;
   }

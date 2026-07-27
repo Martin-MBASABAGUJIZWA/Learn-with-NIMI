@@ -103,13 +103,17 @@ export async function POST(req: NextRequest) {
     .select("id")
     .single();
 
-  await supabase.from("content_access").insert({
+  const { error: accessErr } = await supabase.from("content_access").insert({
     parent_id: redemption.referrer_id,
     access_type: "club",
     order_id: null,
     subscription_id: newSub?.id ?? null,
     expires_at: periodEnd.toISOString(),
   });
+  if (accessErr) {
+    console.error("[admin/referral/grant] content_access insert failed:", accessErr.message);
+    return NextResponse.json({ error: "Subscription created but access grant failed — check logs" }, { status: 500 });
+  }
 
   // Notify referrer
   const [referrerRow, refereeRow] = await Promise.all([

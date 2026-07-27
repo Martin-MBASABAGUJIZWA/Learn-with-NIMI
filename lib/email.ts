@@ -40,7 +40,7 @@ function authBase(title: string, body: string): string {
   </td></tr>
   <tr><td style="background:#ffffff;border-radius:20px;padding:40px 36px;box-shadow:0 4px 24px rgba(0,0,0,0.07);">${body}</td></tr>
   <tr><td align="center" style="padding-top:24px;">
-    <p style="margin:0;font-size:12px;color:#6b7280;">© 2025 NIMIPIKO · <a href="https://nimipiko.com" style="color:#22c55e;text-decoration:none;">nimipiko.com</a></p>
+    <p style="margin:0;font-size:12px;color:#6b7280;">© ${new Date().getFullYear()} NIMIPIKO · <a href="https://nimipiko.com" style="color:#22c55e;text-decoration:none;">nimipiko.com</a></p>
     <p style="margin:4px 0 0;font-size:12px;color:#9ca3af;">Questions? <a href="mailto:support@nimipiko.com" style="color:#22c55e;text-decoration:none;">support@nimipiko.com</a></p>
   </td></tr>
 </table>
@@ -210,8 +210,9 @@ export async function sendPaymentReceipt(opts: {
   currency: string;
   provider: string;
   periodEnd: string;
+  billingInterval?: "month" | "year";
 }): Promise<void> {
-  const { to, parentName, amount, currency, provider, periodEnd } = opts;
+  const { to, parentName, amount, currency, provider, periodEnd, billingInterval = "month" } = opts;
   const renewDate = new Date(periodEnd).toLocaleDateString("en-US", {
     year: "numeric", month: "long", day: "numeric",
   });
@@ -227,7 +228,7 @@ export async function sendPaymentReceipt(opts: {
   </div>
   <div style="background:#fff;padding:32px 24px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 12px 12px">
     <table style="width:100%;border-collapse:collapse;font-size:14px">
-      <tr><td style="padding:10px 0;color:#6b7280;border-bottom:1px solid #f3f4f6">Plan</td><td style="padding:10px 0;font-weight:700;text-align:right">NIMIPIKO Club (Monthly)</td></tr>
+      <tr><td style="padding:10px 0;color:#6b7280;border-bottom:1px solid #f3f4f6">Plan</td><td style="padding:10px 0;font-weight:700;text-align:right">NIMIPIKO Club (${billingInterval === "year" ? "Annual" : "Monthly"})</td></tr>
       <tr><td style="padding:10px 0;color:#6b7280;border-bottom:1px solid #f3f4f6">Amount</td><td style="padding:10px 0;font-weight:700;text-align:right">${amount} ${currency}</td></tr>
       <tr><td style="padding:10px 0;color:#6b7280;border-bottom:1px solid #f3f4f6">Payment</td><td style="padding:10px 0;font-weight:700;text-align:right">${provider === "mtn_momo" ? "MTN Mobile Money" : "Credit / Debit Card"}</td></tr>
       <tr><td style="padding:10px 0;color:#6b7280">Next renewal</td><td style="padding:10px 0;font-weight:700;text-align:right">${renewDate}</td></tr>

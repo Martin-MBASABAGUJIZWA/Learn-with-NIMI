@@ -16,6 +16,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { getServiceClient } from "@/lib/supabase/serviceClient";
 import { getStoryKnowledgeBase } from "@/lib/storyKnowledgeEngine";
 import { linkStoryConceptsToGraph } from "@/lib/learnerKnowledgeGraph";
 
@@ -38,11 +39,14 @@ export async function POST(req: NextRequest) {
   const { data: { user } } = await authClient.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { data: adminRow } = await authClient
+  // Use service client for the admin check so RLS on the admins table
+  // cannot block a legitimate admin from being recognized.
+  const adminCheck = getServiceClient();
+  const { data: adminRow } = await adminCheck
     .from("admins")
     .select("id")
     .eq("id", user.id)
-    .single();
+    .maybeSingle();
   if (!adminRow) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   // Parse body

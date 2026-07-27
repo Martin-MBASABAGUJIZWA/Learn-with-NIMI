@@ -18,7 +18,9 @@ export async function POST(req: NextRequest) {
   if (!user?.email) return NextResponse.json({ ok: true }); // no-op if not authenticated
 
   const { data: parent } = await sb.from("parents").select("name").eq("id", user.id).maybeSingle();
-  void sendWelcomeEmail(user.email, parent?.name ?? "there");
+  sendWelcomeEmail(user.email, parent?.name ?? "there").catch(err =>
+    console.error("[welcome-email] send failed:", err)
+  );
 
   return NextResponse.json({ ok: true });
 }

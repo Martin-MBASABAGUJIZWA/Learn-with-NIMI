@@ -203,6 +203,7 @@ export async function POST(req: NextRequest) {
                         currency: order.currency,
                         provider: "cybersource",
                         periodEnd: periodEnd.toISOString(),
+                        billingInterval,
                       });
                     }
                     console.log("[Webhook] Browser-close recovery: provisioned order", orderId);

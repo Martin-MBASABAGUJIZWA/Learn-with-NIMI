@@ -78,12 +78,15 @@ export async function grantAccess(parentId: string, productId: string, orderId: 
     : product.data.tier === "family_bundle" ? "bundle"
     : "story";
 
-  await supabase.from("content_access").insert({
+  const { error: accessErr } = await supabase.from("content_access").insert({
     parent_id: parentId,
     access_type: accessType,
     story_id: product.data.story_id,
     order_id: orderId,
   });
+  if (accessErr) {
+    console.error("[grantAccess] content_access insert failed:", accessErr.message, { parentId, orderId });
+  }
 }
 
 export async function getParentAccess(parentId: string): Promise<string[]> {
