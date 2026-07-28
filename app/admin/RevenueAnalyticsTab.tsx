@@ -10,6 +10,7 @@ interface SubRow {
   status: string
   amount: number
   currency: string
+  billing_interval: 'month' | 'year' | null
   payment_provider: string
   cancel_at_period_end: boolean
   created_at: string
@@ -49,7 +50,7 @@ export default function RevenueAnalyticsTab() {
     void (async () => {
       try {
         const [{ data: s }, { data: o }] = await Promise.all([
-          supabase.from('nimipiko_subscriptions').select('id, parent_id, status, amount, currency, payment_provider, cancel_at_period_end, created_at, current_period_end').order('created_at'),
+          supabase.from('nimipiko_subscriptions').select('id, parent_id, status, amount, currency, billing_interval, payment_provider, cancel_at_period_end, created_at, current_period_end').order('created_at'),
           supabase.from('orders').select('amount, currency, payment_status, completed_at').order('completed_at'),
         ])
         setSubs((s ?? []) as SubRow[])
@@ -75,14 +76,20 @@ export default function RevenueAnalyticsTab() {
   const newThisMonth = activeSubs.filter(s => new Date(s.created_at) >= thisMonthStart)
   const newLastMonth = activeSubs.filter(s => new Date(s.created_at) >= lastMonthStart && new Date(s.created_at) < thisMonthStart)
 
-  const mrr = activeSubs.reduce((sum, s) => sum + toUSD(s.amount, s.currency), 0)
   const completedOrders = orders.filter(o => o.payment_status === 'completed')
   const totalRevenue = completedOrders.reduce((sum, o) => sum + toUSD(o.amount, o.currency), 0)
   const revenueThisMonth = completedOrders.filter(o => o.completed_at && new Date(o.completed_at) >= thisMonthStart).reduce((sum, o) => sum + toUSD(o.amount, o.currency), 0)
   const revenueLastMonth = completedOrders.filter(o => o.completed_at && new Date(o.completed_at) >= lastMonthStart && new Date(o.completed_at) < thisMonthStart).reduce((sum, o) => sum + toUSD(o.amount, o.currency), 0)
 
+  // Annual subs contribute amount/12 to MRR; multiply by 12 for ARR.
+  const mrrOf = (s: SubRow) => { const u = toUSD(s.amount, s.currency); return s.billing_interval === 'year' ? u / 12 : u }
+  const mrr = activeSubs.reduce((sum, s) => sum + mrrOf(s), 0)
+  const arr = mrr * 12
+
   const cardSubs = activeSubs.filter(s => s.payment_provider === 'cybersource').length
   const momoSubs = activeSubs.filter(s => s.payment_provider === 'mtn_momo').length
+  const monthlySubs = activeSubs.filter(s => s.billing_interval !== 'year').length
+  const annualSubs  = activeSubs.filter(s => s.billing_interval === 'year').length
 
   const churnRate = subs.length > 0 ? ((subs.filter(s => s.status === 'cancelled' || s.status === 'expired').length / subs.length) * 100) : 0
 
@@ -118,7 +125,7 @@ export default function RevenueAnalyticsTab() {
         {[
           { icon: CreditCard,  label: 'Active Subscribers',  value: activeSubs.length,          color: 'text-violet-600 bg-violet-50' },
           { icon: DollarSign,  label: 'MRR (est. USD)',       value: fmtUSD(mrr),                color: 'text-green-600 bg-green-50', sub: '/mo' },
-          { icon: TrendingUp,  label: 'Total Revenue',        value: fmtUSD(totalRevenue),       color: 'text-emerald-600 bg-emerald-50' },
+          { icon: BarChart3,   label: 'ARR (est. USD)',        value: fmtUSD(arr),                color: 'text-indigo-600 bg-indigo-50', sub: '/yr' },
           { icon: Users,       label: 'New This Month',       value: newThisMonth.length,        color: 'text-blue-600 bg-blue-50' },
         ].map(s => (
           <div key={s.label} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 flex items-center gap-3">
@@ -161,27 +168,39 @@ export default function RevenueAnalyticsTab() {
 
       {/* Breakdown */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {/* Payment methods */}
+        {/* Payment methods + billing intervals */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
           <h3 className="text-[14px] font-bold text-gray-800 mb-3">Payment Methods</h3>
           <div className="space-y-3">
-            <div>
-              <div className="flex justify-between text-[12px] font-bold text-gray-600 mb-1">
-                <span className="flex items-center gap-1.5"><CreditCard size={12} className="text-blue-500" /> Card (CyberSource)</span>
-                <span>{cardSubs}</span>
+            {[
+              { icon: CreditCard, label: 'Card (CyberSource)', count: cardSubs, color: 'bg-blue-500', iconClass: 'text-blue-500' },
+              { icon: Phone,      label: 'MTN MoMo',           count: momoSubs, color: 'bg-yellow-400', iconClass: 'text-yellow-500' },
+            ].map(({ icon: Icon, label, count, color, iconClass }) => (
+              <div key={label}>
+                <div className="flex justify-between text-[12px] font-bold text-gray-600 mb-1">
+                  <span className="flex items-center gap-1.5"><Icon size={12} className={iconClass} /> {label}</span>
+                  <span>{count}</span>
+                </div>
+                <div className="w-full bg-gray-100 rounded-full h-2">
+                  <div className={`${color} h-2 rounded-full`} style={{ width: `${activeSubs.length > 0 ? (count / activeSubs.length) * 100 : 0}%` }} />
+                </div>
               </div>
-              <div className="w-full bg-gray-100 rounded-full h-2">
-                <div className="bg-blue-500 h-2 rounded-full" style={{ width: `${activeSubs.length > 0 ? (cardSubs / activeSubs.length) * 100 : 0}%` }} />
-              </div>
-            </div>
-            <div>
-              <div className="flex justify-between text-[12px] font-bold text-gray-600 mb-1">
-                <span className="flex items-center gap-1.5"><Phone size={12} className="text-yellow-500" /> MTN MoMo</span>
-                <span>{momoSubs}</span>
-              </div>
-              <div className="w-full bg-gray-100 rounded-full h-2">
-                <div className="bg-yellow-400 h-2 rounded-full" style={{ width: `${activeSubs.length > 0 ? (momoSubs / activeSubs.length) * 100 : 0}%` }} />
-              </div>
+            ))}
+            <div className="pt-1 border-t border-gray-100">
+              <p className="text-[11px] font-bold text-gray-500 mb-2">Billing Interval</p>
+              {[
+                { label: 'Monthly', count: monthlySubs, color: 'bg-violet-400' },
+                { label: 'Annual',  count: annualSubs,  color: 'bg-indigo-500' },
+              ].map(({ label, count, color }) => (
+                <div key={label} className="mb-2">
+                  <div className="flex justify-between text-[12px] font-bold text-gray-600 mb-1">
+                    <span>{label}</span><span>{count}</span>
+                  </div>
+                  <div className="w-full bg-gray-100 rounded-full h-2">
+                    <div className={`${color} h-2 rounded-full`} style={{ width: `${activeSubs.length > 0 ? (count / activeSubs.length) * 100 : 0}%` }} />
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>

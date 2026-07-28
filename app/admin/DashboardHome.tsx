@@ -48,7 +48,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
           supabase.from('child_achievements').select('id, type'),
           supabase.from('story_slots').select('story_id, slot_key, mission_id'),
           supabase.from('mission_versions').select('id, mission_id, published, language'),
-          supabase.from('nimipiko_subscriptions').select('id, amount, currency, status, created_at').eq('status', 'active'),
+          supabase.from('nimipiko_subscriptions').select('id, amount, currency, billing_interval, status, created_at').eq('status', 'active'),
           supabase.from('orders').select('amount, currency, payment_status, completed_at'),
           supabase.from('weekly_challenges').select('*', { count: 'exact', head: true }),
           supabase.from('story_versions').select('story_id, intro_video_url, theme_song_url, meet_characters_url, story_intro_url'),
@@ -72,10 +72,14 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
         setStats({ published, ready, missing, children: (childrenData ?? []).length, certs, challenges: challengeCount ?? 0 })
 
         // Revenue stats — convert all to USD equivalent (RWF ÷ 1350)
+        // Annual subs contribute amount/12 to MRR (not the full annual amount).
         const toUSD = (amt: number, currency: string) => currency === 'RWF' ? amt / 1350 : amt
         const activeSubs = subsData ?? []
         const orders = (ordersData ?? []).filter(o => o.payment_status === 'completed')
-        const mrr = activeSubs.reduce((sum, s) => sum + toUSD(s.amount, s.currency), 0)
+        const mrr = activeSubs.reduce((sum, s: { amount: number; currency: string; billing_interval?: string }) => {
+          const usd = toUSD(s.amount, s.currency)
+          return sum + (s.billing_interval === 'year' ? usd / 12 : usd)
+        }, 0)
         const totalRevenue = orders.reduce((sum, o) => sum + toUSD(o.amount, o.currency), 0)
         const newThisMonth = activeSubs.filter(s => new Date(s.created_at) >= monthStart).length
         setRevenue({ activeSubscriptions: activeSubs.length, mrr, totalRevenue, newThisMonth })
