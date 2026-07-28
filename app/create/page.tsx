@@ -250,9 +250,21 @@ function CreativeStudioPage() {
   );
 }
 
+function CreateSkeleton() {
+  return (
+    <AppShell>
+      <div className="max-w-2xl mx-auto px-4 pt-4 pb-24 space-y-4">
+        <Bone className="h-32 leaf-lg" />
+        <Bone className="h-12 leaf-lg" />
+        <Bone className="h-64 leaf-lg" />
+      </div>
+    </AppShell>
+  );
+}
+
 export default function CreativeStudioPageWrapper() {
   return (
-    <Suspense>
+    <Suspense fallback={<CreateSkeleton />}>
       <CreativeStudioPage />
     </Suspense>
   );
