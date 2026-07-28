@@ -14,7 +14,6 @@ const NAV_LINKS = [
   { label: "Stories",    href: "#stories",    active: false },
   { label: "Activities", href: "#activities", active: false },
   { label: "Community",  href: "#community",  active: false },
-  { label: "Schools",    href: "#schools",    active: false },
   { label: "About",      href: "#about",      active: false },
 ];
 

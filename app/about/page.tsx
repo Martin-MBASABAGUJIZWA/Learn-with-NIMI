@@ -4,7 +4,7 @@ import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import {
   BookOpen, Globe2, Mic, Palette, Trophy, Brain,
-  Heart, Users, Star, Sparkles, GraduationCap, ArrowRight, Gem,
+  Heart, Users, Star, Sparkles, ArrowRight, Gem,
 } from "lucide-react";
 import AppShell from "@/components/layout/AppShell";
 import { PageSurface } from "@/components/layout/primitives";
@@ -55,12 +55,6 @@ const PILLARS = [
     title: "Nimipiko Friends Club",
     body: "A community where children share their colored drawings, vote on the theme of the next story, and get featured as Star Artist of the Week. Creativity becomes social.",
   },
-  {
-    icon: GraduationCap,
-    color: "bg-violet-50 text-violet-600",
-    title: "Built for Schools Too",
-    body: "Institutional licensing from $7/student/month gives classrooms a separate Educator Dashboard with class-wide progress tracking and district-level reporting.",
-  },
 ];
 
 const WHO = [
@@ -78,11 +72,6 @@ const WHO = [
     icon: "🇫🇷",
     headline: "Francophone families worldwide",
     body: "French is a mother tongue for millions of children across Africa and Europe. Nimipiko treats it as one.",
-  },
-  {
-    icon: "🏫",
-    headline: "Schools & educators",
-    body: "Classrooms that need curriculum-aligned content across multiple languages — with the reporting infrastructure to prove it's working.",
   },
 ];
 

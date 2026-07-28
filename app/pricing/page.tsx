@@ -829,10 +829,10 @@ function PricingInner() {
               {/* CTA */}
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                 <a
-                  href="/schools"
+                  href="mailto:schools@nimipiko.com"
                   className="flex-1 sm:flex-none sm:px-8 py-3.5 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-black text-[15px] shadow-lg shadow-blue-200 flex items-center justify-center gap-2 hover:opacity-90 transition"
                 >
-                  🏫 View School Licensing Plans
+                  🏫 Contact us for School Licensing
                 </a>
                 <p className="text-blue-900/50 text-[11px] font-bold text-center sm:text-left">
                   From $7 · €6.50 · 5,000 RWF /student/month · volume discounts available
@@ -852,7 +852,7 @@ function PricingInner() {
                 { q: "Can I cancel anytime?", a: "Absolutely. Cancel in one click from the Parents Zone — no fees, no questions asked. Your child keeps their progress even after cancelling." },
                 { q: "Which payment methods are accepted?", a: "We accept Visa, Mastercard and Amex for card payments. Rwandan families can pay with MTN Mobile Money or by card." },
                 { q: "Is the content safe for young children?", a: "Every story and activity is educator-reviewed for children aged 2–10. Zero ads, zero in-app purchases beyond what you choose here." },
-                { q: "Does Nimipiko offer school or classroom licensing?", a: "Yes! We offer institutional licenses starting at $7/student/month (5,000–6,000 RWF) with volume discounts for 50+ learners. Visit our Schools page to see plans and submit an inquiry." },
+                { q: "Does Nimipiko offer school or classroom licensing?", a: "Yes! We offer institutional licenses starting at $7/student/month (5,000–6,000 RWF) with volume discounts for 50+ learners. Email us at schools@nimipiko.com to get started." },
               ] as const).map(({ q, a }) => (
                 <div key={q} className="border-b border-ds-border pb-4 last:border-0 last:pb-0">
                   <p className="font-baloo font-black text-ds-text text-[14px] mb-1.5">{q}</p>

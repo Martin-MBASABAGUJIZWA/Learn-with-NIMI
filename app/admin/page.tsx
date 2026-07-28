@@ -54,8 +54,6 @@ const FlipFlopBooksManager = dynamicView(() => import('./FlipFlopBooksManager'))
 const ContentMediaManager = dynamicView(() => import('./ContentMediaManager'))
 const WeeklyChallengesManager = dynamicView(() => import('./WeeklyChallengesManager'))
 const FamiliesManager = dynamicView(() => import('./FamiliesManager'))
-const SchoolsManager             = dynamicView(() => import('./SchoolsManager'))
-const RosterProvisioningManager  = dynamicView(() => import('./RosterProvisioningManager'))
 const NewsletterManager    = dynamicView(() => import('./NewsletterManager'))
 const ReferralManager      = dynamicView(() => import('./ReferralManager'))
 const DiscountCodesManager = dynamicView(() => import('./DiscountCodesManager'))
@@ -218,8 +216,6 @@ export default function AdminPanel() {
   const isAudioView = currentTable === 'audio'
   const isWeeklyChallengesView = currentTable === 'weekly_challenges'
   const isFamiliesView = currentTable === 'families'
-  const isSchoolsView           = currentTable === 'school_inquiries'
-  const isRosterProvisioningView = currentTable === 'roster_provisioning'
   const isNewsletterView   = currentTable === 'newsletter_signups'
   const isReferralView      = currentTable === 'referral_redemptions'
   const isDiscountCodesView = currentTable === 'discount_codes'
@@ -299,8 +295,6 @@ export default function AdminPanel() {
           {isAudioView && <ContentMediaManager title="Audio" description="Manage audio content for sing along missions." missionType="sing" mediaField="media_url" onNavigate={setCurrentTable} onOpenSidebar={() => setSidebarOpen(true)} />}
           {isWeeklyChallengesView && <WeeklyChallengesManager onNavigate={setCurrentTable} onOpenSidebar={() => setSidebarOpen(true)} />}
           {isFamiliesView && <FamiliesManager onNavigate={setCurrentTable} onOpenSidebar={() => setSidebarOpen(true)} />}
-          {isSchoolsView            && <SchoolsManager            onOpenSidebar={() => setSidebarOpen(true)} />}
-          {isRosterProvisioningView && <RosterProvisioningManager onOpenSidebar={() => setSidebarOpen(true)} />}
           {isNewsletterView  && <NewsletterManager  onOpenSidebar={() => setSidebarOpen(true)} />}
           {isReferralView       && <ReferralManager       onOpenSidebar={() => setSidebarOpen(true)} />}
           {isDiscountCodesView  && <DiscountCodesManager  onOpenSidebar={() => setSidebarOpen(true)} />}
@@ -372,7 +366,7 @@ export default function AdminPanel() {
               </div>
             </div>
           )}
-          {!isMissionView && !isStoryView && !isStorySlotsView && !isStoryOrderingView && !isStoryPublishingView && !isFlipFlopView && !isStoryPdfsView && !isVideosView && !isAudioView && !isWeeklyChallengesView && !isFamiliesView && !isColoringView && !isLanguagesView && !isChildrenView && !isParentsView && !isCertificatesView && !isCertTemplatesView && !isRewardsView && !isBadgeImagesView && !isAnalyticsView && !isSettingsView && !isCurriculumView && !isCommunityView && !isProductsView && !isMasterpieceView && !isSchoolsView && !isRosterProvisioningView && !isNewsletterView && !isReferralView && !isDiscountCodesView && !isGiftView && !isAuditLogView && !isPaymentHealthView && !['Buckets', 'Profile', 'admins', 'Dashboard', 'Help', 'notifications'].includes(currentTable) && (
+          {!isMissionView && !isStoryView && !isStorySlotsView && !isStoryOrderingView && !isStoryPublishingView && !isFlipFlopView && !isStoryPdfsView && !isVideosView && !isAudioView && !isWeeklyChallengesView && !isFamiliesView && !isColoringView && !isLanguagesView && !isChildrenView && !isParentsView && !isCertificatesView && !isCertTemplatesView && !isRewardsView && !isBadgeImagesView && !isAnalyticsView && !isSettingsView && !isCurriculumView && !isCommunityView && !isProductsView && !isMasterpieceView && !isNewsletterView && !isReferralView && !isDiscountCodesView && !isGiftView && !isAuditLogView && !isPaymentHealthView && !['Buckets', 'Profile', 'admins', 'Dashboard', 'Help', 'notifications'].includes(currentTable) && (
             <TableView table={currentTable} />
           )}
           </ErrorBoundary>

@@ -4,7 +4,7 @@ import { getCachedAdmin } from './adminAuth'
 import {
   LayoutDashboard, BookOpen, Palette, Trophy, Star,
   Users, Globe, Award, Bell, FolderOpen, Settings,
-  ChevronLeft, ChevronRight, X, CreditCard, Crown, BarChart3, ShieldCheck, GraduationCap, School, Mail, Share2, Tag, Gift, MessageSquareQuote, Handshake, GitMerge, MessagesSquare, ClipboardList, Activity,
+  ChevronLeft, ChevronRight, X, CreditCard, Crown, BarChart3, ShieldCheck, GraduationCap, Mail, Share2, Tag, Gift, MessageSquareQuote, Handshake, MessagesSquare, ClipboardList, Activity,
 } from 'lucide-react'
 
 interface SidebarProps {
@@ -35,8 +35,6 @@ const NAV = [
   { icon: Crown,           label: 'Masterpieces',       table: 'masterpieces' },
   { icon: BarChart3,       label: 'Analytics',          table: 'child_progress' },
   { icon: GraduationCap,   label: 'Curriculum',         table: 'curriculum' },
-  { icon: School,          label: 'Schools',            table: 'school_inquiries' },
-  { icon: GitMerge,       label: 'Roster Sync',        table: 'roster_provisioning' },
   { icon: Mail,            label: 'Newsletter',         table: 'newsletter_signups' },
   { icon: Share2,          label: 'Referrals',          table: 'referral_redemptions' },
   { icon: Tag,             label: 'Discount Codes',     table: 'discount_codes' },

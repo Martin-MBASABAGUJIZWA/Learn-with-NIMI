@@ -13,7 +13,6 @@ const NAV_LINKS = [
   { label: "Stories", href: "#stories" },
   { label: "Activities", href: "#activities" },
   { label: "Community", href: "/community" },
-  { label: "Schools", href: "/schools" },
   { label: "About", href: "/about" },
 ];
 
