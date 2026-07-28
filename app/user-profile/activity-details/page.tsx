@@ -14,17 +14,29 @@ export default function ActivityDetailsPage() {
   const { t } = useLanguage();
   const [range, setRange] = useState<"week" | "all">("week");
   const [rows, setRows] = useState<ProgressRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
-  useEffect(() => {
-    void (async () => {
-      const list = await getChildren();
-      const savedId = typeof window !== "undefined" ? localStorage.getItem(ACTIVE_CHILD_KEY) : null;
-      const child = list.find(c => c.id === savedId) ?? list[0];
-      if (!child) return;
-      const all = await getAllChildProgress(child.id);
-      setRows(all.filter(r => r.language === child.language));
+  const load = () => {
+    setError(false);
+    setLoading(true);
+    (async () => {
+      try {
+        const list = await getChildren();
+        const savedId = typeof window !== "undefined" ? localStorage.getItem(ACTIVE_CHILD_KEY) : null;
+        const child = list.find(c => c.id === savedId) ?? list[0];
+        if (!child) { setLoading(false); return; }
+        const all = await getAllChildProgress(child.id);
+        setRows(all.filter(r => r.language === child.language));
+      } catch {
+        setError(true);
+      } finally {
+        setLoading(false);
+      }
     })();
-  }, []);
+  };
+
+  useEffect(() => { load(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <AppShell>
@@ -51,7 +63,25 @@ export default function ActivityDetailsPage() {
           </div>
 
           <div className="mt-4">
-            <ActivityDetailsList rows={rows} range={range} />
+            {loading ? (
+              <div className="space-y-3 animate-pulse">
+                {Array.from({ length: 7 }).map((_, i) => (
+                  <div key={i} className="h-16 bg-gray-100 rounded-2xl w-full" />
+                ))}
+              </div>
+            ) : error ? (
+              <div className="flex flex-col items-center gap-3 py-16 text-center">
+                <p className="text-gray-500 text-sm">Couldn&apos;t load your activity. Check your connection and try again.</p>
+                <button
+                  onClick={load}
+                  className="px-5 py-2 rounded-full bg-ds-accent text-white text-sm font-black"
+                >
+                  Try again
+                </button>
+              </div>
+            ) : (
+              <ActivityDetailsList rows={rows} range={range} />
+            )}
           </div>
         </main>
       </PageSurface>

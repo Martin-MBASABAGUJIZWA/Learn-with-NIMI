@@ -81,7 +81,7 @@ export default function LandingNav({ scrolled, menuOpen, setMenuOpen, authed }: 
           <Link href="/" className={`shrink-0 transition-opacity duration-200 ${
             menuOpen ? "opacity-0 pointer-events-none lg:opacity-100 lg:pointer-events-auto" : "opacity-100"
           }`}>
-            <Image src="/nimi-logo.png" alt="NIMIPIKO" width={96} height={96}
+            <Image src="/nimi-logo.png" alt="NIMIPIKO" width={96} height={96} priority
               className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 object-contain drop-shadow-md" />
           </Link>
 

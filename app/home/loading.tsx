@@ -1,24 +1,9 @@
 import AppShell from "@/components/layout/AppShell";
-
-function Bone({ className, style }: { className?: string; style?: React.CSSProperties }) {
-  return (
-    <div
-      className={`rounded-2xl bg-gradient-to-r from-gray-100 via-gray-200 to-gray-100 bg-[length:200%_100%] ${className ?? ""}`}
-      style={{ animation: "shimmer 1.5s infinite linear", ...style }}
-    />
-  );
-}
+import { Bone } from "@/components/ui/Bone";
 
 export default function HomeLoading() {
   return (
     <AppShell>
-      <style>{`
-        @keyframes shimmer {
-          0%   { background-position: 200% 0; }
-          100% { background-position: -200% 0; }
-        }
-      `}</style>
-
       <div className="min-h-screen pb-24">
         {/* Hero skeleton */}
         <Bone className="w-full rounded-none" style={{ height: 380 }} />

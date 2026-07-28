@@ -119,7 +119,7 @@ export default function LandingPage() {
   }[]>([]);
 
   useEffect(() => {
-    void Promise.all([
+    Promise.all([
       supabase.auth.getUser(),
       fetch("/api/featured-stories?limit=4").then(r => r.json()).catch(() => []),
       supabase
@@ -133,7 +133,7 @@ export default function LandingPage() {
       if (user) setAuthed(true);
       if (Array.isArray(storiesData)) setStories((storiesData as Story[]).slice(0, 4));
       if (testimonialsData) setTestimonials(testimonialsData);
-    });
+    }).catch(() => { /* leave defaults — auth/network failure is non-fatal */ });
   }, []);
   useEffect(() => {
     const fn = () => {

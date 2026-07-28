@@ -68,6 +68,7 @@ export default function Hero() {
             src={assets.homeHeroMobile}
             alt="Nimi, Piko and Zilo in the NIMIPIKO garden"
             fill
+            priority
             className="object-cover object-top"
           />
         </div>

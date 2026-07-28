@@ -25,18 +25,24 @@ export async function GET(req: NextRequest) {
 
   const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
 
-  // All parents with an email
-  const { data: parents, error: pErr } = await sb
-    .from("parents")
-    .select("id, email, name")
-    .not("email", "is", null);
-
-  if (pErr) return NextResponse.json({ error: pErr.message }, { status: 500 });
-
+  const PAGE = 200;
+  let offset = 0;
   let sent = 0;
   const errors: string[] = [];
 
-  for (const parent of parents ?? []) {
+  // Paginate parents so we never load the whole table into memory at once.
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    const { data: parents, error: pErr } = await sb
+      .from("parents")
+      .select("id, email, name")
+      .not("email", "is", null)
+      .range(offset, offset + PAGE - 1);
+
+    if (pErr) return NextResponse.json({ error: pErr.message }, { status: 500 });
+    if (!parents?.length) break;
+
+    for (const parent of parents) {
     try {
       // Children of this parent
       const { data: children } = await sb
@@ -130,6 +136,10 @@ export async function GET(req: NextRequest) {
     } catch (err) {
       errors.push(`${parent.email}: ${err instanceof Error ? err.message : String(err)}`);
     }
+    }
+
+    offset += PAGE;
+    if (parents.length < PAGE) break;
   }
 
   return NextResponse.json({ sent, errors });

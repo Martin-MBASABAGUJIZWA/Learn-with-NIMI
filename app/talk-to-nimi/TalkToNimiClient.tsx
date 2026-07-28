@@ -44,8 +44,26 @@ interface Props {
   initialHasSubscription?: boolean;
 }
 
+function TalkToNimiSkeleton() {
+  return (
+    <div className="flex flex-col h-full animate-pulse px-4 py-6 gap-4 max-w-2xl mx-auto w-full">
+      <div className="h-10 w-48 bg-gray-100 rounded-2xl" />
+      <div className="flex-1 flex flex-col gap-3">
+        <div className="h-16 w-3/4 bg-gray-100 rounded-2xl self-start" />
+        <div className="h-12 w-1/2 bg-gray-100 rounded-2xl self-end" />
+        <div className="h-16 w-2/3 bg-gray-100 rounded-2xl self-start" />
+      </div>
+      <div className="h-14 w-full bg-gray-100 rounded-full mt-auto" />
+    </div>
+  );
+}
+
 export default function TalkToNimiClient({ initialChildren, initialHasSubscription }: Props = {}) {
-  return <Suspense><TalkToNimiInner initialChildren={initialChildren} initialHasSubscription={initialHasSubscription} /></Suspense>;
+  return (
+    <Suspense fallback={<TalkToNimiSkeleton />}>
+      <TalkToNimiInner initialChildren={initialChildren} initialHasSubscription={initialHasSubscription} />
+    </Suspense>
+  );
 }
 
 function TalkToNimiInner({ initialChildren, initialHasSubscription }: Props) {

@@ -42,13 +42,13 @@ export default function ChildrenManager({ onNavigate, onOpenSidebar }: Props) {
   useEffect(() => {
     void (async () => {
       try {
-        const [{ data: kids }, { data: stories }, { data: progress }] = await Promise.all([
-          supabase.from('children').select('id, name, avatar_url, age, language, created_at, parent_id, parents(name)').order('created_at', { ascending: false }),
-          supabase.from('stories').select('id'),
-          supabase.from('child_progress').select('child_id, completed_at').order('completed_at', { ascending: false }),
+        const [{ data: kids }, { count: storiesCount }, { data: progress }] = await Promise.all([
+          supabase.from('children').select('id, name, avatar_url, age, language, created_at, parent_id, parents(name)').order('created_at', { ascending: false }).limit(200),
+          supabase.from('stories').select('*', { count: 'exact', head: true }),
+          supabase.from('child_progress').select('child_id, completed_at').order('completed_at', { ascending: false }).limit(1000),
         ])
 
-        const totalStories = (stories ?? []).length
+        const totalStories = storiesCount ?? 0
 
         const rows: ChildRow[] = (kids ?? []).map(k => {
           const pd = k.parents as { name: string | null } | { name: string | null }[] | null

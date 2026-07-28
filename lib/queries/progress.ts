@@ -12,11 +12,16 @@ type BaseRow = { mission_id: string; completed_at: string; missions: { stars: nu
 
 function rawProgressRows(childId: string, language: "en" | "fr" | "rw"): Promise<BaseRow[]> {
   return lscached(`progressRows:${childId}:${language}`, TTL_SHORT, async () => {
+    // 90-day window covers all streak, weekly, and today calculations.
+    // All-time star totals use getTotalStars which has its own query.
+    const since = new Date(Date.now() - 90 * 86_400_000).toISOString();
     const { data } = await supabase
       .from("child_progress")
       .select("mission_id, completed_at, missions(stars)")
       .eq("child_id", childId)
-      .eq("language", language);
+      .eq("language", language)
+      .gte("completed_at", since)
+      .order("completed_at", { ascending: false });
     return (data ?? []) as unknown as BaseRow[];
   });
 }
@@ -77,13 +82,18 @@ export function getWeekStreak(childId: string, language: "en" | "fr" | "rw"): Pr
 }
 
 // Sum of `stars` across ALL completed missions (all-time) plus challenge bonus stars.
+// Uses its own unbounded query so the 90-day rawProgressRows cache doesn't undercount.
 export function getTotalStars(childId: string, language: "en" | "fr" | "rw"): Promise<number> {
   return qcached(`totalStars:${childId}:${language}`, async () => {
-    const [rows, bonus] = await Promise.all([
-      rawProgressRows(childId, language),
+    const [{ data }, bonus] = await Promise.all([
+      supabase
+        .from("child_progress")
+        .select("missions(stars)")
+        .eq("child_id", childId)
+        .eq("language", language),
       bonusStarsTotal(childId, language),
     ]);
-    return rows.reduce((sum, r) => sum + (r.missions?.stars ?? 10), 0) + bonus;
+    return (data ?? []).reduce((sum, r) => sum + ((r.missions as unknown as { stars: number } | null)?.stars ?? 10), 0) + bonus;
   });
 }
 
@@ -122,7 +132,9 @@ export function getAllChildProgress(childId: string): Promise<ProgressRow[]> {
     const { data, error } = await supabase
       .from("child_progress")
       .select("mission_id, language, stars_earned, completed_at, missions(category_slug)")
-      .eq("child_id", childId);
+      .eq("child_id", childId)
+      .order("completed_at", { ascending: false })
+      .limit(500);
     if (error) {
       console.error("[getAllChildProgress]", error.message);
       return [];

@@ -29,7 +29,7 @@ export function getStoryLibrary(
         p_child_id: childId,
         p_language: language,
       }),
-      supabase.from("stories").select("id, category"),
+      supabase.from("stories").select("id, category").limit(300),
     ]);
     if (error) {
       console.error("[getStoryLibrary]", error);
