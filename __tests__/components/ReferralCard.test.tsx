@@ -39,26 +39,30 @@ describe("ReferralCard", () => {
     expect(screen.getByText("Free months earned")).toBeInTheDocument();
   });
 
-  it("copies share URL to clipboard on Copy click", async () => {
+  it("copies invite URL to clipboard on link-row Copy click", async () => {
     render(<ReferralCard code="REF42" referralCount={0} rewardsEarned={0} />);
-    fireEvent.click(screen.getByText("Copy"));
+    // Link-row "Copy" button (distinct from "Copy code" button) copies the invite URL
+    const copyBtns = screen.getAllByText("Copy");
+    fireEvent.click(copyBtns[copyBtns.length - 1]);
     await waitFor(() => {
       expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
-        "https://nimipiko.com/signup?ref=REF42"
+        expect.stringContaining("/invite/REF42")
       );
     });
   });
 
-  it("shows 'Copied!' feedback after copy", async () => {
+  it("shows 'Copied ✓' feedback after link-row Copy click", async () => {
     render(<ReferralCard code="REF42" referralCount={0} rewardsEarned={0} />);
-    fireEvent.click(screen.getByText("Copy"));
+    const copyBtns = screen.getAllByText("Copy");
+    fireEvent.click(copyBtns[copyBtns.length - 1]);
     await waitFor(() => {
-      expect(screen.getByText("Copied!")).toBeInTheDocument();
+      expect(screen.getByText("Copied ✓")).toBeInTheDocument();
     });
   });
 
-  it("renders a Share button", () => {
+  it("renders WhatsApp and Email share buttons", () => {
     render(<ReferralCard code="XYZ" referralCount={0} rewardsEarned={0} />);
-    expect(screen.getByText("Share")).toBeInTheDocument();
+    expect(screen.getByText("WhatsApp")).toBeInTheDocument();
+    expect(screen.getByText("Email")).toBeInTheDocument();
   });
 });

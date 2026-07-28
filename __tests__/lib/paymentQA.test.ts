@@ -135,3 +135,69 @@ describe("Bug 1 — gift dispatch gate logic", () => {
     expect(shouldDispatch("2026-06-02T08:00:00Z")).toBe(false);
   });
 });
+
+// ─── weekly-digest: pagination termination logic ──────────────────────────────
+// The fix: was a single unbounded SELECT loading all parents into memory.
+// Now uses offset-based pagination with PAGE=200; loop breaks when the page
+// is smaller than PAGE (meaning we've hit the last page).
+describe("weekly-digest — pagination termination", () => {
+  const PAGE = 200;
+
+  function shouldContinue(pageLength: number): boolean {
+    return pageLength >= PAGE; // break when we got fewer than a full page
+  }
+
+  it("continues when a full page is returned", () => {
+    expect(shouldContinue(200)).toBe(true);
+  });
+
+  it("stops when a partial page is returned", () => {
+    expect(shouldContinue(199)).toBe(false);
+    expect(shouldContinue(1)).toBe(false);
+  });
+
+  it("stops immediately on an empty page", () => {
+    expect(shouldContinue(0)).toBe(false);
+  });
+
+  it("advances offset by PAGE on each iteration", () => {
+    let offset = 0;
+    const pages = [200, 200, 87]; // 3 pages, last is partial
+    let iterations = 0;
+    for (const pageLen of pages) {
+      iterations++;
+      offset += PAGE;
+      if (pageLen < PAGE) break;
+    }
+    expect(iterations).toBe(3);
+    expect(offset).toBe(600);
+  });
+});
+
+// ─── MRR normalization: annual subscriptions ─────────────────────────────────
+// The fix: annual subscribers paying e.g. $120/yr were counted as $120 MRR.
+// Correct MRR = annual_amount / 12.
+describe("MRR normalization — annual subscriptions", () => {
+  function mrrOf(amountUsd: number, billingInterval: string | null): number {
+    return billingInterval === "year" ? amountUsd / 12 : amountUsd;
+  }
+
+  it("passes monthly amount through unchanged", () => {
+    expect(mrrOf(9.99, "month")).toBeCloseTo(9.99);
+  });
+
+  it("divides annual amount by 12", () => {
+    expect(mrrOf(120, "year")).toBeCloseTo(10);
+  });
+
+  it("treats null interval as monthly (safe default)", () => {
+    expect(mrrOf(9.99, null)).toBeCloseTo(9.99);
+  });
+
+  it("ARR = MRR * 12 (round-trips correctly for annual sub)", () => {
+    const monthlyAmount = 10;
+    const annualAmount  = monthlyAmount * 12;
+    const mrr = mrrOf(annualAmount, "year");
+    expect(mrr * 12).toBeCloseTo(annualAmount);
+  });
+});

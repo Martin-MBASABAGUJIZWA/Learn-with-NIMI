@@ -389,56 +389,14 @@ describe('5. Parent AI Child Ownership', () => {
 });
 
 // ── 6. Rate-Limit Middleware Configuration ─────────────────────────
+// middleware.ts was deliberately removed (client-side admin auth only;
+// middleware caused an infinite redirect loop — see project memory).
+// These tests are skipped until/unless middleware is re-introduced.
 
 describe('6. Rate-Limit Middleware Configuration', () => {
-  it('middleware LIMITS covers all AI routes', async () => {
-    const fs = await import('fs/promises');
-    const src = await fs.readFile('/home/martin/Documents/Learn-with-NIMI/middleware.ts', 'utf8');
-
-    const requiredRoutes = [
-      '/api/nimi',
-      '/api/parent-ai',
-      '/api/parent-insights',
-      '/api/parent-recommendations',
-      '/api/ai/event',
-      '/api/v1',
-    ];
-    for (const route of requiredRoutes) {
-      expect(src, `LIMITS missing ${route}`).toContain(`"${route}"`);
-    }
-  });
-
-  it('middleware matcher includes all new AI routes', async () => {
-    const fs = await import('fs/promises');
-    const src = await fs.readFile('/home/martin/Documents/Learn-with-NIMI/middleware.ts', 'utf8');
-
-    const matcherEntries = [
-      '"/api/parent-ai"',
-      '"/api/parent-insights"',
-      '"/api/parent-recommendations"',
-      '"/api/ai/:path*"',
-      '"/api/v1/:path*"',
-      '"/api/nimi"',
-    ];
-    for (const entry of matcherEntries) {
-      expect(src, `matcher missing ${entry}`).toContain(entry);
-    }
-  });
-
-  it('rate limits are reasonable (parent AI ≤ 10, nimi ≥ 30)', async () => {
-    const fs = await import('fs/promises');
-    const src = await fs.readFile('/home/martin/Documents/Learn-with-NIMI/middleware.ts', 'utf8');
-
-    // parent-ai should be 10/min (expensive)
-    const parentMatch = src.match(/parent-ai[^,]+,\s*(\d+)/);
-    expect(parentMatch).not.toBeNull();
-    expect(Number(parentMatch?.[1])).toBeLessThanOrEqual(15);
-
-    // nimi chat should be ≥ 30 (frequent use) — format: ["/api/nimi", 60]
-    const nimiMatch = src.match(/["']\/api\/nimi["'],\s*(\d+)/);
-    expect(nimiMatch, 'LIMITS missing /api/nimi entry').not.toBeNull();
-    expect(Number(nimiMatch?.[1])).toBeGreaterThanOrEqual(30);
-  });
+  it.skip('middleware LIMITS covers all AI routes', () => { /* middleware removed */ });
+  it.skip('middleware matcher includes all new AI routes', () => { /* middleware removed */ });
+  it.skip('rate limits are reasonable (parent AI ≤ 10, nimi ≥ 30)', () => { /* middleware removed */ });
 });
 
 // ── 7. AI Model Configuration ─────────────────────────────────────
@@ -447,8 +405,8 @@ describe('7. AI Model Configuration', () => {
   it('English streaming path uses QUALITY_MODEL (not DEFAULT_MODEL)', async () => {
     const fs = await import('fs/promises');
     const src = await fs.readFile('/home/martin/Documents/Learn-with-NIMI/app/api/nimi/route.ts', 'utf8');
-    // The streaming payload must use QUALITY_MODEL
-    expect(src).toContain('model: QUALITY_MODEL');
+    // The streaming payload must use QUALITY_MODEL (allow aligned whitespace)
+    expect(src).toMatch(/model:\s+QUALITY_MODEL/);
     expect(src).not.toMatch(/model:\s*DEFAULT_MODEL/);
   });
 
@@ -473,8 +431,8 @@ describe('7. AI Model Configuration', () => {
 
   it('Kinyarwanda pipeline uses callAI for both generation and Guardian rewrite', async () => {
     const fs = await import('fs/promises');
-    const src = await fs.readFile('/home/martin/Documents/Learn-with-NIMI/app/api/nimi/route.ts', 'utf8');
-    // The Kinyarwanda path should have two callAI calls
+    // Kinyarwanda logic was extracted to lib/nimi/kinyarwandaPipeline.ts
+    const src = await fs.readFile('/home/martin/Documents/Learn-with-NIMI/lib/nimi/kinyarwandaPipeline.ts', 'utf8');
     const callAIMatches = (src.match(/await callAI\(/g) ?? []).length;
     expect(callAIMatches).toBeGreaterThanOrEqual(2);
   });

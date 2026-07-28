@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import ParentControls from "@/components/parents/ParentControls";
 
 // Supabase mock — component calls supabase on mount; stub it out so tests stay unit-level
@@ -40,54 +40,59 @@ describe("ParentControls", () => {
     expect(screen.getByText("Controls")).toBeInTheDocument();
   });
 
-  it("shows default daily goal of 2", () => {
+  it("shows default daily goal of 2", async () => {
     render(<ParentControls {...MOCK_PROPS} childName="Emma" childLanguage="en" />);
-    expect(screen.getByText("2 missions per day")).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByText("2 missions per day")).toBeInTheDocument());
   });
 
-  it("increments daily goal on + click", () => {
+  it("increments daily goal on + click", async () => {
     render(<ParentControls {...MOCK_PROPS} childName="Emma" childLanguage="en" />);
+    await waitFor(() => screen.getByText("2 missions per day"));
     fireEvent.click(screen.getAllByText("+")[0]);
     expect(screen.getByText("3 missions per day")).toBeInTheDocument();
   });
 
-  it("decrements daily goal on − click", () => {
+  it("decrements daily goal on − click", async () => {
     render(<ParentControls {...MOCK_PROPS} childName="Emma" childLanguage="en" />);
+    await waitFor(() => screen.getByText("2 missions per day"));
     fireEvent.click(screen.getAllByText("−")[0]);
-    expect(screen.getByText("1 missions per day")).toBeInTheDocument();
+    expect(screen.getByText("1 mission per day")).toBeInTheDocument();
   });
 
-  it("does not go below 1 mission per day", () => {
+  it("does not go below 1 mission per day", async () => {
     render(<ParentControls {...MOCK_PROPS} childName="Emma" childLanguage="en" />);
+    await waitFor(() => screen.getByText("2 missions per day"));
     const dec = screen.getAllByText("−")[0];
     fireEvent.click(dec);
     fireEvent.click(dec);
-    expect(screen.getByText("1 missions per day")).toBeInTheDocument();
+    expect(screen.getByText("1 mission per day")).toBeInTheDocument();
   });
 
-  it("saves prefs to localStorage on change", () => {
+  it("saves prefs to localStorage on change", async () => {
     render(<ParentControls {...MOCK_PROPS} childName="Emma" childLanguage="en" />);
+    await waitFor(() => screen.getByText("2 missions per day"));
     fireEvent.click(screen.getAllByText("+")[0]);
     expect(localStorageMock.setItem).toHaveBeenCalled();
   });
 
-  it("shows English for language 'en'", () => {
+  it("shows English for language 'en'", async () => {
     render(<ParentControls {...MOCK_PROPS} childName="Emma" childLanguage="en" />);
-    expect(screen.getByText("English")).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByText(/English/)).toBeInTheDocument());
   });
 
-  it("shows Français for language 'fr'", () => {
+  it("shows Français for language 'fr'", async () => {
     render(<ParentControls {...MOCK_PROPS} childName="Amina" childLanguage="fr" />);
-    expect(screen.getByText("Français")).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByText(/Français/)).toBeInTheDocument());
   });
 
-  it("shows Kinyarwanda for language 'rw'", () => {
+  it("shows Kinyarwanda for language 'rw'", async () => {
     render(<ParentControls {...MOCK_PROPS} childName="Keza" childLanguage="rw" />);
-    expect(screen.getByText("Kinyarwanda")).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByText(/Kinyarwanda/)).toBeInTheDocument());
   });
 
-  it("shows child name in language row description", () => {
+  it("shows child name in language row description", async () => {
     render(<ParentControls {...MOCK_PROPS} childName="Nia" childLanguage="en" />);
-    expect(screen.getByText(/Nia/)).toBeInTheDocument();
+    // Multiple elements contain "Nia" (language row + sharing row)
+    await waitFor(() => expect(screen.getAllByText(/Nia/).length).toBeGreaterThan(0));
   });
 });

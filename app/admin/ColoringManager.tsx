@@ -150,6 +150,29 @@ export default function ColoringManager({ initialBookId, onNavigate, onOpenSideb
     }
   }
 
+  const handleReorder = async (b: ColoringBookRow, dir: 'up' | 'down') => {
+    const sorted = [...books].sort((a, x) => a.sort_order - x.sort_order)
+    const idx = sorted.findIndex(x => x.id === b.id)
+    const swapIdx = dir === 'up' ? idx - 1 : idx + 1
+    if (swapIdx < 0 || swapIdx >= sorted.length) return
+    const neighbor = sorted[swapIdx]
+    setActionError(null)
+    setMutatingId(b.id)
+    try {
+      const [r1, r2] = await Promise.all([
+        supabase.from('stories').update({ sort_order: neighbor.sort_order }).eq('id', b.id),
+        supabase.from('stories').update({ sort_order: b.sort_order }).eq('id', neighbor.id),
+      ])
+      if (r1.error) throw r1.error
+      if (r2.error) throw r2.error
+      await fetchBooks()
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : 'Could not reorder.')
+    } finally {
+      setMutatingId(null)
+    }
+  }
+
   const handleDelete = async (b: ColoringBookRow) => {
     const pageCount = b.coloring_pages.length
     const ok = await confirm({
@@ -343,8 +366,11 @@ export default function ColoringManager({ initialBookId, onNavigate, onOpenSideb
                       <button onClick={() => { handlePreview(); setOpenMenuId(null) }} className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-sm font-medium hover:bg-gray-50 transition">
                         <Eye size={14} className="text-gray-400" /> Preview
                       </button>
-                      <button onClick={() => { void alert({ title: 'Drag-and-drop reordering', message: 'Coming soon! For now, edit a coloring book and change its order number to reorder it in the list.' }); setOpenMenuId(null) }} className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-sm font-medium hover:bg-gray-50 transition">
-                        <ArrowUpDown size={14} className="text-gray-400" /> Change Order
+                      <button onClick={() => { void handleReorder(b, 'up'); setOpenMenuId(null) }} disabled={mutatingId === b.id} className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-sm font-medium hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed">
+                        <ArrowUpDown size={14} className="text-gray-400" /> Move Up
+                      </button>
+                      <button onClick={() => { void handleReorder(b, 'down'); setOpenMenuId(null) }} disabled={mutatingId === b.id} className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-sm font-medium hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed">
+                        <ArrowUpDown size={14} className="text-gray-400" /> Move Down
                       </button>
                       <div className="border-t border-gray-100 my-1" />
                       <button
