@@ -4,7 +4,7 @@ import { getCachedAdmin } from './adminAuth'
 import {
   LayoutDashboard, BookOpen, Palette, Trophy, Star,
   Users, Globe, Award, Bell, FolderOpen, Settings,
-  ChevronLeft, ChevronRight, X, CreditCard, Crown, BarChart3, ShieldCheck, GraduationCap, Mail, Share2, Tag, Gift, MessageSquareQuote, Handshake, MessagesSquare, ClipboardList, Activity,
+  ChevronLeft, ChevronRight, X, CreditCard, Crown, BarChart3, ShieldCheck, GraduationCap, Mail, Share2, Tag, Gift, MessageSquareQuote, Handshake, MessagesSquare, ClipboardList, Activity, Plane,
 } from 'lucide-react'
 
 interface SidebarProps {
@@ -30,6 +30,7 @@ const NAV = [
   { icon: Award,           label: 'Cert Templates',     table: 'certificate_templates' },
   { icon: Bell,            label: 'Notifications',      table: 'notifications' },
   { icon: FolderOpen,      label: 'Media Library',      table: 'Buckets' },
+  { icon: Plane,           label: 'Airways Templates',  table: 'airways_templates' },
   { icon: CreditCard,      label: 'Products & Pricing', table: 'products' },
   { icon: Activity,        label: 'Payment Health',     table: 'payment_health' },
   { icon: Crown,           label: 'Masterpieces',       table: 'masterpieces' },
