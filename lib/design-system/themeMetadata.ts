@@ -132,8 +132,8 @@ const THEME_REGISTRY: ThemeMetadata[] = [
     accentColor:     "#16a34a",
     gradientClass:   "from-green-400 via-emerald-500 to-yellow-400",
     isPremium:       false,
-    isInstalled:     true,
-    comingSoon:      false,
+    isInstalled:     false,
+    comingSoon:      true,
     features: [
       "Warm golden sparkle particles",
       "Cozy card shadows & warm borders",

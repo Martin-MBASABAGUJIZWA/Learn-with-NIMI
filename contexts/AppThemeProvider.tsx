@@ -48,10 +48,12 @@ export function AppThemeProvider({ children }: { children: React.ReactNode }) {
   // Effective theme: preview overrides saved while active
   const themeId: AppThemeId = previewThemeId ?? savedThemeId;
 
-  // Read persisted theme on mount
+  // Read persisted theme on mount — only "default" is accepted; clear any stale value
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY) as AppThemeId | null;
-    if (saved && saved in APP_THEMES) setSavedThemeId(saved);
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved !== "default") {
+      localStorage.setItem(STORAGE_KEY, "default");
+    }
   }, []);
 
   // Apply CSS vars whenever the effective theme changes
