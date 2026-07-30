@@ -14,17 +14,17 @@ export default function KeepGoingCard() {
   const m = useMotion();
 
   return (
-    <div className="relative overflow-hidden border border-[var(--ds-border-primary)]/60 bg-gradient-to-br from-white via-[var(--ds-brand-soft)]/50 to-white p-4 flex flex-col items-center text-center justify-center h-full shadow-[0_16px_34px_rgba(15,23,42,0.08)]" style={{ borderRadius: 'var(--leaf-r-lg)' }}>
+    <div className="relative overflow-hidden border border-[var(--ds-border-primary)]/60 bg-gradient-to-br from-white via-[var(--ds-brand-soft)]/50 to-white p-4 flex flex-col items-center text-center justify-center h-full shadow-card-2xl" style={{ borderRadius: 'var(--leaf-r-lg)' }}>
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.9),transparent_48%)]" />
-      <motion.span className="absolute top-3 right-3 text-yellow-400/30 text-[10px]"
+      <motion.span className="absolute top-3 right-3 text-yellow-400/30 text-3xs"
         animate={m.glowPulse.animate}
         transition={{ ...m.glowPulse.transition, duration: 2 }}>✦</motion.span>
 
-      <div className="relative z-10 bg-white/80 border border-[var(--ds-border-brand)]/20 rounded-xl px-3 py-1.5 mb-3 shadow-sm">
-        <h3 className="font-black text-[var(--ds-brand-primary)] text-[11px] tracking-wide">{t("keepGoingLabel")}</h3>
+      <div className="relative z-10 bg-[var(--ds-surface-card)]/80 border border-[var(--ds-border-brand)]/20 rounded-xl px-3 py-1.5 mb-3 shadow-sm">
+        <h3 className="font-black text-[var(--ds-brand-primary)] text-2xs tracking-wide">{t("keepGoingLabel")}</h3>
       </div>
 
-      <p className="text-gray-400 text-[10px] leading-snug max-w-[120px]">
+      <p className="text-[var(--ds-text-tertiary)] text-3xs leading-snug max-w-[120px]">
         {t("keepGoingDesc")}
       </p>
 
@@ -35,7 +35,7 @@ export default function KeepGoingCard() {
         <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center shadow-lg shadow-yellow-500/20 border border-yellow-300/30" style={{ borderRadius: 'var(--leaf-r)' }}>
           <Star className="w-6 h-6 text-white fill-white" />
         </div>
-        <motion.span className="absolute -top-1 -right-1 text-yellow-300/60 text-[10px]"
+        <motion.span className="absolute -top-1 -right-1 text-yellow-300/60 text-3xs"
           animate={m.starPulse().animate}
           transition={{ ...m.starPulse().transition, duration: 1.5 }}>✦</motion.span>
       </motion.div>

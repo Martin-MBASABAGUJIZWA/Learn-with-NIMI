@@ -158,7 +158,7 @@ export function UserProfileMenu() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <button
-          className="inline-flex items-center justify-center rounded-full h-10 w-10 border bg-white shadow-sm hover:bg-muted"
+          className="inline-flex items-center justify-center rounded-full h-10 w-10 border bg-[var(--ds-surface-card)] shadow-sm hover:bg-muted"
           aria-label="User Profile"
           disabled={isLoading}
         >
@@ -174,7 +174,7 @@ export function UserProfileMenu() {
         {user?.email && (
           <div className="mb-2">
             <Label>Email</Label>
-            <div className="text-sm text-gray-600">{user.email}</div>
+            <div className="text-sm text-[var(--ds-text-secondary)]">{user.email}</div>
           </div>
         )}
 
@@ -183,13 +183,13 @@ export function UserProfileMenu() {
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
-          className={`mb-4 flex items-center justify-center w-full h-32 border-2 rounded-md cursor-pointer ${dragOver ? "border-blue-500 bg-blue-50" : "border-dashed border-gray-300"} ${isLoading ? "opacity-50 pointer-events-none" : ""}`}
+          className={`mb-4 flex items-center justify-center w-full h-32 border-2 rounded-md cursor-pointer ${dragOver ? "border-blue-500 bg-blue-50" : "border-dashed border-[var(--ds-border-strong)]"} ${isLoading ? "opacity-50 pointer-events-none" : ""}`}
           onClick={() => !isLoading && fileInputRef.current?.click()}
         >
           {profile.avatar_url ? (
             <NextImage src={profile.avatar_url} alt="Avatar" width={112} height={112} className="h-28 w-28 rounded-full object-cover" />
           ) : (
-            <span className="text-gray-500">{isLoading ? "Uploading..." : "Click or Drag & Drop Avatar"}</span>
+            <span className="text-[var(--ds-text-secondary)]">{isLoading ? "Uploading..." : "Click or Drag & Drop Avatar"}</span>
           )}
           <input type="file" accept="image/*" ref={fileInputRef} className="hidden" onChange={(e) => e.target.files && handleAvatarUpload(e.target.files[0])} disabled={isLoading} />
         </div>
@@ -217,13 +217,13 @@ export function UserProfileMenu() {
           </div>
 
           {/* Notification Preferences */}
-          <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 space-y-4">
-            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Notification Preferences</p>
+          <div className="rounded-xl border border-[var(--ds-border-primary)] bg-[var(--ds-surface-card-hover)] p-4 space-y-4">
+            <p className="text-2xs font-bold text-[var(--ds-text-tertiary)] uppercase tracking-widest">Notification Preferences</p>
 
             <div className="flex items-center justify-between gap-4">
               <div>
-                <p className="text-sm font-semibold text-gray-800">Email Notifications</p>
-                <p className="text-xs text-gray-400 mt-0.5">Progress reports and updates from NIMIPIKO STUDIO</p>
+                <p className="text-sm font-semibold text-[var(--ds-text-primary)]">Email Notifications</p>
+                <p className="text-xs text-[var(--ds-text-tertiary)] mt-0.5">Progress reports and updates from NIMIPIKO STUDIO</p>
               </div>
               <Switch
                 checked={!!profile.notify_email}
@@ -234,8 +234,8 @@ export function UserProfileMenu() {
 
             <div className="flex items-center justify-between gap-4">
               <div>
-                <p className="text-sm font-semibold text-gray-800">SMS Notifications</p>
-                <p className="text-xs text-gray-400 mt-0.5">Important alerts sent directly to your phone</p>
+                <p className="text-sm font-semibold text-[var(--ds-text-primary)]">SMS Notifications</p>
+                <p className="text-xs text-[var(--ds-text-tertiary)] mt-0.5">Important alerts sent directly to your phone</p>
               </div>
               <Switch
                 checked={!!profile.notify_sms}
@@ -247,8 +247,8 @@ export function UserProfileMenu() {
             {pushSupported && (
               <div className="flex items-center justify-between gap-4">
                 <div>
-                  <p className="text-sm font-semibold text-gray-800">Push Notifications</p>
-                  <p className="text-xs text-gray-400 mt-0.5">Instant alerts on this device</p>
+                  <p className="text-sm font-semibold text-[var(--ds-text-primary)]">Push Notifications</p>
+                  <p className="text-xs text-[var(--ds-text-tertiary)] mt-0.5">Instant alerts on this device</p>
                 </div>
                 <Switch
                   checked={pushSubscribed}
@@ -265,7 +265,7 @@ export function UserProfileMenu() {
 
           <div className="flex items-center justify-between">
             <div className="font-medium">Subscription</div>
-            <span className={`font-bold ${profile.subscription_status === "premium" ? "text-gray-500" : "text-gray-700"}`}>{profile.subscription_status}</span>
+            <span className={`font-bold ${profile.subscription_status === "premium" ? "text-[var(--ds-text-secondary)]" : "text-[var(--ds-text-primary)]"}`}>{profile.subscription_status}</span>
           </div>
         </div>
 

@@ -25,7 +25,7 @@ export default function SupportBanner() {
       </div>
       <a
         href="mailto:support@nimipiko.com"
-        className="flex items-center gap-2 bg-white/20 border border-white/30 text-white font-black px-5 py-2.5 text-sm shrink-0 hover:bg-white/30 transition" style={{ borderRadius: 'var(--leaf-r-sm)' }}
+        className="flex items-center gap-2 bg-[var(--ds-surface-card)]/20 border border-white/30 text-white font-black px-5 py-2.5 text-sm shrink-0 hover:bg-[var(--ds-surface-card)]/30 transition" style={{ borderRadius: 'var(--leaf-r-sm)' }}
       >
         <Mail className="w-4 h-4" />
         {t("emailSupportBtn")}

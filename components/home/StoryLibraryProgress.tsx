@@ -25,7 +25,7 @@ export default function StoryLibraryProgress({ stories, currentStoryId }: Props)
   const completed = stories.filter(s => s.complete).length;
 
   return (
-    <div className="relative overflow-hidden leaf border border-[var(--ds-border-primary)]/60 bg-gradient-to-br from-white via-[var(--ds-brand-soft)]/40 to-white shadow-[0_16px_34px_rgba(15,23,42,0.08)]">
+    <div className="relative overflow-hidden leaf border border-[var(--ds-border-primary)]/60 bg-gradient-to-br from-white via-[var(--ds-brand-soft)]/40 to-white shadow-card-2xl">
       {/* World card texture */}
       <Image src={assets.storyCard.background} alt="" aria-hidden="true" fill
         className="object-cover pointer-events-none opacity-[0.05]" />
@@ -38,15 +38,15 @@ export default function StoryLibraryProgress({ stories, currentStoryId }: Props)
               <span className="text-lg">📚</span>
             </div>
             <div>
-              <h3 className="font-black text-ds-text text-[16px]">STORY LIBRARY</h3>
-              <p className="text-gray-400 text-[10px]">
+              <h3 className="font-black text-ds-text text-base">STORY LIBRARY</h3>
+              <p className="text-[var(--ds-text-tertiary)] text-3xs">
                 Story {completed + (completed < stories.length ? 1 : 0)} of {stories.length}
               </p>
             </div>
           </div>
           <Link href="/stories">
             <motion.button whileHover={m.buttonHover}
-              className="bg-ds-action-subtle text-[var(--ds-brand-primary)] font-black text-[11px] rounded-full px-4 py-2 flex items-center gap-1 border border-[var(--ds-brand-primary)]/20">
+              className="bg-ds-action-subtle text-[var(--ds-brand-primary)] font-black text-2xs rounded-full px-4 py-2 flex items-center gap-1 border border-[var(--ds-brand-primary)]/20">
               View All <ChevronRight className="w-3 h-3" />
             </motion.button>
           </Link>
@@ -90,11 +90,11 @@ export default function StoryLibraryProgress({ stories, currentStoryId }: Props)
                     {isCurrent && !story.complete && (
                       <motion.div animate={{ opacity: [0.7, 1, 0.7] }} transition={{ duration: 1.5, repeat: Infinity }}
                         className="absolute bottom-0 left-0 right-0 bg-gradient-to-r from-yellow-500 to-orange-500 text-center py-0.5">
-                        <span className="text-[8px] font-black text-white">▶ NOW</span>
+                        <span className="text-5xs font-black text-white">▶ NOW</span>
                       </motion.div>
                     )}
-                    <div className="absolute top-1.5 left-1.5 w-6 h-6 bg-white/80 rounded-lg flex items-center justify-center">
-                      <span className="text-gray-700 text-[10px] font-black">{story.sort_order}</span>
+                    <div className="absolute top-1.5 left-1.5 w-6 h-6 bg-[var(--ds-surface-card)]/80 rounded-lg flex items-center justify-center">
+                      <span className="text-[var(--ds-text-primary)] text-3xs font-black">{story.sort_order}</span>
                     </div>
                   </motion.div>
                 </Link>

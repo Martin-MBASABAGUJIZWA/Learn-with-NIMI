@@ -72,7 +72,7 @@ function CurrentlyWearing({ cosmetics, nimiSrc, pikoSrc, onUnequip }: {
       className="overflow-hidden"
     >
       <div className="mt-4 p-3 rounded-2xl border border-ds-border bg-ds-surface/60">
-        <p className="font-black text-ds-text text-[11px] uppercase tracking-widest mb-2.5">{t("shopCurrentlyWearing")}</p>
+        <p className="font-black text-ds-text text-2xs uppercase tracking-widest mb-2.5">{t("shopCurrentlyWearing")}</p>
         <div className="flex gap-2 flex-wrap">
           {slots.map(slot => {
             const item = cosmetics[slot.key] ? SHOP_ITEM_MAP[cosmetics[slot.key]!] : null;
@@ -93,8 +93,8 @@ function CurrentlyWearing({ cosmetics, nimiSrc, pikoSrc, onUnequip }: {
                   <Image src={slot.src} alt={slot.label} width={20} height={20} className="w-5 h-5 rounded-full object-cover shrink-0 border border-green-200" />
                 )}
                 <span className="text-base leading-none">{item.emoji}</span>
-                <span className="font-black text-[11px]">{t(item.nameKey)}</span>
-                <span className="opacity-0 group-hover:opacity-100 transition-opacity text-[10px] text-red-400 ml-0.5">×</span>
+                <span className="font-black text-2xs">{t(item.nameKey)}</span>
+                <span className="opacity-0 group-hover:opacity-100 transition-opacity text-3xs text-red-400 ml-0.5">×</span>
               </motion.button>
             );
           })}

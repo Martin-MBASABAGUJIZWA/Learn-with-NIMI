@@ -49,7 +49,7 @@ export default function StoryMissionGrid({ storySlug, slots }: Props) {
         </div>
         <div>
           <h2 className="font-black text-white text-base">Story Missions</h2>
-          <p className="text-gray-500 text-[11px] font-semibold">Complete all {total} to earn your certificate! · {done}/{total} done</p>
+          <p className="text-[var(--ds-text-secondary)] text-2xs font-semibold">Complete all {total} to earn your certificate! · {done}/{total} done</p>
         </div>
       </div>
 
@@ -87,7 +87,7 @@ export default function StoryMissionGrid({ storySlug, slots }: Props) {
                   <div className="relative z-10 p-3 flex flex-col h-full">
 
                     {/* Number badge */}
-                    <div className={`w-7 h-7 ${completed ? "bg-[var(--nimi-green)]" : "bg-gray-200"} rounded-lg flex items-center justify-center font-black text-white text-xs shadow-md`}>
+                    <div className={`w-7 h-7 ${completed ? "bg-[var(--nimi-green)]" : "bg-[var(--ds-surface-card-active)]"} rounded-lg flex items-center justify-center font-black text-white text-xs shadow-md`}>
                       {mission.num}
                     </div>
 
@@ -99,19 +99,19 @@ export default function StoryMissionGrid({ storySlug, slots }: Props) {
                           alt=""
                           className="w-14 h-14 sm:w-16 sm:h-16 rounded-full border-2 border-white/30 shadow-xl object-cover group-hover:scale-110 transition-transform duration-300"
                          loading="lazy" />
-                        <div className="absolute -bottom-1 -right-1 w-7 h-7 bg-gray-100 rounded-full flex items-center justify-center text-sm shadow-lg">
+                        <div className="absolute -bottom-1 -right-1 w-7 h-7 bg-[var(--ds-surface-card-hover)] rounded-full flex items-center justify-center text-sm shadow-lg">
                           {mission.emoji}
                         </div>
                       </div>
                     </div>
 
                     {/* Title */}
-                    <p className="font-black text-white text-[10px] sm:text-[11px] uppercase leading-tight text-center min-h-[24px] whitespace-pre-line">
+                    <p className="font-black text-white text-3xs sm:text-2xs uppercase leading-tight text-center min-h-[24px] whitespace-pre-line">
                       {mission.title}
                     </p>
 
                     {/* Description */}
-                    <p className="text-white/60 text-[8px] text-center leading-snug mt-1 min-h-[20px] hidden sm:block">
+                    <p className="text-white/60 text-5xs text-center leading-snug mt-1 min-h-[20px] hidden sm:block">
                       {mission.desc}
                     </p>
 
@@ -120,27 +120,27 @@ export default function StoryMissionGrid({ storySlug, slots }: Props) {
                       {completed ? (
                         <div className="flex items-center justify-center gap-1.5 bg-[var(--nimi-green)] rounded-full py-1.5 shadow-lg">
                           <CheckCircle2 className="w-3.5 h-3.5 text-white" />
-                          <span className="text-white text-[10px] font-black tracking-wide">COMPLETED</span>
+                          <span className="text-white text-3xs font-black tracking-wide">COMPLETED</span>
                         </div>
                       ) : isLocked ? (
                         <div className="flex items-center justify-center gap-1.5 bg-gray-400/60 rounded-full py-1.5">
-                          <span className="text-white text-[12px]">🔒</span>
-                          <span className="text-white text-[10px] font-black tracking-wide">LOCKED</span>
+                          <span className="text-white text-xs">🔒</span>
+                          <span className="text-white text-3xs font-black tracking-wide">LOCKED</span>
                         </div>
                       ) : (
                         <div className="flex items-center justify-center gap-1.5 bg-[var(--nimi-green)] text-white rounded-full py-1.5 shadow-md group-hover:bg-[var(--ds-brand-hover)] transition">
                           <Play className="w-3.5 h-3.5 text-white fill-white" />
-                          <span className="text-white text-[10px] font-black tracking-wide">START</span>
+                          <span className="text-white text-3xs font-black tracking-wide">START</span>
                         </div>
                       )}
                     </div>
                   </div>
 
                   {/* Decorative sparkles */}
-                  <motion.span className="absolute top-2 right-2 text-yellow-300/40 text-[10px]"
+                  <motion.span className="absolute top-2 right-2 text-yellow-300/40 text-3xs"
                     animate={m.glowPulse.animate}
                     transition={{ ...m.glowPulse.transition, delay: i * 0.3 }}>✦</motion.span>
-                  <motion.span className="absolute bottom-8 right-3 text-white/20 text-[8px]"
+                  <motion.span className="absolute bottom-8 right-3 text-white/20 text-5xs"
                     animate={{ opacity: [0.1, 0.5, 0.1] }}
                     transition={{ duration: DURATION.loopFloat, repeat: Infinity, delay: 0.5 + i * 0.2 }}>✦</motion.span>
                 </div>

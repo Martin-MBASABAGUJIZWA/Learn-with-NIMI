@@ -29,14 +29,14 @@ export default function StoryAudioPlayer({ url, title, subtitle, color = "bg-[va
 
   if (!url) {
     return (
-      <div className="leaf border border-emerald-100 bg-gradient-to-br from-white via-emerald-50/70 to-amber-50/60 p-6 shadow-[0_16px_34px_rgba(15,23,42,0.08)]">
+      <div className="leaf border border-emerald-100 bg-gradient-to-br from-white via-emerald-50/70 to-amber-50/60 p-6 shadow-card-2xl">
         <div className="flex items-center gap-4">
-          <div className="flex h-14 w-14 items-center justify-center leaf bg-white shadow-sm text-2xl shrink-0">
+          <div className="flex h-14 w-14 items-center justify-center leaf bg-[var(--ds-surface-card)] shadow-sm text-2xl shrink-0">
             <Sparkles className="h-6 w-6 text-emerald-600" />
           </div>
           <div>
-            <p className="text-gray-700 text-sm font-black">Coming Soon</p>
-            {title && <p className="text-gray-500 text-[10px] mt-0.5">{title}</p>}
+            <p className="text-[var(--ds-text-primary)] text-sm font-black">Coming Soon</p>
+            {title && <p className="text-[var(--ds-text-secondary)] text-3xs mt-0.5">{title}</p>}
           </div>
         </div>
       </div>
@@ -77,7 +77,7 @@ export default function StoryAudioPlayer({ url, title, subtitle, color = "bg-[va
   };
 
   return (
-    <div className="leaf border border-emerald-100 bg-gradient-to-br from-white via-emerald-50/70 to-amber-50/60 p-5 shadow-[0_16px_34px_rgba(15,23,42,0.08)]">
+    <div className="leaf border border-emerald-100 bg-gradient-to-br from-white via-emerald-50/70 to-amber-50/60 p-5 shadow-card-2xl">
       <audio
         ref={ref}
         src={src}
@@ -95,18 +95,18 @@ export default function StoryAudioPlayer({ url, title, subtitle, color = "bg-[va
         </motion.button>
 
         <div className="flex-1 min-w-0">
-          {title && <p className="font-black text-ds-text text-[13px] truncate">{title}</p>}
-          {subtitle && <p className="text-gray-500 text-[10px] truncate">{subtitle}</p>}
+          {title && <p className="font-black text-ds-text text-sml truncate">{title}</p>}
+          {subtitle && <p className="text-[var(--ds-text-secondary)] text-3xs truncate">{subtitle}</p>}
 
           {/* Progress bar */}
           <div className="mt-2 flex items-center gap-2">
-            <div className="flex-1 bg-white/80 rounded-full h-[6px] overflow-hidden border border-emerald-100">
+            <div className="flex-1 bg-[var(--ds-surface-card)]/80 rounded-full h-[6px] overflow-hidden border border-emerald-100">
               <motion.div
                 className={`${color} h-full rounded-full`}
                 style={{ width: duration > 0 ? `${(progress / duration) * 100}%` : "0%" }}
               />
             </div>
-            <span className="text-gray-500 text-[9px] font-bold tabular-nums shrink-0">
+            <span className="text-[var(--ds-text-secondary)] text-4xs font-bold tabular-nums shrink-0">
               {formatTime(progress)} / {formatTime(duration)}
             </span>
           </div>
@@ -114,7 +114,7 @@ export default function StoryAudioPlayer({ url, title, subtitle, color = "bg-[va
 
         {/* Restart */}
         <button onClick={restart}
-          className="w-10 h-10 rounded-full bg-white/80 border border-emerald-100 flex items-center justify-center text-gray-500 hover:text-emerald-700 transition shrink-0 shadow-sm">
+          className="w-10 h-10 rounded-full bg-[var(--ds-surface-card)]/80 border border-emerald-100 flex items-center justify-center text-[var(--ds-text-secondary)] hover:text-emerald-700 transition shrink-0 shadow-sm">
           <RotateCcw className="w-4 h-4" />
         </button>
       </div>

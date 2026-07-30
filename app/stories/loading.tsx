@@ -18,7 +18,7 @@ export default function StoriesLoading() {
         {/* Story grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="leaf overflow-hidden border border-gray-100 space-y-0">
+            <div key={i} className="leaf overflow-hidden border border-[var(--ds-border-primary)] space-y-0">
               <Bone className="aspect-square rounded-none rounded-t-[24px]" />
               <div className="p-3 space-y-2">
                 <Bone className="h-4 w-3/4" />

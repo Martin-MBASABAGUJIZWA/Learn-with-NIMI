@@ -87,7 +87,7 @@ export default function CreateExplorerProfile({ onCreated }: Props) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 relative overflow-hidden">
+    <div className="min-h-screen bg-[var(--ds-surface-card-hover)] relative overflow-hidden">
       <AuthBackground />
       {/* Decorative floating emoji */}
       <div className="hidden sm:block pointer-events-none select-none">
@@ -115,13 +115,13 @@ export default function CreateExplorerProfile({ onCreated }: Props) {
           <h1 className="font-black text-2xl sm:text-4xl text-ds-text">
             ✨ {t("welcomeFutureExplorer")} ✨
           </h1>
-          <p className="text-gray-500 mt-2 max-w-xl mx-auto">{t("createProfileSubtitle")}</p>
+          <p className="text-[var(--ds-text-secondary)] mt-2 max-w-xl mx-auto">{t("createProfileSubtitle")}</p>
         </div>
 
         <div className="lg:grid lg:grid-cols-[180px_1fr_280px] lg:gap-6 lg:items-start">
           {/* Left mascot + speech bubble */}
           <div className="hidden lg:flex lg:flex-col lg:items-center lg:gap-3">
-            <div className="bg-white border border-ds-border rounded-2xl rounded-bl-sm shadow-sm px-4 py-3 text-center">
+            <div className="bg-[var(--ds-surface-card)] border border-ds-border rounded-2xl rounded-bl-sm shadow-sm px-4 py-3 text-center">
               <p className="text-sm font-bold text-ds-text leading-snug">{t("nimiOnboardingBubble")}</p>
             </div>
             <motion.img
@@ -132,7 +132,7 @@ export default function CreateExplorerProfile({ onCreated }: Props) {
           </div>
 
           {/* Center form card */}
-          <div className="bg-white border border-ds-border shadow-ds-card p-5 sm:p-8" style={{ borderRadius: 'var(--leaf-r-lg)' }}>
+          <div className="bg-[var(--ds-surface-card)] border border-ds-border shadow-ds-card p-5 sm:p-8" style={{ borderRadius: 'var(--leaf-r-lg)' }}>
             <div className="flex items-center gap-2 mb-6">
               <div className="w-9 h-9 bg-[var(--ds-brand-subtle)] rounded-full flex items-center justify-center flex-shrink-0">
                 <Smile className="w-5 h-5 text-[var(--ds-brand-primary)]" />
@@ -154,7 +154,7 @@ export default function CreateExplorerProfile({ onCreated }: Props) {
                   onKeyDown={e => e.key === "Enter" && handleSubmit()}
                   placeholder={t("explorerNamePlaceholder")}
                   maxLength={30}
-                  className="w-full border border-ds-border bg-ds-input leaf px-4 py-2.5 text-sm font-semibold text-ds-text focus:outline-none focus:ring-2 focus:ring-[var(--ds-state-focus)] transition placeholder:text-gray-400" />
+                  className="w-full border border-ds-border bg-ds-input leaf px-4 py-2.5 text-sm font-semibold text-ds-text focus:outline-none focus:ring-2 focus:ring-[var(--ds-state-focus)] transition placeholder:text-[var(--ds-text-tertiary)]" />
               </div>
 
               {/* Step 2: age group */}
@@ -170,17 +170,17 @@ export default function CreateExplorerProfile({ onCreated }: Props) {
                     className="w-full border border-ds-border bg-ds-input leaf px-4 py-2.5 text-sm font-semibold text-ds-text focus:outline-none focus:ring-2 focus:ring-[var(--ds-state-focus)] transition flex items-center justify-between"
                   >
                     <span>{t(AGE_GROUPS.find(g => g.value === age)?.key ?? AGE_GROUPS[0].key)}</span>
-                    <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${showAgeDropdown ? "rotate-180" : ""}`} />
+                    <ChevronDown className={`w-4 h-4 text-[var(--ds-text-tertiary)] transition-transform ${showAgeDropdown ? "rotate-180" : ""}`} />
                   </button>
                   {showAgeDropdown && (
-                    <div className="absolute left-0 right-0 mt-1 bg-white border border-ds-border rounded-xl shadow-lg overflow-hidden z-50">
+                    <div className="absolute left-0 right-0 mt-1 bg-[var(--ds-surface-card)] border border-ds-border rounded-xl shadow-lg overflow-hidden z-50">
                       {AGE_GROUPS.map(g => (
                         <button
                           key={g.key}
                           type="button"
                           onClick={() => { setAge(g.value); setShowAgeDropdown(false); }}
                           className={`flex items-center px-4 py-2.5 w-full text-sm font-medium transition ${
-                            age === g.value ? "bg-[var(--ds-brand-subtle)] text-[var(--ds-brand-primary)]" : "text-ds-text hover:bg-gray-50"
+                            age === g.value ? "bg-[var(--ds-brand-subtle)] text-[var(--ds-brand-primary)]" : "text-ds-text hover:bg-[var(--ds-surface-card-hover)]"
                           }`}
                         >
                           {t(g.key)}
@@ -204,17 +204,17 @@ export default function CreateExplorerProfile({ onCreated }: Props) {
                     className="w-full border border-ds-border bg-ds-input leaf px-4 py-2.5 text-sm font-semibold text-ds-text focus:outline-none focus:ring-2 focus:ring-[var(--ds-state-focus)] transition flex items-center justify-between"
                   >
                     <span>{t(FAVORITE_CATEGORIES.find(c => c.value === favorite)?.key ?? FAVORITE_CATEGORIES[0].key)}</span>
-                    <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${showFavDropdown ? "rotate-180" : ""}`} />
+                    <ChevronDown className={`w-4 h-4 text-[var(--ds-text-tertiary)] transition-transform ${showFavDropdown ? "rotate-180" : ""}`} />
                   </button>
                   {showFavDropdown && (
-                    <div className="absolute left-0 right-0 mt-1 bg-white border border-ds-border rounded-xl shadow-lg overflow-hidden z-50">
+                    <div className="absolute left-0 right-0 mt-1 bg-[var(--ds-surface-card)] border border-ds-border rounded-xl shadow-lg overflow-hidden z-50">
                       {FAVORITE_CATEGORIES.map(c => (
                         <button
                           key={c.value}
                           type="button"
                           onClick={() => { setFavorite(c.value); setShowFavDropdown(false); }}
                           className={`flex items-center px-4 py-2.5 w-full text-sm font-medium transition ${
-                            favorite === c.value ? "bg-[var(--ds-brand-subtle)] text-[var(--ds-brand-primary)]" : "text-ds-text hover:bg-gray-50"
+                            favorite === c.value ? "bg-[var(--ds-brand-subtle)] text-[var(--ds-brand-primary)]" : "text-ds-text hover:bg-[var(--ds-surface-card-hover)]"
                           }`}
                         >
                           {t(c.key)}
@@ -239,7 +239,7 @@ export default function CreateExplorerProfile({ onCreated }: Props) {
                       className={`w-11 h-11 rounded-full text-2xl flex items-center justify-center transition border-2 ${
                         avatar === a
                           ? "border-[var(--ds-border-brand)] bg-[var(--ds-brand-subtle)] scale-110 shadow"
-                          : "border-transparent bg-gray-100 hover:bg-gray-200"
+                          : "border-transparent bg-[var(--ds-surface-card-active)] hover:bg-[var(--ds-border-primary)]"
                       }`}
                     >
                       {a}
@@ -270,7 +270,7 @@ export default function CreateExplorerProfile({ onCreated }: Props) {
 
           {/* Right sidebar */}
           <div className="mt-6 lg:mt-0 space-y-4">
-            <div className="bg-white border border-ds-border shadow-ds-card p-4" style={{ borderRadius: 'var(--leaf-r)' }}>
+            <div className="bg-[var(--ds-surface-card)] border border-ds-border shadow-ds-card p-4" style={{ borderRadius: 'var(--leaf-r)' }}>
               <p className="font-black text-ds-text mb-3 flex items-center gap-1.5">
                 🏆 {t("adventureAwaitsTitle")}
               </p>
@@ -282,23 +282,23 @@ export default function CreateExplorerProfile({ onCreated }: Props) {
                     </div>
                     <div>
                       <p className="font-bold text-sm text-ds-text">{t(item.titleKey)}</p>
-                      <p className="text-xs text-gray-500">{t(item.descKey)}</p>
+                      <p className="text-xs text-[var(--ds-text-secondary)]">{t(item.descKey)}</p>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="bg-white border border-ds-border shadow-ds-card p-4" style={{ borderRadius: 'var(--leaf-r)' }}>
+            <div className="bg-[var(--ds-surface-card)] border border-ds-border shadow-ds-card p-4" style={{ borderRadius: 'var(--leaf-r)' }}>
               <p className="font-black text-ds-text mb-1 flex items-center gap-1.5">
                 <Gift className="w-4 h-4 text-pink-500" /> {t("welcomeGiftTitle")}
               </p>
-              <p className="text-sm text-gray-500">{t("welcomeGiftDesc")}</p>
+              <p className="text-sm text-[var(--ds-text-secondary)]">{t("welcomeGiftDesc")}</p>
             </div>
           </div>
         </div>
 
-        <p className="text-center text-xs text-gray-400 mt-8 flex items-center justify-center gap-1.5">
+        <p className="text-center text-xs text-[var(--ds-text-tertiary)] mt-8 flex items-center justify-center gap-1.5">
           <ShieldCheck className="w-3.5 h-3.5" /> {t("infoSafetyNote")}
         </p>
       </main>

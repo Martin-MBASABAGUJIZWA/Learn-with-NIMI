@@ -10,13 +10,13 @@ export default function Error({
   reset: () => void;
 }) {
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4 text-center">
-      <div className="bg-white border border-ds-border shadow-ds-card p-8 max-w-md w-full" style={{ borderRadius: 'var(--leaf-r-lg)' }}>
+    <div className="min-h-screen bg-[var(--ds-surface-card)] flex flex-col items-center justify-center px-4 text-center">
+      <div className="bg-[var(--ds-surface-card)] border border-ds-border shadow-ds-card p-8 max-w-md w-full" style={{ borderRadius: 'var(--leaf-r-lg)' }}>
         <p className="text-5xl mb-4">🙈</p>
         <h1 className="text-xl font-bold text-ds-text mb-2">
           Oops! Something went wrong
         </h1>
-        <p className="text-sm text-gray-500 mb-6">
+        <p className="text-sm text-[var(--ds-text-secondary)] mb-6">
           Don&apos;t worry, it&apos;s not your fault. Let&apos;s try that again!
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -29,7 +29,7 @@ export default function Error({
           </button>
           <Link
             href="/home"
-            className="bg-white border border-ds-border text-ds-text font-bold px-6 py-3 hover:bg-gray-50 transition"
+            className="bg-[var(--ds-surface-card)] border border-ds-border text-ds-text font-bold px-6 py-3 hover:bg-[var(--ds-surface-card)] transition"
             style={{ borderRadius: 'var(--leaf-r)' }}
           >
             Go Home

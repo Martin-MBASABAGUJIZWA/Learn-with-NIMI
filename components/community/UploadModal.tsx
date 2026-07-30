@@ -15,7 +15,7 @@ const CREATION_TYPES: { id: CreationType; emoji: string; labelKey: string }[] = 
 ];
 
 const inputClass =
-  "w-full border border-ds-border bg-ds-input leaf px-3 py-2 text-sm font-semibold text-ds-text focus:outline-none focus:ring-2 focus:ring-[var(--ds-state-focus)] transition placeholder:text-gray-400";
+  "w-full border border-ds-border bg-ds-input leaf px-3 py-2 text-sm font-semibold text-ds-text focus:outline-none focus:ring-2 focus:ring-[var(--ds-state-focus)] transition placeholder:text-[var(--ds-text-tertiary)]";
 
 export default function UploadModal({
   open,
@@ -70,14 +70,14 @@ export default function UploadModal({
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.85, opacity: 0 }}
           transition={SPRING.modal}
-          className="bg-white border border-ds-border shadow-2xl w-full max-w-lg my-8 overflow-hidden"
+          className="bg-[var(--ds-surface-card)] border border-ds-border shadow-2xl w-full max-w-lg my-8 overflow-hidden"
           style={{ borderRadius: 'var(--leaf-r-lg)' }}
         >
           <div className="px-5 py-4 flex items-center justify-between sticky top-0" style={{ backgroundColor: 'var(--nimi-green)' }}>
             <p className="text-white font-black text-lg tracking-wide">{t("uploadArtworkTitle")}</p>
             <button
               onClick={() => !formState.isUploading && onClose()}
-              className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-white transition"
+              className="w-8 h-8 rounded-full bg-[var(--ds-surface-card)]/20 hover:bg-[var(--ds-surface-card)]/30 flex items-center justify-center text-white transition"
             >
               <X className="w-4 h-4" />
             </button>
@@ -117,7 +117,7 @@ export default function UploadModal({
               onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
               className={`border-2 border-dashed leaf p-4 text-center cursor-pointer transition
-                ${dragActive ? "border-[var(--ds-border-brand)] bg-[var(--ds-brand-subtle)]" : "border-gray-300 bg-gray-50 hover:bg-gray-100"}
+                ${dragActive ? "border-[var(--ds-border-brand)] bg-[var(--ds-brand-subtle)]" : "border-[var(--ds-border-strong)] bg-[var(--ds-surface-card)] hover:bg-[var(--ds-surface-card-hover)]"}
                 ${formState.isUploading ? "opacity-50 pointer-events-none" : ""}
               `}
             >
@@ -156,7 +156,7 @@ export default function UploadModal({
                     className={`flex-1 flex flex-col items-center gap-1 leaf border-2 py-2 text-xs font-bold transition ${
                       formState.creationType === option.id
                         ? "border-[var(--ds-border-brand)] bg-[var(--ds-brand-subtle)] text-[var(--ds-brand-primary)]"
-                        : "border-ds-border bg-white text-ds-text hover:bg-gray-50"
+                        : "border-ds-border bg-[var(--ds-surface-card)] text-ds-text hover:bg-[var(--ds-surface-card)]"
                     }`}
                   >
                     <span className="text-lg">{option.emoji}</span>
@@ -208,7 +208,7 @@ export default function UploadModal({
                 disabled={formState.isUploading}
                 className="mt-0.5 w-4 h-4 accent-green-600 shrink-0 cursor-pointer"
               />
-              <span className="font-nunito text-[12px] text-gray-700 leading-relaxed">
+              <span className="font-nunito text-xs text-[var(--ds-text-primary)] leading-relaxed">
                 I agree to the{" "}
                 <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-green-700 underline font-bold">
                   Terms of Use
@@ -229,7 +229,7 @@ export default function UploadModal({
               <button
                 onClick={() => !formState.isUploading && onClose()}
                 disabled={formState.isUploading}
-                className="flex-1 border border-ds-border text-ds-text font-black rounded-full py-2.5 text-sm hover:bg-gray-50 transition disabled:opacity-60"
+                className="flex-1 border border-ds-border text-ds-text font-black rounded-full py-2.5 text-sm hover:bg-[var(--ds-surface-card)] transition disabled:opacity-60"
               >
                 {t("cancel")}
               </button>

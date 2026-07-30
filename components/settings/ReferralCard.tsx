@@ -52,8 +52,8 @@ export default function ReferralCard() {
           <Gift className="w-5 h-5 text-amber-600" />
         </div>
         <div>
-          <h3 className="font-baloo font-black text-gray-900 text-[16px] leading-tight">Invite Friends & Earn</h3>
-          <p className="font-nunito text-gray-500 text-[13px] mt-0.5 leading-relaxed">
+          <h3 className="font-baloo font-black text-[var(--ds-text-primary)] text-base leading-tight">Invite Friends & Earn</h3>
+          <p className="font-nunito text-[var(--ds-text-secondary)] text-sml mt-0.5 leading-relaxed">
             Share your link — when a friend subscribes to Club, you <strong>both get 1 free month</strong>. 🎁
           </p>
         </div>
@@ -62,27 +62,27 @@ export default function ReferralCard() {
       {code ? (
         <>
           <div className="flex items-center gap-2 mb-3">
-            <div className="flex-1 bg-white border border-amber-200 rounded-xl px-3 py-2.5 font-mono text-[12px] text-gray-700 truncate select-all">
+            <div className="flex-1 bg-[var(--ds-surface-card)] border border-amber-200 rounded-xl px-3 py-2.5 font-mono text-xs text-[var(--ds-text-primary)] truncate select-all">
               {referralUrl}
             </div>
             <button onClick={copyLink}
-              className="shrink-0 flex items-center gap-1.5 bg-amber-500 hover:bg-amber-600 text-white font-baloo font-black text-[12px] px-3 py-2.5 rounded-xl transition-colors">
+              className="shrink-0 flex items-center gap-1.5 bg-amber-500 hover:bg-amber-600 text-white font-baloo font-black text-xs px-3 py-2.5 rounded-xl transition-colors">
               {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
               {copied ? "Copied!" : "Copy"}
             </button>
           </div>
 
           <button onClick={shareLink}
-            className="w-full flex items-center justify-center gap-2 bg-[var(--ds-brand-primary)] hover:bg-[var(--ds-brand-hover)] text-white font-baloo font-black text-[13px] py-2.5 rounded-xl transition-colors">
+            className="w-full flex items-center justify-center gap-2 bg-[var(--ds-brand-primary)] hover:bg-[var(--ds-brand-hover)] text-white font-baloo font-black text-sml py-2.5 rounded-xl transition-colors">
             <Share2 className="w-4 h-4" /> Share via WhatsApp
           </button>
 
-          <p className="font-nunito text-gray-400 text-[10px] text-center mt-3">
-            Your code: <span className="font-black text-gray-600 font-mono">{code}</span>
+          <p className="font-nunito text-[var(--ds-text-tertiary)] text-3xs text-center mt-3">
+            Your code: <span className="font-black text-[var(--ds-text-secondary)] font-mono">{code}</span>
           </p>
         </>
       ) : (
-        <p className="text-center text-gray-400 text-[13px] font-nunito">Could not load referral code. Try again later.</p>
+        <p className="text-center text-[var(--ds-text-tertiary)] text-sml font-nunito">Could not load referral code. Try again later.</p>
       )}
     </div>
   );

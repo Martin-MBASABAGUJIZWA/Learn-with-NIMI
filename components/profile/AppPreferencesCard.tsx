@@ -23,12 +23,12 @@ function ToggleSwitch({ on, onClick }: { on: boolean; onClick: () => void }) {
       type="button"
       onClick={onClick}
       aria-pressed={on}
-      className={`relative w-12 h-6 rounded-full transition-colors shrink-0 ${on ? "bg-[var(--nimi-green)]" : "bg-gray-200"}`}
+      className={`relative w-12 h-6 rounded-full transition-colors shrink-0 ${on ? "bg-[var(--nimi-green)]" : "bg-[var(--ds-surface-card-active)]"}`}
     >
       <motion.span
         animate={{ x: on ? 24 : 2 }}
         transition={{ type: "spring", stiffness: 500, damping: 30 }}
-        className="absolute top-0.5 w-5 h-5 bg-white rounded-full shadow-md block"
+        className="absolute top-0.5 w-5 h-5 bg-[var(--ds-surface-card)] rounded-full shadow-md block"
       />
     </button>
   );
@@ -73,26 +73,26 @@ export default function AppPreferencesCard({ activeChild, onLanguageChanged }: P
     <div className="bg-ds-card border border-ds-border shadow-ds-card overflow-hidden" style={{ borderRadius: 'var(--leaf-r)' }}>
       {/* Header */}
       <div className="flex items-center gap-3 px-5 py-4 border-b border-ds-border">
-        <div className="w-8 h-8 bg-gray-100 rounded-xl flex items-center justify-center shrink-0">
-          <Settings2 size={15} className="text-gray-500" />
+        <div className="w-8 h-8 bg-[var(--ds-surface-card-hover)] rounded-xl flex items-center justify-center shrink-0">
+          <Settings2 size={15} className="text-[var(--ds-text-secondary)]" />
         </div>
         <div>
-          <p className="font-baloo font-black text-ds-text text-[14px] leading-tight">{t("appPreferencesTitle")}</p>
-          <p className="text-ds-muted text-[11px]">{t("appPreferencesSubtitle")}</p>
+          <p className="font-baloo font-black text-ds-text text-sm leading-tight">{t("appPreferencesTitle")}</p>
+          <p className="text-ds-muted text-2xs">{t("appPreferencesSubtitle")}</p>
         </div>
       </div>
 
       <div className="divide-y divide-gray-100">
         {/* Sound / read-aloud */}
         <div className="flex items-center gap-4 px-5 py-4">
-          <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors ${isReaderActive ? "bg-emerald-100" : "bg-gray-100"}`}>
+          <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors ${isReaderActive ? "bg-emerald-100" : "bg-[var(--ds-surface-card-hover)]"}`}>
             {isReaderActive
               ? <Volume2 size={18} className="text-emerald-600" />
-              : <VolumeX size={18} className="text-gray-400" />}
+              : <VolumeX size={18} className="text-[var(--ds-text-tertiary)]" />}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-bold text-[13px] text-ds-text">{t("soundLabel")}</p>
-            <p className="text-[11px] text-ds-muted">{t("soundDesc")}</p>
+            <p className="font-bold text-sml text-ds-text">{t("soundLabel")}</p>
+            <p className="text-2xs text-ds-muted">{t("soundDesc")}</p>
           </div>
           <ToggleSwitch on={isReaderActive} onClick={toggleReader} />
         </div>
@@ -102,8 +102,8 @@ export default function AppPreferencesCard({ activeChild, onLanguageChanged }: P
           <div className="flex items-center gap-2 mb-3">
             <span className="text-lg">🌍</span>
             <div>
-              <p className="font-bold text-[13px] text-ds-text">{t("languageLabel")}</p>
-              <p className="text-[11px] text-ds-muted">{t("languageDesc")}</p>
+              <p className="font-bold text-sml text-ds-text">{t("languageLabel")}</p>
+              <p className="text-2xs text-ds-muted">{t("languageDesc")}</p>
             </div>
           </div>
           <div className="grid grid-cols-3 gap-2">
@@ -116,15 +116,15 @@ export default function AppPreferencesCard({ activeChild, onLanguageChanged }: P
                   className={`flex flex-col items-center gap-1 py-2.5 px-2 rounded-xl border-2 text-center transition-all ${
                     active
                       ? "border-[var(--nimi-green)] bg-[var(--ds-brand-subtle)] shadow-sm"
-                      : "border-ds-border hover:border-gray-300 bg-ds-card"
+                      : "border-ds-border hover:border-[var(--ds-border-strong)] bg-ds-card"
                   }`}
                 >
                   <span className="text-xl">{lang.flag}</span>
-                  <span className={`text-[10px] font-black leading-tight ${active ? "text-[var(--ds-brand-primary)]" : "text-ds-muted"}`}>
+                  <span className={`text-3xs font-black leading-tight ${active ? "text-[var(--ds-brand-primary)]" : "text-ds-muted"}`}>
                     {lang.label}
                   </span>
                   {active && (
-                    <span className="text-[8px] font-black text-[var(--ds-brand-primary)] bg-[var(--nimi-green)]/10 px-1.5 py-0.5 rounded-full">
+                    <span className="text-5xs font-black text-[var(--ds-brand-primary)] bg-[var(--nimi-green)]/10 px-1.5 py-0.5 rounded-full">
                       Active
                     </span>
                   )}
@@ -144,11 +144,11 @@ export default function AppPreferencesCard({ activeChild, onLanguageChanged }: P
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5">
               <span className={`w-2 h-2 rounded-full shrink-0 ${isOnline ? "bg-emerald-500" : "bg-orange-400"}`} />
-              <p className="font-bold text-[13px] text-ds-text">
+              <p className="font-bold text-sml text-ds-text">
                 {isOnline ? t("onlineLabel") : t("offlineLabel")}
               </p>
             </div>
-            <p className="text-[11px] text-ds-muted mt-0.5">
+            <p className="text-2xs text-ds-muted mt-0.5">
               {pendingCount > 0
                 ? t("activitiesWaitingSyncLabel").replace("{count}", String(pendingCount))
                 : t("allProgressSavedLabel")}
@@ -162,7 +162,7 @@ export default function AppPreferencesCard({ activeChild, onLanguageChanged }: P
                 exit={{ opacity: 0, scale: 0.9 }}
                 onClick={syncNow}
                 disabled={syncing || !isOnline}
-                className="flex items-center gap-1.5 bg-[var(--ds-brand-subtle)] text-[var(--ds-brand-primary)] border border-[var(--ds-border-brand)]/30 font-bold text-[11px] px-3 py-1.5 rounded-full transition disabled:opacity-50 shrink-0"
+                className="flex items-center gap-1.5 bg-[var(--ds-brand-subtle)] text-[var(--ds-brand-primary)] border border-[var(--ds-border-brand)]/30 font-bold text-2xs px-3 py-1.5 rounded-full transition disabled:opacity-50 shrink-0"
               >
                 <RefreshCw size={12} className={syncing ? "animate-spin" : ""} />
                 {syncing ? t("syncingLabel") : t("syncNowBtn")}

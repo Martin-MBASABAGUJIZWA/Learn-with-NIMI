@@ -38,7 +38,7 @@ export default function AttentionAlertsCard({ alerts }: Props) {
   const { t } = useLanguage();
 
   return (
-    <div className="bg-white border border-ds-border shadow-ds-card p-4" style={{ borderRadius: 'var(--leaf-r)' }}>
+    <div className="bg-[var(--ds-surface-card)] border border-ds-border shadow-ds-card p-4" style={{ borderRadius: 'var(--leaf-r)' }}>
       <p className="font-black text-ds-text mb-2">{t("attentionAlertsTitle")}</p>
       <div className="flex flex-col gap-2">
         {alerts.map((alert, i) => {

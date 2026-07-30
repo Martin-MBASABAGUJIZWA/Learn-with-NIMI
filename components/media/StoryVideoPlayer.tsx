@@ -22,12 +22,12 @@ export default function StoryVideoPlayer({ url, title, poster, onEnded }: Props)
 
   if (!url) {
     return (
-      <div className="leaf border border-emerald-100 bg-gradient-to-br from-white via-emerald-50/70 to-amber-50/60 aspect-video flex flex-col items-center justify-center gap-2 shadow-[0_16px_34px_rgba(15,23,42,0.08)]">
-        <div className="rounded-full bg-white p-3 shadow-sm">
+      <div className="leaf border border-emerald-100 bg-gradient-to-br from-white via-emerald-50/70 to-amber-50/60 aspect-video flex flex-col items-center justify-center gap-2 shadow-card-2xl">
+        <div className="rounded-full bg-[var(--ds-surface-card)] p-3 shadow-sm">
           <Sparkles className="h-6 w-6 text-emerald-600" />
         </div>
-        <p className="text-gray-700 text-sm font-black">Coming Soon</p>
-        {title && <p className="text-gray-500 text-[10px]">{title}</p>}
+        <p className="text-[var(--ds-text-primary)] text-sm font-black">Coming Soon</p>
+        {title && <p className="text-[var(--ds-text-secondary)] text-3xs">{title}</p>}
       </div>
     );
   }
@@ -51,7 +51,7 @@ export default function StoryVideoPlayer({ url, title, poster, onEnded }: Props)
   };
 
   return (
-    <div className="overflow-hidden leaf border border-emerald-100 bg-black/40 shadow-[0_16px_34px_rgba(15,23,42,0.12)] relative group">
+    <div className="overflow-hidden leaf border border-emerald-100 bg-black/40 shadow-card-3xl relative group">
       <video
         ref={ref}
         src={src}
@@ -72,7 +72,7 @@ export default function StoryVideoPlayer({ url, title, poster, onEnded }: Props)
       {/* Overlay controls */}
       <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20">
         <motion.button whileTap={m.dangerPress} onClick={toggle}
-          className="w-16 h-16 bg-white/25 backdrop-blur rounded-full flex items-center justify-center text-white shadow-xl border border-white/20">
+          className="w-16 h-16 bg-[var(--ds-surface-card)]/25 backdrop-blur rounded-full flex items-center justify-center text-white shadow-xl border border-white/20">
           {playing ? <Pause className="w-7 h-7" /> : <Play className="w-7 h-7 ml-1" />}
         </motion.button>
       </div>
@@ -90,17 +90,17 @@ export default function StoryVideoPlayer({ url, title, poster, onEnded }: Props)
 
       {/* Bottom bar */}
       <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3 pt-8 flex items-center gap-3">
-        <button onClick={toggle} className="w-10 h-10 rounded-full bg-white/15 border border-white/20 flex items-center justify-center text-white shrink-0">
+        <button onClick={toggle} className="w-10 h-10 rounded-full bg-[var(--ds-surface-card)]/15 border border-white/20 flex items-center justify-center text-white shrink-0">
           {playing ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 ml-0.5" />}
         </button>
-        <div className="flex-1 bg-white/15 rounded-full h-[6px] overflow-hidden">
+        <div className="flex-1 bg-[var(--ds-surface-card)]/15 rounded-full h-[6px] overflow-hidden">
           <div className="bg-cta-gradient h-full rounded-full transition-all duration-200"
             style={{ width: `${progress}%` }} />
         </div>
-        <button onClick={toggleMute} className="w-8 h-8 rounded-full bg-white/10 border border-white/10 flex items-center justify-center text-white/60 shrink-0">
+        <button onClick={toggleMute} className="w-8 h-8 rounded-full bg-[var(--ds-surface-card)]/10 border border-white/10 flex items-center justify-center text-white/60 shrink-0">
           {muted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
         </button>
-        <button onClick={toggleFullscreen} className="w-8 h-8 rounded-full bg-white/10 border border-white/10 flex items-center justify-center text-white/60 shrink-0">
+        <button onClick={toggleFullscreen} className="w-8 h-8 rounded-full bg-[var(--ds-surface-card)]/10 border border-white/10 flex items-center justify-center text-white/60 shrink-0">
           <Maximize className="w-3.5 h-3.5" />
         </button>
       </div>

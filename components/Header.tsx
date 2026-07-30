@@ -28,7 +28,7 @@ export default function Header({ simple }: HeaderProps) {
   return (
     <header
       className={`${
-        simple ? "bg-transparent border-none" : "bg-white/95 border-b-2 border-ds-border"
+        simple ? "bg-transparent border-none" : "bg-[var(--ds-surface-card)]/95 border-b-2 border-ds-border"
       } sticky top-0 z-40 shadow-sm`}
     >
       <div className="max-w-7xl mx-auto px-4">
@@ -59,7 +59,7 @@ export default function Header({ simple }: HeaderProps) {
               >
                 NIMIPIKO
               </h1>
-              <p className="text-gray-400 text-[9px] font-semibold hidden sm:block">
+              <p className="text-[var(--ds-text-tertiary)] text-4xs font-semibold hidden sm:block">
                 Learn • Play • Create • Grow
               </p>
             </div>
@@ -70,19 +70,19 @@ export default function Header({ simple }: HeaderProps) {
             <div className="relative">
               <button
                 onClick={() => setShowPicker(!showPicker)}
-                className="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center text-xl transition"
+                className="w-10 h-10 bg-[var(--ds-surface-card-hover)] hover:bg-[var(--ds-surface-card-active)] rounded-full flex items-center justify-center text-xl transition"
                 aria-label="Change language"
               >
                 {LANGS.find(l => l.code === language)?.flag ?? "🌐"}
               </button>
 
               {showPicker && (
-                <div className="absolute right-0 mt-2 bg-white border border-ds-border rounded-xl shadow-lg overflow-hidden z-50 w-36">
+                <div className="absolute right-0 mt-2 bg-[var(--ds-surface-card)] border border-ds-border rounded-xl shadow-lg overflow-hidden z-50 w-36">
                   {LANGS.map(lang => (
                     <button
                       key={lang.code}
                       onClick={() => { setLanguage(lang.code); setShowPicker(false); }}
-                      className="flex items-center px-3 py-2.5 w-full hover:bg-gray-50 transition text-sm"
+                      className="flex items-center px-3 py-2.5 w-full hover:bg-[var(--ds-surface-card)] transition text-sm"
                     >
                       <span className="text-lg mr-2">{lang.flag}</span>
                       <span className="font-medium text-ds-text">{lang.label}</span>

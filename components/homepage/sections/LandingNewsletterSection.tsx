@@ -131,7 +131,7 @@ export default function LandingNewsletterSection() {
                   )}
 
                   <button type="submit" disabled={status === "loading"}
-                    className="w-full bg-white hover:bg-green-50 active:scale-[0.98] disabled:opacity-60 text-[var(--nimi-green)] font-baloo font-black text-[15px] py-3.5 rounded-xl transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 mt-2">
+                    className="w-full bg-[var(--ds-surface-card)] hover:bg-green-50 active:scale-[0.98] disabled:opacity-60 text-[var(--nimi-green)] font-baloo font-black text-[15px] py-3.5 rounded-xl transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 mt-2">
                     {status === "loading" ? (
                       <>
                         <span className="w-4 h-4 border-2 border-green-700/25 border-t-green-700 rounded-full animate-spin shrink-0" />

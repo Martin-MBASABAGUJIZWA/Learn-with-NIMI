@@ -32,7 +32,7 @@ export default function AchievementRow({ slots, storyTitle, storySlug, isComplet
       <div className="relative leaf overflow-hidden border-2 border-yellow-400/15 shadow-xl">
         <div className="absolute inset-0 bg-gradient-to-br from-yellow-50/50 to-amber-50/30" />
         <div className="relative z-10 p-4">
-          <h4 className="font-black text-[13px] text-center mb-3">
+          <h4 className="font-black text-sml text-center mb-3">
             <span className="text-yellow-300">MY BADGES</span> <span>🏅</span>
           </h4>
           <div className="grid grid-cols-2 gap-2 mb-3">
@@ -49,25 +49,25 @@ export default function AchievementRow({ slots, storyTitle, storySlug, isComplet
                     className={`w-12 h-12 rounded-full flex items-center justify-center text-xl border-[3px] shadow-lg ${
                       is
                         ? `bg-gradient-to-br ${b.bg} border-white/40 ${b.ring} ring-3`
-                        : "bg-white/[0.04] border-dashed border-white/10"
+                        : "bg-[var(--ds-surface-card)]/[0.04] border-dashed border-white/10"
                     }`}>
                     {is ? b.emoji : <span className="text-white/10 text-sm">?</span>}
                   </motion.div>
-                  <span className={`text-[8px] font-black text-center leading-tight whitespace-pre-line ${is ? "text-yellow-200" : "text-white/20"}`}>
+                  <span className={`text-5xs font-black text-center leading-tight whitespace-pre-line ${is ? "text-yellow-200" : "text-white/20"}`}>
                     {b.label}
                   </span>
                 </motion.div>
               );
             })}
             <div className="flex flex-col items-center gap-1">
-              <div className="w-12 h-12 rounded-full flex items-center justify-center text-lg bg-white/[0.03] border-[3px] border-dashed border-white/[0.08]">
+              <div className="w-12 h-12 rounded-full flex items-center justify-center text-lg bg-[var(--ds-surface-card)]/[0.03] border-[3px] border-dashed border-white/[0.08]">
                 <span className="text-white/10 font-black">?</span>
               </div>
-              <span className="text-[8px] font-black text-center text-white/15">More to<br/>Earn</span>
+              <span className="text-5xs font-black text-center text-white/15">More to<br/>Earn</span>
             </div>
           </div>
           <Link href="/treasure"
-            className="flex items-center justify-center gap-1 text-yellow-300/60 hover:text-yellow-200 text-[10px] font-black transition">
+            className="flex items-center justify-center gap-1 text-yellow-300/60 hover:text-yellow-200 text-3xs font-black transition">
             ◀ View All Badges <ChevronRight className="w-3 h-3" />
           </Link>
         </div>
@@ -77,7 +77,7 @@ export default function AchievementRow({ slots, storyTitle, storySlug, isComplet
       <div className="relative leaf overflow-hidden border-2 border-ds-border shadow-xl">
         <div className="absolute inset-0 bg-gradient-to-br from-green-50/50 to-blue-50/30" />
         <div className="relative z-10 p-4 flex flex-col items-center text-center h-full justify-center">
-          <h4 className="font-black text-[13px] text-gray-500 mb-3">NEXT STORY ✨</h4>
+          <h4 className="font-black text-sml text-[var(--ds-text-secondary)] mb-3">NEXT STORY ✨</h4>
           {nextStory ? (
             <>
               <div className="relative w-20 h-20 overflow-hidden border-2 border-white/10 mb-2 shadow-lg" style={{ borderRadius: 'var(--leaf-r)' }}>
@@ -94,16 +94,16 @@ export default function AchievementRow({ slots, storyTitle, storySlug, isComplet
                   </motion.div>
                 </div>
               </div>
-              <p className="font-black text-white text-[13px]">{nextStory.theme_emoji} {nextStory.title}</p>
-              <p className="text-gray-300 text-[9px] mt-1">Complete the current story to unlock!</p>
-              <div className="mt-2 bg-gray-50 border border-ds-border rounded-lg py-1.5 px-4">
-                <span className="text-gray-300 text-[10px] font-black">🔒 Locked</span>
+              <p className="font-black text-white text-sml">{nextStory.theme_emoji} {nextStory.title}</p>
+              <p className="text-[var(--ds-text-tertiary)] text-4xs mt-1">Complete the current story to unlock!</p>
+              <div className="mt-2 bg-[var(--ds-surface-card)] border border-ds-border rounded-lg py-1.5 px-4">
+                <span className="text-[var(--ds-text-tertiary)] text-3xs font-black">🔒 Locked</span>
               </div>
             </>
           ) : (
             <>
               <span className="text-3xl mb-2">🌟</span>
-              <p className="text-gray-300 text-[11px] font-bold">More stories coming soon!</p>
+              <p className="text-[var(--ds-text-tertiary)] text-2xs font-bold">More stories coming soon!</p>
             </>
           )}
         </div>

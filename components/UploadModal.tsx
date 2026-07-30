@@ -123,14 +123,14 @@ export const UploadModal: React.FC<UploadModalProps> = ({ onClose, onSuccess, ch
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <motion.div className="bg-white border border-ds-border shadow-ds-card leaf w-full max-w-md overflow-hidden"
+      <motion.div className="bg-[var(--ds-surface-card)] border border-ds-border shadow-ds-card leaf w-full max-w-md overflow-hidden"
         initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
       >
         <div className="p-6">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-2xl font-bold text-ds-text">{success ? 'Upload Complete!' : 'Share Your Creation'}</h2>
             <button onClick={() => { if (!isUploading) { resetForm(); onClose(); } }}
-              className="text-gray-400 hover:text-ds-text transition-colors" disabled={isUploading}>
+              className="text-[var(--ds-text-tertiary)] hover:text-ds-text transition-colors" disabled={isUploading}>
               <X className="w-6 h-6" />
             </button>
           </div>
@@ -141,12 +141,12 @@ export const UploadModal: React.FC<UploadModalProps> = ({ onClose, onSuccess, ch
                 <CheckCircle className="h-10 w-10 text-[var(--ds-brand-primary)]" />
               </div>
               <h3 className="text-lg font-medium text-ds-text mb-2">Successfully Uploaded!</h3>
-              <p className="text-gray-500 mb-6">Your artwork has been shared with the community.</p>
+              <p className="text-[var(--ds-text-secondary)] mb-6">Your artwork has been shared with the community.</p>
               <Button onClick={() => { resetForm(); onClose(); }} className="w-full">Close</Button>
             </div>
           ) : (
             <>
-              <div {...getRootProps()} className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors mb-4 ${isDragActive ? 'border-[var(--ds-border-brand)] bg-[var(--ds-brand-subtle)]' : error ? 'border-red-300 bg-red-50' : 'border-ds-border hover:border-[var(--ds-border-brand)] bg-gray-50'} ${isUploading ? 'opacity-70 pointer-events-none' : ''}`}>
+              <div {...getRootProps()} className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors mb-4 ${isDragActive ? 'border-[var(--ds-border-brand)] bg-[var(--ds-brand-subtle)]' : error ? 'border-red-300 bg-red-50' : 'border-ds-border hover:border-[var(--ds-border-brand)] bg-[var(--ds-surface-card)]'} ${isUploading ? 'opacity-70 pointer-events-none' : ''}`}>
                 <input {...getInputProps()} />
                 {preview ? (
                   <div className="relative h-48 w-full rounded-md overflow-hidden mb-4">
@@ -154,11 +154,11 @@ export const UploadModal: React.FC<UploadModalProps> = ({ onClose, onSuccess, ch
                   </div>
                 ) : (
                   <div className="space-y-3">
-                    <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-gray-100">
-                      {error ? <AlertCircle className="h-6 w-6 text-red-500" /> : isDragActive ? <UploadCloud className="h-6 w-6 text-[var(--ds-brand-primary)]" /> : <Camera className="h-6 w-6 text-gray-500" />}
+                    <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-[var(--ds-surface-card-hover)]">
+                      {error ? <AlertCircle className="h-6 w-6 text-red-500" /> : isDragActive ? <UploadCloud className="h-6 w-6 text-[var(--ds-brand-primary)]" /> : <Camera className="h-6 w-6 text-[var(--ds-text-secondary)]" />}
                     </div>
                     <p className="text-sm text-ds-text">{error ? 'Try another file' : isDragActive ? 'Drop your artwork here' : 'Drag & drop or click to select'}</p>
-                    <p className="text-xs text-gray-500">JPEG, PNG, GIF, WEBP (max 5MB)</p>
+                    <p className="text-xs text-[var(--ds-text-secondary)]">JPEG, PNG, GIF, WEBP (max 5MB)</p>
                   </div>
                 )}
               </div>
@@ -166,7 +166,7 @@ export const UploadModal: React.FC<UploadModalProps> = ({ onClose, onSuccess, ch
               {error && <div className="p-3 bg-red-500/10 border border-red-400/30 rounded-lg text-red-300 text-sm mb-4"><div className="font-medium flex items-center"><AlertCircle className="w-4 h-4 mr-2" />Upload Error</div><div className="mt-1">{error}</div></div>}
 
               <div className="space-y-4">
-                <Input placeholder="What did you create? (optional)" value={description} onChange={(e) => setDescription(e.target.value)} disabled={isUploading} className="bg-ds-input border-ds-border text-ds-text placeholder:text-gray-400" />
+                <Input placeholder="What did you create? (optional)" value={description} onChange={(e) => setDescription(e.target.value)} disabled={isUploading} className="bg-ds-input border-ds-border text-ds-text placeholder:text-[var(--ds-text-tertiary)]" />
                 <div className="flex items-center space-x-2">
                   <Switch id="visibility" checked={isPublic} onCheckedChange={setIsPublic} disabled={isUploading} />
                   <label htmlFor="visibility" className="text-sm font-medium text-ds-text">{isPublic ? 'Public (Visible to everyone)' : 'Private (Only visible to family)'}</label>

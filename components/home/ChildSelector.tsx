@@ -16,8 +16,8 @@ export default function ChildSelector({ children, activeChild, onSelect }: Props
   const m = useThemeMotion();
   const { t } = useLanguage();
   return (
-    <div className="flex items-center gap-2 mb-4 bg-white px-3 py-2 border border-ds-border overflow-x-auto shadow-sm" style={{ borderRadius: 'var(--leaf-r)' }}>
-      <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wide flex-shrink-0">
+    <div className="flex items-center gap-2 mb-4 bg-[var(--ds-surface-card)] px-3 py-2 border border-ds-border overflow-x-auto shadow-sm" style={{ borderRadius: 'var(--leaf-r)' }}>
+      <span className="text-2xs font-bold text-[var(--ds-text-secondary)] uppercase tracking-wide flex-shrink-0">
         {t("childSelectorPlayingAs")}
       </span>
       <div className="flex items-center gap-2 flex-1">
@@ -26,10 +26,10 @@ export default function ChildSelector({ children, activeChild, onSelect }: Props
             key={child.id}
             onClick={() => onSelect(child)}
             whileTap={m.buttonPress}
-            className={`flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-bold transition-all flex-shrink-0 ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold transition-all flex-shrink-0 ${
               child.id === activeChild.id
                 ? "text-white shadow-sm border border-transparent"
-                : "bg-gray-50 text-gray-700 hover:bg-gray-100 border border-ds-border"
+                : "bg-[var(--ds-surface-card-hover)] text-[var(--ds-text-primary)] hover:bg-[var(--ds-surface-card-active)] border border-ds-border"
             }`}
             style={child.id === activeChild.id
               ? { backgroundColor: 'var(--nimi-green)', borderRadius: 'var(--leaf-r-sm)' }

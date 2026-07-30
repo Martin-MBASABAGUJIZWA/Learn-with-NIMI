@@ -43,7 +43,7 @@ export default function CommunityPreview() {
   if (items.length === 0) return null;
 
   return (
-    <div className="bg-white border border-ds-border shadow-ds-card overflow-hidden" style={{ borderRadius: 'var(--leaf-r)' }}>
+    <div className="bg-[var(--ds-surface-card)] border border-ds-border shadow-ds-card overflow-hidden" style={{ borderRadius: 'var(--leaf-r)' }}>
       <div className="p-5 sm:p-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
@@ -51,13 +51,13 @@ export default function CommunityPreview() {
               <span className="text-lg">🌍</span>
             </div>
             <div>
-              <h3 className="font-black text-ds-text text-[16px]">NIMI COMMUNITY</h3>
-              <p className="text-gray-500 text-[10px]">See what other little champions are sharing!</p>
+              <h3 className="font-black text-ds-text text-base">NIMI COMMUNITY</h3>
+              <p className="text-[var(--ds-text-secondary)] text-3xs">See what other little champions are sharing!</p>
             </div>
           </div>
           <Link href="/community">
             <motion.button whileHover={{ scale: 1.03 }} whileTap={m.buttonPress}
-              className="text-white font-black text-[11px] px-4 py-2 shadow-sm flex items-center gap-1"
+              className="text-white font-black text-2xs px-4 py-2 shadow-sm flex items-center gap-1"
               style={{ backgroundColor: 'var(--nimi-green)', borderRadius: 'var(--leaf-r-sm)' }}>
               Visit Community <ChevronRight className="w-3 h-3" />
             </motion.button>
@@ -70,9 +70,9 @@ export default function CommunityPreview() {
               initial={{ opacity: 0, y: 15, scale: 0.9 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ delay: i * 0.1, type: "spring" }}
-              className="shrink-0 w-[150px] sm:w-[170px] overflow-hidden border border-ds-border bg-white hover:bg-gray-50 transition shadow-sm"
+              className="shrink-0 w-[150px] sm:w-[170px] overflow-hidden border border-ds-border bg-[var(--ds-surface-card)] hover:bg-[var(--ds-surface-card)] transition shadow-sm"
               style={{ borderRadius: 'var(--leaf-r)' }}>
-              <div className="h-24 bg-gray-50 flex items-center justify-center relative overflow-hidden">
+              <div className="h-24 bg-[var(--ds-surface-card)] flex items-center justify-center relative overflow-hidden">
                 {item.image_url ? (
                   <Image src={item.image_url.startsWith("/") ? item.image_url : getStorageUrl(item.image_url)}
                     alt="" fill className="object-cover" />
@@ -84,15 +84,15 @@ export default function CommunityPreview() {
               </div>
               <div className="p-3">
                 <div className="flex items-center gap-1.5 mb-1">
-                  <div className={`w-6 h-6 rounded-full bg-gradient-to-br ${AVATAR_COLORS[i % 4]} flex items-center justify-center text-white text-[9px] font-black shrink-0 shadow`}>
+                  <div className={`w-6 h-6 rounded-full bg-gradient-to-br ${AVATAR_COLORS[i % 4]} flex items-center justify-center text-white text-4xs font-black shrink-0 shadow`}>
                     {item.child_name?.[0]?.toUpperCase() ?? "?"}
                   </div>
-                  <span className="text-ds-text text-[11px] font-bold truncate">{item.child_name}</span>
+                  <span className="text-ds-text text-2xs font-bold truncate">{item.child_name}</span>
                 </div>
-                <p className="text-gray-400 text-[9px] truncate">{item.description}</p>
+                <p className="text-[var(--ds-text-tertiary)] text-4xs truncate">{item.description}</p>
                 <div className="flex items-center gap-1 mt-2">
                   <Heart className="w-3.5 h-3.5 text-pink-400" />
-                  <span className="text-pink-400 text-[9px] font-bold">Love this!</span>
+                  <span className="text-pink-400 text-4xs font-bold">Love this!</span>
                 </div>
               </div>
             </motion.div>

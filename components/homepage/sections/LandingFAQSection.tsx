@@ -48,28 +48,28 @@ export default function LandingFAQSection() {
   const [open, setOpen] = useState<number | null>(null);
 
   return (
-    <section className="relative px-5 sm:px-10 lg:px-14 py-20 sm:py-28 bg-white">
+    <section className="relative px-5 sm:px-10 lg:px-14 py-20 sm:py-28 bg-[var(--ds-surface-card)]">
       <div className="max-w-3xl mx-auto">
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }} variants={stagger}>
           <motion.div variants={fadeUp} className="text-center mb-14">
-            <span className="eyebrow inline-block text-gray-700 mb-4 bg-gray-100 px-4 py-1.5 rounded-full">
+            <span className="eyebrow inline-block text-[var(--ds-text-primary)] mb-4 bg-[var(--ds-surface-card-hover)] px-4 py-1.5 rounded-full">
               💬 Quick Answers
             </span>
-            <h2 className="font-baloo font-black text-gray-900 text-[28px] sm:text-[42px] leading-tight">
+            <h2 className="font-baloo font-black text-[var(--ds-text-primary)] text-[28px] sm:text-[42px] leading-tight">
               Questions parents ask
             </h2>
-            <p className="font-nunito text-gray-500 mt-3 text-[15px] max-w-lg mx-auto">
+            <p className="font-nunito text-[var(--ds-text-secondary)] mt-3 text-[15px] max-w-lg mx-auto">
               Everything you need to know before getting started.
             </p>
           </motion.div>
 
-          <div className="divide-y divide-gray-100 border border-gray-100 rounded-3xl overflow-hidden shadow-sm">
+          <div className="divide-y divide-gray-100 border border-[var(--ds-border-primary)] rounded-3xl overflow-hidden shadow-sm">
             {FAQ_ITEMS.map((item, i) => (
               <motion.div key={i} variants={fadeUp}>
                 <button
                   onClick={() => setOpen(open === i ? null : i)}
-                  className="w-full flex items-center justify-between text-left px-6 py-5 hover:bg-gray-50 transition-colors gap-4">
-                  <span className="font-baloo font-black text-gray-900 text-[15px] sm:text-[17px] leading-snug">
+                  className="w-full flex items-center justify-between text-left px-6 py-5 hover:bg-[var(--ds-surface-card)] transition-colors gap-4">
+                  <span className="font-baloo font-black text-[var(--ds-text-primary)] text-[15px] sm:text-[17px] leading-snug">
                     {item.q}
                   </span>
                   <motion.div
@@ -91,7 +91,7 @@ export default function LandingFAQSection() {
                       exit={{ height: 0, opacity: 0 }}
                       transition={{ duration: 0.25, ease: "easeInOut" }}
                       className="overflow-hidden">
-                      <p className="font-nunito text-gray-500 text-[14px] sm:text-[15px] leading-relaxed px-6 pb-6 pt-1">
+                      <p className="font-nunito text-[var(--ds-text-secondary)] text-[14px] sm:text-[15px] leading-relaxed px-6 pb-6 pt-1">
                         {item.a}
                       </p>
                     </motion.div>
@@ -102,7 +102,7 @@ export default function LandingFAQSection() {
           </div>
 
           <motion.div variants={fadeUp} className="mt-8 text-center">
-            <p className="font-nunito text-gray-400 text-[14px]">
+            <p className="font-nunito text-[var(--ds-text-tertiary)] text-[14px]">
               Still have questions?{" "}
               <Link href="/help" className="font-bold hover:underline transition-colors" style={{ color: "var(--ds-brand-primary)" }}>
                 Visit our Help Center →

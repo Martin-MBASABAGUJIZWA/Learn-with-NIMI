@@ -44,7 +44,7 @@ export default function AchievementDashboard({ childName, childLanguage, achieve
             className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-black transition-colors ${
               activeLang === lang
                 ? "bg-[var(--nimi-green)] text-white shadow"
-                : "border border-ds-border text-ds-text bg-white hover:bg-gray-50"
+                : "border border-ds-border text-ds-text bg-[var(--ds-surface-card)] hover:bg-[var(--ds-surface-card)]"
             }`}
           >
             <span className="text-lg">{LANGUAGE_META[lang].flag}</span>

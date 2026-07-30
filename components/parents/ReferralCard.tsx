@@ -61,7 +61,7 @@ export default function ReferralCard({ code, referralCount, rewardsEarned, codeE
     : 100;
 
   return (
-    <div className="bg-white border border-ds-border p-5 shadow-ds-card overflow-hidden relative" style={{ borderRadius: "var(--leaf-r-lg)" }}>
+    <div className="bg-[var(--ds-surface-card)] border border-ds-border p-5 shadow-ds-card overflow-hidden relative" style={{ borderRadius: "var(--leaf-r-lg)" }}>
       {/* Decorative blob */}
       <div className="absolute -top-8 -right-8 w-40 h-40 rounded-full bg-gradient-to-br from-emerald-200/40 to-teal-200/20 pointer-events-none" />
 
@@ -69,20 +69,20 @@ export default function ReferralCard({ code, referralCount, rewardsEarned, codeE
         {/* Header */}
         <div className="flex items-center gap-2">
           <span className="text-xl">🎁</span>
-          <h2 className="font-black text-ds-text text-[18px]">Invite Friends</h2>
-          <span className="ml-auto text-[11px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full">
+          <h2 className="font-black text-ds-text text-lg">Invite Friends</h2>
+          <span className="ml-auto text-2xs font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full">
             +1 free month each
           </span>
         </div>
 
-        <p className="font-nunito text-ds-muted text-[13px]">
+        <p className="font-nunito text-ds-muted text-sml">
           Share your link with a friend. When they subscribe to NIMIPIKO Club, you both get <strong>1 free month</strong> added automatically.
         </p>
 
         {/* Error state */}
         {codeError && !code && (
           <div className="flex items-center justify-between gap-3 bg-red-50 border border-red-200 px-4 py-3 rounded-xl">
-            <p className="font-nunito text-red-600 text-[13px]">Could not load your referral code.</p>
+            <p className="font-nunito text-red-600 text-sml">Could not load your referral code.</p>
             <button
               onClick={async () => {
                 if (!onRetry) return;
@@ -91,7 +91,7 @@ export default function ReferralCard({ code, referralCount, rewardsEarned, codeE
                 setRetrying(false);
               }}
               disabled={retrying}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-red-200 rounded-lg text-red-600 font-black text-[12px] hover:bg-red-50 transition disabled:opacity-50">
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--ds-surface-card)] border border-red-200 rounded-lg text-red-600 font-black text-xs hover:bg-red-50 transition disabled:opacity-50">
               <RefreshCw className={`w-3.5 h-3.5 ${retrying ? "animate-spin" : ""}`} />
               {retrying ? "Retrying…" : "Retry"}
             </button>
@@ -102,26 +102,26 @@ export default function ReferralCard({ code, referralCount, rewardsEarned, codeE
         <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 px-4 py-3 space-y-2.5" style={{ borderRadius: "var(--leaf-r)" }}>
           <div className="flex items-center justify-between gap-3">
             <div>
-              <p className="font-nunito text-emerald-500 text-[10px] font-bold uppercase tracking-widest mb-0.5">Your code</p>
-              <p className="font-baloo font-black text-emerald-800 text-[26px] tracking-[0.12em] leading-none">
+              <p className="font-nunito text-emerald-500 text-3xs font-bold uppercase tracking-widest mb-0.5">Your code</p>
+              <p className="font-baloo font-black text-emerald-800 text-2.5xl tracking-[0.12em] leading-none">
                 {code ?? "———"}
               </p>
             </div>
             <button onClick={() => copy(code ?? "", "code")} disabled={!code}
-              className={`flex items-center gap-1.5 px-3 py-2 rounded-xl font-nunito font-black text-[12px] transition shrink-0 disabled:opacity-40 disabled:cursor-not-allowed ${copied === "code" ? "bg-emerald-500 text-white" : "bg-white border border-emerald-200 text-emerald-700 hover:bg-emerald-50"}`}>
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-xl font-nunito font-black text-xs transition shrink-0 disabled:opacity-40 disabled:cursor-not-allowed ${copied === "code" ? "bg-emerald-500 text-white" : "bg-[var(--ds-surface-card)] border border-emerald-200 text-emerald-700 hover:bg-emerald-50"}`}>
               {copied === "code" ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
               {copied === "code" ? "Copied!" : "Copy code"}
             </button>
           </div>
 
           {/* Invite link row */}
-          <div className="flex items-center gap-2 bg-white/70 border border-emerald-100 rounded-xl px-3 py-2">
+          <div className="flex items-center gap-2 bg-[var(--ds-surface-card)]/70 border border-emerald-100 rounded-xl px-3 py-2">
             <Link className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-            <p className="flex-1 min-w-0 text-[11px] text-emerald-700 font-mono truncate">
+            <p className="flex-1 min-w-0 text-2xs text-emerald-700 font-mono truncate">
               {typeof window !== "undefined" ? window.location.hostname : "nimipiko.com"}/invite/{code ?? ""}
             </p>
             <button onClick={() => copy(shareUrl, "link")} disabled={!code}
-              className={`text-[11px] font-black shrink-0 transition disabled:opacity-40 disabled:cursor-not-allowed ${copied === "link" ? "text-emerald-600" : "text-emerald-500 hover:text-emerald-700"}`}>
+              className={`text-2xs font-black shrink-0 transition disabled:opacity-40 disabled:cursor-not-allowed ${copied === "link" ? "text-emerald-600" : "text-emerald-500 hover:text-emerald-700"}`}>
               {copied === "link" ? "Copied ✓" : "Copy"}
             </button>
           </div>
@@ -132,12 +132,12 @@ export default function ReferralCard({ code, referralCount, rewardsEarned, codeE
           <button onClick={whatsappShare} disabled={!code}
             className="flex items-center justify-center gap-2 py-3.5 bg-green-50 border border-green-200 rounded-2xl hover:bg-green-100 active:scale-[0.97] transition disabled:opacity-40 disabled:cursor-not-allowed">
             <MessageCircle className="w-[18px] h-[18px] text-green-600 shrink-0" />
-            <span className="text-[13px] font-black text-green-700">WhatsApp</span>
+            <span className="text-sml font-black text-green-700">WhatsApp</span>
           </button>
           <button onClick={emailShare} disabled={!code}
             className="flex items-center justify-center gap-2 py-3.5 bg-blue-50 border border-blue-200 rounded-2xl hover:bg-blue-100 active:scale-[0.97] transition disabled:opacity-40 disabled:cursor-not-allowed">
             <Mail className="w-[18px] h-[18px] text-blue-600 shrink-0" />
-            <span className="text-[13px] font-black text-blue-700">Email</span>
+            <span className="text-sml font-black text-blue-700">Email</span>
           </button>
         </div>
 
@@ -145,12 +145,12 @@ export default function ReferralCard({ code, referralCount, rewardsEarned, codeE
         {nextMilestone && (
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
-              <p className="text-[11px] font-black text-gray-500">
+              <p className="text-2xs font-black text-[var(--ds-text-secondary)]">
                 Progress to <span className="text-emerald-600">{nextMilestone.emoji} {nextMilestone.label}</span>
               </p>
-              <p className="text-[11px] font-black text-gray-400">{referralCount} / {nextMilestone.count}</p>
+              <p className="text-2xs font-black text-[var(--ds-text-tertiary)]">{referralCount} / {nextMilestone.count}</p>
             </div>
-            <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+            <div className="h-2 bg-[var(--ds-surface-card-active)] rounded-full overflow-hidden">
               <motion.div
                 className="h-full bg-gradient-to-r from-emerald-400 to-teal-500 rounded-full"
                 initial={{ width: 0 }}
@@ -158,7 +158,7 @@ export default function ReferralCard({ code, referralCount, rewardsEarned, codeE
                 transition={{ duration: 0.6, ease: "easeOut" }}
               />
             </div>
-            <p className="text-[10px] text-gray-400 font-nunito">
+            <p className="text-3xs text-[var(--ds-text-tertiary)] font-nunito">
               Invite {nextMilestone.count - referralCount} more {nextMilestone.count - referralCount === 1 ? "friend" : "friends"} to unlock {nextMilestone.reward}
             </p>
           </div>
@@ -166,18 +166,18 @@ export default function ReferralCard({ code, referralCount, rewardsEarned, codeE
 
         {/* Stats row */}
         <div className="grid grid-cols-2 gap-3">
-          <div className="bg-gray-50 border border-ds-border px-4 py-3 text-center" style={{ borderRadius: "var(--leaf-r)" }}>
-            <p className="font-baloo font-black text-ds-text text-[24px] leading-none">{referralCount}</p>
-            <p className="font-nunito text-ds-muted text-[11px] mt-0.5">{referralCount === 1 ? "Friend joined" : "Friends joined"}</p>
+          <div className="bg-[var(--ds-surface-card-hover)] border border-ds-border px-4 py-3 text-center" style={{ borderRadius: "var(--leaf-r)" }}>
+            <p className="font-baloo font-black text-ds-text text-2xl leading-none">{referralCount}</p>
+            <p className="font-nunito text-ds-muted text-2xs mt-0.5">{referralCount === 1 ? "Friend joined" : "Friends joined"}</p>
           </div>
           <div className="bg-emerald-50 border border-emerald-200 px-4 py-3 text-center" style={{ borderRadius: "var(--leaf-r)" }}>
             {rewardsEarned > 0 ? (
               <>
-                <p className="font-baloo font-black text-emerald-700 text-[24px] leading-none">{rewardsEarned}</p>
-                <p className="font-nunito text-emerald-500 text-[11px] mt-0.5">Free {rewardsEarned === 1 ? "month" : "months"} earned</p>
+                <p className="font-baloo font-black text-emerald-700 text-2xl leading-none">{rewardsEarned}</p>
+                <p className="font-nunito text-emerald-500 text-2xs mt-0.5">Free {rewardsEarned === 1 ? "month" : "months"} earned</p>
               </>
             ) : (
-              <p className="font-nunito text-emerald-400 text-[12px] leading-snug">No rewards<br />yet</p>
+              <p className="font-nunito text-emerald-400 text-xs leading-snug">No rewards<br />yet</p>
             )}
           </div>
         </div>
@@ -188,9 +188,9 @@ export default function ReferralCard({ code, referralCount, rewardsEarned, codeE
             const reached = referralCount >= m.count;
             return (
               <div key={m.count}
-                className={`flex flex-col items-center gap-1 px-3 py-2 rounded-2xl border shrink-0 transition ${reached ? "bg-emerald-50 border-emerald-200" : "bg-gray-50 border-ds-border opacity-50"}`}>
+                className={`flex flex-col items-center gap-1 px-3 py-2 rounded-2xl border shrink-0 transition ${reached ? "bg-emerald-50 border-emerald-200" : "bg-[var(--ds-surface-card-hover)] border-ds-border opacity-50"}`}>
                 <span className="text-lg">{m.emoji}</span>
-                <span className={`text-[10px] font-black ${reached ? "text-emerald-700" : "text-gray-400"}`}>{m.count} {m.count === 1 ? "friend" : "friends"}</span>
+                <span className={`text-3xs font-black ${reached ? "text-emerald-700" : "text-[var(--ds-text-tertiary)]"}`}>{m.count} {m.count === 1 ? "friend" : "friends"}</span>
               </div>
             );
           })}

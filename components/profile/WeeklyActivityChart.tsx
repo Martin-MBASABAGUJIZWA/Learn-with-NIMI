@@ -19,12 +19,12 @@ export default function WeeklyActivityChart({ weekCounts }: Props) {
     <div className="bg-ds-card border border-ds-border shadow-ds-card p-5" style={{ borderRadius: "var(--leaf-r)" }}>
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <p className="font-baloo font-black text-ds-text text-[15px]">{t("weeklyActivityTitle")}</p>
+        <p className="font-baloo font-black text-ds-text text-mbase">{t("weeklyActivityTitle")}</p>
         {hasActivity && (
           <motion.span
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="text-[11px] font-black text-[var(--ds-brand-primary)] bg-[var(--ds-brand-subtle)] px-2.5 py-1 rounded-full border border-[var(--ds-border-brand)]/30"
+            className="text-2xs font-black text-[var(--ds-brand-primary)] bg-[var(--ds-brand-subtle)] px-2.5 py-1 rounded-full border border-[var(--ds-border-brand)]/30"
           >
             🔥 {total} {t("thisWeekLabel")}
           </motion.span>
@@ -49,15 +49,15 @@ export default function WeeklyActivityChart({ weekCounts }: Props) {
                   animate={{ height: `${h}%` }}
                   transition={{ duration: 0.6, delay: i * 0.06, ease: [0.34, 1.1, 0.64, 1] }}
                 />
-                <span className="text-[10px] font-bold text-ds-muted">{t(dayKeys[i])}</span>
+                <span className="text-3xs font-bold text-ds-muted">{t(dayKeys[i])}</span>
               </div>
             ))}
           </div>
           <div className="absolute inset-0 flex flex-col items-center justify-center pb-4">
             <div className="bg-ds-card/92 backdrop-blur-sm border border-ds-border rounded-2xl px-4 py-3 text-center shadow-sm">
-              <p className="text-[28px] leading-none mb-1">📚</p>
-              <p className="font-baloo font-black text-ds-text text-[13px]">No activity yet this week</p>
-              <p className="text-ds-muted text-[10px] font-semibold mt-0.5">Read a story to light up the chart!</p>
+              <p className="text-3.5xl leading-none mb-1">📚</p>
+              <p className="font-baloo font-black text-ds-text text-sml">No activity yet this week</p>
+              <p className="text-ds-muted text-3xs font-semibold mt-0.5">Read a story to light up the chart!</p>
             </div>
           </div>
         </motion.div>
@@ -77,7 +77,7 @@ export default function WeeklyActivityChart({ weekCounts }: Props) {
                       initial={{ opacity: 0, y: 4 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: i * 0.06 + 0.2 }}
-                      className={`text-[11px] font-black tabular-nums leading-none ${
+                      className={`text-2xs font-black tabular-nums leading-none ${
                         isBest ? "text-[var(--ds-brand-primary)]" : "text-ds-muted"
                       }`}
                     >
@@ -98,7 +98,7 @@ export default function WeeklyActivityChart({ weekCounts }: Props) {
                   animate={{ height: `${heightPct}%` }}
                   transition={{ duration: 0.55, delay: i * 0.06, ease: [0.34, 1.1, 0.64, 1] }}
                 />
-                <span className={`text-[10px] font-bold ${isBest ? "text-[var(--ds-brand-primary)]" : "text-ds-muted"}`}>
+                <span className={`text-3xs font-bold ${isBest ? "text-[var(--ds-brand-primary)]" : "text-ds-muted"}`}>
                   {t(dayKeys[i])}
                 </span>
               </div>
@@ -115,10 +115,10 @@ export default function WeeklyActivityChart({ weekCounts }: Props) {
           transition={{ delay: 0.6 }}
           className="mt-3 pt-3 border-t border-ds-border flex items-center justify-between"
         >
-          <span className="text-ds-muted text-[11px]">
+          <span className="text-ds-muted text-2xs">
             {t("bestDayLabel")}: <span className="font-bold text-ds-text">{t(dayKeys[best])}</span>
           </span>
-          <span className="text-[11px] font-black text-[var(--ds-brand-primary)]">
+          <span className="text-2xs font-black text-[var(--ds-brand-primary)]">
             {weekCounts[best]} {t("activitiesLabel")}
           </span>
         </motion.div>

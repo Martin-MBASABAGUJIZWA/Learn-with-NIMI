@@ -65,7 +65,7 @@ export default function ThemeDetails({ meta, onClose, onPreview, onApply, onUnlo
         className={`
           fixed right-0 top-0 bottom-0 z-50 w-full max-w-sm
           flex flex-col overflow-y-auto
-          bg-white/95 backdrop-blur-sm
+          bg-[var(--ds-surface-card)]/95 backdrop-blur-sm
           shadow-2xl outline-none
           ${cv.dialogStyle.radius}
         `}
@@ -101,28 +101,28 @@ export default function ThemeDetails({ meta, onClose, onPreview, onApply, onUnlo
           {/* Name + badges */}
           <div className="space-y-2">
             <div className="flex items-start justify-between gap-2">
-              <h2 className="text-xl font-extrabold text-gray-900 leading-tight">{meta.name}</h2>
+              <h2 className="text-xl font-extrabold text-[var(--ds-text-primary)] leading-tight">{meta.name}</h2>
               <ThemeBadge status={status} />
             </div>
             <div className="flex items-center gap-2 flex-wrap">
               <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${RARITY_COLORS[meta.rarity]}`}>
                 {RARITY_LABELS[meta.rarity]}
               </span>
-              <span className="text-xs text-gray-400">v{meta.version}</span>
-              <span className="text-xs text-gray-400">by {meta.author}</span>
+              <span className="text-xs text-[var(--ds-text-tertiary)]">v{meta.version}</span>
+              <span className="text-xs text-[var(--ds-text-tertiary)]">by {meta.author}</span>
             </div>
           </div>
 
           {/* Description */}
-          <p className="text-sm text-gray-600 leading-relaxed">{meta.longDescription}</p>
+          <p className="text-sm text-[var(--ds-text-secondary)] leading-relaxed">{meta.longDescription}</p>
 
           {/* Features */}
           {meta.features.length > 0 && (
             <div className="space-y-2">
-              <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider">Features</h3>
+              <h3 className="text-xs font-bold text-[var(--ds-text-secondary)] uppercase tracking-wider">Features</h3>
               <ul className="space-y-1.5">
                 {meta.features.map((f, i) => (
-                  <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
+                  <li key={i} className="flex items-start gap-2 text-sm text-[var(--ds-text-primary)]">
                     <span className="text-current mt-0.5 flex-shrink-0" style={{ color: meta.accentColor }}>✓</span>
                     {f}
                   </li>
@@ -134,10 +134,10 @@ export default function ThemeDetails({ meta, onClose, onPreview, onApply, onUnlo
           {/* Included assets */}
           {meta.includedAssets.length > 0 && (
             <div className="space-y-2">
-              <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider">Included Artwork</h3>
+              <h3 className="text-xs font-bold text-[var(--ds-text-secondary)] uppercase tracking-wider">Included Artwork</h3>
               <ul className="space-y-1.5">
                 {meta.includedAssets.map((a, i) => (
-                  <li key={i} className="flex items-start gap-2 text-sm text-gray-600">
+                  <li key={i} className="flex items-start gap-2 text-sm text-[var(--ds-text-secondary)]">
                     <span className="flex-shrink-0">🖼️</span>
                     {a}
                   </li>
@@ -154,29 +154,29 @@ export default function ThemeDetails({ meta, onClose, onPreview, onApply, onUnlo
             >
               <span className="text-2xl">{meta.unlockType === "stars" ? "⭐" : "💎"}</span>
               <div>
-                <div className="text-sm font-bold text-gray-900">
+                <div className="text-sm font-bold text-[var(--ds-text-primary)]">
                   {meta.unlockCost.toLocaleString()} {meta.unlockType === "stars" ? "Stars" : "Gems"}
                 </div>
-                <div className="text-xs text-gray-500">to unlock this theme</div>
+                <div className="text-xs text-[var(--ds-text-secondary)]">to unlock this theme</div>
               </div>
             </div>
           )}
 
           {meta.estimatedUnlock && (
-            <p className="text-xs text-gray-400">Available: {meta.estimatedUnlock}</p>
+            <p className="text-xs text-[var(--ds-text-tertiary)]">Available: {meta.estimatedUnlock}</p>
           )}
 
           {/* Footer */}
-          <p className="text-xs text-gray-400">Last updated {meta.lastUpdated}</p>
+          <p className="text-xs text-[var(--ds-text-tertiary)]">Last updated {meta.lastUpdated}</p>
         </div>
 
         {/* Sticky action bar */}
-        <div className="sticky bottom-0 p-4 bg-white/95 backdrop-blur-sm border-t border-gray-100 flex gap-3">
+        <div className="sticky bottom-0 p-4 bg-[var(--ds-surface-card)]/95 backdrop-blur-sm border-t border-[var(--ds-border-primary)] flex gap-3">
           {meta.isInstalled && (
             <button
               onClick={() => onPreview(meta)}
-              className="flex-1 py-2.5 leaf text-sm font-semibold border border-gray-200
-                         text-gray-700 hover:bg-gray-50 transition-colors focus-visible:outline-none
+              className="flex-1 py-2.5 leaf text-sm font-semibold border border-[var(--ds-border-primary)]
+                         text-[var(--ds-text-primary)] hover:bg-[var(--ds-surface-card-hover)] transition-colors focus-visible:outline-none
                          focus-visible:ring-2 focus-visible:ring-offset-1"
             >
               Preview
@@ -207,7 +207,7 @@ export default function ThemeDetails({ meta, onClose, onPreview, onApply, onUnlo
               Unlock Theme
             </button>
           ) : (
-            <div className="flex-1 py-2.5 leaf text-sm font-semibold text-center text-gray-400 bg-gray-100">
+            <div className="flex-1 py-2.5 leaf text-sm font-semibold text-center text-[var(--ds-text-tertiary)] bg-[var(--ds-surface-card-active)]">
               Coming Soon
             </div>
           )}

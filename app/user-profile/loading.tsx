@@ -6,7 +6,7 @@ export default function UserProfileLoading() {
     <AppShell>
       <div className="max-w-lg mx-auto w-full pb-24 px-4 space-y-4 pt-2">
         {/* Greeting card skeleton */}
-        <div className="rounded-3xl border border-gray-100 p-5 flex items-center gap-4">
+        <div className="leaf-lg border border-[var(--ds-border-primary)] p-5 flex items-center gap-4">
           <Bone className="w-16 h-16 rounded-full shrink-0" />
           <div className="flex-1 space-y-2">
             <Bone className="h-5 w-36" />
@@ -15,7 +15,7 @@ export default function UserProfileLoading() {
         </div>
 
         {/* Stats row */}
-        <div className="rounded-3xl border border-gray-100 p-5 grid grid-cols-4 gap-3">
+        <div className="leaf-lg border border-[var(--ds-border-primary)] p-5 grid grid-cols-4 gap-3">
           {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="text-center space-y-2">
               <Bone className="h-7 w-12 mx-auto" />
@@ -32,7 +32,7 @@ export default function UserProfileLoading() {
         </div>
 
         {/* Today's progress card */}
-        <div className="rounded-3xl border border-gray-100 p-5 space-y-3">
+        <div className="leaf-lg border border-[var(--ds-border-primary)] p-5 space-y-3">
           <div className="flex items-center gap-4">
             <Bone className="w-[72px] h-[72px] rounded-full shrink-0" />
             <div className="flex-1 space-y-2">
@@ -56,7 +56,7 @@ export default function UserProfileLoading() {
         </div>
 
         {/* Badges */}
-        <div className="rounded-3xl border border-gray-100 p-5 space-y-3">
+        <div className="leaf-lg border border-[var(--ds-border-primary)] p-5 space-y-3">
           <Bone className="h-4 w-28" />
           <Bone className="h-2 w-full rounded-full" />
           <div className="grid grid-cols-5 gap-3">

@@ -110,21 +110,21 @@ export default function NotificationPanel({ isOpen, onClose, onCountChange }: Pr
               {/* Header */}
               <div className="flex items-center justify-between px-4 py-3 border-b border-ds-border">
                 <div>
-                  <p className="rounded-full border border-[var(--ds-border-brand)]/20 bg-white/80 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.24em] text-[var(--ds-brand-primary)] shadow-sm inline-block">
+                  <p className="rounded-full border border-[var(--ds-border-brand)]/20 bg-[var(--ds-surface-card)]/80 px-2.5 py-1 text-3xs font-black uppercase tracking-[0.24em] text-[var(--ds-brand-primary)] shadow-sm inline-block">
                     Updates
                   </p>
-                  <h3 className="font-baloo font-black text-gray-800 text-[18px] mt-1">Notifications</h3>
+                  <h3 className="font-baloo font-black text-[var(--ds-text-primary)] text-lg mt-1">Notifications</h3>
                 </div>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={markAllRead}
-                    className="rounded-full border border-[var(--ds-border-brand)]/20 bg-white/80 px-2.5 py-1 text-gray-500 hover:text-[var(--ds-brand-primary)] text-[11px] font-nunito font-bold flex items-center gap-1 transition shadow-sm"
+                    className="rounded-full border border-[var(--ds-border-brand)]/20 bg-[var(--ds-surface-card)]/80 px-2.5 py-1 text-[var(--ds-text-secondary)] hover:text-[var(--ds-brand-primary)] text-2xs font-nunito font-bold flex items-center gap-1 transition shadow-sm"
                   >
                     <CheckCheck className="w-3.5 h-3.5" /> Mark all read
                   </button>
                   <button
                     onClick={onClose}
-                    className="w-7 h-7 rounded-full border border-[var(--ds-border-brand)]/20 bg-white/80 hover:bg-[var(--ds-brand-soft)] flex items-center justify-center text-gray-500 transition shadow-sm"
+                    className="w-7 h-7 rounded-full border border-[var(--ds-border-brand)]/20 bg-[var(--ds-surface-card)]/80 hover:bg-[var(--ds-brand-soft)] flex items-center justify-center text-[var(--ds-text-secondary)] transition shadow-sm"
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -140,8 +140,8 @@ export default function NotificationPanel({ isOpen, onClose, onCountChange }: Pr
                 ) : notifications.length === 0 ? (
                   <div className="p-8 text-center">
                     <span className="text-3xl">🔔</span>
-                    <p className="font-nunito text-gray-500 text-[14px] font-bold mt-2">No notifications yet</p>
-                    <p className="font-nunito text-gray-500 text-[12px] mt-1">We&apos;ll let you know when something happens!</p>
+                    <p className="font-nunito text-[var(--ds-text-secondary)] text-sm font-bold mt-2">No notifications yet</p>
+                    <p className="font-nunito text-[var(--ds-text-secondary)] text-xs mt-1">We&apos;ll let you know when something happens!</p>
                   </div>
                 ) : (
                   notifications.map(n => (
@@ -152,13 +152,13 @@ export default function NotificationPanel({ isOpen, onClose, onCountChange }: Pr
                         n.read ? "opacity-60" : "hover:bg-[var(--ds-brand-subtle)]"
                       }`}
                     >
-                      <span className="text-[20px] shrink-0 mt-0.5">{TYPE_ICONS[n.type] ?? "💜"}</span>
+                      <span className="text-xl shrink-0 mt-0.5">{TYPE_ICONS[n.type] ?? "💜"}</span>
                       <div className="flex-1 min-w-0">
-                        <p className={`font-nunito text-[13px] font-bold leading-tight ${n.read ? "text-gray-400" : "text-gray-800"}`}>
+                        <p className={`font-nunito text-sml font-bold leading-tight ${n.read ? "text-[var(--ds-text-tertiary)]" : "text-[var(--ds-text-primary)]"}`}>
                           {n.title}
                         </p>
-                        <p className="font-nunito text-gray-500 text-[12px] mt-0.5 leading-snug">{n.body}</p>
-                        <p className="font-nunito text-gray-400 text-[10px] mt-1">{timeAgo(n.created_at)}</p>
+                        <p className="font-nunito text-[var(--ds-text-secondary)] text-xs mt-0.5 leading-snug">{n.body}</p>
+                        <p className="font-nunito text-[var(--ds-text-tertiary)] text-3xs mt-1">{timeAgo(n.created_at)}</p>
                       </div>
                       {!n.read && <div className="w-2.5 h-2.5 bg-[var(--ds-brand-primary)] rounded-full shrink-0 mt-1.5" />}
                     </button>

@@ -154,7 +154,7 @@ export default function MissionCategoryPage() {
         <ContentSurface className="p-6 text-center">
           <p className="text-5xl mb-3">😵</p>
           <p className="font-bold text-ds-text">{t("missionLoadErrorTitle")}</p>
-          <p className="text-sm text-gray-500 mt-1 mb-4">{t("missionLoadErrorHint")}</p>
+          <p className="text-sm text-[var(--ds-text-secondary)] mt-1 mb-4">{t("missionLoadErrorHint")}</p>
           <button
             onClick={() => setReloadKey(k => k + 1)}
             className="px-6 py-3 min-h-[44px] text-white font-black text-sm shadow-md transition" style={{ backgroundColor: 'var(--nimi-green)', borderRadius: 'var(--leaf-r-sm)' }}
@@ -170,7 +170,7 @@ export default function MissionCategoryPage() {
         <ContentSurface className="p-6 text-center">
           <p className="text-5xl mb-3">{activity.emoji}</p>
           <p className="font-bold text-ds-text">{t("noPagesTitle")}</p>
-          <p className="text-sm text-gray-500 mt-1">{t("noPagesHint")}</p>
+          <p className="text-sm text-[var(--ds-text-secondary)] mt-1">{t("noPagesHint")}</p>
         </ContentSurface>
       );
     }
@@ -194,7 +194,7 @@ export default function MissionCategoryPage() {
           <ContentSurface className="p-6 text-center">
             <p className="text-5xl mb-3">{activity.emoji}</p>
             <p className="font-bold text-ds-text">{t("noPagesTitle")}</p>
-            <p className="text-sm text-gray-500 mt-1">{t("noPagesHint")}</p>
+            <p className="text-sm text-[var(--ds-text-secondary)] mt-1">{t("noPagesHint")}</p>
           </ContentSurface>
         );
     }

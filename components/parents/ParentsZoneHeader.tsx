@@ -14,7 +14,7 @@ export default function ParentsZoneHeader({ onUploadClick }: Props) {
     <div className="flex items-start sm:items-center justify-between gap-3 flex-wrap">
       <div>
         <h1 className="font-black text-2xl sm:text-3xl text-ds-text">{t("navParentsZone")}</h1>
-        <p className="text-gray-500 text-sm mt-1">{t("parentsZoneSubtitle")}</p>
+        <p className="text-[var(--ds-text-secondary)] text-sm mt-1">{t("parentsZoneSubtitle")}</p>
       </div>
       <div className="flex items-center gap-2 shrink-0">
         {onUploadClick && (

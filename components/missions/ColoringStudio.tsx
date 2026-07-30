@@ -538,13 +538,13 @@ export default function ColoringStudio({ pages, childId, onClose, t }: ColoringS
 
       {/* ── Desktop sidebar ───────────────────────────────────── */}
       {!isMobile && (
-        <div className="w-[240px] flex-shrink-0 bg-white border-r border-ds-border flex flex-col overflow-hidden">
+        <div className="w-[240px] flex-shrink-0 bg-[var(--ds-surface-card)] border-r border-ds-border flex flex-col overflow-hidden">
           {/* Header */}
           <div className="flex items-center gap-2 px-4 py-3 bg-[var(--nimi-green)] flex-shrink-0">
-            <span className="text-[18px]">🎨</span>
-            <span className="text-white font-baloo font-bold text-[14px] flex-1">Coloring Studio</span>
+            <span className="text-lg">🎨</span>
+            <span className="text-white font-baloo font-bold text-sm flex-1">Coloring Studio</span>
             <motion.button whileTap={themeM.buttonPress} onClick={() => { saveToDb(pageIdx); onClose(); }}
-              className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-white transition">
+              className="w-8 h-8 rounded-full bg-[var(--ds-surface-card)]/20 hover:bg-[var(--ds-surface-card)]/30 flex items-center justify-center text-white transition">
               <X className="h-4 w-4" />
             </motion.button>
           </div>
@@ -567,7 +567,7 @@ export default function ColoringStudio({ pages, childId, onClose, t }: ColoringS
               ))}
             </div>
             <button onClick={() => setShowAdvancedPalette(v => !v)}
-              className="w-full text-[11px] font-bold text-gray-400 hover:text-gray-700 py-1 transition">
+              className="w-full text-2xs font-bold text-[var(--ds-text-tertiary)] hover:text-[var(--ds-text-primary)] py-1 transition">
               {showAdvancedPalette ? '◀ Simple colors' : '▶ More colors'}
             </button>
 
@@ -582,8 +582,8 @@ export default function ColoringStudio({ pages, childId, onClose, t }: ColoringS
                 <button key={id} onClick={() => setTool(id)}
                   className={`flex items-center justify-center py-3 rounded-2xl border-2 transition-all ${
                     tool === id
-                      ? 'border-yellow-400 bg-yellow-400/15 text-gray-800 shadow-lg'
-                      : 'border-ds-border text-gray-400 hover:border-[var(--ds-border-brand)]'
+                      ? 'border-yellow-400 bg-yellow-400/15 text-[var(--ds-text-primary)] shadow-lg'
+                      : 'border-ds-border text-[var(--ds-text-tertiary)] hover:border-[var(--ds-border-brand)]'
                   }`}>
                   {icon}
                 </button>
@@ -617,8 +617,8 @@ export default function ColoringStudio({ pages, childId, onClose, t }: ColoringS
                     brushSize === size ? 'border-yellow-400 bg-yellow-400/10' : 'border-ds-border hover:border-[var(--ds-border-brand)]'
                   }`}
                   style={{ width: w + 12, height: w + 12 }}>
-                  <div className="rounded-full bg-white" style={{ width: Math.max(3, size / 3), height: Math.max(3, size / 3) }} />
-                  <span className="text-[9px] font-bold text-gray-400">{label}</span>
+                  <div className="rounded-full bg-[var(--ds-surface-card)]" style={{ width: Math.max(3, size / 3), height: Math.max(3, size / 3) }} />
+                  <span className="text-4xs font-bold text-[var(--ds-text-tertiary)]">{label}</span>
                 </button>
               ))}
             </div>
@@ -626,32 +626,32 @@ export default function ColoringStudio({ pages, childId, onClose, t }: ColoringS
             {/* Actions */}
             <div className="grid grid-cols-2 gap-1.5 pt-2 border-t border-ds-border">
               <button onClick={undo} disabled={!canUndo}
-                className="flex items-center justify-center gap-1.5 py-2.5 leaf bg-gray-100 text-gray-500 text-[12px] font-bold disabled:opacity-20 hover:bg-gray-200 transition">
+                className="flex items-center justify-center gap-1.5 py-2.5 leaf bg-[var(--ds-surface-card-active)] text-[var(--ds-text-secondary)] text-xs font-bold disabled:opacity-20 hover:bg-[var(--ds-border-primary)] transition">
                 <Undo className="h-4 w-4" /> Undo
               </button>
               <button onClick={redo} disabled={!canRedo}
-                className="flex items-center justify-center gap-1.5 py-2.5 leaf bg-gray-100 text-gray-500 text-[12px] font-bold disabled:opacity-20 hover:bg-gray-200 transition">
+                className="flex items-center justify-center gap-1.5 py-2.5 leaf bg-[var(--ds-surface-card-active)] text-[var(--ds-text-secondary)] text-xs font-bold disabled:opacity-20 hover:bg-[var(--ds-border-primary)] transition">
                 <Redo className="h-4 w-4" /> Redo
               </button>
               <button onClick={clearPage}
-                className="flex items-center justify-center gap-1.5 py-2.5 leaf bg-red-500/10 text-red-400 text-[12px] font-bold hover:bg-red-500/20 transition">
+                className="flex items-center justify-center gap-1.5 py-2.5 leaf bg-red-500/10 text-red-400 text-xs font-bold hover:bg-red-500/20 transition">
                 <Trash2 className="h-4 w-4" /> Clear
               </button>
               <button onClick={() => { savePage(); playSuccess(); }}
-                className="flex items-center justify-center gap-1.5 py-2.5 leaf bg-green-500/10 text-green-400 text-[12px] font-bold hover:bg-green-500/20 transition">
+                className="flex items-center justify-center gap-1.5 py-2.5 leaf bg-green-500/10 text-green-400 text-xs font-bold hover:bg-green-500/20 transition">
                 <Save className="h-4 w-4" /> Save
               </button>
             </div>
 
             {/* Share to Nimi */}
             <button onClick={shareToNimi}
-              className="w-full flex items-center justify-center gap-2 py-3 leaf bg-pink-50 border border-pink-200 text-pink-600 text-[12px] font-bold hover:bg-pink-100 transition">
+              className="w-full flex items-center justify-center gap-2 py-3 leaf bg-pink-50 border border-pink-200 text-pink-600 text-xs font-bold hover:bg-pink-100 transition">
               {t("storyColorShare")}
             </button>
 
             {/* Saved feedback */}
             {showSaved && (
-              <div className="text-center py-2 leaf bg-[var(--ds-brand-subtle)] border border-[var(--ds-border-brand)]/20 text-[var(--ds-brand-primary)] text-[12px] font-bold">
+              <div className="text-center py-2 leaf bg-[var(--ds-brand-subtle)] border border-[var(--ds-border-brand)]/20 text-[var(--ds-brand-primary)] text-xs font-bold">
                 {t("storyColorSaved")}
               </div>
             )}
@@ -663,24 +663,24 @@ export default function ColoringStudio({ pages, childId, onClose, t }: ColoringS
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
 
         {/* Top bar */}
-        <div className="flex items-center gap-3 px-4 py-2.5 bg-white border-b border-ds-border flex-shrink-0">
+        <div className="flex items-center gap-3 px-4 py-2.5 bg-[var(--ds-surface-card)] border-b border-ds-border flex-shrink-0">
           {isMobile && (
             <motion.button whileTap={themeM.buttonPress} onClick={() => { saveToDb(pageIdx); onClose(); }}
-              className="w-9 h-9 rounded-xl bg-gray-100 flex items-center justify-center text-gray-700 hover:bg-gray-200 transition flex-shrink-0">
+              className="w-9 h-9 rounded-xl bg-[var(--ds-surface-card-active)] flex items-center justify-center text-[var(--ds-text-primary)] hover:bg-[var(--ds-border-primary)] transition flex-shrink-0">
               <X className="h-4 w-4" />
             </motion.button>
           )}
-          <span className="hidden md:block text-[13px] font-baloo font-bold text-ds-text flex-shrink-0">🎨 {t("coloringBookTitle")}</span>
+          <span className="hidden md:block text-sml font-baloo font-bold text-ds-text flex-shrink-0">🎨 {t("coloringBookTitle")}</span>
           <div className="flex items-center gap-2 mx-auto">
             <motion.button whileTap={themeM.buttonPress}
               onClick={() => pageIdx > 0 && goTo(pageIdx - 1)} disabled={pageIdx === 0}
-              className="w-11 h-11 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-700 disabled:opacity-20 transition flex-shrink-0">◀</motion.button>
-            <span className="text-[13px] font-baloo font-bold text-ds-text whitespace-nowrap">
+              className="w-11 h-11 rounded-xl bg-[var(--ds-surface-card-active)] hover:bg-[var(--ds-border-primary)] flex items-center justify-center text-[var(--ds-text-primary)] disabled:opacity-20 transition flex-shrink-0">◀</motion.button>
+            <span className="text-sml font-baloo font-bold text-ds-text whitespace-nowrap">
               {pageIdx + 1} / {processed.length}
             </span>
             <motion.button whileTap={themeM.buttonPress}
               onClick={() => pageIdx < processed.length - 1 && goTo(pageIdx + 1)} disabled={pageIdx >= processed.length - 1}
-              className="w-11 h-11 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-700 disabled:opacity-20 transition flex-shrink-0">▶</motion.button>
+              className="w-11 h-11 rounded-xl bg-[var(--ds-surface-card-active)] hover:bg-[var(--ds-border-primary)] flex items-center justify-center text-[var(--ds-text-primary)] disabled:opacity-20 transition flex-shrink-0">▶</motion.button>
           </div>
           {isMobile && (
             <button onClick={() => { savePage(); playSuccess(); }} className="w-11 h-11 rounded-xl bg-[var(--ds-brand-subtle)] text-[var(--ds-brand-primary)] hover:opacity-80 flex items-center justify-center flex-shrink-0">
@@ -708,14 +708,14 @@ export default function ColoringStudio({ pages, childId, onClose, t }: ColoringS
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 pointer-events-none">
               <motion.span className="text-4xl" animate={{ rotate: [0, 360] }}
                 transition={{ duration: 2, repeat: Infinity, ease: "linear" }}>🎨</motion.span>
-              <p className="text-gray-500 font-nunito font-bold text-sm">{t("storyColorPreparing")}</p>
+              <p className="text-[var(--ds-text-secondary)] font-nunito font-bold text-sm">{t("storyColorPreparing")}</p>
             </div>
           )}
         </div>
 
         {/* Mobile toolbar — kid-friendly chunky buttons */}
         {isMobile && (
-          <div className="bg-white border-t border-ds-border flex-shrink-0 pb-safe">
+          <div className="bg-[var(--ds-surface-card)] border-t border-ds-border flex-shrink-0 pb-safe">
             {/* Color swatches — big circles, horizontally scrollable */}
             <div className="flex gap-2 overflow-x-auto px-3 pt-3 pb-1.5" style={{ scrollbarWidth: 'none' }}>
               {KID_COLORS.map(c => (
@@ -734,18 +734,18 @@ export default function ColoringStudio({ pages, childId, onClose, t }: ColoringS
               <button onClick={() => setTool('sticker')} className={`w-12 h-12 rounded-2xl flex items-center justify-center border-2 text-xl transition-all ${tool === 'sticker' ? 'border-yellow-400 bg-yellow-400/15 shadow-lg' : 'border-ds-border'}`}>⭐</button>
               <button onClick={() => setTool('eraser')} className={`w-12 h-12 rounded-2xl flex items-center justify-center border-2 text-xl transition-all ${tool === 'eraser' ? 'border-red-400 bg-red-500/15 shadow-lg' : 'border-ds-border'}`}>🧹</button>
               {/* Size buttons instead of slider */}
-              <div className="w-px h-8 bg-gray-200 mx-1" />
+              <div className="w-px h-8 bg-[var(--ds-border-primary)] mx-1" />
               {[{ s: 6, l: 'S' }, { s: 16, l: 'M' }, { s: 32, l: 'L' }].map(({ s, l }) => (
                 <button key={s} onClick={() => setBrushSize(s)}
                   className={`w-10 h-12 rounded-2xl flex flex-col items-center justify-center border-2 transition-all ${
                     brushSize === s ? 'border-sky-400 bg-sky-400/10' : 'border-ds-border'
                   }`}>
                   <div className="rounded-full bg-gray-600" style={{ width: Math.max(4, s / 3), height: Math.max(4, s / 3) }} />
-                  <span className="text-[8px] font-bold text-gray-400 mt-0.5">{l}</span>
+                  <span className="text-5xs font-bold text-[var(--ds-text-tertiary)] mt-0.5">{l}</span>
                 </button>
               ))}
-              <div className="w-px h-8 bg-gray-200 mx-1" />
-              <button onClick={undo} disabled={!canUndo} className="w-12 h-12 rounded-2xl bg-gray-100 flex items-center justify-center disabled:opacity-20"><Undo className="h-5 w-5 text-gray-400" /></button>
+              <div className="w-px h-8 bg-[var(--ds-border-primary)] mx-1" />
+              <button onClick={undo} disabled={!canUndo} className="w-12 h-12 rounded-2xl bg-[var(--ds-surface-card-active)] flex items-center justify-center disabled:opacity-20"><Undo className="h-5 w-5 text-[var(--ds-text-tertiary)]" /></button>
             </div>
           </div>
         )}

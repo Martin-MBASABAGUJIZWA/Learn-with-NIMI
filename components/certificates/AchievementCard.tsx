@@ -58,7 +58,7 @@ interface Props {
 
 const TIER_STYLES: Record<AchievementTier, { border: string; text: string }> = {
   languageExplorer: { border: "border-amber-300", text: "text-amber-600" },
-  explorer:         { border: "border-green-400",  text: "text-gray-500"  },
+  explorer:         { border: "border-green-400",  text: "text-[var(--ds-text-secondary)]"  },
   categoryMaster:   { border: "border-blue-300",   text: "text-blue-600"  },
 };
 
@@ -96,10 +96,10 @@ function TemplateCertificate({
       <div className="w-full aspect-[3/4] flex flex-col items-center justify-center gap-3 rounded-t-2xl"
         style={{ background: "linear-gradient(160deg,#FDF4DC,#F8EABC)" }}>
         <span className="text-5xl">🏆</span>
-        <p className="font-baloo font-black text-amber-800 text-[15px] text-center px-4 leading-tight">
+        <p className="font-baloo font-black text-amber-800 text-mbase text-center px-4 leading-tight">
           {childName}
         </p>
-        <p className="text-amber-600/70 text-[11px] font-semibold">Story Complete!</p>
+        <p className="text-amber-600/70 text-2xs font-semibold">Story Complete!</p>
       </div>
     );
   }
@@ -178,11 +178,11 @@ function EarnedCertificateCard({ item, childName }: { item: AchievementItem; chi
       <TemplateCertificate childName={childName} language={item.language ?? "en"} onDataUrl={setCertDataUrl} />
       <div className="bg-amber-50 px-3 py-2.5 text-center border-t border-amber-100">
         <p className="font-black text-xs uppercase text-amber-700 tracking-wide">{title}</p>
-        <p className="text-gray-500 text-[10px] mt-0.5">{desc}</p>
+        <p className="text-[var(--ds-text-secondary)] text-3xs mt-0.5">{desc}</p>
         <div className="mt-2 flex items-center justify-center gap-2 flex-wrap">
           <button
             onClick={printCertificate}
-            className="flex items-center gap-1.5 bg-amber-100 hover:bg-amber-200 text-amber-800 font-bold text-[11px] px-3 py-1.5 rounded-full transition"
+            className="flex items-center gap-1.5 bg-amber-100 hover:bg-amber-200 text-amber-800 font-bold text-2xs px-3 py-1.5 rounded-full transition"
           >
             <Printer className="w-3 h-3" /> Print
           </button>
@@ -193,7 +193,7 @@ function EarnedCertificateCard({ item, childName }: { item: AchievementItem; chi
               });
               window.open(`/api/certificate?${params}`, "_blank");
             }}
-            className="flex items-center gap-1.5 bg-amber-100 hover:bg-amber-200 text-amber-800 font-bold text-[11px] px-3 py-1.5 rounded-full transition"
+            className="flex items-center gap-1.5 bg-amber-100 hover:bg-amber-200 text-amber-800 font-bold text-2xs px-3 py-1.5 rounded-full transition"
           >
             📥 PDF
           </button>
@@ -204,14 +204,14 @@ function EarnedCertificateCard({ item, childName }: { item: AchievementItem; chi
               });
               window.open(`/api/certificate?${params}`, "_blank");
             }}
-            className="flex items-center gap-1.5 bg-amber-100 hover:bg-amber-200 text-amber-800 font-bold text-[11px] px-3 py-1.5 rounded-full transition"
+            className="flex items-center gap-1.5 bg-amber-100 hover:bg-amber-200 text-amber-800 font-bold text-2xs px-3 py-1.5 rounded-full transition"
           >
             🖼️ PNG
           </button>
           <button
             onClick={handleShare}
             disabled={sharing}
-            className="flex items-center gap-1.5 bg-[#25D366] hover:bg-[#1ebe5d] text-white font-bold text-[11px] px-3 py-1.5 rounded-full transition disabled:opacity-60"
+            className="flex items-center gap-1.5 bg-[#25D366] hover:bg-[#1ebe5d] text-white font-bold text-2xs px-3 py-1.5 rounded-full transition disabled:opacity-60"
           >
             <Share2 className="w-3 h-3" />
             {sharing ? "…" : "Share"}
@@ -221,7 +221,7 @@ function EarnedCertificateCard({ item, childName }: { item: AchievementItem; chi
 
       {/* Toast */}
       {toast && (
-        <div className="absolute bottom-14 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[11px] font-semibold px-3 py-1.5 rounded-full whitespace-nowrap shadow-lg animate-slide-up">
+        <div className="absolute bottom-14 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-2xs font-semibold px-3 py-1.5 rounded-full whitespace-nowrap shadow-lg animate-slide-up">
           {toast}
         </div>
       )}
@@ -279,13 +279,13 @@ function ShareBadgeButton({ childName, title, badgeSrc }: { childName: string; t
       <button
         onClick={handleShare}
         disabled={sharing}
-        className="flex items-center gap-1 bg-[#25D366] hover:bg-[#1ebe5d] text-white font-bold text-[10px] px-2.5 py-1 rounded-full transition disabled:opacity-60 mx-auto mt-1"
+        className="flex items-center gap-1 bg-[#25D366] hover:bg-[#1ebe5d] text-white font-bold text-3xs px-2.5 py-1 rounded-full transition disabled:opacity-60 mx-auto mt-1"
       >
         <Share2 className="w-2.5 h-2.5" />
         {sharing ? "…" : "Share"}
       </button>
       {toast && (
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[10px] font-semibold px-2.5 py-1 rounded-full whitespace-nowrap shadow-lg">
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-3xs font-semibold px-2.5 py-1 rounded-full whitespace-nowrap shadow-lg">
           {toast}
         </div>
       )}
@@ -322,7 +322,7 @@ export default function AchievementCard({ item, earnedAt, childName }: Props) {
     );
 
     return (
-      <div className="overflow-hidden shadow-ds-card border border-blue-100 bg-white"
+      <div className="overflow-hidden shadow-ds-card border border-blue-100 bg-[var(--ds-surface-card)]"
         style={{ borderRadius: "var(--leaf-r)" }}>
         <div className="flex justify-center pt-3 pb-1">
           {badgeSrc ? (
@@ -333,7 +333,7 @@ export default function AchievementCard({ item, earnedAt, childName }: Props) {
         </div>
         <div className="px-3 pb-3 text-center">
           <p className={`font-black text-xs uppercase tracking-wide ${style.text}`}>{title}</p>
-          <p className="text-gray-500 text-[10px] mt-0.5 px-1">{desc}</p>
+          <p className="text-[var(--ds-text-secondary)] text-3xs mt-0.5 px-1">{desc}</p>
           <div className="flex items-center justify-center gap-1.5 mt-1">
             {badgeSrc && (
               <a
@@ -341,7 +341,7 @@ export default function AchievementCard({ item, earnedAt, childName }: Props) {
                 download={`${childName.replace(/ /g, "_")}_badge.jpeg`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1 bg-blue-100 hover:bg-blue-200 text-blue-700 font-bold text-[10px] px-2.5 py-1 rounded-full transition"
+                className="flex items-center gap-1 bg-blue-100 hover:bg-blue-200 text-blue-700 font-bold text-3xs px-2.5 py-1 rounded-full transition"
               >
                 🖼️ PNG
               </a>
@@ -355,16 +355,16 @@ export default function AchievementCard({ item, earnedAt, childName }: Props) {
 
   /* ── Locked card ── */
   return (
-    <div className="relative border-4 border-dashed shadow-ds-card p-5 text-center bg-gray-50 border-gray-200 opacity-70"
+    <div className="relative border-4 border-dashed shadow-ds-card p-5 text-center bg-[var(--ds-surface-card-hover)] border-[var(--ds-border-primary)] opacity-70"
       style={{ borderRadius: "var(--leaf-r)" }}>
       <span className="absolute top-2 left-2 text-yellow-400 text-sm">⭐</span>
       <span className="absolute top-2 right-2 text-yellow-400 text-sm">⭐</span>
-      <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto shadow-sm">
-        <Lock className="w-7 h-7 text-gray-400" />
+      <div className="w-16 h-16 rounded-full bg-[var(--ds-surface-card-active)] flex items-center justify-center mx-auto shadow-sm">
+        <Lock className="w-7 h-7 text-[var(--ds-text-tertiary)]" />
       </div>
-      <p className="font-black text-xs uppercase tracking-wide mt-3 text-gray-400">{title}</p>
-      <p className="text-gray-400 font-bold text-sm mt-1">{t("certLockedMessage")}</p>
-      <p className="text-gray-500 text-xs mt-1 px-1">{desc}</p>
+      <p className="font-black text-xs uppercase tracking-wide mt-3 text-[var(--ds-text-tertiary)]">{title}</p>
+      <p className="text-[var(--ds-text-tertiary)] font-bold text-sm mt-1">{t("certLockedMessage")}</p>
+      <p className="text-[var(--ds-text-secondary)] text-xs mt-1 px-1">{desc}</p>
     </div>
   );
 }

@@ -146,8 +146,8 @@ function InlineToast({ message, onDone }: { message: string; onDone: () => void 
       transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
       className="fixed bottom-24 left-1/2 -translate-x-1/2 z-[120] flex items-center gap-2.5 bg-gray-900/90 backdrop-blur-sm text-white px-4 py-2.5 rounded-2xl shadow-2xl pointer-events-none"
     >
-      <span className="text-[15px] leading-none">⚠️</span>
-      <span className="font-nunito font-semibold text-[13px] leading-snug max-w-[220px]">{message}</span>
+      <span className="text-mbase leading-none">⚠️</span>
+      <span className="font-nunito font-semibold text-sml leading-snug max-w-[220px]">{message}</span>
     </motion.div>
   );
 }
@@ -513,8 +513,8 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
       <div className="min-h-screen flex flex-col items-center justify-center gap-4 px-6 text-center">
         <span className="text-5xl leading-none">😕</span>
         <div>
-          <p className="font-baloo font-black text-gray-800 text-xl mb-1">Couldn&apos;t load your dashboard</p>
-          <p className="font-nunito text-gray-500 text-sm">Check your connection and try again.</p>
+          <p className="font-baloo font-black text-[var(--ds-text-primary)] text-xl mb-1">Couldn&apos;t load your dashboard</p>
+          <p className="font-nunito text-[var(--ds-text-secondary)] text-sm">Check your connection and try again.</p>
         </div>
         <button
           onClick={() => { setInitError(false); setLoading(true); void init(); }}
@@ -594,13 +594,13 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
             <Bone className="w-full rounded-none" style={{ height: 380 }} />
             <div className="max-w-[1400px] mx-auto px-4 lg:px-6 py-6 flex flex-col xl:flex-row gap-6">
               <div className="flex-1 space-y-8">
-                <div className="leaf-lg border border-gray-100 p-5 space-y-4">
+                <div className="leaf-lg border border-[var(--ds-border-primary)] p-5 space-y-4">
                   <Bone className="h-7 w-48" />
                   <div className="grid grid-cols-3 lg:grid-cols-6 gap-3">
                     {Array.from({ length: 6 }).map((_, i) => <Bone key={i} className="aspect-square leaf" />)}
                   </div>
                 </div>
-                <div className="leaf-lg border border-gray-100 p-5 space-y-4">
+                <div className="leaf-lg border border-[var(--ds-border-primary)] p-5 space-y-4">
                   <Bone className="h-7 w-56" />
                   <div className="flex gap-4 overflow-hidden">
                     {Array.from({ length: 4 }).map((_, i) => <Bone key={i} className="shrink-0 w-[160px] h-[220px] leaf" />)}
@@ -635,41 +635,41 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
 
               {/* ── Sky decorations: clouds, stars, birds ── */}
               {/* Clouds */}
-              <motion.div className="absolute top-[6%] left-[18%] text-[36px] pointer-events-none select-none leading-none opacity-80"
+              <motion.div className="absolute top-[6%] left-[18%] text-4xl pointer-events-none select-none leading-none opacity-80"
                 animate={{ x: [0, 18, 0], y: [0, -4, 0] }} transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}>☁️</motion.div>
-              <motion.div className="absolute top-[3%] left-[52%] text-[28px] pointer-events-none select-none leading-none opacity-70"
+              <motion.div className="absolute top-[3%] left-[52%] text-3.5xl pointer-events-none select-none leading-none opacity-70"
                 animate={{ x: [0, -14, 0], y: [0, -3, 0] }} transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}>☁️</motion.div>
-              <motion.div className="absolute top-[8%] right-[20%] text-[32px] pointer-events-none select-none leading-none opacity-75"
+              <motion.div className="absolute top-[8%] right-[20%] text-3xl pointer-events-none select-none leading-none opacity-75"
                 animate={{ x: [0, 12, 0], y: [0, -5, 0] }} transition={{ duration: 9, repeat: Infinity, ease: "easeInOut", delay: 0.8 }}>⛅</motion.div>
               {/* Stars in sky */}
-              <motion.div className="absolute top-[4%] left-[28%] text-[20px] pointer-events-none select-none leading-none"
+              <motion.div className="absolute top-[4%] left-[28%] text-xl pointer-events-none select-none leading-none"
                 animate={{ scale: [1, 1.4, 1], opacity: [0.6, 1, 0.6] }} transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}>⭐</motion.div>
-              <motion.div className="absolute top-[2%] right-[30%] text-[16px] pointer-events-none select-none leading-none"
+              <motion.div className="absolute top-[2%] right-[30%] text-base pointer-events-none select-none leading-none"
                 animate={{ scale: [1, 1.5, 1], opacity: [0.5, 1, 0.5] }} transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut", delay: 0.7 }}>✨</motion.div>
-              <motion.div className="absolute top-[10%] left-[42%] text-[14px] pointer-events-none select-none leading-none"
+              <motion.div className="absolute top-[10%] left-[42%] text-sm pointer-events-none select-none leading-none"
                 animate={{ scale: [1, 1.6, 1], opacity: [0.4, 0.9, 0.4] }} transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut", delay: 1.2 }}>⭐</motion.div>
               {/* Birds flying */}
-              <motion.div className="absolute top-[12%] left-[32%] text-[20px] pointer-events-none select-none leading-none opacity-80"
+              <motion.div className="absolute top-[12%] left-[32%] text-xl pointer-events-none select-none leading-none opacity-80"
                 animate={{ x: [0, 30, 60, 90], y: [0, -6, 2, -4], opacity: [0, 0.8, 0.8, 0] }}
                 transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 2 }}>🐦</motion.div>
-              <motion.div className="absolute top-[18%] right-[35%] text-[18px] pointer-events-none select-none leading-none opacity-80"
+              <motion.div className="absolute top-[18%] right-[35%] text-lg pointer-events-none select-none leading-none opacity-80"
                 animate={{ x: [0, -25, -50, -75], y: [0, -5, 3, -3], opacity: [0, 0.8, 0.8, 0] }}
                 transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}>🦅</motion.div>
               {/* Butterflies near flowers */}
-              <motion.div className="absolute bottom-[22%] left-[18%] text-[22px] pointer-events-none select-none leading-none opacity-85"
+              <motion.div className="absolute bottom-[22%] left-[18%] text-1.5xl pointer-events-none select-none leading-none opacity-85"
                 animate={{ x: [0, 12, -8, 0], y: [0, -8, -14, 0], rotate: [0, 15, -10, 0] }}
                 transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: 1 }}>🦋</motion.div>
-              <motion.div className="absolute bottom-[20%] right-[18%] text-[20px] pointer-events-none select-none leading-none opacity-80"
+              <motion.div className="absolute bottom-[20%] right-[18%] text-xl pointer-events-none select-none leading-none opacity-80"
                 animate={{ x: [0, -10, 8, 0], y: [0, -10, -6, 0], rotate: [0, -12, 8, 0] }}
                 transition={{ duration: 4.0, repeat: Infinity, ease: "easeInOut", delay: 2.2 }}>🦋</motion.div>
               {/* Flowers near ground */}
-              <motion.div className="absolute bottom-[14%] left-[22%] text-[18px] pointer-events-none select-none leading-none opacity-80"
+              <motion.div className="absolute bottom-[14%] left-[22%] text-lg pointer-events-none select-none leading-none opacity-80"
                 animate={{ rotate: [0, 8, -8, 0], scale: [1, 1.1, 1] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}>🌸</motion.div>
-              <motion.div className="absolute bottom-[12%] right-[22%] text-[20px] pointer-events-none select-none leading-none opacity-80"
+              <motion.div className="absolute bottom-[12%] right-[22%] text-xl pointer-events-none select-none leading-none opacity-80"
                 animate={{ rotate: [0, -10, 10, 0], scale: [1, 1.12, 1] }} transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 0.8 }}>🌺</motion.div>
-              <motion.div className="absolute bottom-[16%] left-[28%] text-[16px] pointer-events-none select-none leading-none opacity-70"
+              <motion.div className="absolute bottom-[16%] left-[28%] text-base pointer-events-none select-none leading-none opacity-70"
                 animate={{ rotate: [0, 6, -6, 0] }} transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}>🌼</motion.div>
-              <motion.div className="absolute bottom-[13%] right-[28%] text-[16px] pointer-events-none select-none leading-none opacity-70"
+              <motion.div className="absolute bottom-[13%] right-[28%] text-base pointer-events-none select-none leading-none opacity-70"
                 animate={{ rotate: [0, -8, 8, 0] }} transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut", delay: 0.4 }}>🌷</motion.div>
 
               {/* ── Layer 2: World environment assets ── */}
@@ -731,7 +731,7 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
                 <motion.div variants={up}
                   className="hidden">
                   {curStory ? (
-                    <div className="relative rounded-3xl p-5 overflow-hidden"
+                    <div className="relative leaf-lg p-5 overflow-hidden"
                       style={{
                         background: "linear-gradient(150deg,#34d399 0%,#10b981 28%,#059669 60%,#047857 100%)",
                         boxShadow: "0 24px 64px rgba(5,150,105,0.50), 0 2px 0 rgba(255,255,255,0.18) inset",
@@ -743,14 +743,14 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
                         style={{ background: "radial-gradient(circle, rgba(255,255,255,0.18) 0%, transparent 70%)" }} />
 
                       {/* Stars */}
-                      <motion.span className="absolute top-3 right-4 text-[26px] pointer-events-none select-none drop-shadow-lg"
+                      <motion.span className="absolute top-3 right-4 text-2.5xl pointer-events-none select-none drop-shadow-lg"
                         animate={{ y: [0, -5, 0], rotate: [0, 10, 0] }}
                         transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}>⭐</motion.span>
-                      <motion.span className="absolute top-7 right-[52px] text-[16px] pointer-events-none select-none opacity-80"
+                      <motion.span className="absolute top-7 right-[52px] text-base pointer-events-none select-none opacity-80"
                         animate={{ y: [0, -4, 0], scale: [1, 1.3, 1] }}
                         transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}>✨</motion.span>
 
-                      <p className="font-baloo font-black text-white text-[16px] mb-4 pr-16 drop-shadow">
+                      <p className="font-baloo font-black text-white text-base mb-4 pr-16 drop-shadow">
                         Continue Your Story
                       </p>
 
@@ -761,16 +761,16 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
                           <Image src={curStory.cover_url ? getStorageUrl(curStory.cover_url) : "/current-story.png"}
                             alt={curStory.title} fill className="object-cover" />
                           <div className="absolute inset-0 bg-black/10 flex items-center justify-center">
-                            <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-xl">
+                            <div className="w-10 h-10 bg-[var(--ds-surface-card)] rounded-full flex items-center justify-center shadow-xl">
                               <Play className="w-4 h-4 fill-violet-600 text-violet-600 ml-0.5" />
                             </div>
                           </div>
                         </div>
                         <div className="flex-1 min-w-0 flex flex-col justify-center gap-1.5">
-                          <p className="font-baloo font-black text-white text-[17px] leading-tight line-clamp-2 drop-shadow">
+                          <p className="font-baloo font-black text-white text-mlg leading-tight line-clamp-2 drop-shadow">
                             {curStory.title}
                           </p>
-                          <p className="font-nunito text-white/65 text-[12px]">
+                          <p className="font-nunito text-white/65 text-xs">
                             Page {doneSlots} of {totalSlots || "?"}
                           </p>
                           <div className="flex items-center gap-2 mt-0.5">
@@ -781,13 +781,13 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
                                 initial={{ width: 0 }} animate={{ width: `${pct}%` }}
                                 transition={{ duration: 1.2, ease: "easeOut", delay: 0.4 }} />
                             </div>
-                            <span className="font-baloo font-black text-white text-[13px] shrink-0">{pct}%</span>
+                            <span className="font-baloo font-black text-white text-sml shrink-0">{pct}%</span>
                           </div>
                         </div>
                       </div>
 
                       <Link href={`/stories/${curStory.slug}`}
-                        className="flex items-center justify-center gap-2 w-full font-baloo font-black text-amber-900 text-[16px] py-3.5 leaf transition-all hover:-translate-y-0.5 active:scale-95"
+                        className="flex items-center justify-center gap-2 w-full font-baloo font-black text-amber-900 text-base py-3.5 leaf transition-all hover:-translate-y-0.5 active:scale-95"
                         style={{
                           background: "linear-gradient(135deg,#fcd34d,#f59e0b)",
                           boxShadow: "0 4px 20px rgba(245,158,11,0.5), 0 1px 0 rgba(255,255,255,0.4) inset",
@@ -797,14 +797,14 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
                       </Link>
                     </div>
                   ) : (
-                    <div className="relative rounded-3xl p-5 shadow-2xl overflow-hidden"
+                    <div className="relative leaf-lg p-5 shadow-2xl overflow-hidden"
                       style={{ background: "linear-gradient(150deg,#34d399 0%,#059669 45%,#047857 100%)" }}>
                       <motion.span className="absolute top-3 right-5 text-2xl pointer-events-none select-none"
                         animate={{ y: [0, -5, 0] }} transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}>🔭</motion.span>
-                      <p className="font-baloo font-black text-white text-[17px] mb-1 pr-10">Your story awaits!</p>
-                      <p className="font-nunito text-white/80 text-[13px] mb-5">Zilo found some great ones at the Library.</p>
+                      <p className="font-baloo font-black text-white text-mlg mb-1 pr-10">Your story awaits!</p>
+                      <p className="font-nunito text-white/80 text-sml mb-5">Zilo found some great ones at the Library.</p>
                       <Link href="/stories"
-                        className="flex items-center justify-center gap-2 w-full font-baloo font-black text-amber-900 text-[16px] py-3.5 leaf shadow-xl transition-all hover:-translate-y-0.5 active:scale-95"
+                        className="flex items-center justify-center gap-2 w-full font-baloo font-black text-amber-900 text-base py-3.5 leaf shadow-xl transition-all hover:-translate-y-0.5 active:scale-95"
                         style={{ background: "linear-gradient(135deg,#fbbf24,#f59e0b)" }}>
                         Start Your Journey <ChevronRight className="w-4 h-4" />
                       </Link>
@@ -822,25 +822,25 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
 
                     {/* Name + XP section */}
                     <div className="px-5 pt-4 pb-3">
-                      <p className="font-nunito font-semibold text-sky-600 text-[11px] tracking-wide mb-0.5 uppercase">
+                      <p className="font-nunito font-semibold text-sky-600 text-2xs tracking-wide mb-0.5 uppercase">
                         {greeting} ✨
                       </p>
-                      <h1 className="font-baloo font-black text-gray-900"
+                      <h1 className="font-baloo font-black text-[var(--ds-text-primary)]"
                         style={{ fontSize: "clamp(1.4rem,3.8vw,2rem)", lineHeight: 1.15 }}>
                         {activeChild?.name ?? "Explorer"}!
                       </h1>
                       {cosmetics.title_badge && SHOP_ITEM_MAP[cosmetics.title_badge] && (
-                        <span className={`inline-flex items-center gap-1.5 text-[11px] font-black px-2.5 py-0.5 rounded-full mt-1 shadow-sm ${SHOP_ITEM_MAP[cosmetics.title_badge].titleColor ?? "bg-gray-100 text-gray-600"}`}>
+                        <span className={`inline-flex items-center gap-1.5 text-2xs font-black px-2.5 py-0.5 rounded-full mt-1 shadow-sm ${SHOP_ITEM_MAP[cosmetics.title_badge].titleColor ?? "bg-[var(--ds-surface-card-active)] text-[var(--ds-text-secondary)]"}`}>
                           {SHOP_ITEM_MAP[cosmetics.title_badge].emoji} {t(SHOP_ITEM_MAP[cosmetics.title_badge].nameKey)}
                         </span>
                       )}
                       {/* XP bar — key resets fill animation when child switches */}
                       <div className="mt-3">
                         <div className="flex items-center justify-between mb-1">
-                          <span className="font-nunito font-bold text-gray-400 text-[10px]">{levelInfo?.icon} Lv.{xpLevel} · {levelInfo ? t(levelInfo.labelKey) : ""}</span>
-                          <span className="font-baloo font-black text-emerald-600 text-[10px]">{xpIn}/{xpNeeded} ⭐</span>
+                          <span className="font-nunito font-bold text-[var(--ds-text-tertiary)] text-3xs">{levelInfo?.icon} Lv.{xpLevel} · {levelInfo ? t(levelInfo.labelKey) : ""}</span>
+                          <span className="font-baloo font-black text-emerald-600 text-3xs">{xpIn}/{xpNeeded} ⭐</span>
                         </div>
-                        <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                        <div className="h-2 bg-[var(--ds-surface-card-active)] rounded-full overflow-hidden">
                           <motion.div key={`xp-${activeChild?.id}`} className="h-full rounded-full"
                             style={{ background: "linear-gradient(90deg,#34d399,#059669)" }}
                             initial={{ width: 0 }} animate={{ width: `${xpPct}%` }}
@@ -850,23 +850,23 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
                     </div>
 
                     {/* Stats footer — 3-cell divided bar */}
-                    <div className="flex items-stretch divide-x divide-gray-100 bg-gray-50/70 border-t border-gray-100">
+                    <div className="flex items-stretch divide-x divide-gray-100 bg-[var(--ds-surface-card-hover)]/70 border-t border-[var(--ds-border-primary)]">
                       <div className="flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5">
-                        <Flame className={`w-[15px] h-[15px] ${consecutiveStreak > 0 ? "fill-orange-400 text-orange-400" : "fill-gray-300 text-gray-300"}`} />
-                        <span className={`font-baloo font-black text-[14px] leading-none ${consecutiveStreak > 0 ? "text-orange-500" : "text-gray-400"}`}>
+                        <Flame className={`w-[15px] h-[15px] ${consecutiveStreak > 0 ? "fill-orange-400 text-orange-400" : "fill-gray-300 text-[var(--ds-text-tertiary)]"}`} />
+                        <span className={`font-baloo font-black text-sm leading-none ${consecutiveStreak > 0 ? "text-orange-500" : "text-[var(--ds-text-tertiary)]"}`}>
                           {consecutiveStreak > 0 ? consecutiveStreak : "–"}
                         </span>
-                        <span className="font-nunito text-gray-400 text-[9px] leading-none">{t("homeStatStreak")}</span>
+                        <span className="font-nunito text-[var(--ds-text-tertiary)] text-4xs leading-none">{t("homeStatStreak")}</span>
                       </div>
                       <div className="flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5">
                         <Star className="w-[15px] h-[15px] fill-amber-400 text-amber-400" />
-                        <span className="font-baloo font-black text-amber-500 text-[14px] leading-none">{totalStars}</span>
-                        <span className="font-nunito text-gray-400 text-[9px] leading-none">{t("homeStatStars")}</span>
+                        <span className="font-baloo font-black text-amber-500 text-sm leading-none">{totalStars}</span>
+                        <span className="font-nunito text-[var(--ds-text-tertiary)] text-4xs leading-none">{t("homeStatStars")}</span>
                       </div>
                       <div className="flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5">
                         <Heart className="w-[15px] h-[15px] fill-rose-400 text-rose-400" />
-                        <span className="font-baloo font-black text-rose-500 text-[14px] leading-none">{level}</span>
-                        <span className="font-nunito text-gray-400 text-[9px] leading-none">{t("homeStatLevel")}</span>
+                        <span className="font-baloo font-black text-rose-500 text-sm leading-none">{level}</span>
+                        <span className="font-nunito text-[var(--ds-text-tertiary)] text-4xs leading-none">{t("homeStatLevel")}</span>
                       </div>
                     </div>
                   </motion.div>
@@ -930,10 +930,10 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
                     return (
                       <div className="px-4 py-3.5 rounded-2xl border border-white/50 shadow-2xl"
                         style={{ background: "rgba(255,255,255,0.65)", backdropFilter: "blur(18px)" }}>
-                        <p className="font-baloo font-black text-sky-700 text-[11px] uppercase tracking-widest mb-2.5">Latest Badge</p>
+                        <p className="font-baloo font-black text-sky-700 text-2xs uppercase tracking-widest mb-2.5">Latest Badge</p>
                         <div className="flex items-center gap-3">
                           <div className="relative shrink-0">
-                            <div className="w-[52px] h-[52px] rounded-2xl flex items-center justify-center text-[28px] shadow-lg"
+                            <div className="w-[52px] h-[52px] rounded-2xl flex items-center justify-center text-3.5xl shadow-lg"
                               style={{ background: `linear-gradient(145deg,${badge.from},${badge.to})` }}>
                               {badge.emoji}
                             </div>
@@ -944,8 +944,8 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
                             </motion.div>
                           </div>
                           <div>
-                            <p className="font-baloo font-black text-amber-600 text-[15px] leading-tight">{badge.label}</p>
-                            <p className="font-nunito font-bold text-emerald-600 text-[11px]">
+                            <p className="font-baloo font-black text-amber-600 text-mbase leading-tight">{badge.label}</p>
+                            <p className="font-nunito font-bold text-emerald-600 text-2xs">
                               {new Date(latest.earned_at).toDateString() === today ? "Earned today 🎉" : "Recently earned ✨"}
                             </p>
                           </div>
@@ -959,9 +959,9 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
                     style={{ background: "rgba(254,243,199,0.92)", backdropFilter: "blur(14px)" }}>
                     <div className="flex items-center gap-2 mb-0.5">
                       <Flame className="w-5 h-5 text-orange-500 fill-orange-500" />
-                      <span className="font-baloo font-black text-orange-600 text-[17px]">{consecutiveStreak} {consecutiveStreak === 1 ? t("homeStreakDayLabel") : t("homeStreakDaysLabel")} {t("heroStreakLabel")}</span>
+                      <span className="font-baloo font-black text-orange-600 text-mlg">{consecutiveStreak} {consecutiveStreak === 1 ? t("homeStreakDayLabel") : t("homeStreakDaysLabel")} {t("heroStreakLabel")}</span>
                     </div>
-                    <p className="font-nunito font-bold text-amber-700 text-[12px] mb-3">
+                    <p className="font-nunito font-bold text-amber-700 text-xs mb-3">
                       {consecutiveStreak >= 7 ? t("homeStreakUnstoppable") : consecutiveStreak >= 3 ? t("homeStreakOnFire") : consecutiveStreak > 0 ? t("homeStreakKeepItUp") : t("homeStreakStart")}
                     </p>
                     <div className="flex justify-between">
@@ -981,7 +981,7 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
                                isToday ? <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-300" /> :
                                          null}
                             </div>
-                            <span className={`font-nunito font-bold text-[9px] ${
+                            <span className={`font-nunito font-bold text-4xs ${
                               done ? "text-emerald-700" : isToday ? "text-amber-600 font-black" : "text-amber-400"
                             }`}>{day}</span>
                           </div>
@@ -1024,7 +1024,7 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
 
           {/* ── Campus Welcome Strip ──────────────────────────────────────── */}
           <div className="relative z-30 -mt-3 px-4 sm:px-6 pb-2 max-w-[1400px] mx-auto">
-            <div className="flex items-center gap-2.5 px-4 py-2.5 bg-white/95 backdrop-blur-sm rounded-2xl shadow-sm border border-emerald-100 w-fit">
+            <div className="flex items-center gap-2.5 px-4 py-2.5 bg-[var(--ds-surface-card)]/95 backdrop-blur-sm rounded-2xl shadow-sm border border-emerald-100 w-fit">
               <motion.img
                 src={assets.nimiCircle}
                 alt="Nimi"
@@ -1033,8 +1033,8 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
                 transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
                 onError={e => { (e.target as HTMLImageElement).style.display = "none"; }}
               />
-              <span className="font-baloo font-black text-emerald-700 text-[12px] sm:text-[13px]">{t("homeCampusOpen")}</span>
-              <span className="font-nunito text-emerald-500 text-[11px] hidden sm:inline">
+              <span className="font-baloo font-black text-emerald-700 text-xs sm:text-sml">{t("homeCampusOpen")}</span>
+              <span className="font-nunito text-emerald-500 text-2xs hidden sm:inline">
                 • {new Date().toLocaleDateString(dateLocale, { weekday: "long", month: "long", day: "numeric" })}
               </span>
             </div>
@@ -1048,10 +1048,10 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
               {ACTIVITIES.map(({ img, labelKey, subKey, href }) => (
                 <motion.div key={labelKey} variants={pop}>
                   <Link href={href}
-                    className="group flex flex-col items-center gap-1.5 bg-white/90 backdrop-blur-sm border border-white hover:border-emerald-200 rounded-2xl px-2 py-3.5 sm:py-4 shadow-sm hover:shadow-md hover:-translate-y-1 active:scale-95 transition-all">
+                    className="group flex flex-col items-center gap-1.5 bg-[var(--ds-surface-card)]/90 backdrop-blur-sm border border-white hover:border-emerald-200 rounded-2xl px-2 py-3.5 sm:py-4 shadow-sm hover:shadow-md hover:-translate-y-1 active:scale-95 transition-all">
                     <img src={img} alt={t(labelKey)} className="w-10 h-10 sm:w-11 sm:h-11 object-contain drop-shadow-sm group-hover:scale-110 transition-transform duration-200" />
-                    <p className="font-baloo font-black text-gray-800 text-[12px] sm:text-[13px] leading-tight text-center">{t(labelKey)}</p>
-                    <p className="font-nunito text-gray-400 text-[9px] sm:text-[10px] text-center hidden sm:block leading-tight">{t(subKey)}</p>
+                    <p className="font-baloo font-black text-[var(--ds-text-primary)] text-xs sm:text-sml leading-tight text-center">{t(labelKey)}</p>
+                    <p className="font-nunito text-[var(--ds-text-tertiary)] text-4xs sm:text-3xs text-center hidden sm:block leading-tight">{t(subKey)}</p>
                   </Link>
                 </motion.div>
               ))}
@@ -1084,8 +1084,8 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
                 <div className="flex items-center gap-3 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl px-4 py-3.5 shadow-sm">
                   <span className="text-2xl shrink-0">⏳</span>
                   <div className="flex-1 min-w-0">
-                    <p className="font-baloo font-black text-amber-900 text-[14px] leading-tight">Your 7-day free trial has ended</p>
-                    <p className="text-amber-700 text-[12px] mt-0.5">
+                    <p className="font-baloo font-black text-amber-900 text-sm leading-tight">Your 7-day free trial has ended</p>
+                    <p className="text-amber-700 text-xs mt-0.5">
                       You&apos;re now on the free plan — 3 stories & 10 Nimi chats/day.{" "}
                       <Link href="/pricing" className="font-black underline underline-offset-2 hover:text-amber-900">Subscribe to restore full access →</Link>
                     </p>
@@ -1095,7 +1095,7 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
                       if (typeof window !== "undefined") localStorage.setItem("nimipiko_trial_expiry_seen", "1");
                       setTrialJustExpired(false);
                     }}
-                    className="w-7 h-7 rounded-full hover:bg-amber-100 flex items-center justify-center text-amber-500 hover:text-amber-700 transition shrink-0 text-[16px] font-black"
+                    className="w-7 h-7 rounded-full hover:bg-amber-100 flex items-center justify-center text-amber-500 hover:text-amber-700 transition shrink-0 text-base font-black"
                     aria-label="Dismiss"
                   >✕</button>
                 </div>
@@ -1162,12 +1162,12 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
                               <span className="text-xl">{trialDaysLeft <= 2 ? "⚡" : "⏳"}</span>
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p className={`font-baloo font-black text-[13px] leading-tight ${
+                              <p className={`font-baloo font-black text-sml leading-tight ${
                                 trialDaysLeft <= 2 ? "text-red-800" : "text-amber-800"
                               }`}>
                                 {trialDaysLeft === 0 ? "Trial ending today!" : `${trialDaysLeft} day${trialDaysLeft === 1 ? "" : "s"} left on trial`}
                               </p>
-                              <p className={`text-[11px] mt-0.5 ${trialDaysLeft <= 2 ? "text-red-600" : "text-amber-600"}`}>
+                              <p className={`text-2xs mt-0.5 ${trialDaysLeft <= 2 ? "text-red-600" : "text-amber-600"}`}>
                                 {trialDaysLeft <= 2 ? "Subscribe now to keep full access" : "Enjoying Club? Subscribe to keep it →"}
                               </p>
                             </div>

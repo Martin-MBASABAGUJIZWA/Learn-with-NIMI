@@ -100,7 +100,7 @@ export default function SettingsAccountCard() {
   }
 
   return (
-    <div className="bg-white border border-ds-border shadow-ds-card p-4" style={{ borderRadius: 'var(--leaf-r)' }}>
+    <div className="bg-[var(--ds-surface-card)] border border-ds-border shadow-ds-card p-4" style={{ borderRadius: 'var(--leaf-r)' }}>
       <h3 className="font-black text-ds-text mb-2">{t("accountTitle")}</h3>
 
       {/* Plan status */}
@@ -113,26 +113,26 @@ export default function SettingsAccountCard() {
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5 flex-wrap">
-                  <span className="font-bold text-[13px] text-ds-text">NIMIPIKO Club</span>
-                  <span className="inline-flex items-center gap-0.5 bg-red-100 text-red-700 text-[10px] font-black px-1.5 py-0.5 rounded-full">
+                  <span className="font-bold text-sml text-ds-text">NIMIPIKO Club</span>
+                  <span className="inline-flex items-center gap-0.5 bg-red-100 text-red-700 text-3xs font-black px-1.5 py-0.5 rounded-full">
                     <XCircle className="w-3 h-3" /> Payment failed
                   </span>
                 </div>
-                <p className="text-[11px] text-red-500 mt-0.5 font-medium">
+                <p className="text-2xs text-red-500 mt-0.5 font-medium">
                   Your access is on hold — please update your payment to continue
                 </p>
               </div>
             </div>
             <div className="flex gap-2 pt-0.5">
               <Link href="/pricing"
-                className="flex-1 text-center py-1.5 text-[11px] font-black text-white rounded-lg transition"
+                className="flex-1 text-center py-1.5 text-2xs font-black text-white rounded-lg transition"
                 style={{ backgroundColor: "var(--nimi-green, #22c55e)" }}>
                 Resubscribe →
               </Link>
               {subscription?.payment_provider === "cybersource" && (
                 <button
                   onClick={() => setShowUpdateCard(true)}
-                  className="flex-1 py-1.5 text-[11px] font-black text-red-600 bg-red-50 border border-red-100 rounded-lg hover:bg-red-100 transition">
+                  className="flex-1 py-1.5 text-2xs font-black text-red-600 bg-red-50 border border-red-100 rounded-lg hover:bg-red-100 transition">
                   Update card
                 </button>
               )}
@@ -146,12 +146,12 @@ export default function SettingsAccountCard() {
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5 flex-wrap">
-                  <span className="font-bold text-[13px] text-ds-text">NIMIPIKO Club</span>
-                  <span className="inline-flex items-center gap-0.5 bg-green-100 text-green-700 text-[10px] font-black px-1.5 py-0.5 rounded-full">
+                  <span className="font-bold text-sml text-ds-text">NIMIPIKO Club</span>
+                  <span className="inline-flex items-center gap-0.5 bg-green-100 text-green-700 text-3xs font-black px-1.5 py-0.5 rounded-full">
                     <CheckCircle2 className="w-3 h-3" /> Active
                   </span>
                 </div>
-                <p className="text-[11px] text-gray-400 mt-0.5">
+                <p className="text-2xs text-[var(--ds-text-tertiary)] mt-0.5">
                   {subscription.cancel_at_period_end
                     ? `✓ Cancels ${formatDate(subscription.current_period_end)} — access until then`
                     : `Renews ${formatDate(subscription.current_period_end)}`}
@@ -160,24 +160,24 @@ export default function SettingsAccountCard() {
             </div>
             {!subscription.cancel_at_period_end && !showCancelConfirm && (
               <button onClick={() => setShowCancelConfirm(true)}
-                className="w-full text-[11px] font-bold text-gray-400 hover:text-red-500 transition-colors text-left px-1">
+                className="w-full text-2xs font-bold text-[var(--ds-text-tertiary)] hover:text-red-500 transition-colors text-left px-1">
                 Cancel subscription
               </button>
             )}
             {showCancelConfirm && (
               <div className="bg-red-50 border border-red-100 rounded-lg p-3 space-y-2">
-                <p className="text-[12px] font-bold text-red-700">Cancel your NIMIPIKO Club?</p>
-                <p className="text-[11px] text-red-500">You&apos;ll keep access until {formatDate(subscription.current_period_end)}. Your child&apos;s progress is saved forever.</p>
+                <p className="text-xs font-bold text-red-700">Cancel your NIMIPIKO Club?</p>
+                <p className="text-2xs text-red-500">You&apos;ll keep access until {formatDate(subscription.current_period_end)}. Your child&apos;s progress is saved forever.</p>
                 {cancelError && (
-                  <p className="text-[11px] font-bold text-red-600">{cancelError}</p>
+                  <p className="text-2xs font-bold text-red-600">{cancelError}</p>
                 )}
                 <div className="flex gap-2">
                   <button onClick={handleCancelSubscription} disabled={cancelling}
-                    className="flex items-center gap-1 bg-red-500 hover:bg-red-600 text-white font-bold text-[11px] px-3 py-1.5 rounded-lg transition disabled:opacity-60">
+                    className="flex items-center gap-1 bg-red-500 hover:bg-red-600 text-white font-bold text-2xs px-3 py-1.5 rounded-lg transition disabled:opacity-60">
                     <XCircle className="w-3 h-3" /> {cancelling ? "Cancelling…" : "Yes, cancel"}
                   </button>
                   <button onClick={() => { setShowCancelConfirm(false); setCancelError(null); }}
-                    className="text-[11px] font-bold text-gray-500 hover:text-gray-700 px-3 py-1.5 transition">
+                    className="text-2xs font-bold text-[var(--ds-text-secondary)] hover:text-[var(--ds-text-primary)] px-3 py-1.5 transition">
                     Keep Club
                   </button>
                 </div>
@@ -190,10 +190,10 @@ export default function SettingsAccountCard() {
               <Crown className="w-4 h-4 text-yellow-600" />
             </div>
             <div className="flex-1 min-w-0">
-              <span className="font-bold text-[13px] text-ds-text block">Free Plan</span>
-              <span className="text-[11px] text-gray-400">Upgrade for full story access</span>
+              <span className="font-bold text-sml text-ds-text block">Free Plan</span>
+              <span className="text-2xs text-[var(--ds-text-tertiary)]">Upgrade for full story access</span>
             </div>
-            <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-yellow-500 transition-colors" />
+            <ChevronRight className="w-4 h-4 text-[var(--ds-text-tertiary)] group-hover:text-yellow-500 transition-colors" />
           </Link>
         )}
       </div>
@@ -219,7 +219,7 @@ export default function SettingsAccountCard() {
               <Check className="w-3.5 h-3.5" />
             </button>
             <button onClick={cancelEditName} disabled={savingName}
-              className="w-7 h-7 flex items-center justify-center rounded-lg border border-ds-border hover:bg-gray-50 text-gray-500 transition disabled:opacity-60 shrink-0">
+              className="w-7 h-7 flex items-center justify-center rounded-lg border border-ds-border hover:bg-[var(--ds-surface-card-hover)] text-[var(--ds-text-secondary)] transition disabled:opacity-60 shrink-0">
               <X className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -227,11 +227,11 @@ export default function SettingsAccountCard() {
           <>
             <div className="flex-1 min-w-0">
               <span className="font-bold text-sm text-ds-text block">Display name</span>
-              {nameError && <span className="text-[11px] text-red-500 font-medium">{nameError}</span>}
-              {!nameError && <span className="text-[11px] text-gray-400">{parentName ?? "Not set"}</span>}
+              {nameError && <span className="text-2xs text-red-500 font-medium">{nameError}</span>}
+              {!nameError && <span className="text-2xs text-[var(--ds-text-tertiary)]">{parentName ?? "Not set"}</span>}
             </div>
             <button onClick={startEditName}
-              className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-400 hover:text-emerald-600 transition shrink-0">
+              className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[var(--ds-surface-card-active)] text-[var(--ds-text-tertiary)] hover:text-emerald-600 transition shrink-0">
               <Pencil className="w-3.5 h-3.5" />
             </button>
           </>
@@ -240,13 +240,13 @@ export default function SettingsAccountCard() {
 
       <button
         onClick={() => setShowPasswordModal(true)}
-        className="flex items-center gap-3 py-3 border-b border-ds-border w-full text-left hover:bg-gray-50 rounded-lg transition px-1 -mx-1"
+        className="flex items-center gap-3 py-3 border-b border-ds-border w-full text-left hover:bg-[var(--ds-surface-card-hover)] rounded-lg transition px-1 -mx-1"
       >
         <div className="w-9 h-9 bg-blue-100 rounded-full flex items-center justify-center shrink-0">
           <KeyRound className="w-4 h-4 text-blue-600" />
         </div>
         <span className="font-bold text-sm flex-1 text-ds-text">{t("changePasswordLabel")}</span>
-        <ChevronRight className="w-4 h-4 text-gray-300" />
+        <ChevronRight className="w-4 h-4 text-[var(--ds-text-tertiary)]" />
       </button>
 
       <button
@@ -258,7 +258,7 @@ export default function SettingsAccountCard() {
           <Trash2 className="w-4 h-4 text-red-500" />
         </div>
         <span className="font-bold text-sm flex-1 text-red-600">{t("deleteAccountLabel")}</span>
-        <ChevronRight className="w-4 h-4 text-gray-300" />
+        <ChevronRight className="w-4 h-4 text-[var(--ds-text-tertiary)]" />
       </button>
 
       {showPasswordModal && <ChangePasswordModal onClose={() => setShowPasswordModal(false)} />}

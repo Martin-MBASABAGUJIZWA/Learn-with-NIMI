@@ -60,10 +60,10 @@ function SlotSkeleton() {
     <div className="px-4 py-3 space-y-0.5">
       {Array.from({ length: 6 }).map((_, i) => (
         <div key={i} className="flex items-center gap-3 px-3 py-2.5 rounded-xl">
-          <div className="w-4 h-4 rounded-full bg-gray-100 animate-pulse shrink-0" />
-          <div className="w-5 h-4 rounded bg-gray-100 animate-pulse" />
+          <div className="w-4 h-4 rounded-full bg-[var(--ds-surface-card-active)] animate-pulse shrink-0" />
+          <div className="w-5 h-4 rounded bg-[var(--ds-surface-card-active)] animate-pulse" />
           <div
-            className="h-3 rounded bg-gray-100 animate-pulse"
+            className="h-3 rounded bg-[var(--ds-surface-card-active)] animate-pulse"
             style={{ width: `${55 + (i % 3) * 20}px`, animationDelay: `${i * 80}ms` }}
           />
         </div>
@@ -125,16 +125,16 @@ function MissionAdventureCard({
     return (
       <div
         className="px-4 py-3 flex items-center gap-3"
-        style={{ background: "#f0fdf4", borderRadius: "14px 14px 14px 4px", border: "1px solid #bbf7d0" }}
+        style={{ background: "var(--ds-brand-soft)", borderRadius: "14px 14px 14px 4px", border: "1px solid #bbf7d0" }}
       >
         <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-500" />
         <div className="flex-1 min-w-0">
-          <p className="font-nunito font-bold text-[12px] text-emerald-700 line-through truncate">
+          <p className="font-nunito font-bold text-xs text-emerald-700 line-through truncate">
             {card.story_title ?? card.title}
           </p>
-          <p className="font-nunito text-[10px] text-emerald-600">Adventure complete!</p>
+          <p className="font-nunito text-3xs text-emerald-600">Adventure complete!</p>
         </div>
-        <span className="text-[18px]">⭐</span>
+        <span className="text-lg">⭐</span>
       </div>
     );
   }
@@ -142,7 +142,7 @@ function MissionAdventureCard({
   return (
     <div
       className="overflow-hidden"
-      style={{ borderRadius: "18px 18px 18px 5px", border: "1.5px solid #bbf7d0", background: "#fff" }}
+      style={{ borderRadius: "18px 18px 18px 5px", border: "1.5px solid #bbf7d0", background: "var(--ds-surface-card)" }}
     >
       {/* Header — always visible, tap to collapse */}
       <button
@@ -159,12 +159,12 @@ function MissionAdventureCard({
               style={{ background: "rgba(255,255,255,0.18)" }}
             >
               <Sparkles className="w-3 h-3 text-yellow-300" />
-              <span className="font-nunito font-bold text-[10px] text-white">
+              <span className="font-nunito font-bold text-3xs text-white">
                 {card.class_name ?? card.teacher_name}
               </span>
             </div>
             {due && (
-              <span className="font-nunito text-[10px] text-white/70 ml-auto">{due}</span>
+              <span className="font-nunito text-3xs text-white/70 ml-auto">{due}</span>
             )}
           </div>
 
@@ -178,7 +178,7 @@ function MissionAdventureCard({
                 {card.story_title ?? card.title}
               </p>
               {card.instructions && (
-                <p className="font-nunito text-white/70 text-[11px] mt-0.5 line-clamp-1">
+                <p className="font-nunito text-white/70 text-2xs mt-0.5 line-clamp-1">
                   {card.instructions}
                 </p>
               )}
@@ -205,10 +205,10 @@ function MissionAdventureCard({
               />
             </div>
             <div className="flex items-center justify-between mt-1.5">
-              <span className="font-nunito text-[10px] text-white/70">
+              <span className="font-nunito text-3xs text-white/70">
                 {card.slotsLoaded ? `${doneCount} of ${total} missions` : "Loading…"}
               </span>
-              <span className="font-baloo font-black text-white text-[12px]">{pct}%</span>
+              <span className="font-baloo font-black text-white text-xs">{pct}%</span>
             </div>
           </div>
         </div>
@@ -231,8 +231,8 @@ function MissionAdventureCard({
               <div className="px-4 py-3">
                 <button
                   onClick={() => onRetry(card.assignment_id)}
-                  className="w-full flex items-center justify-center gap-2 py-3 font-nunito font-bold text-[12px] text-gray-500 transition-colors hover:text-gray-700"
-                  style={{ background: "#f9fafb", borderRadius: "12px 12px 12px 3px", border: "1px solid #E5E7EB" }}
+                  className="w-full flex items-center justify-center gap-2 py-3 font-nunito font-bold text-xs text-[var(--ds-text-secondary)] transition-colors hover:text-[var(--ds-text-primary)]"
+                  style={{ background: "var(--ds-surface-card)", borderRadius: "12px 12px 12px 3px", border: "1px solid var(--ds-border-primary)" }}
                 >
                   <span>⚠️</span> Couldn't load missions · Tap to retry
                 </button>
@@ -258,18 +258,18 @@ function MissionAdventureCard({
                         ? <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-500" />
                         : <Circle className={`w-4 h-4 shrink-0 ${isNext ? "text-amber-400" : "text-gray-200"}`} />}
 
-                      <span className="text-[15px]">{meta.emoji}</span>
+                      <span className="text-mbase">{meta.emoji}</span>
 
                       <span
-                        className={`font-nunito font-bold text-[13px] flex-1 ${
-                          sl.completed ? "text-emerald-700 line-through" : isNext ? "text-amber-700" : "text-gray-400"
+                        className={`font-nunito font-bold text-sml flex-1 ${
+                          sl.completed ? "text-emerald-700 line-through" : isNext ? "text-amber-700" : "text-[var(--ds-text-tertiary)]"
                         }`}
                       >
                         {meta.label}
                       </span>
 
                       {sl.completed && (
-                        <span className="flex items-center gap-0.5 font-nunito font-bold text-[10px] text-amber-500">
+                        <span className="flex items-center gap-0.5 font-nunito font-bold text-3xs text-amber-500">
                           <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
                           {sl.stars}
                         </span>
@@ -277,7 +277,7 @@ function MissionAdventureCard({
 
                       {isNext && (
                         <span
-                          className="font-nunito font-bold text-[9px] px-1.5 py-0.5 rounded-full"
+                          className="font-nunito font-bold text-4xs px-1.5 py-0.5 rounded-full"
                           style={{ background: "#fef3c7", color: "#b45309" }}
                         >
                           NEXT
@@ -300,12 +300,12 @@ function MissionAdventureCard({
                     ? { background: "#fef2f2", border: "1px solid #fecaca" }
                     : { background: "#fef9c3", border: "1px solid #fde68a" }}
                 >
-                  <span className="text-[22px]">{completeError ? "😬" : "🎉"}</span>
+                  <span className="text-1.5xl">{completeError ? "😬" : "🎉"}</span>
                   <div>
-                    <p className={`font-baloo font-black text-[13px] ${completeError ? "text-red-700" : "text-amber-700"}`}>
+                    <p className={`font-baloo font-black text-sml ${completeError ? "text-red-700" : "text-amber-700"}`}>
                       {completeError ? "Couldn't save progress" : autoFired ? "Saved! Mission complete!" : "All missions done!"}
                     </p>
-                    <p className={`font-nunito text-[11px] mt-0.5 ${completeError ? "text-red-500" : "text-amber-600"}`}>
+                    <p className={`font-nunito text-2xs mt-0.5 ${completeError ? "text-red-500" : "text-amber-600"}`}>
                       {completeError ? "Check your connection and reopen the app." : "Your teacher can see your progress."}
                     </p>
                   </div>
@@ -313,7 +313,7 @@ function MissionAdventureCard({
               ) : card.story_slug ? (
                 <Link
                   href={`/stories/${card.story_slug}`}
-                  className="flex items-center justify-center gap-2 w-full font-nunito font-bold text-[13px] text-white py-3 transition-all hover:opacity-90 active:scale-[0.98]"
+                  className="flex items-center justify-center gap-2 w-full font-nunito font-bold text-sml text-white py-3 transition-all hover:opacity-90 active:scale-[0.98]"
                   style={{ background: "#15803d", borderRadius: "12px 12px 12px 3px" }}
                 >
                   <span>{SLOT_META[nextSlot?.slot_key ?? ""]?.emoji ?? "▶"}</span>
@@ -343,10 +343,10 @@ function SimpleTaskCard({
     return (
       <div
         className="px-4 py-3 flex items-center gap-3"
-        style={{ background: "#f9fafb", borderRadius: "14px 14px 14px 4px", border: "1px solid #E5E7EB" }}
+        style={{ background: "var(--ds-surface-card)", borderRadius: "14px 14px 14px 4px", border: "1px solid var(--ds-border-primary)" }}
       >
         <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-500" />
-        <p className="font-nunito text-[12px] flex-1 line-through text-gray-400">{card.title}</p>
+        <p className="font-nunito text-xs flex-1 line-through text-[var(--ds-text-tertiary)]">{card.title}</p>
       </div>
     );
   }
@@ -364,24 +364,24 @@ function SimpleTaskCard({
   return (
     <div
       className="p-3.5"
-      style={{ background: "#F0FDF4", border: "1px solid #bbf7d0", borderRadius: "14px 14px 14px 4px" }}
+      style={{ background: "var(--ds-brand-soft)", border: "1px solid #bbf7d0", borderRadius: "14px 14px 14px 4px" }}
     >
       <div className="flex items-start justify-between gap-2 mb-1.5">
-        <p className="font-nunito font-bold text-[13px] flex-1 text-gray-900">{card.title}</p>
-        {due && <span className="font-nunito text-[10px] text-emerald-600 shrink-0">{due}</span>}
+        <p className="font-nunito font-bold text-sml flex-1 text-[var(--ds-text-primary)]">{card.title}</p>
+        {due && <span className="font-nunito text-3xs text-emerald-600 shrink-0">{due}</span>}
       </div>
       {card.instructions && (
-        <p className="font-nunito text-[12px] text-gray-500 mb-2.5">{card.instructions}</p>
+        <p className="font-nunito text-xs text-[var(--ds-text-secondary)] mb-2.5">{card.instructions}</p>
       )}
       <button
         onClick={markDone}
         disabled={marking}
-        className="flex items-center gap-1.5 font-nunito font-bold text-[12px] px-3 py-2 transition-all disabled:opacity-50"
+        className="flex items-center gap-1.5 font-nunito font-bold text-xs px-3 py-2 transition-all disabled:opacity-50"
         style={{
           background: "rgba(255,255,255,0.8)",
           border: "1px solid rgba(0,0,0,0.08)",
           borderRadius: "10px 10px 10px 3px",
-          color: "#6B7280",
+          color: "var(--ds-text-secondary)",
         }}
       >
         <CheckCircle2 className="w-3.5 h-3.5" />
@@ -396,16 +396,16 @@ function PanelSkeleton() {
   return (
     <div
       className="p-4 space-y-3"
-      style={{ background: "#fff", borderRadius: "20px 20px 20px 5px", border: "1px solid #E5E7EB" }}
+      style={{ background: "var(--ds-surface-card)", borderRadius: "20px 20px 20px 5px", border: "1px solid var(--ds-border-primary)" }}
     >
       <div className="flex items-center gap-3">
-        <div className="w-8 h-8 rounded-[14px_14px_14px_4px] bg-gray-100 animate-pulse" />
+        <div className="w-8 h-8 rounded-[14px_14px_14px_4px] bg-[var(--ds-surface-card-active)] animate-pulse" />
         <div className="space-y-1.5 flex-1">
-          <div className="h-3.5 w-32 rounded bg-gray-100 animate-pulse" />
-          <div className="h-2.5 w-24 rounded bg-gray-100 animate-pulse" />
+          <div className="h-3.5 w-32 rounded bg-[var(--ds-surface-card-active)] animate-pulse" />
+          <div className="h-2.5 w-24 rounded bg-[var(--ds-surface-card-active)] animate-pulse" />
         </div>
       </div>
-      <div className="h-24 rounded-[18px_18px_18px_5px] bg-gray-100 animate-pulse" />
+      <div className="h-24 rounded-[18px_18px_18px_5px] bg-[var(--ds-surface-card-active)] animate-pulse" />
     </div>
   );
 }
@@ -418,21 +418,21 @@ function NoMissionsCard() {
       style={{ background: "linear-gradient(135deg,#f0fdf4,#dcfce7)", borderRadius: "18px 18px 18px 5px", border: "1px solid #bbf7d0" }}
     >
       <motion.span
-        className="text-[40px] leading-none"
+        className="text-5xl leading-none"
         animate={{ y: [0, -6, 0] }}
         transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
       >
         🌱
       </motion.span>
       <div>
-        <p className="font-baloo font-black text-[15px] text-emerald-800 leading-tight">Adventures on their way!</p>
-        <p className="font-nunito text-[12px] text-emerald-700/70 mt-1 max-w-[200px] leading-relaxed">
+        <p className="font-baloo font-black text-mbase text-emerald-800 leading-tight">Adventures on their way!</p>
+        <p className="font-nunito text-xs text-emerald-700/70 mt-1 max-w-[200px] leading-relaxed">
           Your teacher will send class missions here. Check back soon!
         </p>
       </div>
       <div className="flex items-center gap-1.5 bg-emerald-100/60 px-3 py-1.5 rounded-full">
-        <span className="text-[11px]">✉️</span>
-        <span className="font-nunito font-bold text-[11px] text-emerald-700">Waiting for a mission…</span>
+        <span className="text-2xs">✉️</span>
+        <span className="font-nunito font-bold text-2xs text-emerald-700">Waiting for a mission…</span>
       </div>
     </div>
   );
@@ -507,20 +507,20 @@ export default function HomeAssignmentsPanel({ childId, language }: Props) {
   const completed = cards.filter(c =>  c.completed_at);
 
   return (
-    <div className="overflow-hidden leaf-lg border border-gray-100 bg-white shadow-[0_8px_24px_rgba(15,23,42,0.07)]">
+    <div className="overflow-hidden leaf-lg border border-[var(--ds-border-primary)] bg-[var(--ds-surface-card)] shadow-card-md">
       {/* Panel header */}
       <button
         onClick={() => setOpen(o => !o)}
-        className="w-full flex items-center justify-between px-4 pt-4 pb-3 hover:bg-gray-50/60 transition-colors"
+        className="w-full flex items-center justify-between px-4 pt-4 pb-3 hover:bg-[var(--ds-surface-card-hover)]/60 transition-colors"
       >
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center text-[18px] shadow-sm shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center text-lg shadow-sm shrink-0">
             🌟
           </div>
           <div className="text-left">
-            <p className="font-nunito text-emerald-500 text-[10px] uppercase tracking-widest leading-none mb-0.5">Class</p>
-            <p className="font-baloo font-black text-gray-900 text-[17px] leading-tight">Adventures</p>
-            <p className="font-nunito text-[11px] mt-0.5 text-gray-400">
+            <p className="font-nunito text-emerald-500 text-3xs uppercase tracking-widest leading-none mb-0.5">Class</p>
+            <p className="font-baloo font-black text-[var(--ds-text-primary)] text-mlg leading-tight">Adventures</p>
+            <p className="font-nunito text-2xs mt-0.5 text-[var(--ds-text-tertiary)]">
               {pending.length > 0
                 ? `${pending.length} mission${pending.length !== 1 ? "s" : ""} in progress`
                 : cards.length > 0
@@ -530,11 +530,11 @@ export default function HomeAssignmentsPanel({ childId, language }: Props) {
           </div>
         </div>
         {open
-          ? <ChevronUp   className="w-4 h-4 text-gray-400" />
-          : <ChevronDown className="w-4 h-4 text-gray-400" />}
+          ? <ChevronUp   className="w-4 h-4 text-[var(--ds-text-tertiary)]" />
+          : <ChevronDown className="w-4 h-4 text-[var(--ds-text-tertiary)]" />}
       </button>
 
-      <div className="h-px bg-gray-100 mx-4" />
+      <div className="h-px bg-[var(--ds-surface-card-active)] mx-4" />
 
       {/* Body */}
       <AnimatePresence initial={false}>
@@ -561,7 +561,7 @@ export default function HomeAssignmentsPanel({ childId, language }: Props) {
               {completed.length > 0 && (
                 <div className="space-y-1.5">
                   {pending.length > 0 && (
-                    <p className="font-nunito font-bold text-[10px] uppercase tracking-wider px-1 text-gray-400 pt-1">
+                    <p className="font-nunito font-bold text-3xs uppercase tracking-wider px-1 text-[var(--ds-text-tertiary)] pt-1">
                       Done
                     </p>
                   )}
@@ -580,9 +580,9 @@ export default function HomeAssignmentsPanel({ childId, language }: Props) {
                   animate={{ opacity: 1, y: 0 }}
                   className="text-center py-5"
                 >
-                  <p className="text-[32px] mb-1">🏆</p>
-                  <p className="font-baloo font-black text-[14px] text-emerald-700">Hero of the class!</p>
-                  <p className="font-nunito text-[11px] text-gray-400 mt-0.5">All missions complete.</p>
+                  <p className="text-3xl mb-1">🏆</p>
+                  <p className="font-baloo font-black text-sm text-emerald-700">Hero of the class!</p>
+                  <p className="font-nunito text-2xs text-[var(--ds-text-tertiary)] mt-0.5">All missions complete.</p>
                 </motion.div>
               )}
             </div>

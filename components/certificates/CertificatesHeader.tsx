@@ -16,9 +16,9 @@ export default function CertificatesHeader() {
       <div className="absolute inset-0 bg-gradient-to-br from-amber-400 via-yellow-400 to-orange-400" />
 
       {/* Decorative bubbles */}
-      <div className="absolute -top-6 -left-6 w-32 h-32 rounded-full bg-white/10" />
-      <div className="absolute -bottom-8 -right-8 w-40 h-40 rounded-full bg-white/10" />
-      <div className="absolute top-4 right-24 w-16 h-16 rounded-full bg-white/10" />
+      <div className="absolute -top-6 -left-6 w-32 h-32 rounded-full bg-[var(--ds-surface-card)]/10" />
+      <div className="absolute -bottom-8 -right-8 w-40 h-40 rounded-full bg-[var(--ds-surface-card)]/10" />
+      <div className="absolute top-4 right-24 w-16 h-16 rounded-full bg-[var(--ds-surface-card)]/10" />
 
       {/* Floating stars */}
       {([
@@ -46,17 +46,17 @@ export default function CertificatesHeader() {
         <motion.div
           animate={{ y: [0, -6, 0], rotate: [0, 4, -4, 0] }}
           transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-          className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white/20 flex items-center justify-center shrink-0 shadow-lg border-2 border-white/30"
+          className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-[var(--ds-surface-card)]/20 flex items-center justify-center shrink-0 shadow-lg border-2 border-white/30"
         >
           <span className="text-4xl sm:text-5xl">🏆</span>
         </motion.div>
 
         {/* Text */}
         <div className="flex-1 min-w-0">
-          <h1 className="font-baloo font-black text-white text-[26px] sm:text-[34px] leading-tight drop-shadow-md">
+          <h1 className="font-baloo font-black text-white text-2.5xl sm:text-4xl leading-tight drop-shadow-md">
             {t("achievements")}
           </h1>
-          <p className="text-white/80 text-[13px] sm:text-[14px] font-nunito font-semibold mt-0.5">
+          <p className="text-white/80 text-sml sm:text-sm font-nunito font-semibold mt-0.5">
             {t("achievementsPageSubtitle")}
           </p>
         </div>

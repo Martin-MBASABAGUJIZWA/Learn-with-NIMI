@@ -69,7 +69,7 @@ export default function CreateChildModal({ onCreated, onClose }: Props) {
               <p className="text-white font-black text-lg tracking-wide">
                 {step === "design" ? "Design your Explorer!" : "Almost there!"}
               </p>
-              <p className="text-white/75 text-[12px]">
+              <p className="text-white/75 text-xs">
                 {step === "design" ? "Create a unique look for your child" : "Tell us a bit about your explorer"}
               </p>
             </div>
@@ -77,12 +77,12 @@ export default function CreateChildModal({ onCreated, onClose }: Props) {
               {/* Step dots */}
               <div className="flex gap-1.5 mr-1">
                 {(["design", "details"] as Step[]).map(s => (
-                  <div key={s} className={`w-2 h-2 rounded-full transition-all ${step === s ? "bg-white" : "bg-white/40"}`} />
+                  <div key={s} className={`w-2 h-2 rounded-full transition-all ${step === s ? "bg-[var(--ds-surface-card)]" : "bg-[var(--ds-surface-card)]/40"}`} />
                 ))}
               </div>
               {onClose && (
                 <button onClick={onClose}
-                  className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-white transition">
+                  className="w-8 h-8 rounded-full bg-[var(--ds-surface-card)]/20 hover:bg-[var(--ds-surface-card)]/30 flex items-center justify-center text-white transition">
                   <X className="w-4 h-4" />
                 </button>
               )}
@@ -132,7 +132,7 @@ export default function CreateChildModal({ onCreated, onClose }: Props) {
                     onKeyDown={e => e.key === "Enter" && handleSubmit()}
                     placeholder="Enter child's name..."
                     maxLength={30}
-                    className="w-full border border-ds-border bg-ds-input rounded-xl px-3 py-2.5 text-sm font-semibold text-ds-text focus:outline-none focus:ring-2 focus:ring-[var(--ds-state-focus)] transition placeholder:text-gray-400"
+                    className="w-full border border-ds-border bg-ds-input rounded-xl px-3 py-2.5 text-sm font-semibold text-ds-text focus:outline-none focus:ring-2 focus:ring-[var(--ds-state-focus)] transition placeholder:text-[var(--ds-text-tertiary)]"
                   />
                 </div>
 
@@ -146,7 +146,7 @@ export default function CreateChildModal({ onCreated, onClose }: Props) {
                     onChange={e => setAge(Number(e.target.value))}
                     className="w-full accent-green-600"
                   />
-                  <div className="flex justify-between text-[10px] text-gray-400 font-semibold mt-0.5">
+                  <div className="flex justify-between text-3xs text-[var(--ds-text-tertiary)] font-semibold mt-0.5">
                     <span>2</span><span>12</span>
                   </div>
                 </div>
@@ -159,10 +159,10 @@ export default function CreateChildModal({ onCreated, onClose }: Props) {
                       <button
                         key={l.code}
                         onClick={() => setLanguage(l.code)}
-                        className={`flex-1 py-3 rounded-xl text-[12px] font-bold flex flex-col items-center gap-1 border-2 transition ${
+                        className={`flex-1 py-3 rounded-xl text-xs font-bold flex flex-col items-center gap-1 border-2 transition ${
                           language === l.code
                             ? "border-[var(--ds-border-brand)] bg-[var(--ds-brand-subtle)] text-[var(--ds-brand-primary)]"
-                            : "border-ds-border bg-gray-50 text-gray-600 hover:border-gray-300"
+                            : "border-ds-border bg-[var(--ds-surface-card-hover)] text-[var(--ds-text-secondary)] hover:border-[var(--ds-border-strong)]"
                         }`}
                       >
                         <span className="text-xl">{l.flag}</span>
@@ -178,11 +178,11 @@ export default function CreateChildModal({ onCreated, onClose }: Props) {
                       <Lock className="w-5 h-5 text-yellow-600" />
                     </div>
                     <div>
-                      <p className="font-black text-ds-text text-[14px]">Free plan: 1 child included</p>
-                      <p className="text-gray-500 text-[12px] mt-0.5">Upgrade to Nimipiko Club to add unlimited explorers.</p>
+                      <p className="font-black text-ds-text text-sm">Free plan: 1 child included</p>
+                      <p className="text-[var(--ds-text-secondary)] text-xs mt-0.5">Upgrade to Nimipiko Club to add unlimited explorers.</p>
                     </div>
                     <Link href="/pricing?reason=add-child"
-                      className="w-full text-center text-white font-black text-[13px] py-2.5 rounded-xl transition"
+                      className="w-full text-center text-white font-black text-sml py-2.5 rounded-xl transition"
                       style={{ backgroundColor: 'var(--nimi-green)' }}>
                       See Plans →
                     </Link>
@@ -194,7 +194,7 @@ export default function CreateChildModal({ onCreated, onClose }: Props) {
                 <div className="flex gap-3 pt-1">
                   <button
                     onClick={() => setStep("design")}
-                    className="flex items-center gap-1.5 px-4 py-3 rounded-xl border border-ds-border text-ds-muted font-bold text-sm hover:bg-gray-50 transition"
+                    className="flex items-center gap-1.5 px-4 py-3 rounded-xl border border-ds-border text-ds-muted font-bold text-sm hover:bg-[var(--ds-surface-card-hover)] transition"
                   >
                     <ChevronLeft className="w-4 h-4" />
                     Back

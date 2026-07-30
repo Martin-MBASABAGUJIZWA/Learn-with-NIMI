@@ -48,13 +48,13 @@ export default function WelcomeBackOverlay({ childName, daysAway, onDismiss }: P
             exit={{ scale: 0.92, opacity: 0 }}
             transition={{ type: "spring", damping: 20, stiffness: 280, delay: 0.05 }}
             onClick={e => e.stopPropagation()}
-            className="mx-5 max-w-sm w-full bg-white rounded-3xl shadow-2xl overflow-hidden"
+            className="mx-5 max-w-sm w-full bg-[var(--ds-surface-card)] leaf-lg shadow-2xl overflow-hidden"
           >
             {/* Illustrated top band */}
             <div className="h-32 flex items-center justify-center relative"
               style={{ background: "linear-gradient(135deg, #d1fae5 0%, #a7f3d0 50%, #6ee7b7 100%)" }}>
               <motion.span
-                className="text-[72px] leading-none select-none"
+                className="text-7xl leading-none select-none"
                 animate={{ rotate: [0, -8, 8, -4, 0], scale: [1, 1.1, 1.05, 1.1, 1] }}
                 transition={{ duration: 1.2, delay: 0.3, ease: "easeInOut" }}
               >
@@ -65,28 +65,28 @@ export default function WelcomeBackOverlay({ childName, daysAway, onDismiss }: P
             </div>
 
             <div className="px-6 pt-5 pb-6 text-center">
-              <h2 className="font-baloo font-black text-gray-900 text-[24px] leading-tight mb-2">
+              <h2 className="font-baloo font-black text-[var(--ds-text-primary)] text-2xl leading-tight mb-2">
                 Welcome back, {childName}!
               </h2>
-              <p className="font-nunito text-gray-500 text-[14px] leading-relaxed mb-6">
+              <p className="font-nunito text-[var(--ds-text-secondary)] text-sm leading-relaxed mb-6">
                 {message}
               </p>
 
               {/* Progress nudge */}
               <div className="bg-emerald-50 rounded-2xl px-4 py-3 mb-5 flex items-center gap-3">
-                <span className="text-[26px]">🔥</span>
-                <p className="font-nunito text-emerald-700 text-[13px] text-left leading-snug">
+                <span className="text-2.5xl">🔥</span>
+                <p className="font-nunito text-emerald-700 text-sml text-left leading-snug">
                   Start today's adventure to <strong>light a new streak</strong> — every journey begins with one step!
                 </p>
               </div>
 
               <button
                 onClick={dismiss}
-                className="w-full bg-[var(--nimi-green)] text-white font-baloo font-black text-[16px] py-3.5 rounded-2xl hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-green-200/50"
+                className="w-full bg-[var(--nimi-green)] text-white font-baloo font-black text-base py-3.5 rounded-2xl hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-green-200/50"
               >
                 Let's go! 🚀
               </button>
-              <p className="font-nunito text-gray-300 text-[11px] mt-3">Tap anywhere to continue</p>
+              <p className="font-nunito text-[var(--ds-text-tertiary)] text-2xs mt-3">Tap anywhere to continue</p>
             </div>
           </motion.div>
         </motion.div>

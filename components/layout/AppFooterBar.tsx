@@ -10,7 +10,7 @@ export default function AppFooterBar() {
           const Icon = badge.icon;
           return (
             <div key={badge.label}
-              className={`${badge.bg} flex items-center gap-1.5 px-4 py-2 rounded-full text-[11px] font-black tracking-wide text-white shadow-md`}>
+              className={`${badge.bg} flex items-center gap-1.5 px-4 py-2 rounded-full text-2xs font-black tracking-wide text-white shadow-md`}>
               <Icon className="w-3.5 h-3.5" />
               <span>{badge.label}</span>
             </div>

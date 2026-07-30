@@ -80,7 +80,7 @@ export default function WhoIsPlaying({ children, onSelect, onAddChild }: Props) 
           <p className="font-black text-3xl tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-pink-300 via-yellow-200 to-cyan-300">
             NIMIPIKO
           </p>
-          <p className="text-gray-500 text-[11px] font-semibold tracking-widest uppercase">
+          <p className="text-[var(--ds-text-secondary)] text-2xs font-semibold tracking-widest uppercase">
             {t("whoIsPlayingTagline")}
           </p>
         </div>
@@ -93,7 +93,7 @@ export default function WhoIsPlaying({ children, onSelect, onAddChild }: Props) 
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: DURATION.base, delay: 0.2 }}
-        className="text-gray-900 text-2xl sm:text-3xl font-black mb-8 mt-4 tracking-wide text-center"
+        className="text-[var(--ds-text-primary)] text-2xl sm:text-3xl font-black mb-8 mt-4 tracking-wide text-center"
       >
         {t("whoIsPlayingToday")}
       </motion.p>
@@ -124,16 +124,16 @@ export default function WhoIsPlaying({ children, onSelect, onAddChild }: Props) 
               </div>
 
               {/* Name badge */}
-              <div className="bg-white shadow-sm px-5 py-1.5 rounded-full border border-ds-border">
-                <p className="text-gray-900 font-black text-base sm:text-lg tracking-wide">
+              <div className="bg-[var(--ds-surface-card)] shadow-sm px-5 py-1.5 rounded-full border border-ds-border">
+                <p className="text-[var(--ds-text-primary)] font-black text-base sm:text-lg tracking-wide">
                   {child.name}
                 </p>
               </div>
 
               {/* Language badge instead of fake stars */}
-              <div className="flex items-center gap-1.5 bg-white/70 px-2.5 py-0.5 rounded-full border border-ds-border shadow-sm">
-                <span className="text-[13px] leading-none">{lang.flag}</span>
-                <span className="font-nunito font-semibold text-gray-500 text-[11px]">{lang.name}</span>
+              <div className="flex items-center gap-1.5 bg-[var(--ds-surface-card)]/70 px-2.5 py-0.5 rounded-full border border-ds-border shadow-sm">
+                <span className="text-sml leading-none">{lang.flag}</span>
+                <span className="font-nunito font-semibold text-[var(--ds-text-secondary)] text-2xs">{lang.name}</span>
               </div>
             </motion.button>
           );
@@ -148,12 +148,12 @@ export default function WhoIsPlaying({ children, onSelect, onAddChild }: Props) 
         transition={{ ...SPRING.bounce, delay: 0.1 * children.length + 0.35 }}
         whileHover={m.cardHover}
         whileTap={m.dangerPress}
-        className="flex items-center gap-2.5 mb-6 bg-white/80 hover:bg-white border border-dashed border-gray-300 hover:border-gray-400 shadow-sm rounded-full px-5 py-2.5 transition-all group"
+        className="flex items-center gap-2.5 mb-6 bg-[var(--ds-surface-card)]/80 hover:bg-[var(--ds-surface-card)] border border-dashed border-[var(--ds-border-strong)] hover:border-[var(--ds-border-strong)] shadow-sm rounded-full px-5 py-2.5 transition-all group"
       >
-        <div className="w-7 h-7 rounded-full bg-gray-100 group-hover:bg-gray-200 flex items-center justify-center transition-colors">
-          <Plus className="w-4 h-4 text-gray-500 group-hover:text-gray-700 transition-colors" />
+        <div className="w-7 h-7 rounded-full bg-[var(--ds-surface-card-active)] group-hover:bg-[var(--ds-border-primary)] flex items-center justify-center transition-colors">
+          <Plus className="w-4 h-4 text-[var(--ds-text-secondary)] group-hover:text-[var(--ds-text-primary)] transition-colors" />
         </div>
-        <span className="font-baloo font-black text-gray-500 group-hover:text-gray-700 text-[14px] transition-colors">
+        <span className="font-baloo font-black text-[var(--ds-text-secondary)] group-hover:text-[var(--ds-text-primary)] text-sm transition-colors">
           {t("whoAddChild")}
         </span>
       </motion.button>
@@ -164,7 +164,7 @@ export default function WhoIsPlaying({ children, onSelect, onAddChild }: Props) 
         animate={{ opacity: 1 }}
         transition={{ duration: DURATION.base, delay: 0.8 }}
         onClick={() => router.push("/parents")}
-        className="flex items-center gap-2 px-4 py-2 rounded-full bg-white hover:bg-gray-50 border border-ds-border text-gray-500 hover:text-gray-700 text-xs font-semibold transition-all shadow-sm"
+        className="flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--ds-surface-card)] hover:bg-[var(--ds-surface-card-hover)] border border-ds-border text-[var(--ds-text-secondary)] hover:text-[var(--ds-text-primary)] text-xs font-semibold transition-all shadow-sm"
       >
         <Settings className="w-3.5 h-3.5" />
         {t("whoParentZone")}

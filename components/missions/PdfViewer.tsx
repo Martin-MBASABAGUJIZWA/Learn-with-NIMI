@@ -91,13 +91,13 @@ export default function PdfViewer({ url, title, onClose, onLastPage }: PdfViewer
       className="fixed inset-0 z-50 flex flex-col bg-[#e9e2d8]"
     >
       {/* ── Header ─────────────────────────────────────── */}
-      <div className="flex items-center gap-3 px-4 py-3.5 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.08)] flex-shrink-0 z-10">
+      <div className="flex items-center gap-3 px-4 py-3.5 bg-[var(--ds-surface-card)] shadow-[0_1px_3px_rgba(0,0,0,0.08)] flex-shrink-0 z-10">
         <button
           onClick={onClose}
-          className="w-9 h-9 rounded-full hover:bg-gray-100 flex items-center justify-center transition flex-shrink-0"
+          className="w-9 h-9 rounded-full hover:bg-[var(--ds-surface-card-active)] flex items-center justify-center transition flex-shrink-0"
           aria-label="Close"
         >
-          <X className="w-[18px] h-[18px] text-gray-500" />
+          <X className="w-[18px] h-[18px] text-[var(--ds-text-secondary)]" />
         </button>
 
         <div className="flex items-center gap-2.5 flex-1 min-w-0">
@@ -109,8 +109,8 @@ export default function PdfViewer({ url, title, onClose, onLastPage }: PdfViewer
             className="w-8 h-8 rounded-full border-2 border-yellow-300 shadow-sm flex-shrink-0"
           />
           <div className="min-w-0">
-            <p className="font-baloo font-black text-gray-800 text-[15px] truncate leading-tight">{title}</p>
-            <p className="font-nunito text-gray-400 text-[11px] leading-none mt-0.5">Story Book</p>
+            <p className="font-baloo font-black text-[var(--ds-text-primary)] text-mbase truncate leading-tight">{title}</p>
+            <p className="font-nunito text-[var(--ds-text-tertiary)] text-2xs leading-none mt-0.5">Story Book</p>
           </div>
         </div>
 
@@ -122,8 +122,8 @@ export default function PdfViewer({ url, title, onClose, onLastPage }: PdfViewer
               animate={{ opacity: 1, scale: 1 }}
               className="flex-shrink-0 text-right"
             >
-              <p className="font-baloo font-black text-gray-700 text-[15px] leading-tight">{page}</p>
-              <p className="font-nunito text-gray-400 text-[10px] leading-none">of {numPages}</p>
+              <p className="font-baloo font-black text-[var(--ds-text-primary)] text-mbase leading-tight">{page}</p>
+              <p className="font-nunito text-[var(--ds-text-tertiary)] text-3xs leading-none">of {numPages}</p>
             </motion.div>
           )}
         </AnimatePresence>
@@ -144,7 +144,7 @@ export default function PdfViewer({ url, title, onClose, onLastPage }: PdfViewer
                 animate={{ rotate: [0, -18, 18, -18, 0], scale: [1, 1.3, 1] }}
                 transition={{ duration: 0.55, delay: 0.15 }}
                 className="text-xl select-none">🎉</motion.span>
-              <p className="font-baloo font-black text-amber-900 text-[14px] tracking-wide">
+              <p className="font-baloo font-black text-amber-900 text-sm tracking-wide">
                 You read the whole story — amazing!
               </p>
               <motion.span
@@ -167,10 +167,10 @@ export default function PdfViewer({ url, title, onClose, onLastPage }: PdfViewer
           className="absolute left-0 top-0 bottom-0 w-12 z-10 flex items-center justify-start pl-2
             disabled:pointer-events-none group"
         >
-          <div className="w-8 h-8 rounded-full bg-white/70 backdrop-blur-sm shadow-sm
+          <div className="w-8 h-8 rounded-full bg-[var(--ds-surface-card)]/70 backdrop-blur-sm shadow-sm
             flex items-center justify-center
             opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-            <ChevronLeft className="w-4 h-4 text-gray-600" />
+            <ChevronLeft className="w-4 h-4 text-[var(--ds-text-secondary)]" />
           </div>
         </button>
 
@@ -181,10 +181,10 @@ export default function PdfViewer({ url, title, onClose, onLastPage }: PdfViewer
           className="absolute right-0 top-0 bottom-0 w-12 z-10 flex items-center justify-end pr-2
             disabled:pointer-events-none group"
         >
-          <div className="w-8 h-8 rounded-full bg-white/70 backdrop-blur-sm shadow-sm
+          <div className="w-8 h-8 rounded-full bg-[var(--ds-surface-card)]/70 backdrop-blur-sm shadow-sm
             flex items-center justify-center
             opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-            <ChevronRight className="w-4 h-4 text-gray-600" />
+            <ChevronRight className="w-4 h-4 text-[var(--ds-text-secondary)]" />
           </div>
         </button>
 
@@ -207,7 +207,7 @@ export default function PdfViewer({ url, title, onClose, onLastPage }: PdfViewer
                   transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
                   className="w-20 h-20 rounded-full border-4 border-yellow-300 shadow-lg"
                 />
-                <p className="font-baloo font-black text-gray-600 text-[16px]">
+                <p className="font-baloo font-black text-[var(--ds-text-secondary)] text-base">
                   Loading your story…
                 </p>
               </div>
@@ -215,7 +215,7 @@ export default function PdfViewer({ url, title, onClose, onLastPage }: PdfViewer
             error={
               <div className="flex flex-col items-center gap-3 mt-16 text-center px-6">
                 <span className="text-5xl">😕</span>
-                <p className="font-baloo font-black text-gray-800 text-[18px]">
+                <p className="font-baloo font-black text-[var(--ds-text-primary)] text-lg">
                   Couldn't load the story
                 </p>
                 <a href={url} target="_blank" rel="noreferrer"
@@ -254,14 +254,14 @@ export default function PdfViewer({ url, title, onClose, onLastPage }: PdfViewer
       </div>
 
       {/* ── Footer ──────────────────────────────────────── */}
-      <div className="flex-shrink-0 bg-white border-t border-gray-100
+      <div className="flex-shrink-0 bg-[var(--ds-surface-card)] border-t border-[var(--ds-border-primary)]
         shadow-[0_-1px_3px_rgba(0,0,0,0.06)] px-5 pt-3 pb-5 space-y-3">
 
         {/* Dot indicators */}
         <div className="flex items-center justify-center gap-1.5 flex-wrap min-h-[14px]">
           {numPages === 0
             ? Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="w-2 h-2 rounded-full bg-gray-200 animate-pulse" />
+                <div key={i} className="w-2 h-2 rounded-full bg-[var(--ds-border-primary)] animate-pulse" />
               ))
             : showDots
               ? Array.from({ length: numPages }).map((_, i) => (
@@ -273,8 +273,8 @@ export default function PdfViewer({ url, title, onClose, onLastPage }: PdfViewer
                       i + 1 === page
                         ? "w-5 h-2.5 bg-[var(--nimi-green)] rounded-full"
                         : i + 1 < page
-                        ? "w-2 h-2 bg-gray-300"
-                        : "w-2 h-2 bg-gray-200 hover:bg-gray-300"
+                        ? "w-2 h-2 bg-[var(--ds-surface-input)]"
+                        : "w-2 h-2 bg-[var(--ds-border-primary)] hover:bg-[var(--ds-surface-input)]"
                     }`}
                   />
                 ))
@@ -289,9 +289,9 @@ export default function PdfViewer({ url, title, onClose, onLastPage }: PdfViewer
             disabled={page <= 1 || numPages === 0}
             whileTap={{ scale: 0.95 }}
             className="flex-1 h-12 flex items-center justify-center gap-1.5
-              rounded-2xl border-2 border-gray-200
-              font-baloo font-black text-[15px] text-gray-500
-              hover:border-gray-300 hover:text-gray-700
+              rounded-2xl border-2 border-[var(--ds-border-primary)]
+              font-baloo font-black text-mbase text-[var(--ds-text-secondary)]
+              hover:border-[var(--ds-border-strong)] hover:text-[var(--ds-text-primary)]
               disabled:opacity-25 disabled:cursor-not-allowed transition"
           >
             <ChevronLeft className="w-4 h-4" /> Back
@@ -303,7 +303,7 @@ export default function PdfViewer({ url, title, onClose, onLastPage }: PdfViewer
             whileTap={{ scale: 0.95 }}
             className="flex-1 h-12 flex items-center justify-center gap-1.5
               rounded-2xl bg-[var(--nimi-green)] text-white
-              font-baloo font-black text-[15px]
+              font-baloo font-black text-mbase
               shadow-[0_4px_14px_rgba(0,150,80,0.28)]
               hover:opacity-90
               disabled:opacity-25 disabled:cursor-not-allowed transition"

@@ -21,13 +21,13 @@ export default function NotificationSettingsModal({ onClose }: Props) {
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.85, opacity: 0 }}
           transition={{ type: "spring", stiffness: 300, damping: 25 }}
-          className="bg-white border border-ds-border shadow-2xl w-full max-w-sm overflow-hidden" style={{ borderRadius: 'var(--leaf-r-lg)' }}
+          className="bg-[var(--ds-surface-card)] border border-ds-border shadow-2xl w-full max-w-sm overflow-hidden" style={{ borderRadius: 'var(--leaf-r-lg)' }}
         >
           <div className="px-5 py-4 flex items-center justify-between" style={{ backgroundColor: 'var(--nimi-green)' }}>
             <p className="text-white font-black text-lg tracking-wide">{t("notificationSettingsModalTitle")}</p>
             <button onClick={onClose}
               aria-label="Close"
-              className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-white transition">
+              className="w-8 h-8 rounded-full bg-[var(--ds-surface-card)]/20 hover:bg-[var(--ds-surface-card)]/30 flex items-center justify-center text-white transition">
               <X className="w-4 h-4" />
             </button>
           </div>
@@ -38,7 +38,7 @@ export default function NotificationSettingsModal({ onClose }: Props) {
             ) : (
               <>
                 <div className={`w-16 h-16 mx-auto rounded-full flex items-center justify-center ${
-                  isSubscribed ? "bg-[var(--ds-brand-subtle)] text-[var(--ds-brand-primary)]" : "bg-gray-100 text-gray-400"
+                  isSubscribed ? "bg-[var(--ds-brand-subtle)] text-[var(--ds-brand-primary)]" : "bg-[var(--ds-surface-card-hover)] text-[var(--ds-text-tertiary)]"
                 }`}>
                   {isSubscribed ? <Bell className="w-7 h-7" /> : <BellOff className="w-7 h-7" />}
                 </div>
@@ -51,7 +51,7 @@ export default function NotificationSettingsModal({ onClose }: Props) {
                   disabled={loading}
                   className={`w-full font-black py-2.5 text-sm transition disabled:opacity-60 ${
                     isSubscribed
-                      ? "border border-ds-border text-ds-text hover:bg-gray-50"
+                      ? "border border-ds-border text-ds-text hover:bg-[var(--ds-surface-card)]"
                       : "text-white"
                   }`}
                   style={{ borderRadius: 'var(--leaf-r-sm)', ...(!isSubscribed ? { backgroundColor: 'var(--nimi-green)' } : {}) }}

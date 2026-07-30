@@ -27,15 +27,15 @@ export default function AchievementCenterCard({ achievements, maxLevel, childNam
   ];
 
   return (
-    <div className="bg-white border border-ds-border shadow-ds-card p-4" style={{ borderRadius: 'var(--leaf-r)' }}>
+    <div className="bg-[var(--ds-surface-card)] border border-ds-border shadow-ds-card p-4" style={{ borderRadius: 'var(--leaf-r)' }}>
       <p className="font-black text-ds-text mb-3">{t("achievementCenterTitle")}</p>
 
       <div className="grid grid-cols-3 gap-2 mb-3">
         {tiles.map(tile => (
-          <div key={tile.labelKey} className="bg-gray-50 leaf p-3 text-center">
+          <div key={tile.labelKey} className="bg-[var(--ds-surface-card)] leaf p-3 text-center">
             <p className="text-2xl">{tile.emoji}</p>
             <p className="font-black text-ds-text text-sm mt-1">{earnedCount(tile.items)}/{tile.items.length}</p>
-            <p className="text-gray-500 text-xs mt-0.5 leading-tight">{t(tile.labelKey)}</p>
+            <p className="text-[var(--ds-text-secondary)] text-xs mt-0.5 leading-tight">{t(tile.labelKey)}</p>
           </div>
         ))}
       </div>

@@ -28,11 +28,11 @@ export default function DailyAdventureGrid({ completedInLevel }: DailyAdventureG
           <motion.div
             whileHover={m.cardHover}
             whileTap={m.buttonPress}
-            className={`relative overflow-hidden bg-white/95 border border-ds-border shadow-[0_14px_32px_rgba(15,23,42,0.06)] hover:shadow-[0_18px_42px_rgba(15,23,42,0.12)] transition-all flex flex-col items-center pt-4 pb-3 px-2 h-full cursor-pointer ${done ? "ring-2 ring-green-400/30" : ""}`}
+            className={`relative overflow-hidden bg-[var(--ds-surface-card)]/95 border border-ds-border shadow-card-xl hover:shadow-[0_18px_42px_rgba(15,23,42,0.12)] transition-all flex flex-col items-center pt-4 pb-3 px-2 h-full cursor-pointer ${done ? "ring-2 ring-green-400/30" : ""}`}
             style={{ borderRadius: 'var(--leaf-r)' }}
           >
             {/* Number badge */}
-            <div className={`absolute top-2 left-2 w-6 h-6 ${activity.numBg} text-white rounded-full flex items-center justify-center font-black text-[11px] shadow-[0_8px_18px_rgba(15,23,42,0.12)]`}>
+            <div className={`absolute top-2 left-2 w-6 h-6 ${activity.numBg} text-white rounded-full flex items-center justify-center font-black text-2xs shadow-[0_8px_18px_rgba(15,23,42,0.12)]`}>
               {activity.number}
             </div>
 
@@ -43,7 +43,7 @@ export default function DailyAdventureGrid({ completedInLevel }: DailyAdventureG
                 alt={activity.mascot.toUpperCase()}
                 className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-cover border-2 border-white shadow"
                loading="lazy" />
-              <div className="absolute -bottom-1 -right-1 bg-white rounded-full w-7 h-7 flex items-center justify-center text-base shadow-[0_8px_18px_rgba(15,23,42,0.12)] border border-gray-200 leading-none">
+              <div className="absolute -bottom-1 -right-1 bg-[var(--ds-surface-card)] rounded-full w-7 h-7 flex items-center justify-center text-base shadow-[0_8px_18px_rgba(15,23,42,0.12)] border border-[var(--ds-border-primary)] leading-none">
                 {activity.emoji}
               </div>
             </div>
@@ -51,18 +51,18 @@ export default function DailyAdventureGrid({ completedInLevel }: DailyAdventureG
             <p className={`font-black text-ds-text text-xs sm:text-sm uppercase text-center leading-tight`}>
               {t(activity.titleKey)}
             </p>
-            <p className="text-gray-500 text-[10px] sm:text-[11px] text-center leading-snug mt-0.5 min-h-[28px]">
+            <p className="text-[var(--ds-text-secondary)] text-3xs sm:text-2xs text-center leading-snug mt-0.5 min-h-[28px]">
               {t(activity.subtitleKey)}
             </p>
 
             {/* Start button */}
-            <div className={`mt-2 w-full ${activity.numBg} text-white font-black text-[11px] sm:text-xs uppercase py-2 text-center shadow-[0_10px_22px_rgba(15,23,42,0.12)]`} style={{ borderRadius: 'var(--leaf-r-sm)' }}>
+            <div className={`mt-2 w-full ${activity.numBg} text-white font-black text-2xs sm:text-xs uppercase py-2 text-center shadow-[0_10px_22px_rgba(15,23,42,0.12)]`} style={{ borderRadius: 'var(--leaf-r-sm)' }}>
               {t(activity.startKey ?? "")}
             </div>
 
             {/* Activity star */}
             <div className="mt-2 text-lg leading-none">
-              {done ? "⭐" : <span className="text-gray-300">☆</span>}
+              {done ? "⭐" : <span className="text-[var(--ds-text-tertiary)]">☆</span>}
             </div>
           </motion.div>
         );

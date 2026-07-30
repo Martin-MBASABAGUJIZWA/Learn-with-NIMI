@@ -25,7 +25,7 @@ const SIGNAL_STYLE: Record<EvidenceSignal['type'], { bg: string; text: string; d
   interest_match:   { bg: "bg-green-50",   text: "text-green-700",   dot: "bg-green-400"   },
   achievement_unlock:{ bg: "bg-yellow-50", text: "text-yellow-700",  dot: "bg-yellow-400"  },
   level_progression:{ bg: "bg-indigo-50",  text: "text-indigo-700",  dot: "bg-indigo-400"  },
-  time_based:       { bg: "bg-gray-50",    text: "text-gray-600",    dot: "bg-gray-400"    },
+  time_based:       { bg: "bg-[var(--ds-surface-card)]",    text: "text-[var(--ds-text-secondary)]",    dot: "bg-gray-400"    },
 };
 
 const MASTERY_COLOUR: Record<string, string> = {
@@ -40,7 +40,7 @@ const MASTERY_COLOUR: Record<string, string> = {
 function SignalChip({ signal }: { signal: EvidenceSignal }) {
   const s = SIGNAL_STYLE[signal.type] ?? SIGNAL_STYLE.time_based;
   return (
-    <div className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-[11px] font-bold ${s.bg} ${s.text}`}>
+    <div className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-2xs font-bold ${s.bg} ${s.text}`}>
       <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${s.dot}`} />
       {signal.label}
     </div>
@@ -50,13 +50,13 @@ function SignalChip({ signal }: { signal: EvidenceSignal }) {
 function ObjectiveRow({ obj }: { obj: CurriculumObjective }) {
   const colour = MASTERY_COLOUR[obj.masteryLevel ?? 'none'] ?? MASTERY_COLOUR.none;
   return (
-    <div className="flex items-start gap-2 text-[12px]">
-      <span className="text-gray-400 shrink-0 mt-0.5">→</span>
+    <div className="flex items-start gap-2 text-xs">
+      <span className="text-[var(--ds-text-tertiary)] shrink-0 mt-0.5">→</span>
       <div className="flex-1 min-w-0">
         <span className="font-bold text-ds-text">{obj.skillLabel}: </span>
         <span className="text-ds-muted">{obj.objective}</span>
         {obj.masteryLevel && (
-          <span className={`ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-black border ${colour}`}>
+          <span className={`ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-3xs font-black border ${colour}`}>
             {obj.masteryLevel}
             {obj.confidence !== undefined && ` · ${Math.round(obj.confidence * 100)}%`}
           </span>
@@ -84,7 +84,7 @@ export default function ExplainedRecommendationCard({
   rec,
   role = 'parent',
   onAction,
-  accentClass = "bg-white border-ds-border",
+  accentClass = "bg-[var(--ds-surface-card)] border-ds-border",
 }: Props) {
   const [open, setOpen] = useState(false);
   const ev = rec.evidence;
@@ -103,21 +103,21 @@ export default function ExplainedRecommendationCard({
         <div className="flex items-start gap-3 mb-2">
           <span className="text-2xl leading-none shrink-0">{rec.emoji}</span>
           <div className="flex-1 min-w-0">
-            <p className="font-black text-ds-text text-[14px] leading-snug">{rec.title}</p>
-            <p className="text-[11px] font-semibold text-ds-muted mt-0.5">{rec.reasonLabel}</p>
+            <p className="font-black text-ds-text text-sm leading-snug">{rec.title}</p>
+            <p className="text-2xs font-semibold text-ds-muted mt-0.5">{rec.reasonLabel}</p>
           </div>
           {/* Action button */}
           <a
             href={rec.href}
             onClick={e => { if (onAction) { e.preventDefault(); onAction(rec.href); } }}
-            className="shrink-0 px-3 py-1.5 bg-ds-action text-white text-[11px] font-black rounded-full hover:opacity-90 transition whitespace-nowrap"
+            className="shrink-0 px-3 py-1.5 bg-ds-action text-white text-2xs font-black rounded-full hover:opacity-90 transition whitespace-nowrap"
           >
             Go →
           </a>
         </div>
 
         {/* Explanation sentence */}
-        <p className="text-[12px] leading-relaxed text-ds-muted font-nunito">
+        <p className="text-xs leading-relaxed text-ds-muted font-nunito">
           {explanation}
         </p>
 
@@ -125,7 +125,7 @@ export default function ExplainedRecommendationCard({
         {hasEvidence && (
           <button
             onClick={() => setOpen(v => !v)}
-            className="mt-3 flex items-center gap-1 text-[11px] font-bold text-ds-action hover:opacity-70 transition"
+            className="mt-3 flex items-center gap-1 text-2xs font-bold text-ds-action hover:opacity-70 transition"
             aria-expanded={open}
           >
             <span className={`transition-transform duration-200 ${open ? 'rotate-90' : ''}`}>▶</span>
@@ -136,12 +136,12 @@ export default function ExplainedRecommendationCard({
 
       {/* Evidence panel — revealed on toggle */}
       {open && ev && (
-        <div className="border-t border-ds-border bg-gray-50/70 px-4 py-3 space-y-3">
+        <div className="border-t border-ds-border bg-[var(--ds-surface-card)]/70 px-4 py-3 space-y-3">
 
           {/* Signal chips */}
           {ev.signals.length > 0 && (
             <div>
-              <p className="text-[10px] font-black uppercase tracking-wider text-gray-400 mb-1.5">
+              <p className="text-3xs font-black uppercase tracking-wider text-[var(--ds-text-tertiary)] mb-1.5">
                 Signals detected
               </p>
               <div className="flex flex-wrap gap-1.5">
@@ -150,7 +150,7 @@ export default function ExplainedRecommendationCard({
               {/* Signal details */}
               <div className="mt-2 space-y-1">
                 {ev.signals.map((s, i) => (
-                  <p key={i} className="text-[11px] text-ds-muted font-nunito leading-relaxed">
+                  <p key={i} className="text-2xs text-ds-muted font-nunito leading-relaxed">
                     <span className="font-bold text-ds-text">{s.label}:</span> {s.detail}
                   </p>
                 ))}
@@ -161,7 +161,7 @@ export default function ExplainedRecommendationCard({
           {/* Curriculum objectives */}
           {ev.curriculumGoals.length > 0 && (
             <div>
-              <p className="text-[10px] font-black uppercase tracking-wider text-gray-400 mb-1.5">
+              <p className="text-3xs font-black uppercase tracking-wider text-[var(--ds-text-tertiary)] mb-1.5">
                 Curriculum objectives
               </p>
               <div className="space-y-1.5">
@@ -173,10 +173,10 @@ export default function ExplainedRecommendationCard({
           {/* Teacher notes (in teacher mode only) */}
           {role === 'teacher' && (
             <div>
-              <p className="text-[10px] font-black uppercase tracking-wider text-gray-400 mb-1.5">
+              <p className="text-3xs font-black uppercase tracking-wider text-[var(--ds-text-tertiary)] mb-1.5">
                 Full evidence trail
               </p>
-              <pre className="text-[10px] text-ds-muted font-mono whitespace-pre-wrap leading-relaxed bg-white border border-ds-border rounded-lg p-3 overflow-x-auto">
+              <pre className="text-3xs text-ds-muted font-mono whitespace-pre-wrap leading-relaxed bg-[var(--ds-surface-card)] border border-ds-border rounded-lg p-3 overflow-x-auto">
                 {ev.teacherNotes}
               </pre>
             </div>
@@ -185,7 +185,7 @@ export default function ExplainedRecommendationCard({
           {/* Data sources */}
           <div className="flex flex-wrap gap-1">
             {ev.dataSourcesUsed.map(src => (
-              <span key={src} className="text-[9px] font-bold uppercase tracking-wider text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">
+              <span key={src} className="text-4xs font-bold uppercase tracking-wider text-[var(--ds-text-tertiary)] bg-[var(--ds-surface-card-hover)] px-1.5 py-0.5 rounded">
                 {src.replace(/_/g, ' ')}
               </span>
             ))}

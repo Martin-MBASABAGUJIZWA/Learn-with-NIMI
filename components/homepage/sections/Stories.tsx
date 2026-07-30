@@ -20,10 +20,10 @@ export default function Stories() {
           <span className="inline-flex items-center gap-2 bg-emerald-50 text-emerald-700 font-nunito font-bold text-xs tracking-wider uppercase px-4 py-1.5 rounded-full mb-4">
             <BookOpen className="w-3.5 h-3.5" /> Featured Stories
           </span>
-          <h2 className="font-baloo font-black text-gray-900 text-3xl sm:text-4xl leading-tight" style={{textWrap:"balance"}}>
+          <h2 className="font-baloo font-black text-[var(--ds-text-primary)] text-3xl sm:text-4xl leading-tight" style={{textWrap:"balance"}}>
             Stories kids actually <span className="text-nimi-green">want to read</span>
           </h2>
-          <p className="font-nunito text-gray-500 mt-3 max-w-md mx-auto text-sm sm:text-base">
+          <p className="font-nunito text-[var(--ds-text-secondary)] mt-3 max-w-md mx-auto text-sm sm:text-base">
             Every story teaches language through adventure, culture, and characters kids love.
           </p>
         </div>
@@ -34,11 +34,11 @@ export default function Stories() {
               className={`bg-gradient-to-br ${story.color} border ${story.border} rounded-2xl p-5 flex flex-col gap-3 hover:shadow-md transition-shadow`}>
               <div className="text-4xl">{story.emoji}</div>
               <div>
-                <p className="font-baloo font-black text-gray-900 text-[15px] leading-snug">{story.title}</p>
-                <p className="font-nunito text-[11px] font-bold text-gray-500 mt-0.5">{story.lang}</p>
+                <p className="font-baloo font-black text-[var(--ds-text-primary)] text-[15px] leading-snug">{story.title}</p>
+                <p className="font-nunito text-[11px] font-bold text-[var(--ds-text-secondary)] mt-0.5">{story.lang}</p>
               </div>
               <div className="flex items-center justify-between mt-auto">
-                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-gray-500 bg-white/70 px-2 py-1 rounded-full">
+                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[var(--ds-text-secondary)] bg-[var(--ds-surface-card)]/70 px-2 py-1 rounded-full">
                   <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" /> {story.level}
                 </span>
                 <button className="w-8 h-8 bg-nimi-green rounded-full flex items-center justify-center shadow-sm hover:brightness-105 transition" aria-label={`Play ${story.title}`}>

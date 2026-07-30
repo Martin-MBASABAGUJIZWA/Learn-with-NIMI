@@ -42,7 +42,7 @@ export default function AvatarBuilder({ initial = DEFAULT_AVATAR, onChange }: Pr
   };
 
   return (
-    <div className="flex flex-col sm:flex-row gap-0 overflow-hidden rounded-3xl border border-ds-border shadow-ds-card bg-ds-card" style={{ minHeight: 420 }}>
+    <div className="flex flex-col sm:flex-row gap-0 overflow-hidden leaf-lg border border-ds-border shadow-ds-card bg-ds-card" style={{ minHeight: 420 }}>
       {/* ── Left: live preview ───────────────────────────────────────────────── */}
       <div className="flex items-center justify-center sm:w-[280px] shrink-0 py-8 px-4"
         style={{ background: `#${cfg.bg}` }}>
@@ -63,7 +63,7 @@ export default function AvatarBuilder({ initial = DEFAULT_AVATAR, onChange }: Pr
             <button
               key={cat.id}
               onClick={() => setActiveCategory(cat.id)}
-              className={`flex flex-col items-center gap-0.5 px-3.5 py-3 shrink-0 transition-all border-b-2 text-[10px] font-black uppercase tracking-wide ${
+              className={`flex flex-col items-center gap-0.5 px-3.5 py-3 shrink-0 transition-all border-b-2 text-3xs font-black uppercase tracking-wide ${
                 activeCategory === cat.id
                   ? "border-[var(--ds-brand-primary)] text-[var(--ds-brand-primary)]"
                   : "border-transparent text-ds-muted hover:text-ds-text"
@@ -144,7 +144,7 @@ export default function AvatarBuilder({ initial = DEFAULT_AVATAR, onChange }: Pr
                       />
                     ))}
                   </div>
-                  <p className="text-[11px] font-bold text-ds-muted uppercase tracking-wide mb-2">Eye color</p>
+                  <p className="text-2xs font-bold text-ds-muted uppercase tracking-wide mb-2">Eye color</p>
                   <ColorGrid
                     colors={EYE_COLORS}
                     selected={cfg.ec}
@@ -225,7 +225,7 @@ export default function AvatarBuilder({ initial = DEFAULT_AVATAR, onChange }: Pr
                   </div>
                   {cfg.ac !== "none" && (
                     <>
-                      <p className="text-[11px] font-bold text-ds-muted uppercase tracking-wide mb-2">Accessory color</p>
+                      <p className="text-2xs font-bold text-ds-muted uppercase tracking-wide mb-2">Accessory color</p>
                       <ColorGrid
                         colors={ACCESSORY_COLORS}
                         selected={cfg.ab}
@@ -279,7 +279,7 @@ function ColorGrid({
             className={`aspect-square rounded-2xl transition-all border-2 shadow-sm ${
               isSelected
                 ? "border-[var(--ds-brand-primary)] scale-110 shadow-md ring-2 ring-[var(--ds-brand-primary)]/30"
-                : "border-transparent hover:scale-105 hover:border-gray-300"
+                : "border-transparent hover:scale-105 hover:border-[var(--ds-border-strong)]"
             }`}
             style={{ backgroundColor: `#${c.hex}` }}
           />
@@ -311,13 +311,13 @@ function StyleCard({
       className={`flex flex-col items-center gap-1 p-1.5 rounded-2xl border-2 transition-all ${
         active
           ? "border-[var(--ds-brand-primary)] bg-[var(--ds-brand-subtle)] shadow-md"
-          : "border-ds-border bg-ds-card hover:border-gray-300"
+          : "border-ds-border bg-ds-card hover:border-[var(--ds-border-strong)]"
       }`}
     >
       <div className="w-full flex items-center justify-center overflow-hidden rounded-xl" style={{ height: 52 }}>
         {previewEl ?? <span className="text-2xl">{emoji}</span>}
       </div>
-      <span className={`text-[9px] font-black leading-none ${active ? "text-[var(--ds-brand-primary)]" : "text-ds-muted"}`}>
+      <span className={`text-4xs font-black leading-none ${active ? "text-[var(--ds-brand-primary)]" : "text-ds-muted"}`}>
         {label}
       </span>
     </motion.button>

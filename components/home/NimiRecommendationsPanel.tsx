@@ -54,18 +54,18 @@ export default function NimiRecommendationsPanel({ childId, language = "en" }: P
 
   if (loading) {
     return (
-      <div className="overflow-hidden leaf-lg border border-gray-100 bg-white shadow-[0_8px_24px_rgba(15,23,42,0.07)]">
+      <div className="overflow-hidden leaf-lg border border-[var(--ds-border-primary)] bg-[var(--ds-surface-card)] shadow-card-md">
         <div className="flex items-center gap-3 px-4 pt-4 pb-3">
           <div className="w-10 h-10 rounded-xl bg-violet-100 animate-pulse shrink-0" />
           <div className="space-y-1.5 flex-1">
-            <div className="h-2 w-16 rounded-full bg-gray-100 animate-pulse" />
-            <div className="h-3.5 w-28 rounded bg-gray-100 animate-pulse" />
+            <div className="h-2 w-16 rounded-full bg-[var(--ds-surface-card-active)] animate-pulse" />
+            <div className="h-3.5 w-28 rounded bg-[var(--ds-surface-card-active)] animate-pulse" />
           </div>
         </div>
-        <div className="h-px bg-gray-100 mx-4" />
+        <div className="h-px bg-[var(--ds-surface-card-active)] mx-4" />
         <div className="px-3 py-3 space-y-1.5">
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="h-12 rounded-xl bg-gray-100 animate-pulse"
+            <div key={i} className="h-12 rounded-xl bg-[var(--ds-surface-card-active)] animate-pulse"
               style={{ animationDelay: `${i * 80}ms` }} />
           ))}
         </div>
@@ -76,7 +76,7 @@ export default function NimiRecommendationsPanel({ childId, language = "en" }: P
   if (recs.length === 0) return null;
 
   return (
-    <div className="overflow-hidden leaf-lg border border-gray-100 bg-white shadow-[0_8px_24px_rgba(15,23,42,0.07)]">
+    <div className="overflow-hidden leaf-lg border border-[var(--ds-border-primary)] bg-[var(--ds-surface-card)] shadow-card-md">
 
       {/* Header — matches every other sidebar panel */}
       <div className="flex items-center justify-between px-4 pt-4 pb-3">
@@ -85,12 +85,12 @@ export default function NimiRecommendationsPanel({ childId, language = "en" }: P
             <Sparkles className="w-5 h-5 text-violet-500" />
           </div>
           <div>
-            <p className="font-nunito text-violet-500 text-[10px] uppercase tracking-widest leading-none mb-0.5">AI Picks</p>
-            <h3 className="font-baloo font-black text-gray-900 text-[17px] leading-tight">Nimi Recommends</h3>
+            <p className="font-nunito text-violet-500 text-3xs uppercase tracking-widest leading-none mb-0.5">AI Picks</p>
+            <h3 className="font-baloo font-black text-[var(--ds-text-primary)] text-mlg leading-tight">Nimi Recommends</h3>
           </div>
         </div>
       </div>
-      <div className="h-px bg-gray-100 mx-4" />
+      <div className="h-px bg-[var(--ds-surface-card-active)] mx-4" />
 
       <div className="px-3 py-3 space-y-1">
         {recs.map((rec, i) => (
@@ -104,16 +104,16 @@ export default function NimiRecommendationsPanel({ childId, language = "en" }: P
               href={rec.href}
               className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-violet-50 border border-transparent hover:border-violet-100 transition-all group"
             >
-              <span className="text-[20px] leading-none shrink-0">{rec.emoji}</span>
+              <span className="text-xl leading-none shrink-0">{rec.emoji}</span>
               <div className="flex-1 min-w-0">
-                <p className="font-baloo font-black text-gray-800 text-[13px] truncate leading-snug group-hover:text-violet-700 transition-colors">
+                <p className="font-baloo font-black text-[var(--ds-text-primary)] text-sml truncate leading-snug group-hover:text-violet-700 transition-colors">
                   {rec.title}
                 </p>
-                <p className="font-nunito text-gray-400 text-[11px] truncate">
+                <p className="font-nunito text-[var(--ds-text-tertiary)] text-2xs truncate">
                   {REASON_LABEL[rec.reason] ?? rec.reasonLabel}
                 </p>
               </div>
-              <ChevronRight className="w-3.5 h-3.5 text-gray-300 group-hover:text-violet-400 transition-colors shrink-0" />
+              <ChevronRight className="w-3.5 h-3.5 text-[var(--ds-text-tertiary)] group-hover:text-violet-400 transition-colors shrink-0" />
             </Link>
           </motion.div>
         ))}

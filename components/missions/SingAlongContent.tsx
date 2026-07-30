@@ -83,7 +83,7 @@ export default function SingAlongContent({ mission, onComplete, completed, savin
         />
       )}
 
-      <div className="relative overflow-hidden leaf-lg border border-purple-100 bg-gradient-to-br from-purple-50 via-white to-violet-50/60 p-6 text-center shadow-[0_16px_34px_rgba(15,23,42,0.08)]">
+      <div className="relative overflow-hidden leaf-lg border border-purple-100 bg-gradient-to-br from-purple-50 via-white to-violet-50/60 p-6 text-center shadow-card-2xl">
         {/* Floating music notes */}
         {["🎵", "🎶", "🎵"].map((e, i) => (
           <motion.span key={i}
@@ -94,7 +94,7 @@ export default function SingAlongContent({ mission, onComplete, completed, savin
             {e}
           </motion.span>
         ))}
-        <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-sm">
+        <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-[var(--ds-surface-card)] shadow-sm">
           <span className="select-none text-xl">🎵</span>
         </div>
         <div className="flex items-center justify-center gap-4 mb-4">
@@ -109,18 +109,18 @@ export default function SingAlongContent({ mission, onComplete, completed, savin
         </div>
 
         <p className="font-black text-ds-text text-lg">{mission.title}</p>
-        {mission.subtitle && <p className="text-gray-500 text-sm">{mission.subtitle}</p>}
+        {mission.subtitle && <p className="text-[var(--ds-text-secondary)] text-sm">{mission.subtitle}</p>}
 
         {songUrl ? (
           <>
-            <div className="w-full bg-gray-100 rounded-full h-2.5 my-4 overflow-hidden">
+            <div className="w-full bg-[var(--ds-surface-card-hover)] rounded-full h-2.5 my-4 overflow-hidden">
               <div className="bg-cta-gradient h-full rounded-full transition-all"
                 style={{ width: `${progress}%` }} />
             </div>
 
             <div className="flex items-center justify-center gap-4">
               <button onClick={repeat}
-                className="w-12 h-12 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 transition"
+                className="w-12 h-12 rounded-full bg-[var(--ds-surface-card-hover)] hover:bg-[var(--ds-surface-card-active)] flex items-center justify-center text-[var(--ds-text-secondary)] transition"
                 aria-label={t("repeatLabel")}>
                 <RotateCcw className="w-5 h-5" />
               </button>
@@ -157,12 +157,12 @@ export default function SingAlongContent({ mission, onComplete, completed, savin
       </div>
 
       {lyrics.length > 0 && (
-        <div className="leaf border border-purple-100 bg-white/80 p-4 shadow-sm">
+        <div className="leaf border border-purple-100 bg-[var(--ds-surface-card)]/80 p-4 shadow-sm">
           <div className="flex items-center justify-between mb-2 gap-2 flex-wrap">
             <p className="font-black text-ds-text text-xs uppercase">🎵 {t("songLyricsTitle")}</p>
             <button onClick={() => setKaraoke(k => !k)}
               className={`text-xs font-black rounded-full px-3 py-1 transition ${
-                karaoke ? "bg-purple-500 text-white" : "bg-gray-100 text-gray-600 border border-gray-200"
+                karaoke ? "bg-purple-500 text-white" : "bg-[var(--ds-surface-card-hover)] text-[var(--ds-text-secondary)] border border-[var(--ds-border-primary)]"
               }`}>
               🎤 {t("karaokeModeLabel")}
             </button>
@@ -171,7 +171,7 @@ export default function SingAlongContent({ mission, onComplete, completed, savin
             {lyrics.map((line, i) => (
               <p key={i}
                 className={`text-sm font-semibold rounded-lg px-2 py-1 transition-colors ${
-                  karaoke && i === activeLine ? "bg-purple-50 text-purple-700" : "text-gray-700"
+                  karaoke && i === activeLine ? "bg-purple-50 text-purple-700" : "text-[var(--ds-text-primary)]"
                 }`}>
                 {line}
               </p>
@@ -192,7 +192,7 @@ export default function SingAlongContent({ mission, onComplete, completed, savin
           >
             <motion.span animate={{ rotate: [0, -20, 20, -20, 0] }} transition={{ duration: 0.5, delay: 0.1 }}
               className="text-2xl select-none">🎉</motion.span>
-            <p className="font-baloo font-black text-amber-800 text-[15px]">{t("greatSinging")}</p>
+            <p className="font-baloo font-black text-amber-800 text-mbase">{t("greatSinging")}</p>
             <motion.span animate={{ rotate: [0, 20, -20, 20, 0] }} transition={{ duration: 0.5, delay: 0.3 }}
               className="text-2xl select-none">⭐</motion.span>
           </motion.div>
@@ -212,7 +212,7 @@ export default function SingAlongContent({ mission, onComplete, completed, savin
           </motion.button>
         ) : (
           <button disabled
-            className="w-full bg-gray-100 text-gray-400 font-black text-lg rounded-full py-4 flex items-center justify-center gap-2 cursor-not-allowed border border-gray-200">
+            className="w-full bg-[var(--ds-surface-card-hover)] text-[var(--ds-text-tertiary)] font-black text-lg rounded-full py-4 flex items-center justify-center gap-2 cursor-not-allowed border border-[var(--ds-border-primary)]">
             <Lock className="w-5 h-5" /> {t("singToUnlock")}
           </button>
         )

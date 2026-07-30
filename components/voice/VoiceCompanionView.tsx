@@ -49,7 +49,7 @@ function Stars({ count }: { count: number }) {
         <motion.span key={i}
           initial={{ scale: 0 }} animate={{ scale: 1 }}
           transition={{ delay: 0.3 + i * 0.1, type: "spring", stiffness: 300 }}
-          className="text-[28px] select-none"
+          className="text-3.5xl select-none"
           style={{ filter: i < count ? "none" : "grayscale(1) opacity(0.3)" }}>
           ⭐
         </motion.span>
@@ -66,10 +66,10 @@ function WordChip({
   const style = result ? WORD_STYLE[result.status] : undefined;
   return (
     <span
-      className="inline-block px-2 py-1 m-0.5 rounded-lg text-[15px] font-bold transition-all"
+      className="inline-block px-2 py-1 m-0.5 rounded-lg text-mbase font-bold transition-all"
       style={{
         background:  active   ? "#E0F2FE"        : style?.bg    ?? "transparent",
-        color:       active   ? "#0369A1"        : style?.text  ?? "var(--ds-text-primary,#111827)",
+        color:       active   ? "#0369A1"        : style?.text  ?? "var(--ds-text-primary)",
         border:      (active || style)
           ? `1px solid ${active ? "#7DD3FC" : style?.border}`
           : "1px solid transparent",
@@ -77,7 +77,7 @@ function WordChip({
       }}>
       {word}
       {result?.status === "close" && result.spoken && (
-        <span className="text-[10px] font-normal ml-1 opacity-70">({result.spoken})</span>
+        <span className="text-3xs font-normal ml-1 opacity-70">({result.spoken})</span>
       )}
     </span>
   );
@@ -106,17 +106,17 @@ function PhoneticGuidePanel({ language }: { language: VoiceLang }) {
   if (guide.length === 0) return null;
 
   return (
-    <div className="mt-4 p-4 rounded-2xl" style={{ background: "#F0FDF4", border: "1px solid #BBF7D0" }}>
-      <p className="text-[10px] font-black uppercase tracking-widest mb-3" style={{ color: "#15803D" }}>
+    <div className="mt-4 p-4 rounded-2xl" style={{ background: "var(--ds-brand-soft)", border: "1px solid #BBF7D0" }}>
+      <p className="text-3xs font-black uppercase tracking-widest mb-3" style={{ color: "var(--nimi-green)" }}>
         🇷🇼 Kinyarwanda Pronunciation Guide
       </p>
       <div className="grid grid-cols-2 gap-2">
         {guide.slice(0, 6).map(entry => (
           <div key={entry.grapheme} className="flex items-start gap-2">
-            <span className="font-black text-[13px] shrink-0 w-8" style={{ color: "#15803D" }}>
+            <span className="font-black text-sml shrink-0 w-8" style={{ color: "var(--nimi-green)" }}>
               {entry.grapheme}
             </span>
-            <span className="text-[11px] font-nunito leading-relaxed" style={{ color: "#374151" }}>
+            <span className="text-2xs font-nunito leading-relaxed" style={{ color: "var(--ds-text-primary)" }}>
               {entry.soundLike} <span className="opacity-60">e.g. {entry.example}</span>
             </span>
           </div>
@@ -258,30 +258,30 @@ export default function VoiceCompanionView({
       <div className="flex items-center gap-3">
         {onClose && (
           <button onClick={onClose}
-            className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-gray-100 transition text-[18px]"
-            style={{ color: "#6B7280" }}>
+            className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-[var(--ds-surface-card-hover)] transition text-lg"
+            style={{ color: "var(--ds-text-secondary)" }}>
             ←
           </button>
         )}
         <div>
-          <p className="font-black text-[18px]" style={{ color: "var(--ds-text-primary,#111827)" }}>
+          <p className="font-black text-lg" style={{ color: "var(--ds-text-primary)" }}>
             🎤 Practice Reading
           </p>
-          <p className="text-[12px] font-nunito" style={{ color: "#6B7280" }}>
+          <p className="text-xs font-nunito" style={{ color: "var(--ds-text-secondary)" }}>
             Read the passage aloud — Nimi will listen and give feedback
           </p>
         </div>
       </div>
 
       {/* Passage card */}
-      <div className="p-5 rounded-3xl" style={{ background: "#F9FAFB", border: "1px solid #E5E7EB" }}>
+      <div className="p-5 leaf-lg" style={{ background: "var(--ds-surface-card)", border: "1px solid var(--ds-border-primary)" }}>
         <div className="flex items-center justify-between mb-3">
-          <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: "#6B7280" }}>
+          <p className="text-3xs font-black uppercase tracking-widest" style={{ color: "var(--ds-text-secondary)" }}>
             Read this aloud
           </p>
           {ttsIsNative(language) && (
             <button onClick={handleReadPassage}
-              className="text-[11px] font-black px-3 py-1 rounded-full transition"
+              className="text-2xs font-black px-3 py-1 rounded-full transition"
               style={{ background: isPlaying ? "#FFF1F2" : "#F0FDF4",
                        color:      isPlaying ? "#BE123C" : G,
                        border:     isPlaying ? "1px solid #FECDD3" : "1px solid #BBF7D0" }}>
@@ -313,10 +313,10 @@ export default function VoiceCompanionView({
               <div className="w-full flex flex-col gap-3">
                 <div className="p-4 rounded-2xl text-center"
                   style={{ background: "#FFF7ED", border: "1px solid #FED7AA" }}>
-                  <p className="text-[13px] font-bold" style={{ color: "#92400E" }}>
+                  <p className="text-sml font-bold" style={{ color: "#92400E" }}>
                     🎙️ Voice recognition isn&apos;t available yet for Kinyarwanda
                   </p>
-                  <p className="text-[11px] font-nunito mt-1.5" style={{ color: "#B45309" }}>
+                  <p className="text-2xs font-nunito mt-1.5" style={{ color: "#B45309" }}>
                     Type what you read below — Nimi will still check your reading!
                   </p>
                 </div>
@@ -325,18 +325,18 @@ export default function VoiceCompanionView({
                   onChange={e => setRwText(e.target.value)}
                   placeholder="Andika ivyo wasomye hano… (Type the passage here as you read it)"
                   rows={3}
-                  className="w-full text-[14px] font-nunito p-3 rounded-2xl border focus:outline-none resize-none"
-                  style={{ borderColor: "#D1D5DB", color: "#111827", background: "#FAFAFA" }} />
+                  className="w-full text-sm font-nunito p-3 rounded-2xl border focus:outline-none resize-none"
+                  style={{ borderColor: "var(--ds-border-strong)", color: "var(--ds-text-primary)", background: "var(--ds-surface-card)" }} />
                 <button
                   onClick={() => { void processSpoken(rwText); setRwText(""); }}
                   disabled={!rwText.trim()}
-                  className="w-full py-3 rounded-2xl font-black text-[14px] text-white hover:opacity-90 transition disabled:opacity-30"
+                  className="w-full py-3 rounded-2xl font-black text-sm text-white hover:opacity-90 transition disabled:opacity-30"
                   style={{ background: G }}>
                   ✓ Check my reading
                 </button>
               </div>
             ) : !supported ? (
-              <p className="text-[13px] font-nunito text-center" style={{ color: "#BE123C" }}>
+              <p className="text-sml font-nunito text-center" style={{ color: "#BE123C" }}>
                 Your browser doesn&apos;t support voice recording. Try Chrome or Edge.
               </p>
             ) : (
@@ -347,7 +347,7 @@ export default function VoiceCompanionView({
                   style={{ background: G }}>
                   🎤
                 </motion.button>
-                <p className="text-[13px] font-bold" style={{ color: "#6B7280" }}>
+                <p className="text-sml font-bold" style={{ color: "var(--ds-text-secondary)" }}>
                   Tap to start reading
                 </p>
               </>
@@ -361,15 +361,15 @@ export default function VoiceCompanionView({
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="flex flex-col items-center gap-4 py-6">
             <WaveformPulse />
-            <p className="font-black text-[16px]" style={{ color: G }}>Listening…</p>
+            <p className="font-black text-base" style={{ color: G }}>Listening…</p>
             {interimText && (
-              <p className="text-[13px] font-nunito italic text-center px-4" style={{ color: "#6B7280" }}>
+              <p className="text-sml font-nunito italic text-center px-4" style={{ color: "var(--ds-text-secondary)" }}>
                 &ldquo;{interimText}&rdquo;
               </p>
             )}
             <button onClick={handleStop}
-              className="px-6 py-2 rounded-full text-[13px] font-black border hover:bg-gray-50 transition"
-              style={{ borderColor: "#E5E7EB", color: "#6B7280" }}>
+              className="px-6 py-2 rounded-full text-sml font-black border hover:bg-[var(--ds-surface-card)] transition"
+              style={{ borderColor: "var(--ds-border-primary)", color: "var(--ds-text-secondary)" }}>
               ⏹ Done reading
             </button>
           </motion.div>
@@ -382,7 +382,7 @@ export default function VoiceCompanionView({
             className="flex flex-col items-center gap-4 py-8">
             <div className="w-10 h-10 rounded-full border-4 border-t-transparent animate-spin"
               style={{ borderColor: `${G} transparent transparent transparent` }} />
-            <p className="font-black text-[15px]" style={{ color: G }}>Nimi is checking…</p>
+            <p className="font-black text-mbase" style={{ color: G }}>Nimi is checking…</p>
           </motion.div>
         )}
 
@@ -393,27 +393,27 @@ export default function VoiceCompanionView({
             className="space-y-4">
 
             {/* Score card */}
-            <div className="p-5 rounded-3xl text-center"
+            <div className="p-5 leaf-lg text-center"
               style={{ background: G }}>
-              <p className="text-green-200 text-[10px] font-black uppercase tracking-widest mb-2">
+              <p className="text-green-200 text-3xs font-black uppercase tracking-widest mb-2">
                 Your Score
               </p>
-              <p className="font-baloo font-black text-[42px] text-white leading-none mb-2">
+              <p className="font-baloo font-black text-4.5xl text-white leading-none mb-2">
                 {analysis.score}
-                <span className="text-[22px] text-green-200">/100</span>
+                <span className="text-1.5xl text-green-200">/100</span>
               </p>
               <Stars count={analysis.stars} />
               <div className="flex justify-center gap-4 mt-3">
-                <span className="text-[11px] font-bold text-white/80">
+                <span className="text-2xs font-bold text-white/80">
                   ✅ {analysis.correctCount} correct
                 </span>
                 {analysis.closeCount > 0 && (
-                  <span className="text-[11px] font-bold text-white/80">
+                  <span className="text-2xs font-bold text-white/80">
                     🟡 {analysis.closeCount} almost
                   </span>
                 )}
                 {analysis.missedCount > 0 && (
-                  <span className="text-[11px] font-bold text-white/80">
+                  <span className="text-2xs font-bold text-white/80">
                     ❌ {analysis.missedCount} missed
                   </span>
                 )}
@@ -425,23 +425,23 @@ export default function VoiceCompanionView({
               <motion.div
                 initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
                 className="p-4 rounded-2xl"
-                style={{ background: "#F0FDF4", border: "1px solid #BBF7D0" }}>
-                <p className="text-[13px] font-nunito leading-relaxed" style={{ color: "#166534" }}>
+                style={{ background: "var(--ds-brand-soft)", border: "1px solid #BBF7D0" }}>
+                <p className="text-sml font-nunito leading-relaxed" style={{ color: "#166534" }}>
                   💬 {feedback.encouragement}
                 </p>
                 {feedback.practice_word && feedback.practice_tip && (
                   <div className="mt-2.5 px-3 py-2 rounded-xl"
                     style={{ background: "#FFFBEB", border: "1px solid #FDE68A" }}>
-                    <p className="text-[11px] font-black mb-0.5" style={{ color: "#92400E" }}>
+                    <p className="text-2xs font-black mb-0.5" style={{ color: "#92400E" }}>
                       Word to practise: <span className="font-black">{feedback.practice_word}</span>
                     </p>
-                    <p className="text-[12px] font-nunito" style={{ color: "#78350F" }}>
+                    <p className="text-xs font-nunito" style={{ color: "#78350F" }}>
                       {feedback.practice_tip}
                     </p>
                   </div>
                 )}
                 {feedback.invite_retry && (
-                  <p className="text-[12px] font-bold mt-2" style={{ color: "#15803D" }}>
+                  <p className="text-xs font-bold mt-2" style={{ color: "var(--nimi-green)" }}>
                     {feedback.invite_retry}
                   </p>
                 )}
@@ -450,15 +450,15 @@ export default function VoiceCompanionView({
 
             {/* What you said */}
             {spokenText && (
-              <div className="px-4 py-3 rounded-2xl" style={{ background: "#F9FAFB", border: "1px solid #E5E7EB" }}>
-                <p className="text-[10px] font-black uppercase tracking-widest mb-1" style={{ color: "#9CA3AF" }}>
+              <div className="px-4 py-3 rounded-2xl" style={{ background: "var(--ds-surface-card)", border: "1px solid var(--ds-border-primary)" }}>
+                <p className="text-3xs font-black uppercase tracking-widest mb-1" style={{ color: "var(--ds-text-tertiary)" }}>
                   What Nimi heard
                 </p>
-                <p className="text-[13px] font-nunito italic" style={{ color: "#6B7280" }}>
+                <p className="text-sml font-nunito italic" style={{ color: "var(--ds-text-secondary)" }}>
                   &ldquo;{spokenText}&rdquo;
                 </p>
                 {confidence > 0 && (
-                  <p className="text-[10px] font-semibold mt-1" style={{ color: "#9CA3AF" }}>
+                  <p className="text-3xs font-semibold mt-1" style={{ color: "var(--ds-text-tertiary)" }}>
                     Recognition confidence: {Math.round(confidence * 100)}%
                   </p>
                 )}
@@ -468,20 +468,20 @@ export default function VoiceCompanionView({
             {/* Actions */}
             <div className="flex gap-3">
               <button onClick={handleRetry}
-                className="flex-1 py-3 rounded-2xl font-black text-[14px] text-white hover:opacity-90 transition"
+                className="flex-1 py-3 rounded-2xl font-black text-sm text-white hover:opacity-90 transition"
                 style={{ background: G }}>
                 🔄 Try Again
               </button>
               {isPlaying ? (
                 <button onClick={stopSpeak}
-                  className="px-5 py-3 rounded-2xl font-black text-[13px] border hover:bg-gray-50 transition"
-                  style={{ borderColor: "#E5E7EB", color: "#6B7280" }}>
+                  className="px-5 py-3 rounded-2xl font-black text-sml border hover:bg-[var(--ds-surface-card)] transition"
+                  style={{ borderColor: "var(--ds-border-primary)", color: "var(--ds-text-secondary)" }}>
                   ⏹ Stop
                 </button>
               ) : (
                 feedback?.encouragement && (
                   <button onClick={() => speak(feedback.encouragement, language === "rw" ? "en" : language)}
-                    className="px-5 py-3 rounded-2xl font-black text-[13px] border hover:bg-gray-50 transition"
+                    className="px-5 py-3 rounded-2xl font-black text-sml border hover:bg-[var(--ds-surface-card)] transition"
                     style={{ borderColor: "#BBF7D0", color: G }}>
                     🔊 Replay
                   </button>
@@ -498,7 +498,7 @@ export default function VoiceCompanionView({
       {step === "result" && (
         <div className="flex gap-4 justify-center flex-wrap">
           {(["correct","close","missed"] as const).map(s => (
-            <span key={s} className="flex items-center gap-1.5 text-[11px] font-bold"
+            <span key={s} className="flex items-center gap-1.5 text-2xs font-bold"
               style={{ color: WORD_STYLE[s].text }}>
               <span className="w-3 h-3 rounded inline-block" style={{ background: WORD_STYLE[s].bg, border: `1px solid ${WORD_STYLE[s].border}` }} />
               {s === "correct" ? "Correct" : s === "close" ? "Close" : "Missed"}
@@ -514,12 +514,12 @@ export default function VoiceCompanionView({
 
       {micError && (
         <div className="px-4 py-3 rounded-2xl text-center" style={{ background: "#FFF1F2", border: "1px solid #FECDD3" }}>
-          <p className="text-[13px] font-bold" style={{ color: "#BE123C" }}>🎤 {micError}</p>
+          <p className="text-sml font-bold" style={{ color: "#BE123C" }}>🎤 {micError}</p>
         </div>
       )}
 
       {fetchError && (
-        <p className="text-[12px] text-center font-nunito" style={{ color: "#9CA3AF" }}>
+        <p className="text-xs text-center font-nunito" style={{ color: "var(--ds-text-tertiary)" }}>
           {fetchError}
         </p>
       )}

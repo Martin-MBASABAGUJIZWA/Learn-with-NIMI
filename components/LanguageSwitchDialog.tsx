@@ -39,7 +39,7 @@ export default function LanguageSwitchDialog({
           >
             <p className="text-3xl mb-2">🌍</p>
             <h3 className="font-black text-ds-text text-lg">{t("switchLanguageTitle")}</h3>
-            <p className="text-gray-500 text-sm mt-2">
+            <p className="text-[var(--ds-text-secondary)] text-sm mt-2">
               {t("switchLanguageBody")
                 .replace("{language}", LANG_LABELS[pendingLanguage])
                 .replace("{name}", childName ?? "")

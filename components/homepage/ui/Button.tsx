@@ -14,8 +14,8 @@ interface ButtonProps {
 
 const VARIANT: Record<Variant, string> = {
   primary: "bg-nimi-green text-white shadow-lg hover:brightness-105",
-  secondary: "bg-white text-gray-700 border border-gray-200 hover:bg-gray-50",
-  outline: "bg-transparent text-gray-700 border border-gray-300 hover:bg-gray-50",
+  secondary: "bg-[var(--ds-surface-card)] text-[var(--ds-text-primary)] border border-[var(--ds-border-primary)] hover:bg-[var(--ds-surface-card)]",
+  outline: "bg-transparent text-[var(--ds-text-primary)] border border-[var(--ds-border-strong)] hover:bg-[var(--ds-surface-card)]",
 };
 
 // href -> renders a Link (navigation); omit href for an in-page action (onClick/submit).

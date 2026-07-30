@@ -82,8 +82,8 @@ export default function StreaksTab({ activityDates, weekStreak, childId, languag
   return (
     <div className="space-y-4 mt-4">
       <div>
-        <p className="font-baloo font-black text-ds-text text-[18px]">{t("streaksPageTitle")}</p>
-        <p className="text-ds-muted text-[13px] mt-0.5">{t("streaksPageSubtitle")}</p>
+        <p className="font-baloo font-black text-ds-text text-lg">{t("streaksPageTitle")}</p>
+        <p className="text-ds-muted text-sml mt-0.5">{t("streaksPageSubtitle")}</p>
       </div>
 
       {/* Shield status */}
@@ -163,7 +163,7 @@ export default function StreaksTab({ activityDates, weekStreak, childId, languag
         <p className="font-black text-ds-text mb-3">{t("activityCalendarTitle")}</p>
         <div className="grid grid-cols-7 gap-1.5 mb-1.5">
           {dayKeys.map((key, i) => (
-            <span key={i} className="text-[10px] font-bold text-ds-muted text-center">{t(key)}</span>
+            <span key={i} className="text-3xs font-bold text-ds-muted text-center">{t(key)}</span>
           ))}
         </div>
         <div className="space-y-1.5">
@@ -183,7 +183,7 @@ export default function StreaksTab({ activityDates, weekStreak, childId, languag
                   } ${day.today ? "ring-2 ring-[var(--ds-brand-primary)] ring-offset-1" : ""}`}
                 >
                   {day.shielded && (
-                    <span className="text-[9px] leading-none">🛡️</span>
+                    <span className="text-4xs leading-none">🛡️</span>
                   )}
                 </div>
               ))}
@@ -193,15 +193,15 @@ export default function StreaksTab({ activityDates, weekStreak, childId, languag
         <div className="flex items-center gap-4 mt-3 justify-center flex-wrap">
           <div className="flex items-center gap-1.5">
             <div className="w-3 h-3 rounded-sm bg-[var(--ds-brand-primary)]" />
-            <span className="text-[10px] text-ds-muted font-semibold">{t("streakKeepItUp")}</span>
+            <span className="text-3xs text-ds-muted font-semibold">{t("streakKeepItUp")}</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded-sm bg-indigo-500/40 flex items-center justify-center text-[7px]">🛡️</div>
-            <span className="text-[10px] text-ds-muted font-semibold">{t("streakShieldedDay")}</span>
+            <div className="w-3 h-3 rounded-sm bg-indigo-500/40 flex items-center justify-center text-6xs">🛡️</div>
+            <span className="text-3xs text-ds-muted font-semibold">{t("streakShieldedDay")}</span>
           </div>
           <div className="flex items-center gap-1.5">
             <div className="w-3 h-3 rounded-sm ring-2 ring-[var(--ds-brand-primary)]" />
-            <span className="text-[10px] text-ds-muted font-semibold">{t("todayLabel")}</span>
+            <span className="text-3xs text-ds-muted font-semibold">{t("todayLabel")}</span>
           </div>
         </div>
       </div>

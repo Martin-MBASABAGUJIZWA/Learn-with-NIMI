@@ -79,34 +79,34 @@ export default function ShareAchievementFlow({ childId, childName, childLanguage
 
       {sharing ? (
         <>
-          <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+          <div className="w-9 h-9 rounded-xl bg-[var(--ds-surface-card)]/20 flex items-center justify-center shrink-0">
             <motion.div
               animate={{ rotate: 360 }}
               transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
               className="w-5 h-5 border-2 border-white/40 border-t-white rounded-full"
             />
           </div>
-          <span className="text-white text-[14px] font-baloo font-bold relative">
+          <span className="text-white text-sm font-baloo font-bold relative">
             {t("sharingLabel")}
           </span>
         </>
       ) : (
         <>
-          <div className="w-9 h-9 rounded-xl bg-white/20 border border-white/25 flex items-center justify-center shrink-0 shadow-sm">
+          <div className="w-9 h-9 rounded-xl bg-[var(--ds-surface-card)]/20 border border-white/25 flex items-center justify-center shrink-0 shadow-sm">
             <Users className="w-4 h-4 text-white" strokeWidth={2.5} />
           </div>
           <div className="flex-1 text-left relative">
-            <span className="text-white text-[14px] font-baloo font-black block leading-snug">
+            <span className="text-white text-sm font-baloo font-black block leading-snug">
               {t("shareToComm")}
             </span>
-            <span className="text-white/65 text-[11px] font-semibold">
+            <span className="text-white/65 text-2xs font-semibold">
               {cfg.emoji} {cfg.label}
             </span>
           </div>
           <motion.div
             animate={{ x: [0, 3, 0] }}
             transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
-            className="text-white/80 text-[18px] relative shrink-0"
+            className="text-white/80 text-lg relative shrink-0"
           >→</motion.div>
         </>
       )}

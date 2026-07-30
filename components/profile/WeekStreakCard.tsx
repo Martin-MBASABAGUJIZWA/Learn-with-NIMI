@@ -45,7 +45,7 @@ export default function WeekStreakCard({ weekStreak, activityDates, usedShieldDa
           const done = weekStreak[i];
           return (
             <div key={i} className="flex flex-col items-center gap-1 flex-1">
-              <span className="text-[10px] font-bold text-ds-muted">{t(key)}</span>
+              <span className="text-3xs font-bold text-ds-muted">{t(key)}</span>
               <motion.div
                 initial={done ? { scale: 0 } : {}}
                 animate={done ? { scale: 1 } : {}}
@@ -64,7 +64,7 @@ export default function WeekStreakCard({ weekStreak, activityDates, usedShieldDa
       </div>
 
       {activeToday && (
-        <p className="text-[var(--ds-brand-primary)] text-[10px] font-bold mt-2">✓ {t("todayLabel")}</p>
+        <p className="text-[var(--ds-brand-primary)] text-3xs font-bold mt-2">✓ {t("todayLabel")}</p>
       )}
     </div>
   );

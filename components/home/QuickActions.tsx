@@ -18,10 +18,10 @@ export default function QuickActions() {
         {ACTIONS.map(({ label, href, emoji }) => (
           <li key={label}>
             <Link href={href} className="flex flex-col items-center gap-2 group">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gray-100 group-hover:bg-gray-200 flex items-center justify-center text-2xl sm:text-3xl transition-colors" style={{ borderRadius: 'var(--leaf-r)' }}>
+              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-[var(--ds-surface-card-hover)] group-hover:bg-[var(--ds-surface-card-active)] flex items-center justify-center text-2xl sm:text-3xl transition-colors" style={{ borderRadius: 'var(--leaf-r)' }}>
                 {emoji}
               </div>
-              <span className="font-nunito font-bold text-gray-600 text-xs sm:text-sm text-center">
+              <span className="font-nunito font-bold text-[var(--ds-text-secondary)] text-xs sm:text-sm text-center">
                 {label}
               </span>
             </Link>

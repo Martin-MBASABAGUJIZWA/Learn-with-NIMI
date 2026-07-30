@@ -39,7 +39,7 @@ export default function ComprehensionQuestion({ question, onAnswered, current, t
     <motion.div
       initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
       transition={SPRING.card}
-      className="leaf-lg border border-violet-200/60 bg-gradient-to-br from-violet-50 via-white to-indigo-50/50 p-5 shadow-[0_16px_34px_rgba(15,23,42,0.08)]"
+      className="leaf-lg border border-violet-200/60 bg-gradient-to-br from-violet-50 via-white to-indigo-50/50 p-5 shadow-card-2xl"
     >
       {/* Header */}
       <div className="flex items-center gap-2 mb-4">
@@ -48,14 +48,14 @@ export default function ComprehensionQuestion({ question, onAnswered, current, t
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <p className="font-nunito font-black text-[10px] uppercase tracking-[0.2em] text-violet-400">{t("comprehensionTitle")}</p>
+            <p className="font-nunito font-black text-3xs uppercase tracking-[0.2em] text-violet-400">{t("comprehensionTitle")}</p>
             {total && total > 1 && (
-              <span className="ml-auto font-nunito font-bold text-[10px] text-violet-300">
+              <span className="ml-auto font-nunito font-bold text-3xs text-violet-300">
                 {current}/{total}
               </span>
             )}
           </div>
-          <p className="font-baloo font-black text-ds-text text-[16px] leading-snug">{question.text}</p>
+          <p className="font-baloo font-black text-ds-text text-base leading-snug">{question.text}</p>
         </div>
       </div>
 
@@ -66,7 +66,7 @@ export default function ComprehensionQuestion({ question, onAnswered, current, t
           const isRight = i === question.correct;
           const showResult = locked;
 
-          let ringClass = "border-gray-200 bg-white hover:border-violet-300 hover:bg-violet-50";
+          let ringClass = "border-[var(--ds-border-primary)] bg-[var(--ds-surface-card)] hover:border-violet-300 hover:bg-violet-50";
           if (showResult && isRight) ringClass = "border-emerald-400 bg-emerald-50";
           else if (showResult && isSelected && !isRight) ringClass = "border-red-300 bg-red-50";
 
@@ -80,16 +80,16 @@ export default function ComprehensionQuestion({ question, onAnswered, current, t
               transition={{ duration: 0.3 }}
               className={`w-full flex items-center gap-3 rounded-2xl border-2 px-4 py-3 text-left transition-all ${ringClass} disabled:cursor-default`}
             >
-              <span className={`w-7 h-7 rounded-full flex items-center justify-center font-black text-[12px] flex-shrink-0 ${
+              <span className={`w-7 h-7 rounded-full flex items-center justify-center font-black text-xs flex-shrink-0 ${
                 showResult && isRight ? "bg-emerald-400 text-white" :
                 showResult && isSelected ? "bg-red-400 text-white" :
-                "bg-gray-100 text-gray-500"
+                "bg-[var(--ds-surface-card-hover)] text-[var(--ds-text-secondary)]"
               }`}>
                 {showResult && isRight ? <Check className="w-4 h-4" /> :
                  showResult && isSelected ? <X className="w-4 h-4" /> :
                  String.fromCharCode(65 + i)}
               </span>
-              <span className="font-nunito font-bold text-[14px] text-ds-text">{opt}</span>
+              <span className="font-nunito font-bold text-sm text-ds-text">{opt}</span>
             </motion.button>
           );
         })}
@@ -100,7 +100,7 @@ export default function ComprehensionQuestion({ question, onAnswered, current, t
         {locked && (
           <motion.p
             initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-            className={`mt-3 font-baloo font-black text-[15px] text-center ${isCorrect ? "text-emerald-600" : "text-rose-500"}`}
+            className={`mt-3 font-baloo font-black text-mbase text-center ${isCorrect ? "text-emerald-600" : "text-rose-500"}`}
           >
             {isCorrect ? t("comprehensionCorrect") : t("comprehensionTryAgain")}
           </motion.p>

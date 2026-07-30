@@ -20,7 +20,7 @@ const SKILL_GROUPS: {
 ];
 
 const LEVEL_META = {
-  notStarted: { key: "levelNotStarted", bg: "bg-gray-100", text: "text-gray-500",     ring: "ring-gray-200" },
+  notStarted: { key: "levelNotStarted", bg: "bg-[var(--ds-surface-card-hover)]", text: "text-[var(--ds-text-secondary)]",     ring: "ring-gray-200" },
   beginner:   { key: "levelBeginner",   bg: "bg-blue-50",  text: "text-blue-600",     ring: "ring-blue-200" },
   growing:    { key: "levelGrowing",    bg: "bg-amber-50", text: "text-amber-600",    ring: "ring-amber-200" },
   mastered:   { key: "levelMastered",   bg: "bg-emerald-50",text: "text-emerald-700", ring: "ring-emerald-300" },
@@ -50,11 +50,11 @@ export default function SkillsTab({ categoryProgress }: Props) {
     <div className="space-y-4 mt-4">
       <div className="flex items-start justify-between">
         <div>
-          <p className="font-baloo font-black text-ds-text text-[18px]">{t("skillsPageTitle")}</p>
-          <p className="text-ds-muted text-[13px] mt-0.5">{t("skillsPageSubtitle")}</p>
+          <p className="font-baloo font-black text-ds-text text-lg">{t("skillsPageTitle")}</p>
+          <p className="text-ds-muted text-sml mt-0.5">{t("skillsPageSubtitle")}</p>
         </div>
         {masteredCount > 0 && (
-          <span className="text-[11px] font-black text-[var(--ds-brand-primary)] bg-[var(--ds-brand-soft)] border border-[var(--ds-border-brand)]/40 px-2.5 py-1 rounded-full shrink-0 mt-1">
+          <span className="text-2xs font-black text-[var(--ds-brand-primary)] bg-[var(--ds-brand-soft)] border border-[var(--ds-border-brand)]/40 px-2.5 py-1 rounded-full shrink-0 mt-1">
             👑 {t("skillsMasteredCount").replace("{count}", String(masteredCount))}
           </span>
         )}
@@ -87,14 +87,14 @@ export default function SkillsTab({ categoryProgress }: Props) {
                   {group.icon}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-baloo font-black text-ds-text text-[14px]">{t(group.titleKey)}</p>
-                  <p className="text-ds-muted text-[11px]">
+                  <p className="font-baloo font-black text-ds-text text-sm">{t(group.titleKey)}</p>
+                  <p className="text-ds-muted text-2xs">
                     {total > 0
                       ? `${completed}/${total} ${t("skillsActivitiesLabel")}`
                       : t("notStartedYet")}
                   </p>
                 </div>
-                <span className={`flex items-center gap-1 text-[10px] font-black px-2.5 py-1 rounded-full ring-1 ${level.bg} ${level.text} ${level.ring} shrink-0`}>
+                <span className={`flex items-center gap-1 text-3xs font-black px-2.5 py-1 rounded-full ring-1 ${level.bg} ${level.text} ${level.ring} shrink-0`}>
                   {levelEmoji} {t(level.key)}
                 </span>
               </div>
@@ -112,7 +112,7 @@ export default function SkillsTab({ categoryProgress }: Props) {
 
               {/* Pct label */}
               <div className="flex justify-end mt-1.5">
-                <span className="text-[11px] font-black text-ds-muted tabular-nums">{pct}%</span>
+                <span className="text-2xs font-black text-ds-muted tabular-nums">{pct}%</span>
               </div>
             </motion.div>
           );

@@ -16,7 +16,7 @@ export default function MissionCard({ mission, completed, onComplete }: MissionC
 
   return (
     <Card
-      className={`transition duration-300 bg-white border border-ds-border shadow-ds-card overflow-hidden hover:shadow-lg ${
+      className={`transition duration-300 bg-[var(--ds-surface-card)] border border-ds-border shadow-ds-card overflow-hidden hover:shadow-lg ${
         completed ? "ring-1 ring-green-200" : "hover:scale-105"
       }`}
       style={{ borderRadius: 'var(--leaf-r)' }}
@@ -32,18 +32,18 @@ export default function MissionCard({ mission, completed, onComplete }: MissionC
               )}
             </div>
             <div>
-              <CardTitle className="text-2xl text-gray-800 mb-2">{mission.title}</CardTitle>
+              <CardTitle className="text-2xl text-[var(--ds-text-primary)] mb-2">{mission.title}</CardTitle>
               <div className="flex items-center space-x-4">
                 <Badge className="bg-[var(--ds-brand-subtle)] text-[var(--ds-brand-primary)] px-3 py-1">
                   ⏰ {mission.time}
                 </Badge>
-                <Badge variant="outline" className="border-ds-border text-gray-500 px-3 py-1">
+                <Badge variant="outline" className="border-ds-border text-[var(--ds-text-secondary)] px-3 py-1">
                   🎯 {mission.type}
                 </Badge>
               </div>
             </div>
           </div>
-          <div className="text-right text-lg font-semibold text-gray-700">
+          <div className="text-right text-lg font-semibold text-[var(--ds-text-primary)]">
             <div className="flex items-center bg-blue-100 px-3 py-1 rounded-full mb-2">
               <Clock className="w-5 h-5 mr-2 text-blue-600" />
               {mission.duration}
@@ -57,12 +57,12 @@ export default function MissionCard({ mission, completed, onComplete }: MissionC
       </CardHeader>
       <CardContent className="pt-0">
         <div className="mb-4">
-          <p className="text-gray-800 mb-2">🎯 <strong>Objectives:</strong> {mission.objectives.join(", ")}</p>
-          <p className="text-gray-800 mb-2">📝 <strong>Activity:</strong> {mission.activity}</p>
-          <p className="text-gray-800 mb-2">🏆 <strong>Piko Victory:</strong> {mission.pikoVictory}</p>
-          <p className="text-gray-800 mb-2">🧰 <strong>Materials:</strong> {mission.materials.join(", ")}</p>
+          <p className="text-[var(--ds-text-primary)] mb-2">🎯 <strong>Objectives:</strong> {mission.objectives.join(", ")}</p>
+          <p className="text-[var(--ds-text-primary)] mb-2">📝 <strong>Activity:</strong> {mission.activity}</p>
+          <p className="text-[var(--ds-text-primary)] mb-2">🏆 <strong>Piko Victory:</strong> {mission.pikoVictory}</p>
+          <p className="text-[var(--ds-text-primary)] mb-2">🧰 <strong>Materials:</strong> {mission.materials.join(", ")}</p>
           {mission.funFact && (
-            <p className="text-gray-500 italic mt-2">💡 Fun Fact: {mission.funFact}</p>
+            <p className="text-[var(--ds-text-secondary)] italic mt-2">💡 Fun Fact: {mission.funFact}</p>
           )}
         </div>
 

@@ -20,12 +20,12 @@ export default function GlobalError({
             justifyContent: "center",
             padding: "1.5rem",
             textAlign: "center",
-            background: "#F9FAFB",
+            background: "var(--ds-surface-card)",
           }}
         >
           <div
             style={{
-              background: "#fff",
+              background: "var(--ds-surface-card)",
               borderRadius: "1.5rem",
               boxShadow: "0 8px 32px rgba(0,0,0,0.08)",
               padding: "2.5rem 2rem",
@@ -34,10 +34,10 @@ export default function GlobalError({
             }}
           >
             <p style={{ fontSize: "3.5rem", marginBottom: "0.75rem" }}>🌿</p>
-            <h1 style={{ fontSize: "1.2rem", fontWeight: 800, color: "#111827", marginBottom: "0.5rem" }}>
+            <h1 style={{ fontSize: "1.2rem", fontWeight: 800, color: "var(--ds-text-primary)", marginBottom: "0.5rem" }}>
               Something went wrong
             </h1>
-            <p style={{ fontSize: "0.875rem", color: "#6B7280", marginBottom: "1.75rem", lineHeight: 1.6 }}>
+            <p style={{ fontSize: "0.875rem", color: "var(--ds-text-secondary)", marginBottom: "1.75rem", lineHeight: 1.6 }}>
               Nimi bumped into a jungle vine! Don&apos;t worry — your progress is safe.
             </p>
             <div style={{ display: "flex", gap: "0.75rem", justifyContent: "center", flexWrap: "wrap" }}>
@@ -60,7 +60,7 @@ export default function GlobalError({
                 href="/"
                 style={{
                   background: "#F3F4F6",
-                  color: "#374151",
+                  color: "var(--ds-text-primary)",
                   fontWeight: 700,
                   fontSize: "0.875rem",
                   borderRadius: "0.875rem",

@@ -289,7 +289,7 @@ export default function CertificateRenderer({
                   <CheckCircle />
                   <span style={{
                     fontFamily: "var(--font-baloo), 'Baloo 2', cursive",
-                    fontWeight: 700, fontSize: 13, color: "#1F2937", flex: 1,
+                    fontWeight: 700, fontSize: 13, color: "var(--ds-text-primary)", flex: 1,
                   }}>
                     {m.name}
                   </span>
@@ -373,13 +373,13 @@ export default function CertificateRenderer({
           }}>
             <div style={{
               fontFamily: "var(--font-nunito), 'Nunito', sans-serif",
-              fontWeight: 600, fontSize: 12, color: "#6B7280",
+              fontWeight: 600, fontSize: 12, color: "var(--ds-text-secondary)",
             }}>
               {copy.awardedTo}
             </div>
             <div style={{
               fontFamily: "var(--font-baloo), 'Baloo 2', cursive",
-              fontWeight: 900, fontSize: 20, color: "#1F2937",
+              fontWeight: 900, fontSize: 20, color: "var(--ds-text-primary)",
               letterSpacing: "0.05em",
               borderBottom: "2px dashed #D4A832", paddingBottom: 3,
               minWidth: 150, textAlign: "center",
@@ -388,7 +388,7 @@ export default function CertificateRenderer({
             </div>
             <div style={{
               fontFamily: "var(--font-nunito), 'Nunito', sans-serif",
-              fontWeight: 600, fontSize: 11, color: "#9CA3AF",
+              fontWeight: 600, fontSize: 11, color: "var(--ds-text-tertiary)",
               display: "flex", alignItems: "center", gap: 5, marginTop: 1,
             }}>
               <span>—</span><span>🌱</span>

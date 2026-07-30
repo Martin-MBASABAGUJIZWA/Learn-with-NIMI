@@ -12,7 +12,7 @@ interface SectionProps {
 }
 
 const BACKGROUND: Record<Background, string> = {
-  white: "bg-white",
+  white: "bg-[var(--ds-surface-card)]",
   cream: "bg-amber-50",
   transparent: "bg-transparent",
 };

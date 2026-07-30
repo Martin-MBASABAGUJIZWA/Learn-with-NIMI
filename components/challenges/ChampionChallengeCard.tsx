@@ -56,15 +56,15 @@ export default function ChampionChallengeCard({
   };
 
   return (
-    <div className="relative overflow-hidden border border-[var(--ds-border-primary)]/60 bg-gradient-to-br from-white via-[var(--ds-brand-soft)]/40 to-white shadow-[0_16px_34px_rgba(15,23,42,0.08)] leaf h-full">
+    <div className="relative overflow-hidden border border-[var(--ds-border-primary)]/60 bg-gradient-to-br from-white via-[var(--ds-brand-soft)]/40 to-white shadow-card-2xl leaf h-full">
       <div className="absolute inset-x-4 top-4 h-1 rounded-full bg-gradient-to-r from-[var(--ds-brand-primary)]/80 via-[var(--ds-brand-hover)]/70 to-transparent" />
       <div className="px-5 pt-4 pb-0">
         <div className="mb-2 flex items-center justify-start">
-          <div className="rounded-full border border-[var(--ds-border-brand)]/20 bg-white/80 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.24em] text-[var(--ds-brand-primary)] shadow-sm">
+          <div className="rounded-full border border-[var(--ds-border-brand)]/20 bg-[var(--ds-surface-card)]/80 px-2.5 py-1 text-3xs font-black uppercase tracking-[0.24em] text-[var(--ds-brand-primary)] shadow-sm">
             Kindness mission
           </div>
         </div>
-        <p className="font-baloo font-black text-ds-text text-[20px] sm:text-[24px] uppercase tracking-wider">
+        <p className="font-baloo font-black text-ds-text text-xl sm:text-2xl uppercase tracking-wider">
           {t("weeklyChallenge")} 🌿
         </p>
       </div>
@@ -82,18 +82,18 @@ export default function ChampionChallengeCard({
               <Image src={imgUrl} alt={title} fill className="object-cover" />
               {vidUrl && (
                 <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                  <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center shadow-lg">
-                    <Play size={22} className="text-gray-500 ml-0.5" />
+                  <div className="w-12 h-12 rounded-full bg-[var(--ds-surface-card)]/90 flex items-center justify-center shadow-lg">
+                    <Play size={22} className="text-[var(--ds-text-secondary)] ml-0.5" />
                   </div>
                 </div>
               )}
             </div>
           ) : vidUrl ? (
             <button onClick={() => setShowVideo(true)}
-              className="w-full bg-gray-50 border border-ds-border py-6 flex flex-col items-center gap-2 hover:bg-gray-100 transition"
+              className="w-full bg-[var(--ds-surface-card)] border border-ds-border py-6 flex flex-col items-center gap-2 hover:bg-[var(--ds-surface-card-hover)] transition"
               style={{ borderRadius: 'var(--leaf-r)' }}>
-              <Play size={28} className="text-gray-500" />
-              <span className="text-ds-text text-[13px] font-bold">{t("readyToWatch")}</span>
+              <Play size={28} className="text-[var(--ds-text-secondary)]" />
+              <span className="text-ds-text text-sml font-bold">{t("readyToWatch")}</span>
             </button>
           ) : null}
         </div>
@@ -103,14 +103,14 @@ export default function ChampionChallengeCard({
         {/* Trophy — hide when visual example shown */}
         {!imgUrl && !vidUrl && (
           <motion.div animate={m.floatSoft.animate} transition={m.floatSoft.transition}
-            className="shrink-0 text-[72px] sm:text-[88px] leading-none drop-shadow-lg select-none">
+            className="shrink-0 text-7xl sm:text-7.5xl leading-none drop-shadow-lg select-none">
             🏆
           </motion.div>
         )}
 
         <div className="flex-1 min-w-0">
           <div className="flex items-start gap-2">
-            <h3 className="font-baloo font-black text-ds-text text-[22px] sm:text-[26px] leading-tight flex-1">{title}</h3>
+            <h3 className="font-baloo font-black text-ds-text text-1.5xl sm:text-2.5xl leading-tight flex-1">{title}</h3>
             {audUrl && (
               <button onClick={playAudio}
                 className="shrink-0 mt-1 w-9 h-9 rounded-full bg-pink-500/20 border border-pink-400/30 flex items-center justify-center hover:bg-pink-500/30 transition">
@@ -118,17 +118,17 @@ export default function ChampionChallengeCard({
               </button>
             )}
           </div>
-          <p className="font-nunito text-ds-text text-[14px] sm:text-[16px] mt-1.5 leading-relaxed">{description}</p>
+          <p className="font-nunito text-ds-text text-sm sm:text-base mt-1.5 leading-relaxed">{description}</p>
 
           <div className="flex items-center gap-2 mt-2.5 flex-wrap">
-            <span className="flex items-center gap-1 rounded-full border border-yellow-200 bg-yellow-50 px-2.5 py-1 text-[12px] font-black text-yellow-600 shadow-sm">
+            <span className="flex items-center gap-1 rounded-full border border-yellow-200 bg-yellow-50 px-2.5 py-1 text-xs font-black text-yellow-600 shadow-sm">
               <Star className="w-3.5 h-3.5 fill-yellow-400" /> +{stars}
             </span>
-            <span className="rounded-full border border-[var(--ds-border-brand)]/20 bg-white/80 px-2.5 py-1 text-[10px] font-bold text-ds-text shadow-sm">
+            <span className="rounded-full border border-[var(--ds-border-brand)]/20 bg-[var(--ds-surface-card)]/80 px-2.5 py-1 text-3xs font-bold text-ds-text shadow-sm">
               🏅 {reward}
             </span>
             {difficulty && (
-              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+              <span className={`text-3xs font-bold px-2 py-0.5 rounded-full ${
                 difficulty === 'easy' ? 'bg-green-100 text-green-700 border border-green-200' :
                 difficulty === 'medium' ? 'bg-amber-100 text-amber-700 border border-amber-200' :
                 'bg-red-100 text-red-700 border border-red-200'
@@ -139,12 +139,12 @@ export default function ChampionChallengeCard({
           </div>
 
           {completed ? (
-            <div className="mt-4 inline-flex items-center gap-2 text-white font-black px-6 py-3 text-[15px] shadow-lg" style={{ backgroundColor: 'var(--nimi-green)', borderRadius: 'var(--leaf-r)' }}>
+            <div className="mt-4 inline-flex items-center gap-2 text-white font-black px-6 py-3 text-mbase shadow-lg" style={{ backgroundColor: 'var(--nimi-green)', borderRadius: 'var(--leaf-r)' }}>
               ✅ {t("iDidItBtn")}
             </div>
           ) : (
             <motion.button onClick={onDidIt} whileHover={m.buttonHover} whileTap={m.dangerPress}
-              className="mt-4 inline-flex items-center gap-2.5 bg-gradient-to-r from-[var(--ds-brand-primary)] to-[var(--ds-brand-hover)] text-white font-baloo font-black leaf px-7 py-3.5 text-[20px] sm:text-[22px] shadow-[0_8px_24px_rgba(22,163,74,0.25)] transition-shadow">
+              className="mt-4 inline-flex items-center gap-2.5 bg-gradient-to-r from-[var(--ds-brand-primary)] to-[var(--ds-brand-hover)] text-white font-baloo font-black leaf px-7 py-3.5 text-xl sm:text-1.5xl shadow-[0_8px_24px_rgba(22,163,74,0.25)] transition-shadow">
               <CheckSquare className="w-5 h-5" />
               {t("iDidItBtn")}
             </motion.button>

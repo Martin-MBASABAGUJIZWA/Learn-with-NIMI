@@ -41,7 +41,7 @@ export default function DashboardHero({ childName, themeTitle, themeEmoji, level
   const m = useMotion();
 
   return (
-    <div className="relative bg-white border border-ds-border shadow-ds-card p-4 sm:p-6 overflow-hidden" style={{ borderRadius: 'var(--leaf-r-lg)' }}>
+    <div className="relative bg-[var(--ds-surface-card)] border border-ds-border shadow-ds-card p-4 sm:p-6 overflow-hidden" style={{ borderRadius: 'var(--leaf-r-lg)' }}>
       {/* Layer 0 — theme card overlay (inset glow + shimmer) */}
       <DecorativeOverlay effects={effects} overlayZ={0} />
 
@@ -49,7 +49,7 @@ export default function DashboardHero({ childName, themeTitle, themeEmoji, level
       {level !== undefined && (
         <div className="relative z-10 flex justify-end mb-2">
           <span
-            className="text-white font-black text-[10px] sm:text-xs uppercase tracking-wider rounded-full px-3 py-1 shadow"
+            className="text-white font-black text-3xs sm:text-xs uppercase tracking-wider rounded-full px-3 py-1 shadow"
             style={{ backgroundColor: "var(--ds-brand-primary)" }}
           >
             {t("levelAdventureTitle").replace("{level}", String(level))}
@@ -95,7 +95,7 @@ export default function DashboardHero({ childName, themeTitle, themeEmoji, level
           <h1 className="font-black text-ds-text text-xl sm:text-3xl leading-tight">
             {t(greetingKey()).replace("{name}", childName)}
           </h1>
-          <p className="text-gray-500 text-xs sm:text-sm font-bold mt-1">
+          <p className="text-[var(--ds-text-secondary)] text-xs sm:text-sm font-bold mt-1">
             {t("dashboardSubtitle")}
           </p>
         </div>
@@ -119,7 +119,7 @@ export default function DashboardHero({ childName, themeTitle, themeEmoji, level
           background: "linear-gradient(135deg, var(--ds-brand-primary) 0%, var(--ds-brand-hover) 100%)",
           clipPath: "polygon(2.5% 0%, 97.5% 0%, 100% 50%, 97.5% 100%, 2.5% 100%, 0% 50%)",
         }}>
-        <p className="text-white font-black text-[11px] sm:text-xs uppercase tracking-widest">
+        <p className="text-white font-black text-2xs sm:text-xs uppercase tracking-widest">
           {t("todaysAdventure")}
         </p>
         <p className="text-yellow-300 font-bold text-sm sm:text-base mt-1">

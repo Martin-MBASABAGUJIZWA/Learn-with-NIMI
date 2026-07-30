@@ -23,8 +23,8 @@ export default function RecentBadgesCard({ stepsCompleted }: Props) {
   return (
     <div className="bg-ds-card border border-ds-border shadow-ds-card p-5" style={{ borderRadius: 'var(--leaf-r)' }}>
       <div className="flex items-center justify-between mb-1">
-        <h2 className="font-baloo font-black text-ds-text text-[16px]">🎖️ {t("recentBadgesTitle")}</h2>
-        <span className="text-[11px] font-bold text-ds-muted">{earnedCount} / {total}</span>
+        <h2 className="font-baloo font-black text-ds-text text-base">🎖️ {t("recentBadgesTitle")}</h2>
+        <span className="text-2xs font-bold text-ds-muted">{earnedCount} / {total}</span>
       </div>
 
       {/* Progress strip */}
@@ -53,14 +53,14 @@ export default function RecentBadgesCard({ stepsCompleted }: Props) {
               <div className={`relative w-14 h-14 rounded-full flex items-center justify-center text-2xl ring-2 transition-all ${
                 isEarned
                   ? `${activity.numBg} ring-amber-300 shadow-[0_4px_14px_rgba(251,191,36,0.35)]`
-                  : "bg-gray-100 ring-gray-200 opacity-40 grayscale"
+                  : "bg-[var(--ds-surface-card-hover)] ring-gray-200 opacity-40 grayscale"
               }`}>
                 {activity.emoji}
                 {isEarned && (
-                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-amber-400 rounded-full flex items-center justify-center shadow-sm text-[7px] text-white font-black">✓</span>
+                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-amber-400 rounded-full flex items-center justify-center shadow-sm text-6xs text-white font-black">✓</span>
                 )}
               </div>
-              <p className={`font-nunito font-bold text-[10px] leading-tight max-w-[64px] ${isEarned ? "text-ds-text" : "text-ds-muted"}`}>
+              <p className={`font-nunito font-bold text-3xs leading-tight max-w-[64px] ${isEarned ? "text-ds-text" : "text-ds-muted"}`}>
                 {label}
               </p>
             </motion.div>
@@ -69,7 +69,7 @@ export default function RecentBadgesCard({ stepsCompleted }: Props) {
       </div>
 
       {earnedCount === 0 && (
-        <p className="text-center text-ds-muted text-[12px] mt-3">{t("noBadgesYet")}</p>
+        <p className="text-center text-ds-muted text-xs mt-3">{t("noBadgesYet")}</p>
       )}
     </div>
   );

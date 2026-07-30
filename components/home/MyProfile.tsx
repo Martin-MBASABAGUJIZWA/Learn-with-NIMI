@@ -13,8 +13,8 @@ interface Props {
 
 export default function MyProfile({ childName, avatar, categoriesMastered }: Props) {
   return (
-    <div className="bg-white border border-ds-border shadow-ds-card p-4 text-center flex flex-col h-full" style={{ borderRadius: 'var(--leaf-r)' }}>
-      <h3 className="font-black text-ds-text text-[12px] uppercase mb-3 tracking-widest">MY PROFILE</h3>
+    <div className="bg-[var(--ds-surface-card)] border border-ds-border shadow-ds-card p-4 text-center flex flex-col h-full" style={{ borderRadius: 'var(--leaf-r)' }}>
+      <h3 className="font-black text-ds-text text-xs uppercase mb-3 tracking-widest">MY PROFILE</h3>
       <div className="relative inline-block mb-2 mx-auto">
         {avatar && !avatar.startsWith("http") ? (
           <div className="w-20 h-20 rounded-full border-4 border-yellow-300 shadow-lg bg-[var(--ds-brand-subtle)] flex items-center justify-center text-4xl select-none">
@@ -29,23 +29,23 @@ export default function MyProfile({ childName, avatar, categoriesMastered }: Pro
       </div>
       <div className="flex items-center justify-center gap-1 mt-1 mb-0.5">
         <p className="font-black text-ds-text text-sm uppercase tracking-wide">{childName}</p>
-        <Edit className="w-3.5 h-3.5 text-gray-500" />
+        <Edit className="w-3.5 h-3.5 text-[var(--ds-text-secondary)]" />
       </div>
-      <p className="text-[11px] font-bold text-yellow-500 mb-3">⭐ SUPER STAR ★</p>
+      <p className="text-2xs font-bold text-yellow-500 mb-3">⭐ SUPER STAR ★</p>
       <div className="text-left mb-3">
-        <p className="text-[10px] text-gray-500 font-semibold mb-1">Categories Mastered</p>
-        <div className="w-full bg-gray-100 rounded-full h-2.5 mb-1 overflow-hidden">
+        <p className="text-3xs text-[var(--ds-text-secondary)] font-semibold mb-1">Categories Mastered</p>
+        <div className="w-full bg-[var(--ds-surface-card-active)] rounded-full h-2.5 mb-1 overflow-hidden">
           <motion.div
             className="h-full rounded-full" style={{ backgroundColor: 'var(--nimi-green)' }}
             initial={{ width: 0 }}
             animate={{ width: `${(categoriesMastered / 8) * 100}%` }}
             transition={{ duration: 1, ease: "easeOut" }} />
         </div>
-        <p className="text-[10px] text-gray-500 text-right">{categoriesMastered}/8</p>
+        <p className="text-3xs text-[var(--ds-text-secondary)] text-right">{categoriesMastered}/8</p>
       </div>
       <div className="mt-auto">
         <Link href="/user-profile">
-          <Button className="w-full text-white text-[10px] font-black h-8 tracking-wide" style={{ backgroundColor: 'var(--nimi-green)', borderRadius: 'var(--leaf-r-sm)' }}>
+          <Button className="w-full text-white text-3xs font-black h-8 tracking-wide" style={{ backgroundColor: 'var(--nimi-green)', borderRadius: 'var(--leaf-r-sm)' }}>
             VIEW MY ACHIEVEMENTS
           </Button>
         </Link>

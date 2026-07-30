@@ -84,16 +84,16 @@ function CertificateModal({
         exit={{ scale: 0.9, opacity: 0, y: 12 }}
         transition={{ type: "spring", stiffness: 280, damping: 22 }}
         onClick={e => e.stopPropagation()}
-        className="relative w-full max-w-sm bg-white rounded-3xl overflow-hidden shadow-[0_32px_80px_rgba(0,0,0,0.4)] border-[3px] border-amber-300"
+        className="relative w-full max-w-sm bg-[var(--ds-surface-card)] leaf-lg overflow-hidden shadow-[0_32px_80px_rgba(0,0,0,0.4)] border-[3px] border-amber-300"
       >
         {/* Gold header bar */}
         <div className="bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 px-5 py-3 flex items-center justify-between">
-          <p className="font-baloo font-black text-amber-900 text-[15px] tracking-wide">
+          <p className="font-baloo font-black text-amber-900 text-mbase tracking-wide">
             🎓 Story Certificate
           </p>
           <button
             onClick={onClose}
-            className="w-7 h-7 rounded-full bg-amber-900/15 hover:bg-amber-900/30 flex items-center justify-center transition text-amber-900 font-black text-[16px] leading-none"
+            className="w-7 h-7 rounded-full bg-amber-900/15 hover:bg-amber-900/30 flex items-center justify-center transition text-amber-900 font-black text-base leading-none"
           >
             ×
           </button>
@@ -116,13 +116,13 @@ function CertificateModal({
             <div className="w-full aspect-[3/4] rounded-2xl flex flex-col items-center justify-center gap-4 bg-gradient-to-b from-amber-50 to-yellow-100 border-2 border-amber-200 px-6">
               <span className="text-7xl">🏆</span>
               <div className="text-center">
-                <p className="font-baloo font-black text-amber-800 text-[22px] leading-tight">
+                <p className="font-baloo font-black text-amber-800 text-1.5xl leading-tight">
                   {childName}
                 </p>
-                <p className="font-nunito text-amber-600 text-[13px] mt-1 font-semibold">
+                <p className="font-nunito text-amber-600 text-sml mt-1 font-semibold">
                   has mastered
                 </p>
-                <p className="font-baloo font-black text-amber-800 text-[17px] mt-0.5 leading-snug">
+                <p className="font-baloo font-black text-amber-800 text-mlg mt-0.5 leading-snug">
                   {storyTitle}
                 </p>
               </div>
@@ -134,7 +134,7 @@ function CertificateModal({
         </div>
 
         {/* Actions */}
-        <div className="bg-white px-4 py-3 flex gap-2 border-t border-amber-100">
+        <div className="bg-[var(--ds-surface-card)] px-4 py-3 flex gap-2 border-t border-amber-100">
           <button
             onClick={() => {
               if (!dataUrl) return;
@@ -149,13 +149,13 @@ function CertificateModal({
               win.document.close();
             }}
             disabled={!dataUrl}
-            className="flex-1 flex items-center justify-center gap-2 bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-800 font-baloo font-black text-[14px] py-2.5 rounded-2xl transition disabled:opacity-40"
+            className="flex-1 flex items-center justify-center gap-2 bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-800 font-baloo font-black text-sm py-2.5 rounded-2xl transition disabled:opacity-40"
           >
             🖨️ Print
           </button>
           <button
             onClick={onClose}
-            className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-[var(--nimi-green)] to-[var(--ds-brand-hover)] text-white font-baloo font-black text-[14px] py-2.5 rounded-2xl shadow-sm transition"
+            className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-[var(--nimi-green)] to-[var(--ds-brand-hover)] text-white font-baloo font-black text-sm py-2.5 rounded-2xl shadow-sm transition"
           >
             ✅ Done
           </button>
@@ -550,10 +550,10 @@ export default function StoryDetailPage() {
               </div>
             </motion.div>
             <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-              <h1 className="font-baloo font-black text-ds-text text-[28px] leading-tight mb-2">
+              <h1 className="font-baloo font-black text-ds-text text-3.5xl leading-tight mb-2">
                 {t("premiumStoryTitle")}
               </h1>
-              <p className="font-nunito text-gray-500 text-[15px] leading-relaxed mb-8 max-w-xs mx-auto">
+              <p className="font-nunito text-[var(--ds-text-secondary)] text-mbase leading-relaxed mb-8 max-w-xs mx-auto">
                 {t("premiumStoryDesc")}
               </p>
               <div className="space-y-3">
@@ -561,7 +561,7 @@ export default function StoryDetailPage() {
                   <motion.button
                     whileTap={{ scale: 0.96 }} whileHover={{ scale: 1.02 }}
                     onClick={() => setShowPricingModal(true)}
-                    className="w-full font-baloo font-black text-white text-[17px] bg-gradient-to-r from-violet-500 to-purple-600 rounded-2xl px-6 py-4 shadow-lg shadow-purple-400/25"
+                    className="w-full font-baloo font-black text-white text-mlg bg-gradient-to-r from-violet-500 to-purple-600 rounded-2xl px-6 py-4 shadow-lg shadow-purple-400/25"
                   >
                     🔓 {t("unlockWithClub")}
                   </motion.button>
@@ -569,14 +569,14 @@ export default function StoryDetailPage() {
                   <Link href="/parents">
                     <motion.button
                       whileTap={{ scale: 0.96 }} whileHover={{ scale: 1.02 }}
-                      className="w-full font-baloo font-black text-white text-[17px] bg-gradient-to-r from-violet-500 to-purple-600 rounded-2xl px-6 py-4 shadow-lg shadow-purple-400/25"
+                      className="w-full font-baloo font-black text-white text-mlg bg-gradient-to-r from-violet-500 to-purple-600 rounded-2xl px-6 py-4 shadow-lg shadow-purple-400/25"
                     >
                       🔓 {t("unlockWithClub")}
                     </motion.button>
                   </Link>
                 )}
                 <button onClick={() => router.back()}
-                  className="w-full font-baloo font-black text-gray-400 text-[15px] py-2">
+                  className="w-full font-baloo font-black text-[var(--ds-text-tertiary)] text-mbase py-2">
                   ← {t("goBack")}
                 </button>
               </div>
@@ -641,7 +641,7 @@ export default function StoryDetailPage() {
 
                 {/* Welcome content */}
                 <div className="flex-1 flex flex-col items-center px-6 -mt-10 relative z-10">
-                  <div className="w-full max-w-md leaf-lg border border-white/30 bg-white/95 px-5 py-6 shadow-[0_20px_48px_rgba(15,23,42,0.14)] backdrop-blur">
+                  <div className="w-full max-w-md leaf-lg border border-white/30 bg-[var(--ds-surface-card)]/95 px-5 py-6 shadow-[0_20px_48px_rgba(15,23,42,0.14)] backdrop-blur">
                     {/* Nimi — the Library guide */}
                     <div className="flex items-end justify-center mb-4">
                       <motion.img src={assets.nimiCircle} alt="Nimi" animate={{ y: [0, -8, 0] }}
@@ -650,30 +650,30 @@ export default function StoryDetailPage() {
                     </div>
 
                     <div className="flex items-center justify-center mb-3">
-                      <span className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-[11px] font-black uppercase tracking-[0.24em] text-emerald-700">
+                      <span className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-2xs font-black uppercase tracking-[0.24em] text-emerald-700">
                         Story guide
                       </span>
                     </div>
 
-                    <h1 className="font-baloo font-black text-[28px] text-ds-text text-center leading-tight">
+                    <h1 className="font-baloo font-black text-3.5xl text-ds-text text-center leading-tight">
                       {storyTitle}
                     </h1>
 
-                    <motion.p className="text-gray-500 text-[15px] font-nunito text-center mt-3"
+                    <motion.p className="text-[var(--ds-text-secondary)] text-mbase font-nunito text-center mt-3"
                       initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: DURATION.base }}>
                       {childName}, your story is waiting!<br />
-                      <span className="text-gray-600 text-[13px]">Nimi will guide you through each little adventure.</span>
+                      <span className="text-[var(--ds-text-secondary)] text-sml">Nimi will guide you through each little adventure.</span>
                     </motion.p>
 
                     {/* Progress stars */}
                     <div className="flex items-center justify-center gap-1 mt-5">
                       {Array.from({ length: totalCount }).map((_, i) => (
                         <motion.div key={i} initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: DURATION.moderate + i * DURATION.fast, ...SPRING.card }}>
-                          <Star className={`w-6 h-6 ${i < doneCount ? "text-yellow-400 fill-yellow-400" : "text-gray-300 fill-gray-200"}`} />
+                          <Star className={`w-6 h-6 ${i < doneCount ? "text-yellow-400 fill-yellow-400" : "text-[var(--ds-text-tertiary)] fill-gray-200"}`} />
                         </motion.div>
                       ))}
                     </div>
-                    <p className="text-gray-500 text-[12px] font-bold mt-1 text-center">{doneCount} / 6 Missions Completed</p>
+                    <p className="text-[var(--ds-text-secondary)] text-xs font-bold mt-1 text-center">{doneCount} / 6 Missions Completed</p>
 
                     {/* Streak badge */}
                     {streak > 0 && (
@@ -683,7 +683,7 @@ export default function StoryDetailPage() {
                         className="mt-3 flex items-center justify-center gap-2 bg-orange-50 border border-orange-200 rounded-full px-5 py-2"
                       >
                         <motion.span animate={{ scale: [1, 1.3, 1] }} transition={{ duration: 1.2, repeat: Infinity }}>🔥</motion.span>
-                        <span className="font-baloo font-black text-orange-600 text-[15px]">{streak} {t("streakDays")}</span>
+                        <span className="font-baloo font-black text-orange-600 text-mbase">{streak} {t("streakDays")}</span>
                       </motion.div>
                     )}
 
@@ -698,14 +698,14 @@ export default function StoryDetailPage() {
                           className="flex items-center justify-center gap-2 bg-gradient-to-r from-yellow-50 to-amber-50 border border-yellow-300 rounded-full px-5 py-2"
                         >
                           <motion.span animate={{ rotate: [0, 15, -15, 0] }} transition={{ duration: 2, repeat: Infinity }}>🏆</motion.span>
-                          <span className="font-baloo font-black text-amber-700 text-[14px]">{t("masteredLabel")} — {storyTitle}</span>
+                          <span className="font-baloo font-black text-amber-700 text-sm">{t("masteredLabel")} — {storyTitle}</span>
                         </motion.div>
                         {/* View certificate */}
                         <motion.button
                           initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, ...SPRING.gentle }}
                           whileHover={m.buttonHover} whileTap={m.buttonPress}
                           onClick={() => { playCelebration(); setPhase("certificate"); }}
-                          className="w-full text-white font-baloo font-black text-[18px] px-10 py-4 shadow-2xl flex items-center justify-center gap-3"
+                          className="w-full text-white font-baloo font-black text-lg px-10 py-4 shadow-2xl flex items-center justify-center gap-3"
                           style={{ background: 'linear-gradient(to right, #f59e0b, #d97706)', borderRadius: 'var(--leaf-r-lg)', boxShadow: '0 8px 24px rgba(245,158,11,0.35)' }}>
                           🌟 {t("storySeeCertificate")}
                         </motion.button>
@@ -714,7 +714,7 @@ export default function StoryDetailPage() {
                           initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55, ...SPRING.gentle }}
                           whileTap={m.buttonPress}
                           onClick={() => { playTap(); setPhase("missions"); }}
-                          className="w-full font-baloo font-black text-[15px] py-3 rounded-full border-2 border-[var(--nimi-green)] text-[var(--ds-brand-primary)] bg-white flex items-center justify-center gap-2 transition hover:bg-emerald-50">
+                          className="w-full font-baloo font-black text-mbase py-3 rounded-full border-2 border-[var(--nimi-green)] text-[var(--ds-brand-primary)] bg-[var(--ds-surface-card)] flex items-center justify-center gap-2 transition hover:bg-emerald-50">
                           {t("playAgainBtn")}
                         </motion.button>
                       </div>
@@ -723,7 +723,7 @@ export default function StoryDetailPage() {
                         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: DURATION.loopBounce, ...SPRING.gentle }}
                         whileHover={m.buttonHover} whileTap={m.buttonPress}
                         onClick={() => { playTap(); setPhase(allIntrosDone ? "missions" : "intro"); }}
-                        className="mt-8 w-full text-white font-baloo font-black text-[20px] px-10 py-4 shadow-2xl flex items-center justify-center gap-3" style={{ background: 'linear-gradient(to right, var(--nimi-green), #0e9d60)', borderRadius: 'var(--leaf-r-lg)', boxShadow: '0 8px 24px rgba(26,168,106,0.35)' }}>
+                        className="mt-8 w-full text-white font-baloo font-black text-xl px-10 py-4 shadow-2xl flex items-center justify-center gap-3" style={{ background: 'linear-gradient(to right, var(--nimi-green), #0e9d60)', borderRadius: 'var(--leaf-r-lg)', boxShadow: '0 8px 24px rgba(26,168,106,0.35)' }}>
                         <Play className="w-6 h-6 fill-white" />
                         {doneCount > 0 ? t("storyContinueBtn") : t("storyBeginMyAdventure")}
                       </motion.button>
@@ -740,15 +740,15 @@ export default function StoryDetailPage() {
               <motion.div key="intro" initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -50 }}
                 className="flex-1 flex flex-col px-5 py-6">
 
-                <button onClick={() => setPhase("welcome")} className="self-start mb-4 text-gray-400 flex items-center gap-1 text-[13px] font-bold">
+                <button onClick={() => setPhase("welcome")} className="self-start mb-4 text-[var(--ds-text-tertiary)] flex items-center gap-1 text-sml font-bold">
                   <ArrowLeft className="w-4 h-4" /> Back
                 </button>
 
-                <h2 className="font-baloo font-black text-[var(--ds-brand-primary)] text-[22px] text-center mb-2">{t("storyAdventureBegins")}</h2>
+                <h2 className="font-baloo font-black text-[var(--ds-brand-primary)] text-1.5xl text-center mb-2">{t("storyAdventureBegins")}</h2>
 
                 <div className="mb-5 leaf border border-emerald-100 bg-gradient-to-r from-emerald-50 to-white p-4 shadow-sm">
-                  <p className="font-baloo font-black text-[16px] text-emerald-800">First, meet the story helpers</p>
-                  <p className="text-[13px] text-gray-600 mt-1">Each card opens a tiny adventure. Complete them in order and the path ahead will light up.</p>
+                  <p className="font-baloo font-black text-base text-emerald-800">First, meet the story helpers</p>
+                  <p className="text-sml text-[var(--ds-text-secondary)] mt-1">Each card opens a tiny adventure. Complete them in order and the path ahead will light up.</p>
                 </div>
 
                 {/* Progress dots */}
@@ -781,19 +781,19 @@ export default function StoryDetailPage() {
                           className={`w-full p-5 flex items-center gap-4 transition-all ${
                             done ? "bg-[var(--ds-brand-subtle)] border-2 border-[var(--ds-border-brand)]/40" :
                             isNext ? `bg-gradient-to-r ${v.contentGradients.storyIntro[i]} border-2 border-white/20 shadow-xl` :
-                            "bg-gray-50 border-2 border-ds-border opacity-40"
+                            "bg-[var(--ds-surface-card-hover)] border-2 border-ds-border opacity-40"
                           }`}
                           style={{ borderRadius: 'var(--leaf-r-lg)' }}>
                           <motion.span className="text-4xl" animate={isNext ? { rotate: [0, -10, 10, 0] } : {}}
                             transition={{ duration: DURATION.loopBase, repeat: Infinity }}>{item.emoji}</motion.span>
                           <div className="flex-1 text-left">
-                            <p className={`font-baloo font-black text-[17px] ${done ? "text-green-800" : isNext ? "text-white" : "text-gray-500"}`}>{t(item.tKey)}</p>
+                            <p className={`font-baloo font-black text-mlg ${done ? "text-green-800" : isNext ? "text-white" : "text-[var(--ds-text-secondary)]"}`}>{t(item.tKey)}</p>
                           </div>
                           {done ? (
                             <CheckCircle2 className="w-7 h-7 text-green-400 shrink-0" />
                           ) : isNext && (hasUrl || item.key === "meet_characters") ? (
                             <motion.div animate={{ scale: [1, 1.15, 1] }} transition={{ duration: DURATION.loopShimmer, repeat: Infinity }}
-                              className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+                              className="w-12 h-12 rounded-full bg-[var(--ds-surface-card)]/20 flex items-center justify-center shrink-0">
                               <Play className="w-5 h-5 text-white fill-white ml-0.5" />
                             </motion.div>
                           ) : null}
@@ -825,7 +825,7 @@ export default function StoryDetailPage() {
                   <motion.button initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ ...SPRING.gentle }}
                     whileHover={m.buttonHover} whileTap={m.buttonPress}
                     onClick={() => { playUnlock(); setPhase("missions"); }}
-                    className="mt-6 w-full text-white font-baloo font-black text-[20px] py-4 flex items-center justify-center gap-3" style={{ background: 'linear-gradient(to right, var(--nimi-green), #0e9d60)', borderRadius: 'var(--leaf-r-lg)', boxShadow: '0 8px 24px rgba(26,168,106,0.35)' }}>
+                    className="mt-6 w-full text-white font-baloo font-black text-xl py-4 flex items-center justify-center gap-3" style={{ background: 'linear-gradient(to right, var(--nimi-green), #0e9d60)', borderRadius: 'var(--leaf-r-lg)', boxShadow: '0 8px 24px rgba(26,168,106,0.35)' }}>
                     {t("storyBeginMyAdventure")}
                   </motion.button>
                 )}
@@ -848,7 +848,7 @@ export default function StoryDetailPage() {
 
                 {/* Top bar */}
                 <div className="flex items-center justify-between px-5 py-4 relative z-10">
-                  <button onClick={() => setPhase("welcome")} className="w-11 h-11 bg-gray-100 rounded-full flex items-center justify-center text-gray-700">
+                  <button onClick={() => setPhase("welcome")} className="w-11 h-11 bg-[var(--ds-surface-card-active)] rounded-full flex items-center justify-center text-[var(--ds-text-primary)]">
                     <ArrowLeft className="w-5 h-5" />
                   </button>
                   {/* Tweak 4: Star count with bounce */}
@@ -856,7 +856,7 @@ export default function StoryDetailPage() {
                     {streak > 0 && (
                       <div className="flex items-center gap-1 bg-orange-50 border border-orange-200 rounded-full px-3 py-1.5">
                         <motion.span animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 1.5, repeat: Infinity }}>🔥</motion.span>
-                        <span className="font-baloo font-black text-orange-600 text-[13px]">{streak}</span>
+                        <span className="font-baloo font-black text-orange-600 text-sml">{streak}</span>
                       </div>
                     )}
                     <motion.div
@@ -866,22 +866,22 @@ export default function StoryDetailPage() {
                       <motion.div animate={{ rotate: [0, 15, -15, 0] }} transition={{ duration: DURATION.loopBase, repeat: Infinity }}>
                         <Star className="w-5 h-5 text-yellow-400 fill-yellow-400" />
                       </motion.div>
-                      <span className="font-baloo font-black text-yellow-600 text-[16px]">{totalStars}</span>
+                      <span className="font-baloo font-black text-yellow-600 text-base">{totalStars}</span>
                     </motion.div>
                   </div>
                 </div>
 
-                <div className="mx-5 mb-4 leaf border border-white/70 bg-white/85 p-4 shadow-[0_16px_34px_rgba(15,23,42,0.08)] backdrop-blur relative z-10">
+                <div className="mx-5 mb-4 leaf border border-white/70 bg-[var(--ds-surface-card)]/85 p-4 shadow-card-2xl backdrop-blur relative z-10">
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <p className="font-baloo font-black text-[15px] text-ds-text">{t("storyAdventureBegins")}</p>
-                      <p className="text-[12px] text-gray-500 mt-0.5">{doneCount} / {totalCount} · {totalStars} ⭐</p>
+                      <p className="font-baloo font-black text-mbase text-ds-text">{t("storyAdventureBegins")}</p>
+                      <p className="text-xs text-[var(--ds-text-secondary)] mt-0.5">{doneCount} / {totalCount} · {totalStars} ⭐</p>
                     </div>
                     {(() => {
                       const nb = nextMission ? (SLOT_BADGE[nextMission.slot_key] ?? { bg: "bg-emerald-50", text: "text-emerald-700", border: "border-emerald-200" }) : null;
                       const ne = nextMission ? (MISSION_META[nextMission.slot_key]?.emoji ?? "⭐") : null;
                       return (
-                        <div className={`rounded-full border px-3 py-1.5 text-[11px] font-black whitespace-nowrap ${
+                        <div className={`rounded-full border px-3 py-1.5 text-2xs font-black whitespace-nowrap ${
                           nb ? `${nb.bg} ${nb.text} ${nb.border}` : "bg-emerald-50 text-emerald-700 border-emerald-200"
                         }`}>
                           {nextMission
@@ -901,16 +901,16 @@ export default function StoryDetailPage() {
                       className="w-16 h-16 rounded-full border-4 border-yellow-400 shadow-xl" />
                     <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ duration: DURATION.loopFast, repeat: Infinity }}
                       className="absolute -top-2 -right-2 bg-yellow-400 rounded-full px-1.5 py-0.5 shadow-lg">
-                      <span className="text-[10px] font-black text-ds-text">{doneCount}/{totalCount}</span>
+                      <span className="text-3xs font-black text-ds-text">{doneCount}/{totalCount}</span>
                     </motion.div>
                     {/* Speech bubble */}
                     <motion.div initial={{ opacity: 0, scale: 0.5, y: 5 }} animate={{ opacity: 1, scale: 1, y: 0 }}
                       transition={{ delay: DURATION.moderate, ...SPRING.card }}
-                      className="absolute -right-28 top-1 bg-white px-3 py-1.5 shadow-lg min-w-[100px]" style={{ borderRadius: 'var(--leaf-r)' }}>
-                      <p className="font-baloo font-bold text-ds-text text-[11px] whitespace-nowrap">
+                      className="absolute -right-28 top-1 bg-[var(--ds-surface-card)] px-3 py-1.5 shadow-lg min-w-[100px]" style={{ borderRadius: 'var(--leaf-r)' }}>
+                      <p className="font-baloo font-bold text-ds-text text-2xs whitespace-nowrap">
                         {doneCount === 0 ? t("storyBubbleLetsGo") : doneCount < totalCount / 2 ? t("storyBubbleGreatStart") : doneCount < totalCount ? t("storyBubbleAlmostThere") : t("storyBubbleYouDidIt")}
                       </p>
-                      <div className="absolute left-[-6px] top-3 w-3 h-3 bg-white rotate-45" />
+                      <div className="absolute left-[-6px] top-3 w-3 h-3 bg-[var(--ds-surface-card)] rotate-45" />
                     </motion.div>
                   </div>
                 </div>
@@ -971,9 +971,9 @@ export default function StoryDetailPage() {
                         )}
 
                         {/* Small terrain detail next to some nodes */}
-                        {i === 0 && <span className="absolute -left-2 top-4 text-[14px] opacity-10 pointer-events-none">🏕️</span>}
-                        {i === 2 && <span className="absolute -right-2 top-4 text-[14px] opacity-10 pointer-events-none">🌉</span>}
-                        {i === 4 && <span className="absolute -left-2 top-4 text-[14px] opacity-10 pointer-events-none">⛺</span>}
+                        {i === 0 && <span className="absolute -left-2 top-4 text-sm opacity-10 pointer-events-none">🏕️</span>}
+                        {i === 2 && <span className="absolute -right-2 top-4 text-sm opacity-10 pointer-events-none">🌉</span>}
+                        {i === 4 && <span className="absolute -left-2 top-4 text-sm opacity-10 pointer-events-none">⛺</span>}
 
                         {/* Mission node */}
                         <motion.div
@@ -990,8 +990,8 @@ export default function StoryDetailPage() {
                                 slot.completed
                                   ? "border-emerald-200 bg-emerald-50/80 shadow-[0_10px_24px_rgba(16,185,129,0.12)]"
                                   : isNext
-                                    ? "border-amber-200 bg-white/90 shadow-[0_12px_28px_rgba(250,204,21,0.16)]"
-                                    : "border-white/70 bg-white/70 shadow-sm"
+                                    ? "border-amber-200 bg-[var(--ds-surface-card)]/90 shadow-[0_12px_28px_rgba(250,204,21,0.16)]"
+                                    : "border-white/70 bg-[var(--ds-surface-card)]/70 shadow-sm"
                               }`}>
                               <div className={`absolute inset-x-3 top-2 h-1 rounded-full ${slot.completed ? "bg-emerald-400" : isNext ? "bg-amber-400" : "bg-slate-200"}`} />
 
@@ -1006,7 +1006,7 @@ export default function StoryDetailPage() {
                                     ? `bg-gradient-to-br ${meta.color} shadow-xl ring-4 ring-green-400/40`
                                     : isNext
                                       ? `bg-gradient-to-br ${meta.color} shadow-2xl ring-4 ring-yellow-400/50`
-                                      : "bg-white border-2 border-ds-border"
+                                      : "bg-[var(--ds-surface-card)] border-2 border-ds-border"
                                 }`}>
 
                                 {/* Emoji or lock */}
@@ -1028,10 +1028,10 @@ export default function StoryDetailPage() {
                                 {/* Tweak 2: Sparkle confetti on completed */}
                                 {slot.completed && (
                                   <>
-                                    <motion.span className="absolute -top-3 left-1 text-[12px]" animate={{ opacity: [0, 1, 0], y: [0, -8, 0], rotate: [0, 180, 360] }} transition={{ duration: DURATION.loopSlow, repeat: Infinity, delay: DURATION.fast }}>⭐</motion.span>
-                                    <motion.span className="absolute -top-2 right-0 text-[10px]" animate={{ opacity: [0, 1, 0], y: [0, -6, 0] }} transition={{ duration: DURATION.loopBase, repeat: Infinity, delay: DURATION.slow }}>✨</motion.span>
-                                    <motion.span className="absolute top-0 -left-3 text-[8px]" animate={{ opacity: [0, 0.8, 0], x: [-2, -8, -2] }} transition={{ duration: DURATION.loopFloat, repeat: Infinity, delay: DURATION.progress }}>🌟</motion.span>
-                                    <motion.span className="absolute -bottom-2 left-2 text-[9px]" animate={{ opacity: [0, 0.7, 0], y: [0, 5, 0] }} transition={{ duration: DURATION.loopSlow, repeat: Infinity, delay: DURATION.moderate }}>💫</motion.span>
+                                    <motion.span className="absolute -top-3 left-1 text-xs" animate={{ opacity: [0, 1, 0], y: [0, -8, 0], rotate: [0, 180, 360] }} transition={{ duration: DURATION.loopSlow, repeat: Infinity, delay: DURATION.fast }}>⭐</motion.span>
+                                    <motion.span className="absolute -top-2 right-0 text-3xs" animate={{ opacity: [0, 1, 0], y: [0, -6, 0] }} transition={{ duration: DURATION.loopBase, repeat: Infinity, delay: DURATION.slow }}>✨</motion.span>
+                                    <motion.span className="absolute top-0 -left-3 text-5xs" animate={{ opacity: [0, 0.8, 0], x: [-2, -8, -2] }} transition={{ duration: DURATION.loopFloat, repeat: Infinity, delay: DURATION.progress }}>🌟</motion.span>
+                                    <motion.span className="absolute -bottom-2 left-2 text-4xs" animate={{ opacity: [0, 0.7, 0], y: [0, 5, 0] }} transition={{ duration: DURATION.loopSlow, repeat: Infinity, delay: DURATION.moderate }}>💫</motion.span>
                                   </>
                                 )}
 
@@ -1044,13 +1044,13 @@ export default function StoryDetailPage() {
                               </motion.div>
 
                               {/* Label below circle */}
-                              <p className={`font-baloo font-black text-[12px] text-center leading-tight ${
-                                isLocked ? "text-gray-300" : slot.completed ? "text-gray-700" : "text-gray-900"
+                              <p className={`font-baloo font-black text-xs text-center leading-tight ${
+                                isLocked ? "text-[var(--ds-text-tertiary)]" : slot.completed ? "text-[var(--ds-text-primary)]" : "text-[var(--ds-text-primary)]"
                               }`}>
                                 {slot.title || t(meta.tKey)}
                               </p>
 
-                              <div className={`text-[10px] font-black uppercase tracking-[0.2em] ${
+                              <div className={`text-3xs font-black uppercase tracking-[0.2em] ${
                                 slot.completed ? "text-emerald-600" : isNext ? "text-amber-600" : "text-slate-400"
                               }`}>
                                 {slot.completed && doneCount >= totalCount ? t("masteredLabel") : slot.completed ? "Done ✓" : isNext ? "Ready" : "Soon"}
@@ -1060,7 +1060,7 @@ export default function StoryDetailPage() {
                               {!isLocked && (
                                 <div className="flex items-center gap-0.5">
                                   <Star className={`w-3 h-3 ${slot.completed ? "text-yellow-400 fill-yellow-400" : "text-yellow-400/40 fill-yellow-400/40"}`} />
-                                  <span className={`text-[10px] font-bold ${slot.completed ? "text-yellow-600" : "text-yellow-400/40"}`}>{slot.stars ?? 10}</span>
+                                  <span className={`text-3xs font-bold ${slot.completed ? "text-yellow-600" : "text-yellow-400/40"}`}>{slot.stars ?? 10}</span>
                                 </div>
                               )}
                             </motion.div>
@@ -1084,13 +1084,13 @@ export default function StoryDetailPage() {
                         className={`relative w-24 h-24 rounded-full flex items-center justify-center text-5xl ${
                           doneCount >= totalCount
                             ? "bg-gradient-to-br from-yellow-400 to-amber-500 shadow-2xl shadow-yellow-500/30 ring-4 ring-yellow-400/40"
-                            : "bg-white border-2 border-ds-border"
+                            : "bg-[var(--ds-surface-card)] border-2 border-ds-border"
                         }`}>
                         {doneCount >= totalCount ? "🏆" : "🔒"}
                         {doneCount >= totalCount && (
                           <>
-                            <motion.span className="absolute -top-3 -left-2 text-[14px]" animate={{ opacity: [0, 1, 0], y: [0, -10, 0] }} transition={{ duration: DURATION.loopBase, repeat: Infinity }}>⭐</motion.span>
-                            <motion.span className="absolute -top-2 -right-3 text-[12px]" animate={{ opacity: [0, 1, 0], y: [0, -8, 0] }} transition={{ duration: DURATION.loopSlow, repeat: Infinity, delay: DURATION.moderate }}>✨</motion.span>
+                            <motion.span className="absolute -top-3 -left-2 text-sm" animate={{ opacity: [0, 1, 0], y: [0, -10, 0] }} transition={{ duration: DURATION.loopBase, repeat: Infinity }}>⭐</motion.span>
+                            <motion.span className="absolute -top-2 -right-3 text-xs" animate={{ opacity: [0, 1, 0], y: [0, -8, 0] }} transition={{ duration: DURATION.loopSlow, repeat: Infinity, delay: DURATION.moderate }}>✨</motion.span>
                           </>
                         )}
                       </motion.div>
@@ -1101,11 +1101,11 @@ export default function StoryDetailPage() {
                           className="w-12 h-12 rounded-full border-3 border-blue-400 shadow-lg" />
                         <motion.div initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }}
                           transition={{ delay: DURATION.loopSpark, ...SPRING.gentle }}
-                          className="absolute -left-24 top-0 bg-white rounded-2xl rounded-br-sm px-2.5 py-1 shadow-lg">
-                          <p className="font-baloo font-bold text-ds-text text-[10px] whitespace-nowrap">
+                          className="absolute -left-24 top-0 bg-[var(--ds-surface-card)] rounded-2xl rounded-br-sm px-2.5 py-1 shadow-lg">
+                          <p className="font-baloo font-bold text-ds-text text-3xs whitespace-nowrap">
                             {doneCount >= totalCount ? t("storyBubbleWeDidIt") : t("storyBubbleKeepGoing")}
                           </p>
-                          <div className="absolute right-[-5px] top-2.5 w-2.5 h-2.5 bg-white rotate-45" />
+                          <div className="absolute right-[-5px] top-2.5 w-2.5 h-2.5 bg-[var(--ds-surface-card)] rotate-45" />
                         </motion.div>
                       </div>
                     </div>
@@ -1118,7 +1118,7 @@ export default function StoryDetailPage() {
                     <motion.button initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
                       whileTap={m.buttonPress}
                       onClick={() => { playCelebration(); setPhase("certificate"); }}
-                      className="w-full bg-gradient-to-r from-yellow-400 to-amber-500 text-white font-baloo font-black text-[20px] rounded-full py-4 shadow-2xl shadow-yellow-500/30 flex items-center justify-center gap-3">
+                      className="w-full bg-gradient-to-r from-yellow-400 to-amber-500 text-white font-baloo font-black text-xl rounded-full py-4 shadow-2xl shadow-yellow-500/30 flex items-center justify-center gap-3">
                       {t("storySeeCertificate")}
                     </motion.button>
                   </div>
@@ -1137,7 +1137,7 @@ export default function StoryDetailPage() {
                 {/* Back button */}
                 <button
                   onClick={() => setPhase("missions")}
-                  className="self-start flex items-center gap-1 text-gray-400 text-[13px] font-bold mb-2 hover:text-gray-600 transition">
+                  className="self-start flex items-center gap-1 text-[var(--ds-text-tertiary)] text-sml font-bold mb-2 hover:text-[var(--ds-text-secondary)] transition">
                   <ArrowLeft className="w-4 h-4" /> {t("storyBackBtn")}
                 </button>
 
@@ -1169,25 +1169,25 @@ export default function StoryDetailPage() {
 
                 {/* Child name — the hero text */}
                 <motion.div initial={{ y: 14, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}>
-                  <p className="font-nunito text-gray-400 text-[13px] font-bold uppercase tracking-widest mb-1">{t("storyCertWoo")}</p>
-                  <h2 className="font-baloo font-black text-[32px] leading-tight" style={{ color: "var(--ds-brand-primary)" }}>
+                  <p className="font-nunito text-[var(--ds-text-tertiary)] text-sml font-bold uppercase tracking-widest mb-1">{t("storyCertWoo")}</p>
+                  <h2 className="font-baloo font-black text-3xl leading-tight" style={{ color: "var(--ds-brand-primary)" }}>
                     ⭐ {childName}! ⭐
                   </h2>
-                  <p className="font-nunito text-gray-500 text-[15px] mt-1">{t("storyCertCompleted")}</p>
-                  <h3 className="font-baloo font-black text-ds-text text-[20px] mt-0.5 leading-tight">{storyTitle}</h3>
+                  <p className="font-nunito text-[var(--ds-text-secondary)] text-mbase mt-1">{t("storyCertCompleted")}</p>
+                  <h3 className="font-baloo font-black text-ds-text text-xl mt-0.5 leading-tight">{storyTitle}</h3>
                 </motion.div>
 
                 {/* Stars earned card */}
                 <motion.div
                   initial={{ y: 16, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.35 }}
-                  className="mt-5 w-full max-w-sm leaf-lg border border-amber-100 bg-white/90 p-5 shadow-[0_18px_38px_rgba(15,23,42,0.08)]">
+                  className="mt-5 w-full max-w-sm leaf-lg border border-amber-100 bg-[var(--ds-surface-card)]/90 p-5 shadow-[0_18px_38px_rgba(15,23,42,0.08)]">
                   <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: DURATION.moderate, ...SPRING.card }}
                     className="mx-auto w-20 h-20 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center shadow-2xl shadow-yellow-500/40">
                     <Star className="w-10 h-10 text-white fill-white" />
                   </motion.div>
-                  <p className="text-yellow-500 font-baloo font-black text-[24px] mt-3">+{totalStars} {t("storyStarsLabel")}</p>
-                  <p className="text-gray-400 text-[13px] font-bold mt-1">{t("storyCertEarned")}</p>
-                  <div className="mt-3 rounded-full border border-yellow-200 bg-yellow-50 px-3 py-2 text-[12px] font-black text-yellow-700">
+                  <p className="text-yellow-500 font-baloo font-black text-2xl mt-3">+{totalStars} {t("storyStarsLabel")}</p>
+                  <p className="text-[var(--ds-text-tertiary)] text-sml font-bold mt-1">{t("storyCertEarned")}</p>
+                  <div className="mt-3 rounded-full border border-yellow-200 bg-yellow-50 px-3 py-2 text-xs font-black text-yellow-700">
                     ✨ A shining finish for {childName}!
                   </div>
                 </motion.div>
@@ -1207,7 +1207,7 @@ export default function StoryDetailPage() {
                     transition={{ duration: DURATION.loopBase, repeat: Infinity }}
                     whileHover={m.buttonHover}
                     whileTap={m.buttonPress}
-                    className="w-full relative overflow-hidden bg-gradient-to-r from-yellow-400 via-amber-400 to-green-400 text-white font-baloo font-black text-[20px] leaf py-5 shadow-2xl flex items-center justify-center gap-3">
+                    className="w-full relative overflow-hidden bg-gradient-to-r from-yellow-400 via-amber-400 to-green-400 text-white font-baloo font-black text-xl leaf py-5 shadow-2xl flex items-center justify-center gap-3">
 
                     {/* Sparkle particles inside button */}
                     {[0, 1, 2, 3, 4].map(i => (
@@ -1236,11 +1236,11 @@ export default function StoryDetailPage() {
                   {feeling ? (
                     <motion.div initial={{ scale: 0.7, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 320, damping: 22 }}>
                       <span className="text-4xl">{feeling}</span>
-                      <p className="font-baloo font-black text-ds-text text-[15px] mt-2">{t("feelingThanks")}</p>
+                      <p className="font-baloo font-black text-ds-text text-mbase mt-2">{t("feelingThanks")}</p>
                     </motion.div>
                   ) : (
                     <>
-                      <p className="font-baloo font-black text-ds-text text-[14px] mb-3">{t("howDidYouFeel")}</p>
+                      <p className="font-baloo font-black text-ds-text text-sm mb-3">{t("howDidYouFeel")}</p>
                       <div className="flex items-center justify-center gap-3">
                         {["😊", "😢", "😮", "😂", "💖"].map(emoji => (
                           <motion.button key={emoji} onClick={() => handleFeelingSelect(emoji)}
@@ -1261,7 +1261,7 @@ export default function StoryDetailPage() {
 
                   <motion.button whileTap={m.buttonPress}
                     onClick={() => setPhase("challenge")}
-                    className="w-full bg-gradient-to-r from-[var(--nimi-green)] to-[var(--ds-brand-hover)] text-white font-baloo font-black text-[16px] rounded-full py-3.5 shadow-lg flex items-center justify-center gap-2">
+                    className="w-full bg-gradient-to-r from-[var(--nimi-green)] to-[var(--ds-brand-hover)] text-white font-baloo font-black text-base rounded-full py-3.5 shadow-lg flex items-center justify-center gap-2">
                     {t("storyBonusChallenge")}
                   </motion.button>
                 </div>
@@ -1279,13 +1279,13 @@ export default function StoryDetailPage() {
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.8, y: 50 }}
                         transition={SPRING.bounce}
-                        className="fixed inset-x-4 top-[10%] sm:inset-auto sm:left-1/2 sm:top-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:w-[400px] bg-white leaf-lg border-2 border-yellow-400/30 p-6 text-center shadow-2xl"
+                        className="fixed inset-x-4 top-[10%] sm:inset-auto sm:left-1/2 sm:top-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:w-[400px] bg-[var(--ds-surface-card)] leaf-lg border-2 border-yellow-400/30 p-6 text-center shadow-2xl"
                         style={{ zIndex: 101 }}>
 
                         {!treasureAnimating ? (
                           <>
                             {/* Eyebrow */}
-                            <p className="font-nunito font-black text-[11px] text-yellow-500 uppercase tracking-[0.14em] mb-4">
+                            <p className="font-nunito font-black text-2xs text-yellow-500 uppercase tracking-[0.14em] mb-4">
                               🏆 Badge Unlocked!
                             </p>
 
@@ -1317,17 +1317,17 @@ export default function StoryDetailPage() {
 
                             {/* Badge name */}
                             <motion.div initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }}>
-                              <h3 className="font-baloo font-black text-gray-900 text-[22px] leading-tight">
+                              <h3 className="font-baloo font-black text-[var(--ds-text-primary)] text-1.5xl leading-tight">
                                 {earnedBadgeSlug
                                   ? (getMilestoneBadgeMeta(earnedBadgeSlug)?.label ?? badgeDisplayName(earnedBadgeSlug))
                                   : "Story Badge"}
                               </h3>
-                              <p className="font-nunito text-gray-400 text-[13px] mt-1 leading-snug">
+                              <p className="font-nunito text-[var(--ds-text-tertiary)] text-sml mt-1 leading-snug">
                                 {earnedBadgeSlug && getMilestoneBadgeMeta(earnedBadgeSlug)
                                   ? <>{getMilestoneBadgeMeta(earnedBadgeSlug)!.desc} 🎉</>
                                   : earnedBadgeSlug
-                                    ? <>{childName} earned this by completing<br /><span className="font-bold text-gray-600">{storyTitle}</span></>
-                                    : <span className="text-gray-300">Awarding your badge…</span>
+                                    ? <>{childName} earned this by completing<br /><span className="font-bold text-[var(--ds-text-secondary)]">{storyTitle}</span></>
+                                    : <span className="text-[var(--ds-text-tertiary)]">Awarding your badge…</span>
                                 }
                               </p>
                             </motion.div>
@@ -1342,8 +1342,8 @@ export default function StoryDetailPage() {
                                   📜
                                 </div>
                                 <div className="flex-1 min-w-0 text-left">
-                                  <p className="font-baloo font-black text-amber-800 text-[13px] leading-tight">Story Certificate</p>
-                                  <p className="font-nunito text-amber-500/80 text-[11px] truncate">Awarded to {childName}</p>
+                                  <p className="font-baloo font-black text-amber-800 text-sml leading-tight">Story Certificate</p>
+                                  <p className="font-nunito text-amber-500/80 text-2xs truncate">Awarded to {childName}</p>
                                 </div>
                                 <div className="flex-shrink-0 flex flex-col gap-1">
                                   {hasSubscription || storyIsFree ? (
@@ -1351,20 +1351,20 @@ export default function StoryDetailPage() {
                                       <button
                                         onClick={() => void downloadCert("pdf")}
                                         disabled={downloadingCert !== null}
-                                        className="bg-amber-100 hover:bg-amber-200 text-amber-700 font-black text-[11px] rounded-xl px-3 py-1.5 transition disabled:opacity-60 flex items-center gap-1">
+                                        className="bg-amber-100 hover:bg-amber-200 text-amber-700 font-black text-2xs rounded-xl px-3 py-1.5 transition disabled:opacity-60 flex items-center gap-1">
                                         {downloadingCert === "pdf" ? <Loader2 className="w-3 h-3 animate-spin" /> : "📥"} PDF
                                       </button>
                                       <button
                                         onClick={() => void downloadCert("png")}
                                         disabled={downloadingCert !== null}
-                                        className="bg-amber-100 hover:bg-amber-200 text-amber-700 font-black text-[11px] rounded-xl px-3 py-1.5 transition disabled:opacity-60 flex items-center gap-1">
+                                        className="bg-amber-100 hover:bg-amber-200 text-amber-700 font-black text-2xs rounded-xl px-3 py-1.5 transition disabled:opacity-60 flex items-center gap-1">
                                         {downloadingCert === "png" ? <Loader2 className="w-3 h-3 animate-spin" /> : "🖼️"} PNG
                                       </button>
                                     </>
                                   ) : (
                                     <button
                                       onClick={() => setShowPricingModal(true)}
-                                      className="bg-amber-400 hover:bg-amber-500 text-white font-black text-[11px] rounded-xl px-3 py-1.5 transition flex items-center gap-1">
+                                      className="bg-amber-400 hover:bg-amber-500 text-white font-black text-2xs rounded-xl px-3 py-1.5 transition flex items-center gap-1">
                                       👑 Unlock
                                     </button>
                                   )}
@@ -1377,10 +1377,10 @@ export default function StoryDetailPage() {
                                     <BadgeCircle slug={earnedBadgeSlug} size="sm" imageUrl={earnedBadgeImageUrl} />
                                   </div>
                                   <div className="flex-1 min-w-0 text-left">
-                                    <p className="font-baloo font-black text-green-800 text-[13px] leading-tight">
+                                    <p className="font-baloo font-black text-green-800 text-sml leading-tight">
                                       {earnedBadgeSlug ? badgeDisplayName(earnedBadgeSlug) : "Story Badge"}
                                     </p>
-                                    <p className="font-nunito text-green-600/80 text-[11px] truncate">Earned by {childName}</p>
+                                    <p className="font-nunito text-green-600/80 text-2xs truncate">Earned by {childName}</p>
                                   </div>
                                   <button
                                     onClick={() => {
@@ -1390,7 +1390,7 @@ export default function StoryDetailPage() {
                                       a.target = "_blank";
                                       a.click();
                                     }}
-                                    className="flex-shrink-0 bg-green-100 hover:bg-green-200 text-green-700 font-black text-[11px] rounded-xl px-3 py-1.5 transition">
+                                    className="flex-shrink-0 bg-green-100 hover:bg-green-200 text-green-700 font-black text-2xs rounded-xl px-3 py-1.5 transition">
                                     🖼️ PNG
                                   </button>
                                 </div>
@@ -1413,13 +1413,13 @@ export default function StoryDetailPage() {
                                   }, 2000);
                                 }, 1500);
                               }}
-                              className="w-full mt-4 bg-gradient-to-r from-yellow-400 to-amber-500 text-white font-baloo font-black text-[17px] rounded-full py-4 shadow-[0_8px_22px_rgba(245,158,11,0.32)] flex items-center justify-center gap-2">
+                              className="w-full mt-4 bg-gradient-to-r from-yellow-400 to-amber-500 text-white font-baloo font-black text-mlg rounded-full py-4 shadow-[0_8px_22px_rgba(245,158,11,0.32)] flex items-center justify-center gap-2">
                               <motion.span animate={{ scale: [1, 1.2, 1] }} transition={{ duration: DURATION.loopSpark, repeat: Infinity }}>✨</motion.span>
                               Send to My Treasure Box!
                             </motion.button>
 
                             <button onClick={() => setShowRewardModal(false)}
-                              className="mt-3 text-gray-400 text-[12px] font-semibold hover:text-gray-600 transition">
+                              className="mt-3 text-[var(--ds-text-tertiary)] text-xs font-semibold hover:text-[var(--ds-text-secondary)] transition">
                               Maybe later
                             </button>
                           </>
@@ -1468,12 +1468,12 @@ export default function StoryDetailPage() {
 
                             <motion.p
                               initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: DURATION.loopBase }}
-                              className="font-baloo font-black text-yellow-600 text-[20px] mt-4">
+                              className="font-baloo font-black text-yellow-600 text-xl mt-4">
                               POOF! 🎉
                             </motion.p>
                             <motion.p
                               initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: DURATION.loopBase + DURATION.base }}
-                              className="text-gray-500 text-[14px] mt-1">
+                              className="text-[var(--ds-text-secondary)] text-sm mt-1">
                               Saved to your Champion Treasure Box!
                             </motion.p>
                           </div>
@@ -1492,26 +1492,26 @@ export default function StoryDetailPage() {
               <motion.div key="challenge" initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -50 }}
                 className="flex-1 flex flex-col px-5 py-6">
 
-                <button onClick={() => { playCelebration(); setPhase("certificate"); }} className="self-start mb-4 text-gray-400 flex items-center gap-1 text-[13px] font-bold">
+                <button onClick={() => { playCelebration(); setPhase("certificate"); }} className="self-start mb-4 text-[var(--ds-text-tertiary)] flex items-center gap-1 text-sml font-bold">
                   <ArrowLeft className="w-4 h-4" /> Back
                 </button>
 
                 <div className="mb-4 leaf border border-yellow-200 bg-gradient-to-r from-yellow-50 via-amber-50/60 to-yellow-50 p-4 shadow-sm">
-                  <p className="font-baloo font-black text-[16px] text-amber-800">🏆 One extra sparkle challenge</p>
-                  <p className="text-[13px] text-gray-600 mt-1">A little kindness mission to finish the story with a happy heart.</p>
+                  <p className="font-baloo font-black text-base text-amber-800">🏆 One extra sparkle challenge</p>
+                  <p className="text-sml text-[var(--ds-text-secondary)] mt-1">A little kindness mission to finish the story with a happy heart.</p>
                 </div>
 
-                <h2 className="font-baloo font-black text-[var(--ds-brand-primary)] text-[22px] text-center mb-4">{t("storyBonusChallenge")}</h2>
+                <h2 className="font-baloo font-black text-[var(--ds-brand-primary)] text-1.5xl text-center mb-4">{t("storyBonusChallenge")}</h2>
 
                 {challengeDone ? (
                   <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}
                     className="flex-1 flex flex-col items-center justify-center text-center">
                     <motion.span className="text-6xl" animate={{ rotate: [0, 15, -15, 0] }} transition={{ duration: DURATION.loopBase, repeat: Infinity }}>🎉</motion.span>
-                    <h3 className="font-baloo font-black text-ds-text text-[22px] mt-4">{t("storyChallengeDone")}</h3>
-                    <p className="text-gray-500 text-[14px] mt-2">You&apos;re a true champion!</p>
+                    <h3 className="font-baloo font-black text-ds-text text-1.5xl mt-4">{t("storyChallengeDone")}</h3>
+                    <p className="text-[var(--ds-text-secondary)] text-sm mt-2">You&apos;re a true champion!</p>
                     <motion.button whileTap={m.buttonPress}
                       onClick={() => { playStar(); setPhase("complete"); }}
-                      className="mt-6 bg-gradient-to-r from-yellow-400 to-orange-500 text-white font-baloo font-black text-[18px] rounded-full px-8 py-4 shadow-xl flex items-center gap-2">
+                      className="mt-6 bg-gradient-to-r from-yellow-400 to-orange-500 text-white font-baloo font-black text-lg rounded-full px-8 py-4 shadow-xl flex items-center gap-2">
                       {t("storyContinueBtn")}
                     </motion.button>
                   </motion.div>
@@ -1574,7 +1574,7 @@ export default function StoryDetailPage() {
                     transition={{ type: "spring", stiffness: 300, damping: 18 }}
                     className="mb-4 bg-gradient-to-r from-yellow-400 to-amber-500 px-6 py-2"
                     style={{ borderRadius: "var(--leaf-r)", boxShadow: "0 8px 32px rgba(251,191,36,0.40), inset 0 1px 0 rgba(255,255,255,0.35)" }}>
-                    <p className="font-baloo font-black text-[28px] text-amber-950 tracking-wide leading-none">
+                    <p className="font-baloo font-black text-3.5xl text-amber-950 tracking-wide leading-none">
                       🎉 YOU DID IT! 🎉
                     </p>
                   </motion.div>
@@ -1584,7 +1584,7 @@ export default function StoryDetailPage() {
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.25 }}
-                    className="font-baloo font-black text-ds-text text-[22px] leading-tight">
+                    className="font-baloo font-black text-ds-text text-1.5xl leading-tight">
                     {childName ? `${childName} is a` : "You are a"}
                   </motion.p>
                   <motion.div
@@ -1593,7 +1593,7 @@ export default function StoryDetailPage() {
                     transition={{ delay: 0.35, type: "spring", stiffness: 260 }}
                     className={`mt-1 mb-5 px-6 py-1.5 rounded-full bg-gradient-to-r ${v.zoneGradients.library}`}
                     style={{ boxShadow: `0 6px 24px ${theme.shadow.cta}` }}>
-                    <p className="font-baloo font-black text-white text-[20px] tracking-widest uppercase">
+                    <p className="font-baloo font-black text-white text-xl tracking-widest uppercase">
                       ⭐ SUPER EXPLORER ⭐
                     </p>
                   </motion.div>
@@ -1634,17 +1634,17 @@ export default function StoryDetailPage() {
                     transition={{ delay: 0.55 }}
                     className="flex flex-col items-center gap-2 mb-6">
                     <div className="px-4 py-1.5 rounded-full border border-ds-border bg-ds-card">
-                      <p className="font-nunito font-black text-ds-text text-[13px] tracking-wide">
+                      <p className="font-nunito font-black text-ds-text text-sml tracking-wide">
                         📖 {storyTitle}
                       </p>
                     </div>
                     <div className="flex gap-2">
                       <motion.div
-                        className={`px-3 py-1 rounded-full text-[11px] font-black text-white bg-gradient-to-r ${theme.gradients.badge}`}
+                        className={`px-3 py-1 rounded-full text-2xs font-black text-white bg-gradient-to-r ${theme.gradients.badge}`}
                         animate={{ scale: [1,1.08,1] }} transition={{ duration: 2, repeat: Infinity }}>
                         ⚡ +100 XP
                       </motion.div>
-                      <div className="px-3 py-1 rounded-full text-[11px] font-black bg-gradient-to-r from-yellow-400 to-amber-500 text-amber-950">
+                      <div className="px-3 py-1 rounded-full text-2xs font-black bg-gradient-to-r from-yellow-400 to-amber-500 text-amber-950">
                         🏅 Badge Earned!
                       </div>
                     </div>
@@ -1660,7 +1660,7 @@ export default function StoryDetailPage() {
 
                   <div className="flex items-center gap-2 mb-3 justify-center">
                     <div className="flex-1 h-px bg-ds-border" />
-                    <p className="font-baloo font-black text-ds-muted text-[11px] uppercase tracking-[0.18em]">
+                    <p className="font-baloo font-black text-ds-muted text-2xs uppercase tracking-[0.18em]">
                       🚀 What&apos;s Next?
                     </p>
                     <div className="flex-1 h-px bg-ds-border" />
@@ -1670,14 +1670,14 @@ export default function StoryDetailPage() {
                     {/* Current story — MASTERED */}
                     <div className="flex-1 p-3.5 flex flex-col items-center gap-2 bg-ds-card border border-ds-border shadow-ds-card"
                       style={{ borderRadius: "var(--leaf-r)" }}>
-                      <p className="font-baloo font-black text-[9px] text-amber-500 uppercase tracking-widest">
+                      <p className="font-baloo font-black text-4xs text-amber-500 uppercase tracking-widest">
                         Story {details?.sort_order ?? ""}
                       </p>
                       <span className="text-4xl leading-none">{details?.theme_emoji ?? "📖"}</span>
-                      <p className="font-baloo font-black text-[12px] text-ds-text text-center leading-tight line-clamp-2 flex-1">
+                      <p className="font-baloo font-black text-xs text-ds-text text-center leading-tight line-clamp-2 flex-1">
                         {storyTitle}
                       </p>
-                      <div className={`w-full font-black text-[10px] py-1.5 flex items-center justify-center gap-1 text-white bg-gradient-to-r ${theme.gradients.badge}`}
+                      <div className={`w-full font-black text-3xs py-1.5 flex items-center justify-center gap-1 text-white bg-gradient-to-r ${theme.gradients.badge}`}
                         style={{ borderRadius: "var(--leaf-r-sm)" }}>
                         ✅ MASTERED!
                       </div>
@@ -1702,14 +1702,14 @@ export default function StoryDetailPage() {
                           <motion.div whileTap={m.buttonPress}
                             className="h-full p-3.5 flex flex-col items-center gap-2 bg-ds-card border border-amber-200 shadow-ds-card"
                             style={{ borderRadius: "var(--leaf-r)" }}>
-                            <p className="font-baloo font-black text-[9px] text-amber-500 uppercase tracking-widest">
+                            <p className="font-baloo font-black text-4xs text-amber-500 uppercase tracking-widest">
                               Story {nextStory.sort_order}
                             </p>
                             <span className="text-4xl leading-none">{nextStory.theme_emoji ?? "📖"}</span>
-                            <p className="font-baloo font-black text-[12px] text-ds-text text-center leading-tight line-clamp-2 flex-1">
+                            <p className="font-baloo font-black text-xs text-ds-text text-center leading-tight line-clamp-2 flex-1">
                               {nextStory.title}
                             </p>
-                            <div className="w-full font-black text-[10px] py-1.5 flex items-center justify-center gap-1 bg-gradient-to-r from-yellow-400 to-amber-500 text-amber-950"
+                            <div className="w-full font-black text-3xs py-1.5 flex items-center justify-center gap-1 bg-gradient-to-r from-yellow-400 to-amber-500 text-amber-950"
                               style={{ borderRadius: "var(--leaf-r-sm)" }}>
                               🚀 START!
                             </div>
@@ -1720,10 +1720,10 @@ export default function StoryDetailPage() {
                           <motion.div whileHover={{ scale: 1.02 }} whileTap={m.buttonPress}
                             className="h-full p-3.5 flex flex-col items-center gap-2 cursor-pointer"
                             style={{ borderRadius: "var(--leaf-r)", background: "linear-gradient(135deg,#6d28d9,#7c3aed)", border: "1px solid rgba(139,92,246,0.4)" }}>
-                            <p className="font-baloo font-black text-[9px] text-purple-200 uppercase tracking-widest">Story {nextStory.sort_order}</p>
+                            <p className="font-baloo font-black text-4xs text-purple-200 uppercase tracking-widest">Story {nextStory.sort_order}</p>
                             <span className="text-4xl leading-none opacity-60">{nextStory.theme_emoji ?? "📖"}</span>
-                            <p className="font-baloo font-black text-[12px] text-white text-center leading-tight line-clamp-2 flex-1">{nextStory.title}</p>
-                            <div className="w-full font-black text-[10px] py-1.5 flex items-center justify-center gap-1 bg-yellow-300 text-purple-900"
+                            <p className="font-baloo font-black text-xs text-white text-center leading-tight line-clamp-2 flex-1">{nextStory.title}</p>
+                            <div className="w-full font-black text-3xs py-1.5 flex items-center justify-center gap-1 bg-yellow-300 text-purple-900"
                               style={{ borderRadius: "var(--leaf-r-sm)" }}>
                               👑 Club Only
                             </div>
@@ -1732,10 +1732,10 @@ export default function StoryDetailPage() {
                       ) : (
                         <div className="flex-1 p-3.5 flex flex-col items-center gap-2 bg-ds-card border border-ds-border opacity-50"
                           style={{ borderRadius: "var(--leaf-r)" }}>
-                          <p className="text-[9px] font-black text-ds-muted uppercase tracking-widest">Story {nextStory.sort_order}</p>
+                          <p className="text-4xs font-black text-ds-muted uppercase tracking-widest">Story {nextStory.sort_order}</p>
                           <span className="text-4xl leading-none opacity-40">{nextStory.theme_emoji ?? "📖"}</span>
-                          <p className="font-baloo font-black text-[12px] text-ds-muted text-center leading-tight line-clamp-2 flex-1">{nextStory.title}</p>
-                          <div className="w-full bg-gray-100 text-ds-muted font-black text-[10px] py-1.5 flex items-center justify-center gap-1"
+                          <p className="font-baloo font-black text-xs text-ds-muted text-center leading-tight line-clamp-2 flex-1">{nextStory.title}</p>
+                          <div className="w-full bg-[var(--ds-surface-card-active)] text-ds-muted font-black text-3xs py-1.5 flex items-center justify-center gap-1"
                             style={{ borderRadius: "var(--leaf-r-sm)" }}>🔒 LOCKED</div>
                         </div>
                       )
@@ -1743,12 +1743,12 @@ export default function StoryDetailPage() {
                       <div className="flex-1 p-3.5 flex flex-col items-center justify-center gap-2 bg-ds-card border border-dashed border-ds-border"
                         style={{ borderRadius: "var(--leaf-r)" }}>
                         <span className="text-3xl">🌟</span>
-                        <p className="font-baloo font-black text-[11px] text-ds-muted text-center leading-snug">More coming soon!</p>
+                        <p className="font-baloo font-black text-2xs text-ds-muted text-center leading-snug">More coming soon!</p>
                       </div>
                     )}
                   </div>
 
-                  <p className="font-nunito text-ds-muted text-[11px] mt-2.5">
+                  <p className="font-nunito text-ds-muted text-2xs mt-2.5">
                     {nextStory?.unlocked
                       ? "🎉 Your next adventure is ready — tap to begin!"
                       : nextStory && !nextStory.is_free && !hasSubscription
@@ -1770,7 +1770,7 @@ export default function StoryDetailPage() {
                   <motion.button
                     whileTap={m.buttonPress}
                     onClick={() => setShowCertModal(true)}
-                    className="relative w-full font-baloo font-black text-[20px] py-4 flex items-center justify-center gap-2.5 overflow-hidden bg-gradient-to-r from-yellow-400 to-amber-500 text-amber-950"
+                    className="relative w-full font-baloo font-black text-xl py-4 flex items-center justify-center gap-2.5 overflow-hidden bg-gradient-to-r from-yellow-400 to-amber-500 text-amber-950"
                     style={{ borderRadius: "var(--leaf-r-lg)", boxShadow: "0 4px 20px rgba(251,191,36,0.40), inset 0 1px 0 rgba(255,255,255,0.4)" }}>
                     <motion.div className="absolute inset-0 pointer-events-none"
                       animate={{ x: ["-100%","200%"] }}
@@ -1783,7 +1783,7 @@ export default function StoryDetailPage() {
                   {nextStory?.unlocked ? (
                     <Link href={`/stories/${nextStory.slug}`} className="block">
                       <motion.div whileTap={m.buttonPress}
-                        className={`w-full font-baloo font-black text-[17px] py-3.5 flex items-center justify-center gap-2 text-white ${v.buttonStyle.primary}`}
+                        className={`w-full font-baloo font-black text-mlg py-3.5 flex items-center justify-center gap-2 text-white ${v.buttonStyle.primary}`}
                         style={{ borderRadius: "var(--leaf-r-lg)" }}>
                         🚀 {t("storyNextStory")}
                       </motion.div>
@@ -1791,7 +1791,7 @@ export default function StoryDetailPage() {
                   ) : nextStory && !nextStory.is_free && !hasSubscription ? (
                     <Link href="/pricing" className="block">
                       <motion.div whileTap={m.buttonPress} whileHover={{ scale: 1.02 }}
-                        className="w-full font-baloo font-black text-[17px] py-3.5 flex items-center justify-center gap-2 text-white bg-gradient-to-r from-violet-500 to-purple-600"
+                        className="w-full font-baloo font-black text-mlg py-3.5 flex items-center justify-center gap-2 text-white bg-gradient-to-r from-violet-500 to-purple-600"
                         style={{ borderRadius: "var(--leaf-r-lg)", boxShadow: "0 6px 20px rgba(109,40,217,0.30)" }}>
                         👑 Unlock Next Story
                       </motion.div>
@@ -1799,7 +1799,7 @@ export default function StoryDetailPage() {
                   ) : (
                     <Link href="/treasure" className="block">
                       <motion.div whileTap={m.buttonPress}
-                        className={`w-full font-baloo font-black text-[17px] py-3.5 flex items-center justify-center gap-2 text-white bg-gradient-to-r ${v.zoneGradients.treasureRoom}`}
+                        className={`w-full font-baloo font-black text-mlg py-3.5 flex items-center justify-center gap-2 text-white bg-gradient-to-r ${v.zoneGradients.treasureRoom}`}
                         style={{ borderRadius: "var(--leaf-r-lg)", boxShadow: "0 6px 20px rgba(245,158,11,0.30)" }}>
                         🏆 {t("storyMyTreasure")}
                       </motion.div>
@@ -1810,14 +1810,14 @@ export default function StoryDetailPage() {
                     whileTap={m.buttonPress}
                     onClick={handleShare}
                     disabled={sharingCert}
-                    className={`w-full font-baloo font-black text-[15px] py-3 flex items-center justify-center gap-2 text-white bg-gradient-to-r ${v.zoneGradients.communitySquare} disabled:opacity-60`}
+                    className={`w-full font-baloo font-black text-mbase py-3 flex items-center justify-center gap-2 text-white bg-gradient-to-r ${v.zoneGradients.communitySquare} disabled:opacity-60`}
                     style={{ borderRadius: "var(--leaf-r)", boxShadow: "0 4px 14px rgba(56,189,248,0.25)" }}>
                     {sharingCert ? "⏳ Preparing..." : "📲 Share on WhatsApp"}
                   </motion.button>
 
                   <Link href="/stories" className="block">
                     <motion.div whileTap={m.buttonPress}
-                      className="w-full font-baloo font-black text-[14px] py-2.5 flex items-center justify-center gap-2 bg-ds-card border border-ds-border text-ds-text"
+                      className="w-full font-baloo font-black text-sm py-2.5 flex items-center justify-center gap-2 bg-ds-card border border-ds-border text-ds-text"
                       style={{ borderRadius: "var(--leaf-r)" }}>
                       📚 {t("storyBackBtn")}
                     </motion.div>

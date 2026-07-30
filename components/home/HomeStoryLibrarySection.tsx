@@ -40,27 +40,27 @@ function UpgradeWallCard({ lockedCount }: { lockedCount: number }) {
             <motion.div
               animate={{ y: [0, -5, 0] }}
               transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut" }}
-              className="w-14 h-14 rounded-2xl bg-white/20 flex items-center justify-center shadow-lg border border-white/30">
+              className="w-14 h-14 rounded-2xl bg-[var(--ds-surface-card)]/20 flex items-center justify-center shadow-lg border border-white/30">
               <Crown className="w-7 h-7 text-yellow-300" />
             </motion.div>
             <div className="text-center">
-              <p className="font-baloo font-black text-white text-[13px] leading-tight">
+              <p className="font-baloo font-black text-white text-sml leading-tight">
                 {lockedCount} more {lockedCount === 1 ? "story" : "stories"}
               </p>
-              <p className="text-purple-200 text-[10px] mt-0.5 leading-tight">
+              <p className="text-purple-200 text-3xs mt-0.5 leading-tight">
                 waiting for you
               </p>
             </div>
             {/* Decorative dots */}
             <div className="flex gap-1 mt-1">
               {[...Array(Math.min(lockedCount, 5))].map((_, i) => (
-                <div key={i} className="w-1.5 h-1.5 rounded-full bg-white/40" />
+                <div key={i} className="w-1.5 h-1.5 rounded-full bg-[var(--ds-surface-card)]/40" />
               ))}
             </div>
           </div>
           {/* Bottom CTA */}
-          <div className="px-2.5 py-2.5 bg-white/10 border-t border-white/20 group-hover:bg-white/20 transition">
-            <p className="font-baloo font-black text-yellow-300 text-[11px] text-center leading-tight">
+          <div className="px-2.5 py-2.5 bg-[var(--ds-surface-card)]/10 border-t border-white/20 group-hover:bg-[var(--ds-surface-card)]/20 transition">
+            <p className="font-baloo font-black text-yellow-300 text-2xs text-center leading-tight">
               👑 Unlock All →
             </p>
           </div>
@@ -89,13 +89,13 @@ export default function HomeStoryLibrarySection({ stories, curStory, hasSubscrip
         {/* Section header */}
         <motion.div variants={up} className="flex items-center justify-between gap-3 mb-5">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-sky-100 flex items-center justify-center text-[22px] shrink-0 shadow-sm">📚</div>
+            <div className="w-10 h-10 rounded-2xl bg-sky-100 flex items-center justify-center text-1.5xl shrink-0 shadow-sm">📚</div>
             <div>
-              <p className="font-nunito text-[9px] uppercase tracking-widest text-sky-400 leading-none mb-0.5">The Library</p>
-              <h2 className="font-baloo font-black text-[21px] sm:text-[23px] text-gray-800 leading-tight">Story Library</h2>
+              <p className="font-nunito text-4xs uppercase tracking-widest text-sky-400 leading-none mb-0.5">The Library</p>
+              <h2 className="font-baloo font-black text-1.5xl sm:text-2xl text-[var(--ds-text-primary)] leading-tight">Story Library</h2>
             </div>
           </div>
-          <Link href="/stories" className="flex items-center gap-1 font-nunito font-bold text-sky-500 text-[13px] hover:underline">
+          <Link href="/stories" className="flex items-center gap-1 font-nunito font-bold text-sky-500 text-sml hover:underline">
             See all <ChevronRight className="w-4 h-4" />
           </Link>
         </motion.div>
@@ -116,7 +116,7 @@ export default function HomeStoryLibrarySection({ stories, curStory, hasSubscrip
 
               <motion.div variants={pop} className="shrink-0 w-[148px] sm:w-[164px]">
                 {story.unlocked ? (
-                  <div className="rounded-2xl overflow-hidden bg-white transition-all hover:-translate-y-1"
+                  <div className="rounded-2xl overflow-hidden bg-[var(--ds-surface-card)] transition-all hover:-translate-y-1"
                     style={{
                       boxShadow: isActive
                         ? "0 8px 28px rgba(5,150,105,0.25), 0 0 0 2px rgba(5,150,105,0.4)"
@@ -144,15 +144,15 @@ export default function HomeStoryLibrarySection({ stories, curStory, hasSubscrip
                         {/* Top-left status chip */}
                         <div className="absolute top-2.5 left-2.5">
                           {story.complete ? (
-                            <span className="flex items-center gap-1 font-baloo font-black text-[9px] bg-emerald-500 text-white px-2 py-0.5 rounded-full shadow-md">
+                            <span className="flex items-center gap-1 font-baloo font-black text-4xs bg-emerald-500 text-white px-2 py-0.5 rounded-full shadow-md">
                               <Star className="w-2.5 h-2.5 fill-white" /> Done
                             </span>
                           ) : isActive ? (
-                            <span className="flex items-center gap-1 font-baloo font-black text-[9px] bg-white/90 text-emerald-700 px-2 py-0.5 rounded-full shadow-md backdrop-blur-sm">
+                            <span className="flex items-center gap-1 font-baloo font-black text-4xs bg-[var(--ds-surface-card)]/90 text-emerald-700 px-2 py-0.5 rounded-full shadow-md backdrop-blur-sm">
                               <Play className="w-2 h-2 fill-emerald-600" /> Reading
                             </span>
                           ) : story.is_free ? (
-                            <span className="font-baloo font-black text-[9px] bg-sky-500 text-white px-2 py-0.5 rounded-full shadow-md">
+                            <span className="font-baloo font-black text-4xs bg-sky-500 text-white px-2 py-0.5 rounded-full shadow-md">
                               Free
                             </span>
                           ) : null}
@@ -160,11 +160,11 @@ export default function HomeStoryLibrarySection({ stories, curStory, hasSubscrip
 
                         {/* Bottom overlay — title + progress */}
                         <div className="absolute bottom-0 left-0 right-0 px-2.5 pb-2.5 pt-6">
-                          <p className="font-baloo font-black text-white text-[12px] leading-tight line-clamp-2 mb-1.5 drop-shadow">
+                          <p className="font-baloo font-black text-white text-xs leading-tight line-clamp-2 mb-1.5 drop-shadow">
                             {story.title}
                           </p>
                           {pctDone > 0 && !story.complete && (
-                            <div className="h-1.5 bg-white/30 rounded-full overflow-hidden">
+                            <div className="h-1.5 bg-[var(--ds-surface-card)]/30 rounded-full overflow-hidden">
                               <div className="h-full rounded-full" style={{ width: `${pctDone}%`, background: "#34d399" }} />
                             </div>
                           )}
@@ -172,27 +172,27 @@ export default function HomeStoryLibrarySection({ stories, curStory, hasSubscrip
                       </div>
 
                       {/* Bottom pill row */}
-                      <div className="flex items-center justify-between px-2.5 py-2 bg-white border-t border-gray-50">
+                      <div className="flex items-center justify-between px-2.5 py-2 bg-[var(--ds-surface-card)] border-t border-gray-50">
                         {story.category ? (
-                          <span className="font-nunito font-bold text-[9px] text-sky-600 bg-sky-50 px-2 py-0.5 rounded-full capitalize truncate max-w-[75px]">
+                          <span className="font-nunito font-bold text-4xs text-sky-600 bg-sky-50 px-2 py-0.5 rounded-full capitalize truncate max-w-[75px]">
                             {story.category}
                           </span>
                         ) : (
-                          <span className="font-nunito font-bold text-[9px] text-gray-400">Story</span>
+                          <span className="font-nunito font-bold text-4xs text-[var(--ds-text-tertiary)]">Story</span>
                         )}
                         {story.complete ? (
-                          <span className="font-nunito font-bold text-[9px] text-emerald-600">✓ All done</span>
+                          <span className="font-nunito font-bold text-4xs text-emerald-600">✓ All done</span>
                         ) : pctDone > 0 ? (
-                          <span className="font-nunito font-bold text-[9px] text-gray-400">{pctDone}%</span>
+                          <span className="font-nunito font-bold text-4xs text-[var(--ds-text-tertiary)]">{pctDone}%</span>
                         ) : (
-                          <span className="font-nunito font-bold text-[9px] text-sky-500">Start →</span>
+                          <span className="font-nunito font-bold text-4xs text-sky-500">Start →</span>
                         )}
                       </div>
                     </Link>
 
                     {/* Practice reading strip — separate link so it doesn't nest inside the story link */}
                     <Link href="/talk-to-nimi?mode=practice"
-                      className="flex items-center justify-center gap-1 py-1.5 text-[9px] font-black transition border-t border-sky-100 bg-sky-50 hover:bg-sky-100 text-sky-600">
+                      className="flex items-center justify-center gap-1 py-1.5 text-4xs font-black transition border-t border-sky-100 bg-sky-50 hover:bg-sky-100 text-sky-600">
                       🎤 Practice Reading
                     </Link>
                   </div>
@@ -200,47 +200,47 @@ export default function HomeStoryLibrarySection({ stories, curStory, hasSubscrip
                   /* Locked card — clickable if premium-locked, static if progress-locked */
                   isPremiumLocked ? (
                     <Link href="/pricing" className="block">
-                      <div className="rounded-2xl overflow-hidden bg-white shadow-[0_4px_12px_rgba(15,23,42,0.06)] group cursor-pointer">
+                      <div className="rounded-2xl overflow-hidden bg-[var(--ds-surface-card)] shadow-card-xs group cursor-pointer">
                         <div className="relative w-full" style={{ aspectRatio: "3/4" }}>
                           {story.cover_url
                             ? <Image src={getStorageUrl(story.cover_url)} alt={story.title} fill
                                 className="object-cover grayscale group-hover:grayscale-0 transition-all duration-500" />
-                            : <div className="absolute inset-0 flex items-center justify-center text-5xl bg-gray-100">
+                            : <div className="absolute inset-0 flex items-center justify-center text-5xl bg-[var(--ds-surface-card-active)]">
                                 {story.theme_emoji ?? "📖"}
                               </div>
                           }
                           <div className="absolute inset-0 bg-black/40 group-hover:bg-purple-900/50 transition-colors duration-300 flex flex-col items-center justify-center gap-1.5">
-                            <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center shadow-lg group-hover:bg-yellow-300 transition-colors">
+                            <div className="w-10 h-10 rounded-full bg-[var(--ds-surface-card)]/90 flex items-center justify-center shadow-lg group-hover:bg-yellow-300 transition-colors">
                               <Crown className="w-5 h-5 text-purple-600 group-hover:text-purple-800" />
                             </div>
-                            <span className="font-baloo font-black text-white/90 text-[10px] group-hover:text-yellow-300 transition-colors">Club Only</span>
+                            <span className="font-baloo font-black text-white/90 text-3xs group-hover:text-yellow-300 transition-colors">Club Only</span>
                           </div>
                         </div>
                         <div className="flex items-center justify-between px-2.5 py-2 bg-purple-50 border-t border-purple-100 group-hover:bg-purple-100 transition-colors">
-                          <p className="font-baloo font-black text-purple-700 text-[10px] leading-tight line-clamp-1 flex-1">{story.title}</p>
+                          <p className="font-baloo font-black text-purple-700 text-3xs leading-tight line-clamp-1 flex-1">{story.title}</p>
                           <Crown className="w-3 h-3 text-purple-400 shrink-0 ml-1" />
                         </div>
                       </div>
                     </Link>
                   ) : (
-                    <div className="rounded-2xl overflow-hidden bg-white opacity-55 shadow-[0_4px_12px_rgba(15,23,42,0.06)]">
+                    <div className="rounded-2xl overflow-hidden bg-[var(--ds-surface-card)] opacity-55 shadow-card-xs">
                       <div className="relative w-full" style={{ aspectRatio: "3/4" }}>
                         {story.cover_url
                           ? <Image src={getStorageUrl(story.cover_url)} alt={story.title} fill
                               className="object-cover grayscale" />
-                          : <div className="absolute inset-0 flex items-center justify-center text-5xl bg-gray-100">
+                          : <div className="absolute inset-0 flex items-center justify-center text-5xl bg-[var(--ds-surface-card-active)]">
                               {story.theme_emoji ?? "📖"}
                             </div>
                         }
                         <div className="absolute inset-0 bg-black/35 flex flex-col items-center justify-center gap-2">
-                          <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center shadow-lg">
-                            <Lock className="w-5 h-5 text-gray-500" />
+                          <div className="w-10 h-10 rounded-full bg-[var(--ds-surface-card)]/90 flex items-center justify-center shadow-lg">
+                            <Lock className="w-5 h-5 text-[var(--ds-text-secondary)]" />
                           </div>
                         </div>
                       </div>
-                      <div className="flex items-center justify-between px-2.5 py-2 bg-gray-50 border-t border-gray-100">
-                        <p className="font-baloo font-black text-gray-400 text-[10px] leading-tight line-clamp-1 flex-1">{story.title}</p>
-                        <Lock className="w-3 h-3 text-gray-300 shrink-0 ml-1" />
+                      <div className="flex items-center justify-between px-2.5 py-2 bg-[var(--ds-surface-card-hover)] border-t border-[var(--ds-border-primary)]">
+                        <p className="font-baloo font-black text-[var(--ds-text-tertiary)] text-3xs leading-tight line-clamp-1 flex-1">{story.title}</p>
+                        <Lock className="w-3 h-3 text-[var(--ds-text-tertiary)] shrink-0 ml-1" />
                       </div>
                     </div>
                   )
@@ -256,18 +256,18 @@ export default function HomeStoryLibrarySection({ stories, curStory, hasSubscrip
               <Link href="/stories">
                 <div className="rounded-2xl overflow-hidden h-full group cursor-pointer border-2 border-dashed border-sky-200 bg-gradient-to-br from-sky-50 to-indigo-50 hover:border-sky-400 transition-all">
                   <div className="flex flex-col items-center justify-center gap-2 px-3 pt-5 pb-3" style={{ aspectRatio: "3/4" }}>
-                    <motion.span className="text-[44px] leading-none"
+                    <motion.span className="text-4.5xl leading-none"
                       animate={{ y: [0, -6, 0] }}
                       transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut" }}>
                       🔭
                     </motion.span>
                     <div className="text-center">
-                      <p className="font-baloo font-black text-sky-700 text-[13px] leading-tight">What&apos;s next?</p>
-                      <p className="font-nunito text-sky-500 text-[10px] mt-1 leading-snug">More adventures are waiting for you!</p>
+                      <p className="font-baloo font-black text-sky-700 text-sml leading-tight">What&apos;s next?</p>
+                      <p className="font-nunito text-sky-500 text-3xs mt-1 leading-snug">More adventures are waiting for you!</p>
                     </div>
                   </div>
                   <div className="px-2.5 py-2 bg-sky-100/60 border-t border-sky-100 group-hover:bg-sky-200/60 transition">
-                    <p className="font-baloo font-black text-sky-600 text-[11px] text-center">Explore Stories →</p>
+                    <p className="font-baloo font-black text-sky-600 text-2xs text-center">Explore Stories →</p>
                   </div>
                 </div>
               </Link>

@@ -70,13 +70,13 @@ export default function BreakNudge({ status, suggestion, onDismiss, onBreak }: P
           <div className={`mx-3 my-2 p-3.5 border rounded-xl ${cfg.bg} ${cfg.border}`}>
             {/* Top row */}
             <div className="flex items-start gap-2.5">
-              <span className="text-[20px] shrink-0 leading-none mt-0.5">{cfg.emoji}</span>
+              <span className="text-xl shrink-0 leading-none mt-0.5">{cfg.emoji}</span>
               <div className="flex-1 min-w-0">
-                <p className={`font-black text-[13px] leading-snug mb-1 ${cfg.text}`}>
+                <p className={`font-black text-sml leading-snug mb-1 ${cfg.text}`}>
                   {cfg.headline}
                 </p>
                 {/* Offline activity chip */}
-                <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 border rounded-full text-[11px] font-bold ${cfg.badgeBg} ${cfg.badgeText} ${cfg.badgeBorder}`}>
+                <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 border rounded-full text-2xs font-bold ${cfg.badgeBg} ${cfg.badgeText} ${cfg.badgeBorder}`}>
                   <span>💡</span>
                   <span className="truncate max-w-[220px]">{suggestion}</span>
                 </div>
@@ -88,14 +88,14 @@ export default function BreakNudge({ status, suggestion, onDismiss, onBreak }: P
               {onBreak && (
                 <button
                   onClick={onBreak}
-                  className={`flex-1 py-2 text-[12px] font-black rounded-lg border ${cfg.border} ${cfg.text} bg-white hover:opacity-90 transition text-center`}
+                  className={`flex-1 py-2 text-xs font-black rounded-lg border ${cfg.border} ${cfg.text} bg-[var(--ds-surface-card)] hover:opacity-90 transition text-center`}
                 >
                   {cfg.breakLabel}
                 </button>
               )}
               <button
                 onClick={onDismiss}
-                className="flex-1 py-2 text-[12px] font-black rounded-lg bg-white/60 border border-gray-200 text-gray-500 hover:bg-white transition text-center"
+                className="flex-1 py-2 text-xs font-black rounded-lg bg-[var(--ds-surface-card)]/60 border border-[var(--ds-border-primary)] text-[var(--ds-text-secondary)] hover:bg-[var(--ds-surface-card)] transition text-center"
               >
                 {cfg.keepLabel}
               </button>

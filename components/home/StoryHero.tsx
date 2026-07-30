@@ -144,7 +144,7 @@ export default function StoryHero({ childName, childAvatar, story, slots, introV
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative leaf overflow-hidden cursor-pointer group bg-white border border-ds-border shadow-ds-card h-full flex flex-col"
+        className="relative leaf overflow-hidden cursor-pointer group bg-[var(--ds-surface-card)] border border-ds-border shadow-ds-card h-full flex flex-col"
       >
 
         {/* ═══ HERO AREA — layered world system ═══ */}
@@ -189,10 +189,10 @@ export default function StoryHero({ childName, childAvatar, story, slots, introV
 
           {/* Content text — z-10 */}
           <div className="relative z-10 p-5 sm:p-7 md:p-8 pt-12 sm:pt-14 max-w-[65%] sm:max-w-[55%] flex flex-col justify-center min-h-[260px] sm:min-h-[320px]">
-            <h2 className="font-baloo font-black text-white text-[32px] sm:text-[38px] md:text-[42px] leading-[1.1] drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]">
+            <h2 className="font-baloo font-black text-white text-3xl sm:text-4xl md:text-4.5xl leading-[1.1] drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]">
               {story.title}
             </h2>
-            <p className="font-nunito text-white/80 text-[14px] sm:text-[16px] mt-2 sm:mt-3 leading-relaxed drop-shadow-[0_1px_4px_rgba(0,0,0,0.4)]">
+            <p className="font-nunito text-white/80 text-sm sm:text-base mt-2 sm:mt-3 leading-relaxed drop-shadow-[0_1px_4px_rgba(0,0,0,0.4)]">
               {isComplete
                 ? `Amazing work, ${childName}! You've completed this story.`
                 : `Join ${childName}, Nimi and Piko on an adventure with ${story.title}!`}
@@ -208,12 +208,12 @@ export default function StoryHero({ childName, childAvatar, story, slots, introV
         </div>
 
         {/* ═══ PROGRESS BAR ═══ */}
-        <div className="bg-white px-4 sm:px-6 py-3 flex items-center gap-2 sm:gap-3 border-t border-ds-border">
+        <div className="bg-[var(--ds-surface-card)] px-4 sm:px-6 py-3 flex items-center gap-2 sm:gap-3 border-t border-ds-border">
           <Star className="w-5 h-5 text-yellow-400 fill-yellow-400 shrink-0" />
-          <span className="font-nunito text-gray-700 text-[14px] sm:text-[16px] font-bold shrink-0">
+          <span className="font-nunito text-[var(--ds-text-primary)] text-sm sm:text-base font-bold shrink-0">
             Story Progress
           </span>
-          <div className="flex-1 bg-gray-100 rounded-full h-2.5 sm:h-3 overflow-hidden">
+          <div className="flex-1 bg-[var(--ds-surface-card-hover)] rounded-full h-2.5 sm:h-3 overflow-hidden">
             <motion.div
               className={`h-full rounded-full bg-gradient-to-r ${theme.gradients.progress}`}
               initial={{ width: 0 }}
@@ -221,7 +221,7 @@ export default function StoryHero({ childName, childAvatar, story, slots, introV
               transition={{ duration: 1.2, ease: "easeOut" }}
             />
           </div>
-          <span className="font-nunito text-gray-900 font-bold text-[14px] sm:text-[16px] shrink-0 tabular-nums">
+          <span className="font-nunito text-[var(--ds-text-primary)] font-bold text-sm sm:text-base shrink-0 tabular-nums">
             {done} / {total} Missions Completed
           </span>
         </div>

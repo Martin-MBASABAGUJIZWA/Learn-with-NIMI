@@ -23,13 +23,13 @@ export default function HelpActionCards() {
         <button
           key={card.titleKey}
           onClick={card.action}
-          className="bg-white border border-ds-border shadow-ds-card p-4 flex flex-col items-center text-center gap-2 hover:bg-gray-50 active:scale-[0.97] transition" style={{ borderRadius: 'var(--leaf-r)' }}
+          className="bg-[var(--ds-surface-card)] border border-ds-border shadow-ds-card p-4 flex flex-col items-center text-center gap-2 hover:bg-[var(--ds-surface-card)] active:scale-[0.97] transition" style={{ borderRadius: 'var(--leaf-r)' }}
         >
           <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${card.color}`}>
             <card.icon className="w-6 h-6" />
           </div>
           <p className="font-black text-ds-text text-sm">{t(card.titleKey)}</p>
-          <p className="text-gray-500 text-xs">{t(card.descKey)}</p>
+          <p className="text-[var(--ds-text-secondary)] text-xs">{t(card.descKey)}</p>
         </button>
       ))}
     </div>

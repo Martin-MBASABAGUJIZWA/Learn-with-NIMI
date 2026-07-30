@@ -36,18 +36,18 @@ export default function MagicDialog({ open, onClose, title, emoji, children }: P
               className={`w-full sm:max-w-md ${cv.dialogStyle.containerRadius} p-6 pb-8 sm:pb-6 ${cv.dialogStyle.background} border-t border-t-ds-border sm:${cv.dialogStyle.border} sm:mx-4 ${cv.dialogStyle.shadow}`}
             >
               {/* Mobile handle */}
-              <div className="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-4 sm:hidden" />
+              <div className="w-10 h-1 bg-[var(--ds-surface-card-active)] rounded-full mx-auto mb-4 sm:hidden" />
 
               {/* Header */}
               {(title || emoji) && (
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
                     {emoji && <span className="text-2xl">{emoji}</span>}
-                    {title && <h3 className="font-baloo font-black text-gray-900 text-[20px]">{title}</h3>}
+                    {title && <h3 className="font-baloo font-black text-[var(--ds-text-primary)] text-xl">{title}</h3>}
                   </div>
                   <button
                     onClick={onClose}
-                    className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-500 hover:text-gray-700 transition-colors"
+                    className="w-8 h-8 rounded-full bg-[var(--ds-surface-card-hover)] hover:bg-[var(--ds-surface-card-active)] flex items-center justify-center text-[var(--ds-text-secondary)] hover:text-[var(--ds-text-primary)] transition-colors"
                   >
                     <X size={16} />
                   </button>

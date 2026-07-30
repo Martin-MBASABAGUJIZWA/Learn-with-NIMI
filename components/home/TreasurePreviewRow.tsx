@@ -28,7 +28,7 @@ export default function TreasurePreviewRow({ badgeCount }: Props) {
   const m = useThemeMotion();
   const { t } = useLanguage();
   return (
-    <div className="bg-white border border-ds-border shadow-ds-card overflow-hidden" style={{ borderRadius: 'var(--leaf-r)' }}>
+    <div className="bg-[var(--ds-surface-card)] border border-ds-border shadow-ds-card overflow-hidden" style={{ borderRadius: 'var(--leaf-r)' }}>
       <div className="p-5 sm:p-6">
         <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-3">
@@ -37,13 +37,13 @@ export default function TreasurePreviewRow({ badgeCount }: Props) {
               className="w-12 h-12 bg-gradient-to-br from-yellow-500 to-amber-600 flex items-center justify-center shadow-xl shadow-yellow-500/20 border-2 border-yellow-300/30 shrink-0" style={{ borderRadius: 'var(--leaf-r)' }}>
               <span className="text-2xl">💎</span>
             </motion.div>
-            <h3 className="font-black text-ds-text text-[16px] sm:text-[18px] leading-tight">
+            <h3 className="font-black text-ds-text text-base sm:text-lg leading-tight">
               {t("treasureTitle")}
             </h3>
           </div>
           <div className="flex flex-col items-end gap-1.5">
-            <span className="text-ds-text font-black text-[18px]">{badgeCount}<span className="text-gray-400 text-[14px]">/6</span></span>
-            <span className="text-gray-400 text-[9px] font-bold">{t("treasureCollected")}</span>
+            <span className="text-ds-text font-black text-lg">{badgeCount}<span className="text-[var(--ds-text-tertiary)] text-sm">/6</span></span>
+            <span className="text-[var(--ds-text-tertiary)] text-4xs font-bold">{t("treasureCollected")}</span>
           </div>
         </div>
 
@@ -62,17 +62,17 @@ export default function TreasurePreviewRow({ badgeCount }: Props) {
                   className={`w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center text-xl sm:text-2xl border-[3px] shadow-xl ${
                     earned
                       ? `bg-gradient-to-br ${STICKER_BG[i]} border-white/40 shadow-yellow-500/15`
-                      : "bg-gray-100 border-dashed border-gray-200"
+                      : "bg-[var(--ds-surface-card-hover)] border-dashed border-[var(--ds-border-primary)]"
                   }`}
                   style={{ borderRadius: 'var(--leaf-r)' }}>
                   {earned ? (
                     <span className="drop-shadow-lg">{STICKER_EMOJIS[i]}</span>
                   ) : (
-                    <span className="text-gray-300 text-xl font-black">?</span>
+                    <span className="text-[var(--ds-text-tertiary)] text-xl font-black">?</span>
                   )}
                 </motion.div>
-                <span className={`text-[7px] sm:text-[8px] font-black text-center leading-tight whitespace-pre-line truncate w-full ${
-                  earned ? "text-gray-600" : "text-gray-300"
+                <span className={`text-6xs sm:text-5xs font-black text-center leading-tight whitespace-pre-line truncate w-full ${
+                  earned ? "text-[var(--ds-text-secondary)]" : "text-[var(--ds-text-tertiary)]"
                 }`}>{t(key)}</span>
               </motion.div>
             );
@@ -81,7 +81,7 @@ export default function TreasurePreviewRow({ badgeCount }: Props) {
 
         <Link href="/treasure">
           <motion.button whileHover={{ scale: 1.02 }} whileTap={m.buttonPress}
-            className="w-full text-white font-black text-[13px] py-3 shadow-lg flex items-center justify-center gap-2 transition-colors"
+            className="w-full text-white font-black text-sml py-3 shadow-lg flex items-center justify-center gap-2 transition-colors"
             style={{ backgroundColor: 'var(--nimi-green)', borderRadius: 'var(--leaf-r-sm)' }}>
             {t("treasureOpenChest")} <ChevronRight className="w-4 h-4" />
           </motion.button>

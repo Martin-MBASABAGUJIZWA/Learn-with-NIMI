@@ -18,7 +18,7 @@ export default function NextStoryCard({ story }: Props) {
   if (!story) return null;
 
   return (
-    <div className="relative overflow-hidden border border-[var(--ds-border-primary)]/60 bg-gradient-to-br from-white via-[var(--ds-brand-soft)]/60 to-white shadow-[0_16px_34px_rgba(15,23,42,0.08)] flex flex-col h-full" style={{ borderRadius: 'var(--leaf-r-lg)' }}>
+    <div className="relative overflow-hidden border border-[var(--ds-border-primary)]/60 bg-gradient-to-br from-white via-[var(--ds-brand-soft)]/60 to-white shadow-card-2xl flex flex-col h-full" style={{ borderRadius: 'var(--leaf-r-lg)' }}>
       <Image src={assets.storyCard.background} alt="" aria-hidden="true"
         fill className="object-cover pointer-events-none opacity-[0.08]" />
       <Image src={assets.storyCard.frame} alt="" aria-hidden="true"
@@ -27,11 +27,11 @@ export default function NextStoryCard({ story }: Props) {
 
       <div className="relative z-10 flex flex-col flex-1">
         <div className="flex items-center justify-center px-4 pt-4">
-          <div className="rounded-full border border-[var(--ds-border-brand)]/20 bg-white/80 px-3 py-1 text-[10px] font-black uppercase tracking-[0.24em] text-[var(--ds-brand-primary)] shadow-sm">
+          <div className="rounded-full border border-[var(--ds-border-brand)]/20 bg-[var(--ds-surface-card)]/80 px-3 py-1 text-3xs font-black uppercase tracking-[0.24em] text-[var(--ds-brand-primary)] shadow-sm">
             Next Adventure
           </div>
         </div>
-        <h3 className="font-baloo font-black text-ds-text text-[20px] sm:text-[24px] text-center pt-3 px-4 uppercase tracking-wider">
+        <h3 className="font-baloo font-black text-ds-text text-xl sm:text-2xl text-center pt-3 px-4 uppercase tracking-wider">
           Next Story 🌿
         </h3>
 
@@ -55,12 +55,12 @@ export default function NextStoryCard({ story }: Props) {
         </div>
 
         <div className="p-4 flex-1 flex flex-col text-center">
-          <h4 className="font-baloo font-black text-ds-text text-[20px]">{story.title}</h4>
-          <p className="font-nunito text-gray-500 text-[14px] mt-1.5 leading-snug flex-1">
+          <h4 className="font-baloo font-black text-ds-text text-xl">{story.title}</h4>
+          <p className="font-nunito text-[var(--ds-text-secondary)] text-sm mt-1.5 leading-snug flex-1">
             Complete the current story to unlock this adventure!
           </p>
-          <div className="mt-3 border border-[var(--ds-border-brand)]/20 bg-white/80 leaf py-2.5 shadow-sm">
-            <span className="font-nunito text-[var(--ds-brand-primary)] text-[16px] font-black">🔒 Locked</span>
+          <div className="mt-3 border border-[var(--ds-border-brand)]/20 bg-[var(--ds-surface-card)]/80 leaf py-2.5 shadow-sm">
+            <span className="font-nunito text-[var(--ds-brand-primary)] text-base font-black">🔒 Locked</span>
           </div>
         </div>
       </div>

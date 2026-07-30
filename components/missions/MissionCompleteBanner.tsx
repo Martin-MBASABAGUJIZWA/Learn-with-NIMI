@@ -28,7 +28,7 @@ export default function MissionCompleteBanner({ storySlug }: Props) {
       initial={{ scale: 0.8, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       transition={SPRING.modal}
-      className="relative overflow-hidden leaf-lg border border-[var(--ds-brand-primary)]/30 bg-gradient-to-br from-white via-emerald-50/70 to-amber-50/60 p-6 text-center shadow-[0_16px_34px_rgba(15,23,42,0.08)]"
+      className="relative overflow-hidden leaf-lg border border-[var(--ds-brand-primary)]/30 bg-gradient-to-br from-white via-emerald-50/70 to-amber-50/60 p-6 text-center shadow-card-2xl"
     >
       <Image src={assets.rewards.celebration} alt="" aria-hidden="true" fill
         className="object-cover pointer-events-none opacity-[0.06]" />
@@ -51,7 +51,7 @@ export default function MissionCompleteBanner({ storySlug }: Props) {
         <motion.p
           initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.4, duration: DURATION.base, ease: EASE.enter }}
-          className="font-baloo font-black text-[var(--ds-brand-primary)] text-[24px]"
+          className="font-baloo font-black text-[var(--ds-brand-primary)] text-2xl"
         >
           {t("storyMissionCompleteTitle")}
         </motion.p>
@@ -59,7 +59,7 @@ export default function MissionCompleteBanner({ storySlug }: Props) {
         <motion.p
           initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.6, duration: DURATION.base, ease: EASE.enter }}
-          className="font-nunito text-gray-600 text-[14px] mt-1"
+          className="font-nunito text-[var(--ds-text-secondary)] text-sm mt-1"
         >
           {t("storyMissionCompleteDesc")}
         </motion.p>
@@ -71,7 +71,7 @@ export default function MissionCompleteBanner({ storySlug }: Props) {
           >
             <Link
               href={`/stories/${storySlug}`}
-              className="inline-flex items-center gap-2 mt-4 font-baloo font-black bg-[var(--ds-brand-primary)] hover:bg-[var(--ds-brand-hover)] text-white text-[16px] rounded-full px-6 py-3 shadow-lg transition"
+              className="inline-flex items-center gap-2 mt-4 font-baloo font-black bg-[var(--ds-brand-primary)] hover:bg-[var(--ds-brand-hover)] text-white text-base rounded-full px-6 py-3 shadow-lg transition"
             >
               {t("storyContinueArrow")}
             </Link>

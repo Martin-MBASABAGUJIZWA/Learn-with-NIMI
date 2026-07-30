@@ -56,7 +56,7 @@ export default function Navigation() {
       <header
         className={`fixed top-0 inset-x-0 z-40 transition-all duration-300 ${
           scrolled
-            ? "bg-white/95 backdrop-blur-sm border-b border-gray-100 shadow-sm"
+            ? "bg-[var(--ds-surface-card)]/95 backdrop-blur-sm border-b border-[var(--ds-border-primary)] shadow-sm"
             : "bg-transparent"
         }`}
       >
@@ -71,8 +71,8 @@ export default function Navigation() {
                 href={link.href}
                 className={`font-nunito font-bold text-[14px] transition-colors pb-0.5 ${
                   link.active
-                    ? "text-gray-900 border-b-2 border-nimi-green"
-                    : "text-gray-700 hover:text-gray-900 border-b-2 border-transparent"
+                    ? "text-[var(--ds-text-primary)] border-b-2 border-nimi-green"
+                    : "text-[var(--ds-text-primary)] hover:text-[var(--ds-text-primary)] border-b-2 border-transparent"
                 }`}
               >
                 {link.label}
@@ -83,7 +83,7 @@ export default function Navigation() {
           <div className="hidden md:flex items-center gap-2 shrink-0 mt-4">
             <Link
               href="/loginpage"
-              className="font-baloo font-black text-gray-800 text-[13px] px-5 py-2 rounded-full bg-white/90 border border-gray-200 hover:bg-white transition-colors shadow-sm"
+              className="font-baloo font-black text-[var(--ds-text-primary)] text-[13px] px-5 py-2 rounded-full bg-[var(--ds-surface-card)]/90 border border-[var(--ds-border-primary)] hover:bg-[var(--ds-surface-card)] transition-colors shadow-sm"
             >
               Log In
             </Link>
@@ -99,9 +99,9 @@ export default function Navigation() {
           <button
             onClick={() => setMenuOpen(true)}
             aria-label="Open menu"
-            className="md:hidden w-10 h-10 rounded-full flex items-center justify-center bg-white/90 border border-gray-200 shrink-0 active:scale-90 transition-transform mt-3"
+            className="md:hidden w-10 h-10 rounded-full flex items-center justify-center bg-[var(--ds-surface-card)]/90 border border-[var(--ds-border-primary)] shrink-0 active:scale-90 transition-transform mt-3"
           >
-            <Menu className="w-5 h-5 text-gray-700" />
+            <Menu className="w-5 h-5 text-[var(--ds-text-primary)]" />
           </button>
         </div>
       </header>
@@ -117,17 +117,17 @@ export default function Navigation() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: DURATION.base, ease: EASE.enter }}
-            className="fixed inset-0 z-50 bg-white md:hidden flex flex-col"
+            className="fixed inset-0 z-50 bg-[var(--ds-surface-card)] md:hidden flex flex-col"
           >
             {/* Top bar */}
-            <div className="flex items-center gap-3 px-4 sm:px-6 py-2 border-b border-gray-100 shrink-0">
+            <div className="flex items-center gap-3 px-4 sm:px-6 py-2 border-b border-[var(--ds-border-primary)] shrink-0">
               <Logo />
               <button
                 onClick={() => setMenuOpen(false)}
                 aria-label="Close menu"
-                className="w-10 h-10 rounded-full flex items-center justify-center border border-gray-200 shrink-0 active:scale-90 transition-transform"
+                className="w-10 h-10 rounded-full flex items-center justify-center border border-[var(--ds-border-primary)] shrink-0 active:scale-90 transition-transform"
               >
-                <X className="w-5 h-5 text-gray-700" />
+                <X className="w-5 h-5 text-[var(--ds-text-primary)]" />
               </button>
             </div>
 
@@ -145,7 +145,7 @@ export default function Navigation() {
                     href={link.href}
                     onClick={() => setMenuOpen(false)}
                     className={`block font-baloo font-black text-[24px] py-3 active:scale-95 transition-transform ${
-                      link.active ? "text-nimi-green" : "text-gray-800"
+                      link.active ? "text-nimi-green" : "text-[var(--ds-text-primary)]"
                     }`}
                   >
                     {link.label}
@@ -164,7 +164,7 @@ export default function Navigation() {
               <Link
                 href="/loginpage"
                 onClick={() => setMenuOpen(false)}
-                className="font-baloo font-black text-gray-700 text-[15px] text-center px-4 py-3 rounded-full border border-gray-200"
+                className="font-baloo font-black text-[var(--ds-text-primary)] text-[15px] text-center px-4 py-3 rounded-full border border-[var(--ds-border-primary)]"
               >
                 Log In
               </Link>

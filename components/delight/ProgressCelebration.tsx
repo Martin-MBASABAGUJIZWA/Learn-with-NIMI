@@ -38,7 +38,7 @@ export default function ProgressCelebration({
   return (
     <div className={`relative ${className ?? ""}`}>
       <div
-        className="w-full bg-gray-100 rounded-full overflow-hidden"
+        className="w-full bg-[var(--ds-surface-card-hover)] rounded-full overflow-hidden"
         style={{ height }}
         role="progressbar"
         aria-valuenow={Math.round(pct)}

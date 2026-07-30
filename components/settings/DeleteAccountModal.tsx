@@ -55,13 +55,13 @@ export default function DeleteAccountModal({ email, onClose }: Props) {
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
         <motion.div
           {...m.modalAnimation}
-          className="bg-white border border-ds-border shadow-2xl w-full max-w-sm overflow-hidden" style={{ borderRadius: 'var(--leaf-r-lg)' }}
+          className="bg-[var(--ds-surface-card)] border border-ds-border shadow-2xl w-full max-w-sm overflow-hidden" style={{ borderRadius: 'var(--leaf-r-lg)' }}
         >
           <div className="bg-red-600 px-5 py-4 flex items-center justify-between">
             <p className="text-white font-black text-lg tracking-wide">{t("deleteAccountModalTitle")}</p>
             <button onClick={onClose} disabled={deleting}
               aria-label="Close"
-              className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-white transition disabled:opacity-60">
+              className="w-8 h-8 rounded-full bg-[var(--ds-surface-card)]/20 hover:bg-[var(--ds-surface-card)]/30 flex items-center justify-center text-white transition disabled:opacity-60">
               <X className="w-4 h-4" />
             </button>
           </div>
@@ -82,7 +82,7 @@ export default function DeleteAccountModal({ email, onClose }: Props) {
                 onChange={(e) => { setConfirmText(e.target.value); setError(null); }}
                 placeholder={t("deleteAccountConfirmPlaceholder")}
                 disabled={deleting}
-                className="w-full border border-ds-border bg-ds-input leaf px-3 py-2 text-sm font-semibold text-ds-text focus:outline-none focus:ring-2 focus:ring-red-400 transition placeholder:text-gray-400"
+                className="w-full border border-ds-border bg-ds-input leaf px-3 py-2 text-sm font-semibold text-ds-text focus:outline-none focus:ring-2 focus:ring-red-400 transition placeholder:text-[var(--ds-text-tertiary)]"
               />
             </div>
 
@@ -99,7 +99,7 @@ export default function DeleteAccountModal({ email, onClose }: Props) {
               <button
                 onClick={onClose}
                 disabled={deleting}
-                className="flex-1 border border-ds-border text-ds-text font-black rounded-full py-2.5 text-sm hover:bg-gray-50 transition disabled:opacity-60"
+                className="flex-1 border border-ds-border text-ds-text font-black rounded-full py-2.5 text-sm hover:bg-[var(--ds-surface-card)] transition disabled:opacity-60"
               >
                 {t("cancel")}
               </button>

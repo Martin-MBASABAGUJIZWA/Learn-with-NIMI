@@ -47,9 +47,9 @@ function ConfidenceStars({ confidence }: { confidence: number }) {
   return (
     <div className="flex items-center gap-1">
       {[1, 2, 3].map(i => (
-        <span key={i} className={`text-[14px] ${i <= stars ? 'text-amber-400' : 'text-gray-200'}`}>★</span>
+        <span key={i} className={`text-sm ${i <= stars ? 'text-amber-400' : 'text-gray-200'}`}>★</span>
       ))}
-      <span className="text-[10px] font-semibold text-ds-muted ml-1">
+      <span className="text-3xs font-semibold text-ds-muted ml-1">
         {label.replace('★★★ ', '').replace('★★☆ ', '').replace('★☆☆ ', '')}
       </span>
     </div>
@@ -59,8 +59,8 @@ function ConfidenceStars({ confidence }: { confidence: number }) {
 function OutcomeStatement({ text }: { text: string }) {
   return (
     <div className="flex items-start gap-2">
-      <span className="text-emerald-500 font-black text-[13px] shrink-0 mt-px">✓</span>
-      <span className="text-[12px] text-ds-text font-nunito leading-relaxed">{text}</span>
+      <span className="text-emerald-500 font-black text-sml shrink-0 mt-px">✓</span>
+      <span className="text-xs text-ds-text font-nunito leading-relaxed">{text}</span>
     </div>
   );
 }
@@ -69,7 +69,7 @@ function MeasurementMethod({ text }: { text: string }) {
   return (
     <div className="flex items-center gap-2">
       <span className="w-1.5 h-1.5 rounded-full bg-blue-400 shrink-0" />
-      <span className="text-[11px] text-ds-muted font-nunito">{text}</span>
+      <span className="text-2xs text-ds-muted font-nunito">{text}</span>
     </div>
   );
 }
@@ -83,7 +83,7 @@ function CriterionRow({ c }: { c: SuccessCriterion }) {
     skill_confidence:       '🧠',
   };
   return (
-    <div className="flex items-center gap-2 text-[11px]">
+    <div className="flex items-center gap-2 text-2xs">
       <span>{metricIcon[c.metric] ?? '●'}</span>
       <span className="flex-1 text-ds-muted font-nunito">{c.description}</span>
       <span className="font-black text-ds-text shrink-0">
@@ -104,13 +104,13 @@ function BreakdownBar({ item }: { item: OutcomeBreakdownItem }) {
 
   return (
     <div className="space-y-1">
-      <div className="flex items-center justify-between text-[11px]">
+      <div className="flex items-center justify-between text-2xs">
         <span className="text-ds-muted font-nunito truncate flex-1 mr-2">{item.label}</span>
         <span className={`font-black shrink-0 ${exceeded ? 'text-emerald-600' : 'text-rose-600'}`}>
           {actualPct}% {exceeded ? '↑' : '↓'} (predicted {predPct}%)
         </span>
       </div>
-      <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+      <div className="h-1.5 bg-[var(--ds-surface-card-hover)] rounded-full overflow-hidden">
         <div className={`h-full rounded-full transition-all ${colour}`} style={{ width: `${barWidth}%` }} />
       </div>
     </div>
@@ -127,24 +127,24 @@ export default function LearningOutcomeCard({ storyTitle, prediction, outcome, r
   const scoreDisplay = hasOutcome ? formatSuccessScore(outcome!.successScore) : null;
 
   return (
-    <div className="border border-ds-border rounded-xl overflow-hidden bg-white shadow-ds-card">
+    <div className="border border-ds-border rounded-xl overflow-hidden bg-[var(--ds-surface-card)] shadow-ds-card">
 
       {/* Header */}
       <div className="px-4 pt-4 pb-3 border-b border-ds-border bg-gradient-to-br from-indigo-50 to-white">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <p className="text-[10px] font-black uppercase tracking-wider text-indigo-400 mb-1">
+            <p className="text-3xs font-black uppercase tracking-wider text-indigo-400 mb-1">
               Learning Outcome
             </p>
-            <p className="font-black text-ds-text text-[15px] leading-snug">{storyTitle}</p>
+            <p className="font-black text-ds-text text-mbase leading-snug">{storyTitle}</p>
           </div>
           {/* Success score badge (when available) */}
           {scoreDisplay && (
             <div className={`shrink-0 flex flex-col items-center px-3 py-2 rounded-xl bg-${scoreDisplay.colour}-50 border border-${scoreDisplay.colour}-200`}>
-              <span className={`text-[22px] font-black text-${scoreDisplay.colour}-600 leading-none`}>
+              <span className={`text-1.5xl font-black text-${scoreDisplay.colour}-600 leading-none`}>
                 {scoreDisplay.icon} {scoreDisplay.label}
               </span>
-              <span className={`text-[9px] font-bold text-${scoreDisplay.colour}-500 mt-0.5`}>
+              <span className={`text-4xs font-bold text-${scoreDisplay.colour}-500 mt-0.5`}>
                 {scoreDisplay.detail}
               </span>
             </div>
@@ -162,7 +162,7 @@ export default function LearningOutcomeCard({ storyTitle, prediction, outcome, r
             <button
               key={t}
               onClick={() => setTab(t)}
-              className={`flex-1 py-2 text-[12px] font-black transition-colors ${
+              className={`flex-1 py-2 text-xs font-black transition-colors ${
                 tab === t
                   ? 'text-indigo-600 border-b-2 border-indigo-500 bg-indigo-50/50'
                   : 'text-ds-muted hover:text-ds-text'
@@ -181,7 +181,7 @@ export default function LearningOutcomeCard({ storyTitle, prediction, outcome, r
           {/* Expected outcomes */}
           {prediction.outcomeStatements.length > 0 && (
             <div>
-              <p className="text-[10px] font-black uppercase tracking-wider text-gray-400 mb-2">
+              <p className="text-3xs font-black uppercase tracking-wider text-[var(--ds-text-tertiary)] mb-2">
                 After completing this story
               </p>
               <div className="space-y-1.5">
@@ -197,7 +197,7 @@ export default function LearningOutcomeCard({ storyTitle, prediction, outcome, r
             <div>
               <button
                 onClick={() => setShowCriteria(v => !v)}
-                className="flex items-center gap-1.5 text-[11px] font-bold text-ds-action hover:opacity-70 transition mb-2"
+                className="flex items-center gap-1.5 text-2xs font-bold text-ds-action hover:opacity-70 transition mb-2"
               >
                 <span className={`transition-transform ${showCriteria ? 'rotate-90' : ''}`}>▶</span>
                 {showCriteria ? 'Hide success criteria' : "How we’ll measure success"}
@@ -213,7 +213,7 @@ export default function LearningOutcomeCard({ storyTitle, prediction, outcome, r
           {/* Measurement methods */}
           {prediction.measurementMethods.length > 0 && (
             <div>
-              <p className="text-[10px] font-black uppercase tracking-wider text-gray-400 mb-1.5">
+              <p className="text-3xs font-black uppercase tracking-wider text-[var(--ds-text-tertiary)] mb-1.5">
                 Measured using
               </p>
               <div className="space-y-1">
@@ -226,9 +226,9 @@ export default function LearningOutcomeCard({ storyTitle, prediction, outcome, r
 
           {/* Teacher: show raw prediction numbers */}
           {role === 'teacher' && prediction.expectedQuizAccuracy !== null && (
-            <div className="bg-gray-50 rounded-lg p-3 border border-ds-border">
-              <p className="text-[10px] font-black uppercase tracking-wider text-gray-400 mb-2">Model output</p>
-              <div className="space-y-1 font-mono text-[10px] text-ds-muted">
+            <div className="bg-[var(--ds-surface-card)] rounded-lg p-3 border border-ds-border">
+              <p className="text-3xs font-black uppercase tracking-wider text-[var(--ds-text-tertiary)] mb-2">Model output</p>
+              <div className="space-y-1 font-mono text-3xs text-ds-muted">
                 <div>Predicted quiz accuracy: {Math.round(prediction.expectedQuizAccuracy * 100)}%</div>
                 <div>Prediction confidence: {Math.round(prediction.predictionConfidence * 100)}%</div>
                 {prediction.expectedVocabGains.length > 0 && (
@@ -250,7 +250,7 @@ export default function LearningOutcomeCard({ storyTitle, prediction, outcome, r
           {/* Breakdown bars */}
           {outcome.breakdown.length > 0 && (
             <div>
-              <p className="text-[10px] font-black uppercase tracking-wider text-gray-400 mb-3">
+              <p className="text-3xs font-black uppercase tracking-wider text-[var(--ds-text-tertiary)] mb-3">
                 Prediction vs actual
               </p>
               <div className="space-y-3">
@@ -262,23 +262,23 @@ export default function LearningOutcomeCard({ storyTitle, prediction, outcome, r
           )}
 
           {/* Prediction accuracy */}
-          <div className="flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2 border border-ds-border">
-            <span className="text-[11px] text-ds-muted font-nunito">Nimi&apos;s prediction accuracy</span>
-            <span className={`text-[12px] font-black ${outcome.predictionAccuracy >= 0.7 ? 'text-emerald-600' : 'text-amber-600'}`}>
+          <div className="flex items-center justify-between bg-[var(--ds-surface-card)] rounded-lg px-3 py-2 border border-ds-border">
+            <span className="text-2xs text-ds-muted font-nunito">Nimi&apos;s prediction accuracy</span>
+            <span className={`text-xs font-black ${outcome.predictionAccuracy >= 0.7 ? 'text-emerald-600' : 'text-amber-600'}`}>
               {Math.round(outcome.predictionAccuracy * 100)}%
             </span>
           </div>
 
           {outcome.beatPrediction && (
             <div className="flex items-center gap-2 px-3 py-2 bg-emerald-50 border border-emerald-200 rounded-lg">
-              <span className="text-emerald-500 text-[14px]">✓</span>
-              <p className="text-[11px] font-bold text-emerald-700">
+              <span className="text-emerald-500 text-sm">✓</span>
+              <p className="text-2xs font-bold text-emerald-700">
                 Results exceeded prediction — recommendation engine is learning correctly.
               </p>
             </div>
           )}
 
-          <p className="text-[10px] text-gray-300 text-center font-semibold">
+          <p className="text-3xs text-[var(--ds-text-tertiary)] text-center font-semibold">
             These results will improve future recommendations for this learner.
           </p>
         </div>

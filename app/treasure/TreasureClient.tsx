@@ -87,7 +87,7 @@ function SectionCleared({ label }: { label: string }) {
     <motion.div
       initial={{ opacity:0, scale:0.92, y:6 }}
       animate={{ opacity:1, scale:1,   y:0 }}
-      className="flex items-center justify-center gap-2 py-2 px-4 rounded-xl bg-[var(--nimi-green)]/10 border border-[var(--nimi-green)]/30 text-[13px] font-black"
+      className="flex items-center justify-center gap-2 py-2 px-4 rounded-xl bg-[var(--nimi-green)]/10 border border-[var(--nimi-green)]/30 text-sml font-black"
       style={{ color:"var(--nimi-green)" }}
     >
       <motion.span animate={{ rotate:[0,15,-10,0] }} transition={{ duration:0.6, delay:0.2 }}>🎉</motion.span>
@@ -151,7 +151,7 @@ function ChallengeCard({
       <div className="flex-1 min-w-0 pl-1">
         <div className="flex items-center gap-2 mb-0.5">
           <p className={`font-black leading-tight ${
-            premium ? "text-[15px]" : "text-[13px]"
+            premium ? "text-mbase" : "text-sml"
           } ${state === "locked" ? "text-ds-muted" : "text-ds-text"}`}>
             {t(challenge.titleKey)}
           </p>
@@ -161,7 +161,7 @@ function ChallengeCard({
             <motion.span
               initial={{ scale:0, opacity:0 }}
               animate={{ scale:1, opacity:1 }}
-              className="text-[9px] font-black px-2 py-0.5 rounded-full text-white shrink-0"
+              className="text-4xs font-black px-2 py-0.5 rounded-full text-white shrink-0"
               style={{ background:"var(--nimi-green)",
                 boxShadow:"0 0 0 3px rgba(34,197,94,0.25)" }}
             >
@@ -171,11 +171,11 @@ function ChallengeCard({
 
           {/* Premium crown */}
           {premium && state === "locked" && (
-            <span className="text-[11px] shrink-0">👑</span>
+            <span className="text-2xs shrink-0">👑</span>
           )}
         </div>
 
-        <p className={`text-[11px] leading-snug mb-2 ${state === "locked" ? "text-ds-muted/60" : "text-ds-muted"}`}>
+        <p className={`text-2xs leading-snug mb-2 ${state === "locked" ? "text-ds-muted/60" : "text-ds-muted"}`}>
           {t(challenge.descKey)}
         </p>
 
@@ -189,7 +189,7 @@ function ChallengeCard({
               transition={{ duration:0.9, ease:"easeOut", delay: index * 0.065 + 0.25 }}
             />
           </div>
-          <span className={`text-[10px] font-bold shrink-0 tabular-nums ${state === "locked" ? "text-ds-muted/60" : "text-ds-text"}`}>
+          <span className={`text-3xs font-bold shrink-0 tabular-nums ${state === "locked" ? "text-ds-muted/60" : "text-ds-text"}`}>
             {label}
           </span>
         </div>
@@ -197,7 +197,7 @@ function ChallengeCard({
 
       {/* Right: star amount + action */}
       <div className="shrink-0 flex flex-col items-center gap-1.5 min-w-[60px]">
-        <span className={`text-[12px] font-black ${state === "locked" ? "text-ds-muted/50" : "text-amber-500"}`}>
+        <span className={`text-xs font-black ${state === "locked" ? "text-ds-muted/50" : "text-amber-500"}`}>
           {state === "claimed" ? `+${challenge.stars}⭐` : `⭐ +${challenge.stars}`}
         </span>
 
@@ -218,7 +218,7 @@ function ChallengeCard({
               whileTap={{ scale:0.93 }}
               onClick={() => onClaim(challenge)}
               disabled={claiming}
-              className="text-[11px] font-black px-3 py-1.5 rounded-xl text-white shadow-md disabled:opacity-60 transition-opacity"
+              className="text-2xs font-black px-3 py-1.5 rounded-xl text-white shadow-md disabled:opacity-60 transition-opacity"
               style={{ background:"var(--nimi-green)" }}
             >
               {claiming ? "…" : t("treasureClaim")}
@@ -437,13 +437,13 @@ export default function TreasureClient({ initialChildren }: Props = {}) {
                 {/* Back button */}
                 <button
                   onClick={() => router.back()}
-                  className="absolute top-4 left-5 z-20 flex items-center gap-1.5 text-white/80 hover:text-white text-[13px] font-bold transition-colors"
+                  className="absolute top-4 left-5 z-20 flex items-center gap-1.5 text-white/80 hover:text-white text-sml font-bold transition-colors"
                 >
                   <ArrowLeft className="w-4 h-4" /> {t("storyBackBtn")}
                 </button>
 
-                <div className="absolute -top-8 -right-8 w-44 h-44 rounded-full bg-white/10 pointer-events-none" />
-                <div className="absolute -bottom-6 -left-6 w-32 h-32 rounded-full bg-white/10 pointer-events-none" />
+                <div className="absolute -top-8 -right-8 w-44 h-44 rounded-full bg-[var(--ds-surface-card)]/10 pointer-events-none" />
+                <div className="absolute -bottom-6 -left-6 w-32 h-32 rounded-full bg-[var(--ds-surface-card)]/10 pointer-events-none" />
 
                 {([ {tp:"12%",l:"5%",d:0},{tp:"70%",l:"7%",d:0.55},{tp:"18%",r:"5%",d:0.3},{tp:"66%",r:"8%",d:0.9} ] as Array<{tp:string;d:number;l?:string;r?:string}>).map((s,i) => (
                   <motion.span key={i}
@@ -461,10 +461,10 @@ export default function TreasureClient({ initialChildren }: Props = {}) {
                       className="w-14 h-14 rounded-full border-2 border-white/40 shadow-xl shrink-0"
                       animate={{ y:[0,-5,0] }} transition={{ duration:2.8, repeat:Infinity }} />
                     <div className="flex-1 min-w-0">
-                      <p className="text-white/60 text-[10px] font-bold uppercase tracking-[0.14em] mb-0.5">
+                      <p className="text-white/60 text-3xs font-bold uppercase tracking-[0.14em] mb-0.5">
                         {t("treasureChallengeArena")}
                       </p>
-                      <h1 className="font-baloo font-black text-white text-[22px] sm:text-[28px] leading-tight drop-shadow-md">
+                      <h1 className="font-baloo font-black text-white text-1.5xl sm:text-3.5xl leading-tight drop-shadow-md">
                         {childName}&apos;s Challenges! 🏆
                       </h1>
                     </div>
@@ -472,26 +472,26 @@ export default function TreasureClient({ initialChildren }: Props = {}) {
 
                   {/* Stats row */}
                   <div className="flex gap-2.5 mt-4 flex-wrap">
-                    <div className="flex items-center gap-2 bg-white/20 border border-white/30 rounded-full px-4 py-2 backdrop-blur-sm">
-                      <span className="text-[18px]">⭐</span>
-                      <span className="font-baloo font-black text-white text-[18px]">
+                    <div className="flex items-center gap-2 bg-[var(--ds-surface-card)]/20 border border-white/30 rounded-full px-4 py-2 backdrop-blur-sm">
+                      <span className="text-lg">⭐</span>
+                      <span className="font-baloo font-black text-white text-lg">
                         <StarCount target={totalStars} />
                       </span>
-                      <span className="text-white/70 text-[11px] font-bold">{t("treasureTotalStars")}</span>
+                      <span className="text-white/70 text-2xs font-bold">{t("treasureTotalStars")}</span>
                     </div>
 
                     {/* Progress chip */}
-                    <div className="flex items-center gap-2 bg-white/20 border border-white/30 rounded-full px-4 py-2 backdrop-blur-sm">
-                      <span className="text-[18px]">🏅</span>
-                      <span className="font-baloo font-black text-white text-[18px]">{totalDone}</span>
-                      <span className="text-white/70 text-[11px] font-bold">/ {totalCount} {t("treasureDone")}</span>
+                    <div className="flex items-center gap-2 bg-[var(--ds-surface-card)]/20 border border-white/30 rounded-full px-4 py-2 backdrop-blur-sm">
+                      <span className="text-lg">🏅</span>
+                      <span className="font-baloo font-black text-white text-lg">{totalDone}</span>
+                      <span className="text-white/70 text-2xs font-bold">/ {totalCount} {t("treasureDone")}</span>
                     </div>
                   </div>
 
                   {/* Overall progress bar */}
-                  <div className="mt-3 h-1.5 rounded-full bg-white/20 overflow-hidden">
+                  <div className="mt-3 h-1.5 rounded-full bg-[var(--ds-surface-card)]/20 overflow-hidden">
                     <motion.div
-                      className="h-full rounded-full bg-white"
+                      className="h-full rounded-full bg-[var(--ds-surface-card)]"
                       initial={{ width:0 }}
                       animate={{ width: `${(totalDone/totalCount)*100}%` }}
                       transition={{ duration:1, ease:"easeOut", delay:0.3 }}
@@ -504,10 +504,10 @@ export default function TreasureClient({ initialChildren }: Props = {}) {
               <section>
                 <div className="flex items-center justify-between mb-3">
                   <div>
-                    <h2 className="font-black text-ds-text text-[16px]">📅 {t("treasureWeeklyTitle")}</h2>
-                    <p className="text-ds-muted text-[11px]">{t("treasureWeeklyReset")}</p>
+                    <h2 className="font-black text-ds-text text-base">📅 {t("treasureWeeklyTitle")}</h2>
+                    <p className="text-ds-muted text-2xs">{t("treasureWeeklyReset")}</p>
                   </div>
-                  <span className="text-[11px] font-black text-ds-muted bg-ds-surface border border-ds-border px-2.5 py-1 rounded-full">
+                  <span className="text-2xs font-black text-ds-muted bg-ds-surface border border-ds-border px-2.5 py-1 rounded-full">
                     {weeklyDone}/{WEEKLY_CHALLENGES.length}
                   </span>
                 </div>
@@ -538,10 +538,10 @@ export default function TreasureClient({ initialChildren }: Props = {}) {
               <section>
                 <div className="flex items-center justify-between mb-3">
                   <div>
-                    <h2 className="font-black text-ds-text text-[16px]">☀️ {t("treasureDailyTitle")}</h2>
-                    <p className="text-ds-muted text-[11px]">{t("treasureDailyReset")}</p>
+                    <h2 className="font-black text-ds-text text-base">☀️ {t("treasureDailyTitle")}</h2>
+                    <p className="text-ds-muted text-2xs">{t("treasureDailyReset")}</p>
                   </div>
-                  <span className="text-[11px] font-black text-ds-muted bg-ds-surface border border-ds-border px-2.5 py-1 rounded-full">
+                  <span className="text-2xs font-black text-ds-muted bg-ds-surface border border-ds-border px-2.5 py-1 rounded-full">
                     {dailyDone}/{DAILY_CHALLENGES.length}
                   </span>
                 </div>
@@ -581,12 +581,12 @@ export default function TreasureClient({ initialChildren }: Props = {}) {
                 >
                   {totalDone === totalCount ? "🎊" : "🌟"}
                 </motion.div>
-                <p className="font-black text-ds-text text-[15px]">
+                <p className="font-black text-ds-text text-mbase">
                   {totalDone === totalCount
                     ? t("treasureFooterAllDone")
                     : `${remaining} ${t("treasureChallengeLabel")}${remaining !== 1 ? "s" : ""} ${t("treasureFooterRemaining")}`}
                 </p>
-                <p className="text-ds-muted text-[11px] mt-1">{t("treasureFooterReset")}</p>
+                <p className="text-ds-muted text-2xs mt-1">{t("treasureFooterReset")}</p>
               </motion.div>
 
             </motion.div>

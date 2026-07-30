@@ -27,7 +27,7 @@ export default function HelpSupportPage() {
                 <Image src={assets.nimiCircle} alt="NIMI" width={80} height={80} className="rounded-full object-cover border-4 border-white/50 shadow-lg" />
               </motion.div>
               <div className="flex-1">
-                <h1 className="font-baloo font-black text-white text-[24px] sm:text-[30px] leading-tight">{t("helpSupportTitle")}</h1>
+                <h1 className="font-baloo font-black text-white text-2xl sm:text-3xl leading-tight">{t("helpSupportTitle")}</h1>
                 <p className="text-white/80 text-sm mt-1">{t("helpSupportSubtitle")}</p>
               </div>
             </div>

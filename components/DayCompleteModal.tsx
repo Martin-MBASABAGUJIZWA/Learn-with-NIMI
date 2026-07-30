@@ -37,7 +37,7 @@ const DayCompleteModal = ({
       aria-live="polite"
     >
       <motion.div
-        className="bg-white leaf-lg p-8 shadow-xl text-center max-w-xs w-full"
+        className="bg-[var(--ds-surface-card)] leaf-lg p-8 shadow-xl text-center max-w-xs w-full"
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}

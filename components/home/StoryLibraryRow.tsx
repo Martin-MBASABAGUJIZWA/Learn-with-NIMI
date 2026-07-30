@@ -33,10 +33,10 @@ export default function StoryLibraryRow({ stories, currentStoryId }: Props) {
           </div>
           <div>
             <h2 className="font-black text-ds-text text-base">Story Library</h2>
-            <p className="text-gray-500 text-[11px] font-semibold">{completed}/{stories.length} stories completed</p>
+            <p className="text-[var(--ds-text-secondary)] text-2xs font-semibold">{completed}/{stories.length} stories completed</p>
           </div>
         </div>
-        <Link href="/stories" className="flex items-center gap-1 text-gray-500 hover:text-gray-700 text-xs font-bold transition">
+        <Link href="/stories" className="flex items-center gap-1 text-[var(--ds-text-secondary)] hover:text-[var(--ds-text-primary)] text-xs font-bold transition">
           View All <ChevronRight className="w-3.5 h-3.5" />
         </Link>
       </div>
@@ -87,18 +87,18 @@ export default function StoryLibraryRow({ stories, currentStoryId }: Props) {
 
                       {/* Status badge */}
                       {story.complete ? (
-                        <div className="absolute top-2.5 right-2.5 flex items-center gap-1 bg-[var(--ds-brand-primary)] text-white text-[10px] font-black px-2.5 py-1 rounded-lg shadow-lg">
+                        <div className="absolute top-2.5 right-2.5 flex items-center gap-1 bg-[var(--ds-brand-primary)] text-white text-3xs font-black px-2.5 py-1 rounded-lg shadow-lg">
                           <CheckCircle2 className="w-3 h-3" /> Complete
                         </div>
                       ) : isCurrent ? (
-                        <div className="absolute top-2.5 right-2.5 flex items-center gap-1 bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-[10px] font-black px-2.5 py-1 rounded-lg shadow-lg">
+                        <div className="absolute top-2.5 right-2.5 flex items-center gap-1 bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-3xs font-black px-2.5 py-1 rounded-lg shadow-lg">
                           <Play className="w-3 h-3 fill-white" /> Continue
                         </div>
                       ) : null}
                     </div>
 
                     {/* Info panel — world texture layered in white section */}
-                    <div className="p-3 bg-white flex-1 flex flex-col relative overflow-hidden">
+                    <div className="p-3 bg-[var(--ds-surface-card)] flex-1 flex flex-col relative overflow-hidden">
                       <Image src={assets.storyCard.background} alt="" aria-hidden="true"
                         fill className="object-cover pointer-events-none opacity-[0.07]" />
                       <div className="relative z-10 flex flex-col flex-1">
@@ -110,15 +110,15 @@ export default function StoryLibraryRow({ stories, currentStoryId }: Props) {
                         {story.complete ? (
                           <div className="flex items-center gap-1.5 mt-2">
                             <CheckCircle2 className="w-4 h-4 text-[var(--ds-brand-primary)]" />
-                            <span className="text-[var(--ds-brand-primary)] text-[11px] font-bold">All missions done!</span>
+                            <span className="text-[var(--ds-brand-primary)] text-2xs font-bold">All missions done!</span>
                           </div>
                         ) : story.progress > 0 ? (
                           <div className="mt-2">
-                            <div className="flex items-center justify-between text-[10px] font-bold text-gray-500 mb-1">
+                            <div className="flex items-center justify-between text-3xs font-bold text-[var(--ds-text-secondary)] mb-1">
                               <span>Progress</span>
                               <span>{done}/6</span>
                             </div>
-                            <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
+                            <div className="w-full bg-[var(--ds-surface-card-active)] rounded-full h-2 overflow-hidden">
                               <motion.div
                                 className={`bg-gradient-to-r ${assets.storyCard.progressFill} h-full rounded-full`}
                                 initial={{ width: 0 }}
@@ -128,7 +128,7 @@ export default function StoryLibraryRow({ stories, currentStoryId }: Props) {
                             </div>
                           </div>
                         ) : (
-                          <p className="text-gray-500 text-[11px] font-semibold mt-2">Ready to start</p>
+                          <p className="text-[var(--ds-text-secondary)] text-2xs font-semibold mt-2">Ready to start</p>
                         )}
                       </div>
                     </div>
@@ -147,19 +147,19 @@ export default function StoryLibraryRow({ stories, currentStoryId }: Props) {
                       </div>
                     )}
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="w-12 h-12 bg-gray-100 shadow-sm rounded-full flex items-center justify-center">
-                        <Lock className="w-5 h-5 text-gray-400" />
+                      <div className="w-12 h-12 bg-[var(--ds-surface-card-active)] shadow-sm rounded-full flex items-center justify-center">
+                        <Lock className="w-5 h-5 text-[var(--ds-text-tertiary)]" />
                       </div>
                     </div>
-                    <div className="absolute top-2.5 left-2.5 w-7 h-7 bg-gray-200 text-gray-400 rounded-lg flex items-center justify-center font-black text-xs">
+                    <div className="absolute top-2.5 left-2.5 w-7 h-7 bg-[var(--ds-border-primary)] text-[var(--ds-text-tertiary)] rounded-lg flex items-center justify-center font-black text-xs">
                       {story.sort_order}
                     </div>
                   </div>
-                  <div className="p-3 bg-gray-50">
-                    <p className="font-black text-gray-400 text-sm">{story.theme_emoji} {story.title}</p>
+                  <div className="p-3 bg-[var(--ds-surface-card-hover)]">
+                    <p className="font-black text-[var(--ds-text-tertiary)] text-sm">{story.theme_emoji} {story.title}</p>
                     <div className="flex items-center gap-1.5 mt-2">
-                      <Lock className="w-3.5 h-3.5 text-gray-300" />
-                      <span className="text-gray-300 text-[11px] font-bold">Locked</span>
+                      <Lock className="w-3.5 h-3.5 text-[var(--ds-text-tertiary)]" />
+                      <span className="text-[var(--ds-text-tertiary)] text-2xs font-bold">Locked</span>
                     </div>
                   </div>
                 </div>

@@ -24,7 +24,7 @@ export default function InviteLoading() {
         </div>
 
         {/* Reward callout */}
-        <div className="bg-emerald-100 rounded-3xl p-6 space-y-3">
+        <div className="bg-emerald-100 leaf-lg p-6 space-y-3">
           <Bone className="h-7 w-44 mx-auto" />
           <Bone className="h-4 w-full" />
           <Bone className="h-4 w-3/4 mx-auto" />
@@ -49,7 +49,7 @@ export default function InviteLoading() {
         {/* Benefits grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="bg-white border border-gray-100 rounded-2xl p-5 flex items-start gap-4">
+            <div key={i} className="bg-[var(--ds-surface-card)] border border-[var(--ds-border-primary)] leaf p-5 flex items-start gap-4">
               <Bone className="w-11 h-11 rounded-xl shrink-0" />
               <div className="flex-1 space-y-2">
                 <Bone className="h-4 w-3/4" />

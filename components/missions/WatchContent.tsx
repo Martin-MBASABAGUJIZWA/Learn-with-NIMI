@@ -58,13 +58,13 @@ export default function WatchContent({ mission, onComplete, completed, saving, s
 
         <div className="relative z-10 mb-2 flex items-center justify-center gap-2">
           <span className="select-none text-base">🍿</span>
-          <span className="rounded-full border border-yellow-400/30 bg-yellow-400/15 px-3 py-0.5 text-[10px] font-black uppercase tracking-[0.2em] text-yellow-300">
+          <span className="rounded-full border border-yellow-400/30 bg-yellow-400/15 px-3 py-0.5 text-3xs font-black uppercase tracking-[0.2em] text-yellow-300">
             {t("movieTimeLabel")}
           </span>
           <span className="select-none text-base">🎥</span>
         </div>
-        <p className="relative z-10 font-baloo font-black text-white text-[20px] leading-snug">{mission.title}</p>
-        {mission.subtitle && <p className="relative z-10 mt-1 font-nunito text-indigo-200/70 text-[13px]">{mission.subtitle}</p>}
+        <p className="relative z-10 font-baloo font-black text-white text-xl leading-snug">{mission.title}</p>
+        {mission.subtitle && <p className="relative z-10 mt-1 font-nunito text-indigo-200/70 text-sml">{mission.subtitle}</p>}
       </div>
 
       {/* Video player */}
@@ -93,8 +93,8 @@ export default function WatchContent({ mission, onComplete, completed, saving, s
         <div className="leaf border border-indigo-100 bg-gradient-to-br from-indigo-50 to-blue-50 p-10 text-center shadow-sm">
           <motion.div animate={{ scale: [1, 1.12, 1] }} transition={{ duration: 2, repeat: Infinity }}
             className="mb-3 text-5xl select-none">🎬</motion.div>
-          <p className="font-baloo font-black text-ds-text text-[18px]">{t("videoComingSoon")}</p>
-          <p className="font-nunito text-gray-500 text-[13px] mt-1">{t("comingSoonTeacher")}</p>
+          <p className="font-baloo font-black text-ds-text text-lg">{t("videoComingSoon")}</p>
+          <p className="font-nunito text-[var(--ds-text-secondary)] text-sml mt-1">{t("comingSoonTeacher")}</p>
         </div>
       )}
 
@@ -103,7 +103,7 @@ export default function WatchContent({ mission, onComplete, completed, saving, s
         <div className="leaf border border-indigo-100 bg-indigo-50/50 px-4 py-3 flex items-center gap-3">
           <Lock className="w-4 h-4 text-indigo-400 flex-shrink-0" />
           <div className="flex-1">
-            <p className="font-nunito font-bold text-[11px] text-indigo-500 mb-1">{t("watchToUnlock")}</p>
+            <p className="font-nunito font-bold text-2xs text-indigo-500 mb-1">{t("watchToUnlock")}</p>
             <div className="h-2 w-full bg-indigo-100 rounded-full overflow-hidden">
               <motion.div
                 className="h-full bg-gradient-to-r from-indigo-400 to-blue-500 rounded-full"
@@ -113,7 +113,7 @@ export default function WatchContent({ mission, onComplete, completed, saving, s
               />
             </div>
           </div>
-          <span className="font-baloo font-black text-[13px] text-indigo-500 w-9 text-right flex-shrink-0">
+          <span className="font-baloo font-black text-sml text-indigo-500 w-9 text-right flex-shrink-0">
             {Math.round(watchProgress)}%
           </span>
         </div>
@@ -129,7 +129,7 @@ export default function WatchContent({ mission, onComplete, completed, saving, s
           >
             <motion.span animate={{ rotate: [0, -20, 20, -20, 0] }} transition={{ duration: 0.5, delay: 0.1 }}
               className="select-none text-2xl">🎉</motion.span>
-            <p className="font-baloo font-black text-indigo-800 text-[15px]">{t("watchedItAllMsg")}</p>
+            <p className="font-baloo font-black text-indigo-800 text-mbase">{t("watchedItAllMsg")}</p>
             <motion.span animate={{ rotate: [0, 20, -20, 20, 0] }} transition={{ duration: 0.5, delay: 0.3 }}
               className="select-none text-2xl">⭐</motion.span>
           </motion.div>
@@ -144,13 +144,13 @@ export default function WatchContent({ mission, onComplete, completed, saving, s
             initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
             transition={{ type: "spring", stiffness: 300, damping: 22, delay: 0.1 }}
             whileTap={{ scale: 0.96 }}
-            className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-indigo-500 to-blue-600 py-4 font-baloo font-black text-[18px] text-white shadow-[0_10px_24px_rgba(99,102,241,0.30)] transition disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-indigo-500 to-blue-600 py-4 font-baloo font-black text-lg text-white shadow-[0_10px_24px_rgba(99,102,241,0.30)] transition disabled:opacity-50"
           >
             {saving ? t("saving") : <><Check className="h-5 w-5" /> {t("iWatchedItBtn")}</>}
           </motion.button>
         ) : (
           <button disabled
-            className="flex w-full items-center justify-center gap-2 rounded-full bg-gray-100 py-4 font-baloo font-black text-[18px] text-gray-400 cursor-not-allowed border border-gray-200">
+            className="flex w-full items-center justify-center gap-2 rounded-full bg-[var(--ds-surface-card-hover)] py-4 font-baloo font-black text-lg text-[var(--ds-text-tertiary)] cursor-not-allowed border border-[var(--ds-border-primary)]">
             <Lock className="h-5 w-5" /> {t("watchToUnlock")}
           </button>
         )

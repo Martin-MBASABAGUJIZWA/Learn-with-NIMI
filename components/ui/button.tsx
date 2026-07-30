@@ -14,13 +14,13 @@ const buttonVariants = cva(
         destructive:
           "bg-destructive text-destructive-foreground hover:bg-destructive/90",
         outline:
-          "border border-[var(--ds-border-brand)]/30 bg-white/90 text-[var(--ds-text-primary)] hover:bg-[var(--ds-brand-soft)] hover:text-[var(--ds-brand-primary)] shadow-sm hover:shadow-[0_8px_20px_rgba(15,23,42,0.06)]",
+          "border border-[var(--ds-border-brand)]/30 bg-[var(--ds-surface-card)]/90 text-[var(--ds-text-primary)] hover:bg-[var(--ds-brand-soft)] hover:text-[var(--ds-brand-primary)] shadow-sm hover:shadow-[0_8px_20px_rgba(15,23,42,0.06)]",
         secondary:
-          "bg-white/90 border border-[var(--ds-border-primary)] text-[var(--ds-text-primary)] hover:bg-[var(--ds-brand-soft)] shadow-sm",
+          "bg-[var(--ds-surface-card)]/90 border border-[var(--ds-border-primary)] text-[var(--ds-text-primary)] hover:bg-[var(--ds-brand-soft)] shadow-sm",
         soft:
           "bg-[var(--ds-brand-soft)] text-[var(--ds-brand-primary)] border border-[var(--ds-border-brand)]/20 shadow-[0_8px_20px_rgba(22,163,74,0.08)] hover:bg-[var(--ds-brand-primary)] hover:text-white",
         elevated:
-          "bg-white text-[var(--ds-text-primary)] border border-[var(--ds-border-primary)] shadow-[0_12px_28px_rgba(15,23,42,0.08)] hover:-translate-y-0.5 hover:shadow-[0_16px_34px_rgba(15,23,42,0.12)]",
+          "bg-[var(--ds-surface-card)] text-[var(--ds-text-primary)] border border-[var(--ds-border-primary)] shadow-[0_12px_28px_rgba(15,23,42,0.08)] hover:-translate-y-0.5 hover:shadow-card-3xl",
         ghost: "hover:bg-[var(--ds-brand-soft)] hover:text-[var(--ds-brand-primary)]",
         link: "text-primary underline-offset-4 hover:underline",
       },

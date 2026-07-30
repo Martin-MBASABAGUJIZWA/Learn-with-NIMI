@@ -36,7 +36,7 @@ export default function BottomNavigation() {
       href: "/",
       icon: Home,
       activeColor: "bg-ds-nav-active text-[var(--ds-nav-active-text)]",
-      hoverColor: "hover:bg-gray-50 hover:text-[var(--ds-nav-active-text)]",
+      hoverColor: "hover:bg-[var(--ds-surface-card)] hover:text-[var(--ds-nav-active-text)]",
       underlineColor: "bg-[var(--ds-nav-active-text)]",
     },
     {
@@ -44,7 +44,7 @@ export default function BottomNavigation() {
       href: "/stories",
       icon: BookOpen,
       activeColor: "bg-ds-nav-active text-[var(--ds-nav-active-text)]",
-      hoverColor: "hover:bg-gray-50 hover:text-[var(--ds-nav-active-text)]",
+      hoverColor: "hover:bg-[var(--ds-surface-card)] hover:text-[var(--ds-nav-active-text)]",
       underlineColor: "bg-[var(--ds-nav-active-text)]",
     },
     {
@@ -52,7 +52,7 @@ export default function BottomNavigation() {
       href: "/create",
       icon: Palette,
       activeColor: "bg-ds-nav-active text-[var(--ds-nav-active-text)]",
-      hoverColor: "hover:bg-gray-50 hover:text-[var(--ds-nav-active-text)]",
+      hoverColor: "hover:bg-[var(--ds-surface-card)] hover:text-[var(--ds-nav-active-text)]",
       underlineColor: "bg-[var(--ds-nav-active-text)]",
     },
     {
@@ -60,7 +60,7 @@ export default function BottomNavigation() {
       href: "/community",
       icon: Users,
       activeColor: "bg-ds-nav-active text-[var(--ds-nav-active-text)]",
-      hoverColor: "hover:bg-gray-50 hover:text-[var(--ds-nav-active-text)]",
+      hoverColor: "hover:bg-[var(--ds-surface-card)] hover:text-[var(--ds-nav-active-text)]",
       underlineColor: "bg-[var(--ds-nav-active-text)]",
     },
     {
@@ -68,7 +68,7 @@ export default function BottomNavigation() {
       href: "/parents",
       icon: UserCheck,
       activeColor: "bg-ds-nav-active text-[var(--ds-nav-active-text)]",
-      hoverColor: "hover:bg-gray-50 hover:text-[var(--ds-nav-active-text)]",
+      hoverColor: "hover:bg-[var(--ds-surface-card)] hover:text-[var(--ds-nav-active-text)]",
       underlineColor: "bg-[var(--ds-nav-active-text)]",
     },
   ];
@@ -83,7 +83,7 @@ export default function BottomNavigation() {
       </div>
 
       <nav
-        className="fixed bottom-0 left-0 right-0 bg-white border-t border-ds-border shadow-ds-nav z-50 h-16 md:h-20"
+        className="fixed bottom-0 left-0 right-0 bg-[var(--ds-surface-card)] border-t border-ds-border shadow-ds-nav z-50 h-16 md:h-20"
         aria-label="Primary"
       >
         <div className="flex items-center justify-around h-full max-w-4xl mx-auto px-2 sm:px-4">
@@ -153,7 +153,7 @@ export default function BottomNavigation() {
                     ${
                       isActive
                         ? `${item.activeColor} shadow-[0_0_8px_1px_rgba(0,0,0,0.1)]`
-                        : `bg-gray-100 text-gray-500 ${item.hoverColor}`
+                        : `bg-[var(--ds-surface-card-hover)] text-[var(--ds-text-secondary)] ${item.hoverColor}`
                     }
                     ${isHovered ? "scale-110 rotate-3 shadow-lg" : ""}
                     ${activeAndAnimating ? "animate-bounce" : ""}
@@ -163,7 +163,7 @@ export default function BottomNavigation() {
                     className={`w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 transition-transform duration-200 ${
                       isActive || isHovered
                         ? "text-current"
-                        : "text-gray-400 group-hover:text-current"
+                        : "text-[var(--ds-text-tertiary)] group-hover:text-current"
                     }`}
                     aria-hidden="true"
                   />
@@ -179,7 +179,7 @@ export default function BottomNavigation() {
                         ? "opacity-0 scale-90"
                         : isActive
                         ? "text-black font-extrabold opacity-100"
-                        : "text-gray-600 group-hover:text-black opacity-100"
+                        : "text-[var(--ds-text-secondary)] group-hover:text-black opacity-100"
                     }
                     hidden sm:block
                   `}

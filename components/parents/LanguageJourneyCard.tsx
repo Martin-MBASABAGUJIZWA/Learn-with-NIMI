@@ -17,7 +17,7 @@ export default function LanguageJourneyCard({ journey, maxLevel, isActive }: Pro
   const levelPct = total > 0 ? Math.round((done / total) * 100) : 0;
 
   return (
-    <div className={`bg-white shadow-ds-card p-4 border-2 ${isActive ? "border-ds-border-brand" : "border-ds-border"}`} style={{ borderRadius: 'var(--leaf-r)' }}>
+    <div className={`bg-[var(--ds-surface-card)] shadow-ds-card p-4 border-2 ${isActive ? "border-ds-border-brand" : "border-ds-border"}`} style={{ borderRadius: 'var(--leaf-r)' }}>
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
           <span className="text-2xl">{meta.flag}</span>
@@ -35,10 +35,10 @@ export default function LanguageJourneyCard({ journey, maxLevel, isActive }: Pro
       </p>
 
       <div className="mt-2">
-        <p className="text-xs text-gray-500 font-bold mb-1">
+        <p className="text-xs text-[var(--ds-text-secondary)] font-bold mb-1">
           {fillTemplate(t("missionsProgressLabel"), { done: String(done), total: String(total) })}
         </p>
-        <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+        <div className="w-full h-2 bg-[var(--ds-surface-card-hover)] rounded-full overflow-hidden">
           <div className="h-full bg-ds-progress-fill rounded-full" style={{ width: `${levelPct}%` }} />
         </div>
       </div>
@@ -48,7 +48,7 @@ export default function LanguageJourneyCard({ journey, maxLevel, isActive }: Pro
       </div>
 
       <div className="flex items-center justify-between mt-1">
-        <span className="text-gray-500 text-xs font-bold">{t("lastActivityLabel")}</span>
+        <span className="text-[var(--ds-text-secondary)] text-xs font-bold">{t("lastActivityLabel")}</span>
         <span className="text-ds-text text-xs font-bold">
           {journey.lastActivityDate
             ? new Date(`${journey.lastActivityDate}T00:00:00`).toLocaleDateString("en-US", { month: "short", day: "numeric" })
@@ -57,11 +57,11 @@ export default function LanguageJourneyCard({ journey, maxLevel, isActive }: Pro
       </div>
 
       <div className="mt-2">
-        <div className="flex justify-between text-xs text-gray-500 font-bold mb-1">
+        <div className="flex justify-between text-xs text-[var(--ds-text-secondary)] font-bold mb-1">
           <span>{t("completionLabel")}</span>
           <span>{journey.completionPct}%</span>
         </div>
-        <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+        <div className="w-full h-2 bg-[var(--ds-surface-card-hover)] rounded-full overflow-hidden">
           <div className="h-full bg-ds-progress-fill rounded-full" style={{ width: `${journey.completionPct}%` }} />
         </div>
       </div>

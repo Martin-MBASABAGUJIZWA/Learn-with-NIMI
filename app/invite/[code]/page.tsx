@@ -56,19 +56,19 @@ export default async function InvitePage({ params }: { params: Promise<{ code: s
     return (
       <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-teal-50 flex flex-col items-center justify-center px-4 py-16">
         <img src="/nimi-logo-circle.png" alt="NIMI" className="w-20 h-20 rounded-full mb-6" />
-        <h1 className="font-baloo font-black text-3xl text-gray-800 text-center mb-3">
+        <h1 className="font-baloo font-black text-3xl text-[var(--ds-text-primary)] text-center mb-3">
           This invite link has expired
         </h1>
-        <p className="font-nunito text-gray-500 text-center max-w-sm mb-8">
+        <p className="font-nunito text-[var(--ds-text-secondary)] text-center max-w-sm mb-8">
           This referral link is no longer valid. You can still create a free account and enjoy a 7-day trial.
         </p>
         <Link
           href="/signuppage"
-          className="bg-emerald-600 text-white font-black text-[16px] px-8 py-4 rounded-2xl shadow-lg hover:bg-emerald-700 active:scale-95 transition"
+          className="bg-emerald-600 text-white font-black text-base px-8 py-4 rounded-2xl shadow-lg hover:bg-emerald-700 active:scale-95 transition"
         >
           🚀 Start free trial
         </Link>
-        <p className="font-nunito text-gray-400 text-sm mt-6 text-center">
+        <p className="font-nunito text-[var(--ds-text-tertiary)] text-sm mt-6 text-center">
           Have a code? You can enter it on the sign-up page.
         </p>
       </div>
@@ -85,9 +85,9 @@ export default async function InvitePage({ params }: { params: Promise<{ code: s
       <header className="w-full px-5 py-4 flex items-center justify-between max-w-4xl mx-auto">
         <Link href="/" className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-xl bg-emerald-600 flex items-center justify-center text-white text-lg font-black">🌿</div>
-          <span className="font-baloo font-black text-[18px] text-gray-800">NIMIPIKO</span>
+          <span className="font-baloo font-black text-lg text-[var(--ds-text-primary)]">NIMIPIKO</span>
         </Link>
-        <Link href="/loginpage" className="font-nunito font-bold text-[13px] text-gray-500 hover:text-gray-700 transition">
+        <Link href="/loginpage" className="font-nunito font-bold text-sml text-[var(--ds-text-secondary)] hover:text-[var(--ds-text-primary)] transition">
           Already have an account? Log in →
         </Link>
       </header>
@@ -113,29 +113,29 @@ export default async function InvitePage({ params }: { params: Promise<{ code: s
             <span className="font-nunito font-bold text-emerald-700 text-sm">{referrer.name} sent you an invite</span>
           </div>
 
-          <h1 className="font-baloo font-black text-4xl sm:text-5xl text-gray-800 leading-tight mb-4">
+          <h1 className="font-baloo font-black text-4xl sm:text-5xl text-[var(--ds-text-primary)] leading-tight mb-4">
             {firstName} thinks your<br />
             <span className="text-emerald-600">child will love this</span>
           </h1>
 
-          <p className="font-nunito text-gray-500 text-[16px] max-w-md mx-auto leading-relaxed">
-            Join NIMIPIKO — the multilingual learning app that makes reading feel like an adventure. Sign up with {firstName}&apos;s invite and <strong className="text-gray-700">you both get 1 free month of Club</strong>.
+          <p className="font-nunito text-[var(--ds-text-secondary)] text-base max-w-md mx-auto leading-relaxed">
+            Join NIMIPIKO — the multilingual learning app that makes reading feel like an adventure. Sign up with {firstName}&apos;s invite and <strong className="text-[var(--ds-text-primary)]">you both get 1 free month of Club</strong>.
           </p>
         </div>
 
         {/* Reward callout */}
-        <div className="bg-gradient-to-r from-emerald-500 to-teal-500 rounded-3xl p-6 text-white text-center mb-8 shadow-lg">
-          <p className="font-baloo font-black text-[28px] leading-tight mb-1">🎁 Referral reward</p>
-          <p className="font-nunito text-white/90 text-[15px]">
+        <div className="bg-gradient-to-r from-emerald-500 to-teal-500 leaf-lg p-6 text-white text-center mb-8 shadow-lg">
+          <p className="font-baloo font-black text-3.5xl leading-tight mb-1">🎁 Referral reward</p>
+          <p className="font-nunito text-white/90 text-mbase">
             Sign up, subscribe to Club, and you <strong>both</strong> automatically receive <strong>1 free month</strong> — no coupon needed.
           </p>
-          <div className="mt-4 flex items-center justify-center gap-6 text-[13px] font-bold">
+          <div className="mt-4 flex items-center justify-center gap-6 text-sml font-bold">
             <div className="flex flex-col items-center gap-1">
               <span className="text-2xl">👤</span>
               <span className="text-white/80">You get</span>
               <span className="text-white font-black">1 free month</span>
             </div>
-            <div className="w-px h-10 bg-white/30" />
+            <div className="w-px h-10 bg-[var(--ds-surface-card)]/30" />
             <div className="flex flex-col items-center gap-1">
               <span className="text-2xl">👥</span>
               <span className="text-white/80">{firstName} gets</span>
@@ -147,31 +147,31 @@ export default async function InvitePage({ params }: { params: Promise<{ code: s
         {/* CTA */}
         <Link
           href={signupUrl}
-          className="block w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black text-[18px] text-center py-5 rounded-2xl shadow-xl transition active:scale-[0.98] mb-4"
+          className="block w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black text-lg text-center py-5 rounded-2xl shadow-xl transition active:scale-[0.98] mb-4"
         >
           🚀 Accept {firstName}&apos;s invite
         </Link>
-        <p className="text-center font-nunito text-gray-400 text-[13px] mb-10">
+        <p className="text-center font-nunito text-[var(--ds-text-tertiary)] text-sml mb-10">
           7-day free trial included · No credit card required
         </p>
 
         {/* Benefits grid */}
         <div className="mb-10">
-          <h2 className="font-baloo font-black text-[22px] text-gray-800 text-center mb-5">
+          <h2 className="font-baloo font-black text-1.5xl text-[var(--ds-text-primary)] text-center mb-5">
             What&apos;s inside NIMIPIKO
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {BENEFITS.map(b => (
               <div
                 key={b.title}
-                className="bg-white border border-gray-100 rounded-2xl p-5 flex items-start gap-4 shadow-sm"
+                className="bg-[var(--ds-surface-card)] border border-[var(--ds-border-primary)] leaf p-5 flex items-start gap-4 shadow-sm"
               >
                 <div className="w-11 h-11 bg-emerald-50 rounded-xl flex items-center justify-center text-2xl shrink-0">
                   {b.emoji}
                 </div>
                 <div>
-                  <p className="font-baloo font-black text-[15px] text-gray-800 leading-tight">{b.title}</p>
-                  <p className="font-nunito text-gray-400 text-[12px] mt-0.5">{b.desc}</p>
+                  <p className="font-baloo font-black text-mbase text-[var(--ds-text-primary)] leading-tight">{b.title}</p>
+                  <p className="font-nunito text-[var(--ds-text-tertiary)] text-xs mt-0.5">{b.desc}</p>
                 </div>
               </div>
             ))}
@@ -179,26 +179,26 @@ export default async function InvitePage({ params }: { params: Promise<{ code: s
         </div>
 
         {/* Social proof / trust */}
-        <div className="bg-white border border-gray-100 rounded-2xl p-6 text-center shadow-sm mb-8">
+        <div className="bg-[var(--ds-surface-card)] border border-[var(--ds-border-primary)] leaf p-6 text-center shadow-sm mb-8">
           <div className="flex items-center justify-center gap-1 mb-2 text-yellow-400 text-xl">
             {"⭐".repeat(5)}
           </div>
-          <p className="font-nunito text-gray-600 text-[14px] italic leading-relaxed max-w-sm mx-auto">
+          <p className="font-nunito text-[var(--ds-text-secondary)] text-sm italic leading-relaxed max-w-sm mx-auto">
             &ldquo;My daughter went from avoiding reading to asking for more stories every night. NIMIPIKO is genuinely magical.&rdquo;
           </p>
-          <p className="font-nunito font-bold text-gray-400 text-[12px] mt-3">— Parent of a 6-year-old</p>
+          <p className="font-nunito font-bold text-[var(--ds-text-tertiary)] text-xs mt-3">— Parent of a 6-year-old</p>
         </div>
 
         {/* Bottom CTA */}
         <Link
           href={signupUrl}
-          className="block w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black text-[16px] text-center py-4 rounded-2xl shadow-lg transition active:scale-[0.98]"
+          className="block w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black text-base text-center py-4 rounded-2xl shadow-lg transition active:scale-[0.98]"
         >
           🌿 Join {firstName} on NIMIPIKO
         </Link>
 
-        <p className="text-center font-nunito text-gray-400 text-[11px] mt-5">
-          Your invite code <strong className="text-gray-500 font-mono">{code}</strong> is applied automatically when you sign up.
+        <p className="text-center font-nunito text-[var(--ds-text-tertiary)] text-2xs mt-5">
+          Your invite code <strong className="text-[var(--ds-text-secondary)] font-mono">{code}</strong> is applied automatically when you sign up.
         </p>
       </main>
     </div>

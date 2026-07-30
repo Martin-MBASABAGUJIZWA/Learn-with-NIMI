@@ -28,10 +28,10 @@ export default function HomeWeekStreakPanel({ weekStreak, consecutiveStreak, tot
 
   /* Active colour — orange-red for fire streak, emerald for growth/broke, gray for zero */
   const noStreak   = !isBroke && consecutiveStreak === 0;
-  const accentBg   = isBroke ? "bg-emerald-100" : noStreak ? "bg-gray-100" : "bg-orange-100";
-  const accentText = isBroke ? "text-emerald-600" : noStreak ? "text-gray-500" : "text-orange-500";
-  const eyebrow    = isBroke ? "text-emerald-500" : noStreak ? "text-gray-400" : "text-orange-400";
-  const numColor   = isBroke ? "text-emerald-600" : noStreak ? "text-gray-400" : "text-orange-500";
+  const accentBg   = isBroke ? "bg-emerald-100" : noStreak ? "bg-[var(--ds-surface-card-active)]" : "bg-orange-100";
+  const accentText = isBroke ? "text-emerald-600" : noStreak ? "text-[var(--ds-text-secondary)]" : "text-orange-500";
+  const eyebrow    = isBroke ? "text-emerald-500" : noStreak ? "text-[var(--ds-text-tertiary)]" : "text-orange-400";
+  const numColor   = isBroke ? "text-emerald-600" : noStreak ? "text-[var(--ds-text-tertiary)]" : "text-orange-500";
   const dotDone    = isBroke ? "bg-emerald-400" : "bg-orange-400";
   const todayRing  = isBroke ? "border-emerald-300 bg-emerald-50" : "border-orange-300 bg-orange-50";
 
@@ -42,19 +42,19 @@ export default function HomeWeekStreakPanel({ weekStreak, consecutiveStreak, tot
                                      "Start today!";
 
   return (
-    <div className="overflow-hidden leaf-lg border border-gray-100 bg-white shadow-[0_8px_24px_rgba(15,23,42,0.07)]">
+    <div className="overflow-hidden leaf-lg border border-[var(--ds-border-primary)] bg-[var(--ds-surface-card)] shadow-card-md">
 
       {/* Header */}
       <div className="flex items-center justify-between px-4 pt-4 pb-3">
         <div className="flex items-center gap-3">
-          <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-[20px] shadow-sm shrink-0 ${accentBg}`}>
+          <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl shadow-sm shrink-0 ${accentBg}`}>
             {isBroke ? "🌱" : noStreak ? "🔥" : "🔥"}
           </div>
           <div>
-            <p className={`font-nunito text-[10px] uppercase tracking-widest leading-none mb-0.5 ${eyebrow}`}>
+            <p className={`font-nunito text-3xs uppercase tracking-widest leading-none mb-0.5 ${eyebrow}`}>
               {isBroke ? "Fresh start" : noStreak ? "Start a streak" : "Daily streak"}
             </p>
-            <h3 className="font-baloo font-black text-gray-900 text-[17px] leading-tight">
+            <h3 className="font-baloo font-black text-[var(--ds-text-primary)] text-mlg leading-tight">
               {heading}
             </h3>
           </div>
@@ -62,24 +62,24 @@ export default function HomeWeekStreakPanel({ weekStreak, consecutiveStreak, tot
 
         {/* Stars pill */}
         <div className="flex items-center gap-1 bg-amber-50 rounded-full px-2.5 py-1 border border-amber-100">
-          <span className="text-[12px] leading-none">⭐</span>
-          <span className="font-baloo font-black text-amber-600 text-[13px] leading-none">{totalStars}</span>
+          <span className="text-xs leading-none">⭐</span>
+          <span className="font-baloo font-black text-amber-600 text-sml leading-none">{totalStars}</span>
         </div>
       </div>
 
-      <div className="h-px bg-gray-100 mx-4" />
+      <div className="h-px bg-[var(--ds-surface-card-active)] mx-4" />
 
       {/* Big number + message — or empty-state prompt */}
       {noStreak ? (
         <div className="px-4 pt-3 pb-2 flex items-center gap-3">
-          <motion.span className="text-[40px] leading-none"
+          <motion.span className="text-5xl leading-none"
             animate={{ y: [0, -5, 0] }}
             transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}>
             🔥
           </motion.span>
           <div>
-            <p className="font-baloo font-black text-gray-700 text-[14px] leading-tight">Build your streak!</p>
-            <p className="font-nunito text-gray-400 text-[11px] mt-0.5">{message}</p>
+            <p className="font-baloo font-black text-[var(--ds-text-primary)] text-sm leading-tight">Build your streak!</p>
+            <p className="font-nunito text-[var(--ds-text-tertiary)] text-2xs mt-0.5">{message}</p>
           </div>
         </div>
       ) : (
@@ -92,10 +92,10 @@ export default function HomeWeekStreakPanel({ weekStreak, consecutiveStreak, tot
             {consecutiveStreak}
           </motion.span>
           <div className="pb-1.5">
-            <p className="font-baloo font-black text-gray-400 text-[15px] leading-none">
+            <p className="font-baloo font-black text-[var(--ds-text-tertiary)] text-mbase leading-none">
               {consecutiveStreak === 1 ? t("homeStreakDayLabel") : t("homeStreakDaysLabel")}
             </p>
-            <p className={`font-nunito font-semibold text-[11px] mt-0.5 leading-snug max-w-[130px] ${accentText}`}>
+            <p className={`font-nunito font-semibold text-2xs mt-0.5 leading-snug max-w-[130px] ${accentText}`}>
               {message}
             </p>
           </div>
@@ -103,7 +103,7 @@ export default function HomeWeekStreakPanel({ weekStreak, consecutiveStreak, tot
       )}
 
       {/* Week grid */}
-      <div className="mx-3 mb-4 bg-gray-50 rounded-2xl px-3 py-3 border border-gray-100">
+      <div className="mx-3 mb-4 bg-[var(--ds-surface-card-hover)] rounded-2xl px-3 py-3 border border-[var(--ds-border-primary)]">
         <div className="flex justify-between gap-1">
           {DAYS.map((day, i) => {
             const done    = weekStreak[i] ?? false;
@@ -112,22 +112,22 @@ export default function HomeWeekStreakPanel({ weekStreak, consecutiveStreak, tot
             return (
               <div key={i} className="flex flex-col items-center gap-1 flex-1">
                 <motion.div
-                  className={`w-full aspect-square max-w-[34px] rounded-full flex items-center justify-center text-[14px] transition-all duration-200 border ${
+                  className={`w-full aspect-square max-w-[34px] rounded-full flex items-center justify-center text-sm transition-all duration-200 border ${
                     done    ? `${dotDone} border-transparent shadow-sm` :
                     isToday ? `border-2 ${todayRing}` :
-                    future  ? "bg-white border-gray-100 opacity-40" :
-                              "bg-white border-gray-200"
+                    future  ? "bg-[var(--ds-surface-card)] border-[var(--ds-border-primary)] opacity-40" :
+                              "bg-[var(--ds-surface-card)] border-[var(--ds-border-primary)]"
                   }`}
                   animate={done ? { scale: [1, 1.08, 1] } : undefined}
                   transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut", delay: i * 0.15 }}>
-                  {done    ? <span className="text-white text-[13px]">{isBroke ? "🌿" : "🔥"}</span> :
-                   isToday ? <span className="font-black text-gray-400 text-[9px]">•</span> :
+                  {done    ? <span className="text-white text-sml">{isBroke ? "🌿" : "🔥"}</span> :
+                   isToday ? <span className="font-black text-[var(--ds-text-tertiary)] text-4xs">•</span> :
                              null}
                 </motion.div>
-                <span className={`font-nunito font-bold text-[9px] ${
+                <span className={`font-nunito font-bold text-4xs ${
                   done ? (isBroke ? "text-emerald-500" : "text-orange-400") :
-                  isToday ? "text-gray-600" :
-                  "text-gray-300"
+                  isToday ? "text-[var(--ds-text-secondary)]" :
+                  "text-[var(--ds-text-tertiary)]"
                 }`}>{day}</span>
               </div>
             );
@@ -135,7 +135,7 @@ export default function HomeWeekStreakPanel({ weekStreak, consecutiveStreak, tot
         </div>
 
         {isBroke && (
-          <p className="text-center font-nunito text-gray-400 text-[10px] mt-2.5 leading-snug">
+          <p className="text-center font-nunito text-[var(--ds-text-tertiary)] text-3xs mt-2.5 leading-snug">
             {t("homeStreakBrokeHint")}
           </p>
         )}

@@ -11,11 +11,11 @@ import { getThemeAssets } from "@/lib/design-system/assetRegistry";
 function HeroCopy() {
   return (
     <div className="flex flex-col items-start">
-      <h1 className="font-baloo font-black text-gray-900 text-h1 sm:text-display leading-[1.1]">
+      <h1 className="font-baloo font-black text-[var(--ds-text-primary)] text-h1 sm:text-display leading-[1.1]">
         Grow with<br />
         <span className="text-nimi-green">every story.</span>
       </h1>
-      <p className="font-nunito text-gray-600 text-body sm:text-body-lg mt-4 max-w-sm leading-relaxed">
+      <p className="font-nunito text-[var(--ds-text-secondary)] text-body sm:text-body-lg mt-4 max-w-sm leading-relaxed">
         Read, create, explore and grow with<br />Nimi, Piko &amp; Zilo.
       </p>
       <div className="flex items-center gap-3 mt-7">
@@ -42,7 +42,7 @@ export default function Hero() {
         <div className="relative z-10 flex flex-col justify-center shrink-0
                         w-[44%] xl:w-[40%] 2xl:w-[36%]
                         pl-8 sm:pl-12 lg:pl-16 xl:pl-20
-                        pr-6 pt-36 lg:pt-40 pb-16 bg-white">
+                        pr-6 pt-36 lg:pt-40 pb-16 bg-[var(--ds-surface-card)]">
           <HeroCopy />
         </div>
         <div className="relative z-10 w-16 shrink-0 bg-gradient-to-r from-white to-transparent pointer-events-none" />
@@ -60,7 +60,7 @@ export default function Hero() {
 
       {/* Mobile: stacked */}
       <div className="md:hidden">
-        <div className="px-5 pt-36 pb-6 bg-white">
+        <div className="px-5 pt-36 pb-6 bg-[var(--ds-surface-card)]">
           <HeroCopy />
         </div>
         <div className="relative w-full aspect-[853/1200]">

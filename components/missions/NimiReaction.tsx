@@ -62,7 +62,7 @@ export default function NimiReaction({ missionType }: NimiReactionProps) {
       <div className={`relative flex-1 leaf border ${borderBg} px-4 py-3 shadow-sm`}>
         {/* Speech tail */}
         <div className="absolute left-[-6px] top-[14px] w-3 h-3 rotate-45 border-l border-b border-inherit bg-inherit" style={{ borderColor: "inherit" }} />
-        <p className={`font-baloo font-black text-[15px] ${textColor} leading-snug`}>{reaction}</p>
+        <p className={`font-baloo font-black text-mbase ${textColor} leading-snug`}>{reaction}</p>
       </div>
     </motion.div>
   );

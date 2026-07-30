@@ -83,11 +83,11 @@ export default function ThemeUnlockModal({ meta, onClose }: Props) {
           {/* Body */}
           <div className="p-5 space-y-4">
             <div className="flex items-start justify-between gap-2">
-              <h2 className="text-lg font-extrabold text-gray-900">{meta.name}</h2>
+              <h2 className="text-lg font-extrabold text-[var(--ds-text-primary)]">{meta.name}</h2>
               <ThemeBadge status={status} />
             </div>
 
-            <p className="text-sm text-gray-600 leading-relaxed">{meta.description}</p>
+            <p className="text-sm text-[var(--ds-text-secondary)] leading-relaxed">{meta.description}</p>
 
             {/* Unlock requirement */}
             <div
@@ -96,15 +96,15 @@ export default function ThemeUnlockModal({ meta, onClose }: Props) {
             >
               <span className="text-3xl">{unlockIcon}</span>
               <div>
-                <div className="text-sm font-bold text-gray-900">Unlock for {unlockLabel}</div>
+                <div className="text-sm font-bold text-[var(--ds-text-primary)]">Unlock for {unlockLabel}</div>
                 {meta.estimatedUnlock && (
-                  <div className="text-xs text-gray-500 mt-0.5">Available: {meta.estimatedUnlock}</div>
+                  <div className="text-xs text-[var(--ds-text-secondary)] mt-0.5">Available: {meta.estimatedUnlock}</div>
                 )}
                 {!meta.estimatedUnlock && meta.unlockType === "stars" && (
-                  <div className="text-xs text-gray-500 mt-0.5">Earn stars by completing lessons</div>
+                  <div className="text-xs text-[var(--ds-text-secondary)] mt-0.5">Earn stars by completing lessons</div>
                 )}
                 {!meta.estimatedUnlock && meta.unlockType === "gems" && (
-                  <div className="text-xs text-gray-500 mt-0.5">Earn gems from the Reward Shop</div>
+                  <div className="text-xs text-[var(--ds-text-secondary)] mt-0.5">Earn gems from the Reward Shop</div>
                 )}
               </div>
             </div>
@@ -114,14 +114,14 @@ export default function ThemeUnlockModal({ meta, onClose }: Props) {
               <button
                 ref={closeRef}
                 onClick={onClose}
-                className="flex-1 py-2.5 leaf text-sm font-semibold border border-gray-200
-                           text-gray-700 hover:bg-gray-50 transition-colors focus-visible:outline-none
+                className="flex-1 py-2.5 leaf text-sm font-semibold border border-[var(--ds-border-primary)]
+                           text-[var(--ds-text-primary)] hover:bg-[var(--ds-surface-card-hover)] transition-colors focus-visible:outline-none
                            focus-visible:ring-2 focus-visible:ring-offset-1"
               >
                 Close
               </button>
               {meta.comingSoon ? (
-                <div className="flex-1 py-2.5 leaf text-sm font-semibold text-center text-gray-400 bg-gray-100">
+                <div className="flex-1 py-2.5 leaf text-sm font-semibold text-center text-[var(--ds-text-tertiary)] bg-[var(--ds-surface-card-active)]">
                   Coming Soon
                 </div>
               ) : (

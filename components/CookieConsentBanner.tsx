@@ -35,7 +35,7 @@ export default function CookieConsentBanner() {
         style={{ pointerEvents: "auto" }}
       >
         <span className="text-2xl shrink-0" aria-hidden>🍪</span>
-        <p className="font-nunito text-[13px] text-gray-200 flex-1 leading-relaxed">
+        <p className="font-nunito text-sml text-gray-200 flex-1 leading-relaxed">
           We use essential cookies to keep NIMIPIKO running smoothly and remember your preferences.
           No ads, no tracking.{" "}
           <Link href="/privacy" className="text-green-400 underline hover:text-green-300 transition-colors">
@@ -44,7 +44,7 @@ export default function CookieConsentBanner() {
         </p>
         <button
           onClick={accept}
-          className="shrink-0 bg-[var(--nimi-green,#15803D)] hover:bg-[var(--ds-brand-primary,#15803d)] active:bg-[var(--ds-brand-hover,#166534)] text-white font-baloo font-bold text-[13px] px-5 py-2 rounded-xl transition-colors whitespace-nowrap"
+          className="shrink-0 bg-[var(--nimi-green,#15803D)] hover:bg-[var(--ds-brand-primary,#15803d)] active:bg-[var(--ds-brand-hover,#166534)] text-white font-baloo font-bold text-sml px-5 py-2 rounded-xl transition-colors whitespace-nowrap"
         >
           Got it
         </button>

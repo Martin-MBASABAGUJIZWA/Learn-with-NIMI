@@ -25,16 +25,16 @@ import ThemePreviewModal from "./ThemePreviewModal";
 // ── Skeleton card ─────────────────────────────────────────────────────────────
 function ThemeCardSkeleton() {
   return (
-    <div className="flex flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white animate-pulse">
-      <div className="h-36 bg-gray-100" />
+    <div className="flex flex-col overflow-hidden rounded-2xl border border-[var(--ds-border-primary)] bg-[var(--ds-surface-card)] animate-pulse">
+      <div className="h-36 bg-[var(--ds-surface-card-active)]" />
       <div className="p-3 space-y-2">
         <div className="flex justify-between gap-2">
-          <div className="h-4 w-24 rounded-full bg-gray-100" />
-          <div className="h-4 w-14 rounded-full bg-gray-100" />
+          <div className="h-4 w-24 rounded-full bg-[var(--ds-surface-card-active)]" />
+          <div className="h-4 w-14 rounded-full bg-[var(--ds-surface-card-active)]" />
         </div>
-        <div className="h-3 w-full rounded-full bg-gray-100" />
-        <div className="h-3 w-3/4 rounded-full bg-gray-100" />
-        <div className="h-8 rounded-lg bg-gray-100 mt-2" />
+        <div className="h-3 w-full rounded-full bg-[var(--ds-surface-card-active)]" />
+        <div className="h-3 w-3/4 rounded-full bg-[var(--ds-surface-card-active)]" />
+        <div className="h-8 rounded-lg bg-[var(--ds-surface-card-active)] mt-2" />
       </div>
     </div>
   );
@@ -114,7 +114,7 @@ export default function ThemeGallery() {
 
       {/* Results */}
       {filtered.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 gap-3 text-gray-500">
+        <div className="flex flex-col items-center justify-center py-16 gap-3 text-[var(--ds-text-secondary)]">
           <span className="text-4xl">🎨</span>
           <p className="text-sm font-medium">No themes match your search</p>
           <button

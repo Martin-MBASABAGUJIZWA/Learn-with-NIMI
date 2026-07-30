@@ -18,7 +18,7 @@ export default function ProfileBadgesRow({ completedInLevel }: Props) {
   const { t } = useLanguage();
 
   return (
-    <div className="bg-white border border-ds-border shadow-ds-card p-4" style={{ borderRadius: 'var(--leaf-r)' }}>
+    <div className="bg-[var(--ds-surface-card)] border border-ds-border shadow-ds-card p-4" style={{ borderRadius: 'var(--leaf-r)' }}>
       <div className="flex items-center justify-between mb-3">
         <h3 className="font-black text-ds-text">{t("myBadges")}</h3>
         <Link href="/user-profile" className="text-sm font-bold text-ds-text hover:underline">
@@ -37,14 +37,14 @@ export default function ProfileBadgesRow({ completedInLevel }: Props) {
                   {badge.icon}
                 </Link>
               ) : (
-                <div className="w-14 h-14 bg-gray-100 rounded-full flex items-center justify-center text-2xl opacity-50 relative">
+                <div className="w-14 h-14 bg-[var(--ds-surface-card-hover)] rounded-full flex items-center justify-center text-2xl opacity-50 relative">
                   {badge.icon}
                   <div className="absolute inset-0 flex items-center justify-center rounded-full">
                     <span className="text-sm">🔒</span>
                   </div>
                 </div>
               )}
-              <p className={`text-[11px] text-center font-bold leading-tight ${earned ? "text-ds-text" : "text-gray-400"}`}>
+              <p className={`text-2xs text-center font-bold leading-tight ${earned ? "text-ds-text" : "text-[var(--ds-text-tertiary)]"}`}>
                 {badge.title}
               </p>
             </div>

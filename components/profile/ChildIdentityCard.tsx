@@ -36,7 +36,7 @@ export default function ChildIdentityCard({
   const avatarSize = compact ? 48 : 64;
 
   return (
-    <div className={`relative overflow-hidden border p-4 flex items-center gap-4 shadow-[0_16px_34px_rgba(15,23,42,0.08)] transition-all duration-300 ${cardRing} ${cardBg} ${className}`}
+    <div className={`relative overflow-hidden border p-4 flex items-center gap-4 shadow-card-2xl transition-all duration-300 ${cardRing} ${cardBg} ${className}`}
       style={{ borderRadius: 'var(--leaf-r)', borderColor: frame ? undefined : 'var(--ds-border-primary)' }}>
 
       {/* Top accent bar */}
@@ -49,7 +49,7 @@ export default function ChildIdentityCard({
         {avatarUrl ? (
           /* Child's own avatar — prominent */
           <motion.div
-            className={`rounded-full overflow-hidden ring-2 ring-[var(--ds-brand-primary)]/40 shadow-md bg-white/30 flex items-center justify-center ${compact ? "w-12 h-12" : "w-16 h-16"}`}
+            className={`rounded-full overflow-hidden ring-2 ring-[var(--ds-brand-primary)]/40 shadow-md bg-[var(--ds-surface-card)]/30 flex items-center justify-center ${compact ? "w-12 h-12" : "w-16 h-16"}`}
             animate={{ y: [0, -5, 0] }}
             transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
           >
@@ -130,17 +130,17 @@ export default function ChildIdentityCard({
           <motion.span
             initial={{ opacity: 0, y: 4 }}
             animate={{ opacity: 1, y: 0 }}
-            className={`inline-flex items-center gap-1 text-[10px] font-black px-2 py-0.5 rounded-full mt-1 ${titleBadge.titleColor ?? "bg-gray-100 text-gray-600"}`}
+            className={`inline-flex items-center gap-1 text-3xs font-black px-2 py-0.5 rounded-full mt-1 ${titleBadge.titleColor ?? "bg-[var(--ds-surface-card-active)] text-[var(--ds-text-secondary)]"}`}
           >
             {titleBadge.emoji} {t(titleBadge.nameKey)}
           </motion.span>
         )}
 
         {subtitle && !titleBadge && (
-          <p className="text-gray-500 text-sm mt-0.5">{subtitle}</p>
+          <p className="text-[var(--ds-text-secondary)] text-sm mt-0.5">{subtitle}</p>
         )}
         {subtitle && titleBadge && (
-          <p className="text-gray-500 text-xs mt-1">{subtitle}</p>
+          <p className="text-[var(--ds-text-secondary)] text-xs mt-1">{subtitle}</p>
         )}
       </div>
     </div>

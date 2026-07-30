@@ -39,7 +39,7 @@ export default function MagicCard({
       whileHover={hover && !onClick ? { y: -3 } : hover ? m.cardHoverSm : {}}
       whileTap={onClick ? m.buttonPress : {}}
       onClick={onClick}
-      className={`${baseStyles[variant]} ${onClick ? "cursor-pointer" : ""} bg-white border-ds-border ${className}`}
+      className={`${baseStyles[variant]} ${onClick ? "cursor-pointer" : ""} bg-[var(--ds-surface-card)] border-ds-border ${className}`}
       style={variant === "paper" ? { backgroundColor: "#faf6ee", borderColor: "rgba(180,160,130,0.2)" } : undefined}
     >
       {children}

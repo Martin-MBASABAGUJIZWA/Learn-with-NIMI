@@ -34,7 +34,7 @@ export default function StoryProgressPanel({ storySlug, slots }: Props) {
   const offset = C * (1 - done / total);
 
   return (
-    <div className="relative overflow-hidden border border-[var(--ds-border-primary)]/60 bg-gradient-to-br from-white via-[var(--ds-brand-soft)]/40 to-white leaf p-4 sm:p-5 h-full flex flex-col shadow-[0_16px_34px_rgba(15,23,42,0.08)]">
+    <div className="relative overflow-hidden border border-[var(--ds-border-primary)]/60 bg-gradient-to-br from-white via-[var(--ds-brand-soft)]/40 to-white leaf p-4 sm:p-5 h-full flex flex-col shadow-card-2xl">
       {/* World card texture — 6% opacity, purely decorative */}
       <Image src={assets.storyCard.background} alt="" aria-hidden="true"
         fill className="object-cover pointer-events-none opacity-[0.06]" />
@@ -42,11 +42,11 @@ export default function StoryProgressPanel({ storySlug, slots }: Props) {
       <div className="absolute inset-x-4 top-4 h-1 rounded-full bg-gradient-to-r from-[var(--ds-brand-primary)]/80 via-[var(--ds-brand-hover)]/70 to-transparent" />
       <div className="relative z-10 flex flex-col flex-1">
         <div className="mb-3 flex justify-center">
-          <div className="rounded-full border border-[var(--ds-border-brand)]/20 bg-white/80 px-3 py-1 text-[10px] font-black uppercase tracking-[0.24em] text-[var(--ds-brand-primary)] shadow-sm">
+          <div className="rounded-full border border-[var(--ds-border-brand)]/20 bg-[var(--ds-surface-card)]/80 px-3 py-1 text-3xs font-black uppercase tracking-[0.24em] text-[var(--ds-brand-primary)] shadow-sm">
             Story progress
           </div>
         </div>
-        <h3 className="font-baloo font-black text-ds-text text-[16px] sm:text-[18px] uppercase tracking-wider mb-3 text-center">
+        <h3 className="font-baloo font-black text-ds-text text-base sm:text-lg uppercase tracking-wider mb-3 text-center">
           Story Progress 🌿
         </h3>
 
@@ -67,10 +67,10 @@ export default function StoryProgressPanel({ storySlug, slots }: Props) {
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <motion.img src={assets.starMascot} alt="" className="w-9 h-9 sm:w-11 sm:h-11"
                   animate={{ scale: [1, 1.12, 1] }} transition={{ duration: 2.5, repeat: Infinity }} />
-                <span className="font-black text-[var(--ds-brand-primary)] text-[18px] sm:text-[22px] leading-none mt-0.5">
+                <span className="font-black text-[var(--ds-brand-primary)] text-lg sm:text-1.5xl leading-none mt-0.5">
                   {done}/{total}
                 </span>
-                <span className="text-gray-500 text-[7px] sm:text-[9px] font-bold mt-0.5 text-center leading-tight">
+                <span className="text-[var(--ds-text-secondary)] text-6xs sm:text-4xs font-bold mt-0.5 text-center leading-tight">
                   Missions<br/>Completed
                 </span>
               </div>
@@ -84,18 +84,18 @@ export default function StoryProgressPanel({ storySlug, slots }: Props) {
               return (
                 <Link key={slot.slot_key} href={`/stories/${storySlug}/mission/${slot.slot_key}`}>
                   <div className={`flex items-center gap-2 px-1 py-[3px] rounded-lg transition ${
-                    slot.completed ? "hover:bg-[var(--ds-brand-soft)]" : "hover:bg-gray-50"
+                    slot.completed ? "hover:bg-[var(--ds-brand-soft)]" : "hover:bg-[var(--ds-surface-card)]"
                   }`}>
                     <Image src={meta.icon} alt="" width={24} height={24} className="shrink-0 rounded-md" />
-                    <span className={`font-nunito text-[11px] sm:text-[12px] font-bold flex-1 leading-tight whitespace-nowrap ${
-                      slot.completed ? "text-ds-text" : "text-gray-500"
+                    <span className={`font-nunito text-2xs sm:text-xs font-bold flex-1 leading-tight whitespace-nowrap ${
+                      slot.completed ? "text-ds-text" : "text-[var(--ds-text-secondary)]"
                     }`}>
                       {meta.num}. {meta.label}
                     </span>
                     {slot.completed ? (
                       <CheckCircle2 className="w-5 h-5 text-[var(--ds-brand-primary)] shrink-0" />
                     ) : (
-                      <Circle className="w-5 h-5 text-gray-300 shrink-0" />
+                      <Circle className="w-5 h-5 text-[var(--ds-text-tertiary)] shrink-0" />
                     )}
                   </div>
                 </Link>
@@ -105,7 +105,7 @@ export default function StoryProgressPanel({ storySlug, slots }: Props) {
         </div>
 
         <Link href={`/stories/${storySlug}`}
-          className="mt-3 sm:mt-4 flex items-center justify-center gap-2 text-[var(--ds-brand-primary)] font-baloo font-black text-[15px] hover:bg-[var(--ds-brand-soft)] leaf py-2.5 transition border border-[var(--ds-brand-primary)]/20">
+          className="mt-3 sm:mt-4 flex items-center justify-center gap-2 text-[var(--ds-brand-primary)] font-baloo font-black text-mbase hover:bg-[var(--ds-brand-soft)] leaf py-2.5 transition border border-[var(--ds-brand-primary)]/20">
           View Story <ChevronRight className="w-5 h-5" />
         </Link>
       </div>

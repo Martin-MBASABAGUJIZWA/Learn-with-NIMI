@@ -41,7 +41,7 @@ export default function StatsSidebar({
     <div className="flex flex-col gap-4">
 
       {/* ── Streak card ── */}
-      <div className="bg-white border border-ds-border shadow-ds-card p-4"
+      <div className="bg-[var(--ds-surface-card)] border border-ds-border shadow-ds-card p-4"
         style={{ borderRadius: "var(--leaf-r)" }}>
         {/* Header */}
         <div className="flex items-center justify-center gap-2 mb-3">
@@ -66,7 +66,7 @@ export default function StatsSidebar({
         <div className="flex items-center justify-between">
           {DAY_LABELS.map((label, i) => (
             <div key={i} className="flex flex-col items-center gap-1">
-              <span className="text-[8px] font-bold text-gray-400">{label}</span>
+              <span className="text-5xs font-bold text-[var(--ds-text-tertiary)]">{label}</span>
               <motion.div
                 initial={{ scale: 0.8 }}
                 animate={{ scale: weekStreak[i] ? 1 : 0.85 }}
@@ -74,27 +74,27 @@ export default function StatsSidebar({
                 className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
                   weekStreak[i]
                     ? "bg-orange-500 border-orange-400 text-white shadow-glow-gold"
-                    : "bg-gray-100 border-gray-200 text-gray-300"
+                    : "bg-[var(--ds-surface-card-active)] border-[var(--ds-border-primary)] text-[var(--ds-text-tertiary)]"
                 }`}>
                 {weekStreak[i]
                   ? <Check className="w-4 h-4" strokeWidth={3} />
-                  : <span className="w-2 h-2 rounded-full bg-gray-300 block" />}
+                  : <span className="w-2 h-2 rounded-full bg-[var(--ds-surface-input)] block" />}
               </motion.div>
             </div>
           ))}
         </div>
 
-        <p className="text-[10px] text-ds-muted text-center mt-3 leading-snug">
+        <p className="text-3xs text-ds-muted text-center mt-3 leading-snug">
           {t("streakEncouragement")}
         </p>
       </div>
 
       {/* ── Badges preview ── */}
-      <div className="bg-white border border-ds-border shadow-ds-card p-4"
+      <div className="bg-[var(--ds-surface-card)] border border-ds-border shadow-ds-card p-4"
         style={{ borderRadius: "var(--leaf-r)" }}>
         <div className="flex items-center justify-between mb-3">
-          <h3 className="font-baloo font-black text-ds-text text-[12px] tracking-wide">{t("myBadges")}</h3>
-          <Link href="/user-profile" className="text-[10px] font-bold text-ds-brand hover:underline">
+          <h3 className="font-baloo font-black text-ds-text text-xs tracking-wide">{t("myBadges")}</h3>
+          <Link href="/user-profile" className="text-3xs font-bold text-ds-brand hover:underline">
             {t("viewAll")}
           </Link>
         </div>
@@ -111,8 +111,8 @@ export default function StatsSidebar({
               </motion.div>
             ))}
             {badges.length > 8 && (
-              <div className="w-10 h-10 rounded-full bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center">
-                <span className="text-[10px] font-black text-gray-400">+{badges.length - 8}</span>
+              <div className="w-10 h-10 rounded-full bg-[var(--ds-surface-card-active)] border-2 border-dashed border-[var(--ds-border-strong)] flex items-center justify-center">
+                <span className="text-3xs font-black text-[var(--ds-text-tertiary)]">+{badges.length - 8}</span>
               </div>
             )}
           </div>
@@ -126,20 +126,20 @@ export default function StatsSidebar({
                 transition={{ ...SPRING.bounce, delay: i * DURATION.fast }}
                 whileHover={{ scale: 1.06 }}
                 title={`🔒 ${badge.desc}`}
-                className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center cursor-default relative">
+                className="w-10 h-10 rounded-full bg-[var(--ds-surface-card-active)] flex items-center justify-center cursor-default relative">
                 <span className="grayscale opacity-25 select-none text-xl">{badge.emoji}</span>
                 <motion.span
                   animate={{ scale: [1, 1.25, 1] }}
                   transition={{ duration: DURATION.loopBase, repeat: Infinity, delay: i * 0.3 }}
-                  className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-white border border-gray-200 shadow flex items-center justify-center">
-                  <Lock className="w-2 h-2 text-gray-400" />
+                  className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-[var(--ds-surface-card)] border border-[var(--ds-border-primary)] shadow flex items-center justify-center">
+                  <Lock className="w-2 h-2 text-[var(--ds-text-tertiary)]" />
                 </motion.span>
               </motion.div>
             ))}
           </div>
         )}
 
-        <p className="text-[10px] text-ds-muted text-center leading-snug">
+        <p className="text-3xs text-ds-muted text-center leading-snug">
           {badges.length > 0
             ? t("badgesEarned").replace("{count}", String(badges.length))
             : t("noBadgesYet")}
@@ -162,9 +162,9 @@ export default function StatsSidebar({
               transition={{ duration: DURATION.loopBase, repeat: Infinity }}>
               <Trophy className="w-5 h-5 text-ds-action" />
             </motion.div>
-            <h3 className="font-baloo font-black text-ds-text text-[12px] tracking-wide">{t("certificateTeaserTitle")}</h3>
+            <h3 className="font-baloo font-black text-ds-text text-xs tracking-wide">{t("certificateTeaserTitle")}</h3>
           </div>
-          <p className="text-[10px] text-ds-muted leading-snug mb-2.5">{t("certificateTeaserBody")}</p>
+          <p className="text-3xs text-ds-muted leading-snug mb-2.5">{t("certificateTeaserBody")}</p>
           <div className="flex items-center gap-2">
             <div className="flex-1 h-2 bg-ds-progress-track rounded-full overflow-hidden">
               <motion.div
@@ -174,11 +174,11 @@ export default function StatsSidebar({
                 transition={{ duration: DURATION.loopBounce }}
               />
             </div>
-            <span className="text-[10px] font-baloo font-black text-ds-brand shrink-0">{activitiesCompleted}/8</span>
+            <span className="text-3xs font-baloo font-black text-ds-brand shrink-0">{activitiesCompleted}/8</span>
           </div>
           {certProgress >= 100 && (
             <motion.p initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }}
-              className="text-[10px] font-bold text-ds-action mt-1.5 flex items-center gap-1">
+              className="text-3xs font-bold text-ds-action mt-1.5 flex items-center gap-1">
               <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" /> Ready to claim! ✨
             </motion.p>
           )}
@@ -186,9 +186,9 @@ export default function StatsSidebar({
       </Link>
 
       {/* ── Today's stars ── */}
-      <div className="bg-white border border-ds-border shadow-ds-card p-4 text-center"
+      <div className="bg-[var(--ds-surface-card)] border border-ds-border shadow-ds-card p-4 text-center"
         style={{ borderRadius: "var(--leaf-r)" }}>
-        <p className="text-[11px] font-baloo font-bold text-ds-text">{t("todayStarsLabel")}</p>
+        <p className="text-2xs font-baloo font-bold text-ds-text">{t("todayStarsLabel")}</p>
         <motion.p
           key={todayStars}
           initial={{ scale: 0.7, opacity: 0 }}
@@ -203,11 +203,11 @@ export default function StatsSidebar({
         </motion.p>
         {hasStars ? (
           <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}
-            className="text-[9px] font-nunito font-bold text-ds-brand mt-1">
+            className="text-4xs font-nunito font-bold text-ds-brand mt-1">
             Amazing work! Keep going! 🎉
           </motion.p>
         ) : (
-          <p className="text-[9px] text-ds-muted mt-1 leading-snug">{t("keepLearningStars")}</p>
+          <p className="text-4xs text-ds-muted mt-1 leading-snug">{t("keepLearningStars")}</p>
         )}
       </div>
     </div>

@@ -38,14 +38,14 @@ export default function WordLearnedCard({ word, onNext, current, total }: WordLe
       initial={{ opacity: 0, scale: 0.92, y: 12 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       transition={{ ...SPRING.card, delay: 0.15 }}
-      className="leaf-lg border border-teal-200/60 bg-gradient-to-br from-teal-50 via-white to-cyan-50/50 p-5 shadow-[0_16px_34px_rgba(15,23,42,0.08)]"
+      className="leaf-lg border border-teal-200/60 bg-gradient-to-br from-teal-50 via-white to-cyan-50/50 p-5 shadow-card-2xl"
     >
       <div className="flex items-center mb-3">
-        <p className="font-nunito font-black text-[10px] uppercase tracking-[0.2em] text-teal-400">
+        <p className="font-nunito font-black text-3xs uppercase tracking-[0.2em] text-teal-400">
           ✨ {t("wordLearnedTitle")}
         </p>
         {total && total > 1 && (
-          <span className="ml-auto font-nunito font-bold text-[10px] text-teal-300">{current}/{total}</span>
+          <span className="ml-auto font-nunito font-bold text-3xs text-teal-300">{current}/{total}</span>
         )}
       </div>
 
@@ -61,7 +61,7 @@ export default function WordLearnedCard({ word, onNext, current, total }: WordLe
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <h3 className="font-baloo font-black text-[22px] text-teal-800 leading-none">{word.word}</h3>
+            <h3 className="font-baloo font-black text-1.5xl text-teal-800 leading-none">{word.word}</h3>
             {word.audio_url && (
               <motion.button
                 onClick={playAudio}
@@ -75,7 +75,7 @@ export default function WordLearnedCard({ word, onNext, current, total }: WordLe
               </motion.button>
             )}
           </div>
-          <p className="font-nunito text-[13px] text-gray-600 leading-snug">{word.meaning}</p>
+          <p className="font-nunito text-sml text-[var(--ds-text-secondary)] leading-snug">{word.meaning}</p>
         </div>
       </div>
 
@@ -83,7 +83,7 @@ export default function WordLearnedCard({ word, onNext, current, total }: WordLe
       <div className="flex items-center justify-between mt-4">
         <div className="flex gap-1.5">
           {["🌟", "✨", "💫", "⭐", "🌟"].map((e, i) => (
-            <motion.span key={i} className="text-[11px] select-none"
+            <motion.span key={i} className="text-2xs select-none"
               animate={{ y: [0, -4, 0], opacity: [0.5, 1, 0.5] }}
               transition={{ duration: 1.5 + i * 0.2, repeat: Infinity, delay: i * 0.3 }}>
               {e}
@@ -93,14 +93,14 @@ export default function WordLearnedCard({ word, onNext, current, total }: WordLe
         {onNext && (
           <div className="flex items-center gap-2">
             {total && current && current >= total && (
-              <Link href="/vocab" className="font-nunito font-bold text-[11px] text-teal-500 hover:underline">
+              <Link href="/vocab" className="font-nunito font-bold text-2xs text-teal-500 hover:underline">
                 See all my words →
               </Link>
             )}
             <motion.button
               onClick={onNext}
               whileTap={{ scale: 0.95 }}
-              className="font-baloo font-black text-[13px] text-white bg-teal-500 hover:bg-teal-600 transition px-4 py-1.5 rounded-full shadow-sm"
+              className="font-baloo font-black text-sml text-white bg-teal-500 hover:bg-teal-600 transition px-4 py-1.5 rounded-full shadow-sm"
             >
               {total && current && current < total ? "Next word →" : "Got it! ✓"}
             </motion.button>

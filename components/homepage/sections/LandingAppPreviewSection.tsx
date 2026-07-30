@@ -61,9 +61,9 @@ function AppMockup({ screen }: { screen: number }) {
           </div>
         </div>
         <div className="flex items-center justify-center gap-4 py-2.5 shrink-0">
-          <button className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white text-[11px]">◀</button>
+          <button className="w-8 h-8 rounded-full bg-[var(--ds-surface-card)]/10 flex items-center justify-center text-white text-[11px]">◀</button>
           <button className="w-11 h-11 rounded-full bg-amber-400 flex items-center justify-center text-white text-[16px] shadow-lg">▶</button>
-          <button className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white text-[11px]">▶▶</button>
+          <button className="w-8 h-8 rounded-full bg-[var(--ds-surface-card)]/10 flex items-center justify-center text-white text-[11px]">▶▶</button>
         </div>
       </div>
     </div>
@@ -72,15 +72,15 @@ function AppMockup({ screen }: { screen: number }) {
   return (
     <div className="absolute inset-0 overflow-hidden flex flex-col items-center" style={{ background: "var(--parchment, #fdf3e0)" }}>
       <div className="flex items-center justify-between w-full px-4 pt-10 pb-1 shrink-0">
-        <span className="text-[8px] font-bold text-gray-600">9:41</span>
+        <span className="text-[8px] font-bold text-[var(--ds-text-secondary)]">9:41</span>
         <span className="text-[8px] font-black text-amber-500">⭐ 260</span>
       </div>
       <img loading="lazy" src="/themes/default/rewards/trophy.png" alt="" className="w-14 h-14 object-contain drop-shadow-xl mt-1" draggable={false} />
-      <p className="font-baloo font-black text-gray-900 text-[12px] mt-1.5">Story Complete! 🎉</p>
+      <p className="font-baloo font-black text-[var(--ds-text-primary)] text-[12px] mt-1.5">Story Complete! 🎉</p>
       <div className="flex gap-0.5 mt-1">
         {Array.from({length:5}).map((_,i) => <span key={i} className="text-yellow-400 text-[15px]">★</span>)}
       </div>
-      <p className="text-[7.5px] text-gray-500 mt-0.5 mb-3">+15 stars · Lion Champion badge unlocked</p>
+      <p className="text-[7.5px] text-[var(--ds-text-secondary)] mt-0.5 mb-3">+15 stars · Lion Champion badge unlocked</p>
       <div className="relative px-4 w-full">
         <img loading="lazy" src="/themes/default/rewards/certificate-frame.png" alt="Certificate of Achievement"
           className="w-full object-contain" draggable={false} />
@@ -104,7 +104,7 @@ export default function LandingAppPreviewSection({ authed }: { authed: boolean }
   const [active, setActive] = useState(0);
 
   return (
-    <section className="py-20 sm:py-28 px-5 sm:px-10 lg:px-14 bg-white overflow-visible">
+    <section className="py-20 sm:py-28 px-5 sm:px-10 lg:px-14 bg-[var(--ds-surface-card)] overflow-visible">
       <div className="max-w-6xl mx-auto">
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }} variants={stagger}>
 
@@ -113,10 +113,10 @@ export default function LandingAppPreviewSection({ authed }: { authed: boolean }
               style={{ color:"var(--ds-brand-primary)", background:"var(--ds-brand-subtle)" }}>
               📱 Explore The App
             </span>
-            <h2 className="font-baloo font-black text-gray-900 text-[30px] sm:text-[46px] leading-tight">
+            <h2 className="font-baloo font-black text-[var(--ds-text-primary)] text-[30px] sm:text-[46px] leading-tight">
               Built to enchant<br className="hidden sm:block" /> curious minds
             </h2>
-            <p className="font-nunito text-gray-500 mt-4 text-[15px] max-w-md mx-auto leading-relaxed">
+            <p className="font-nunito text-[var(--ds-text-secondary)] mt-4 text-[15px] max-w-md mx-auto leading-relaxed">
               From the first story to the final badge — every screen designed to delight children and reassure parents.
             </p>
           </motion.div>
@@ -127,18 +127,18 @@ export default function LandingAppPreviewSection({ authed }: { authed: boolean }
               {PREVIEW_SCREENS.map((s, i) => (
                 <button key={s.label} onClick={() => setActive(i)}
                   className={`flex items-start gap-4 p-5 rounded-2xl text-left transition-all duration-200 group ${
-                    active === i ? "bg-green-50 border-2 border-green-200 shadow-sm" : "border-2 border-transparent hover:bg-gray-50"
+                    active === i ? "bg-green-50 border-2 border-green-200 shadow-sm" : "border-2 border-transparent hover:bg-[var(--ds-surface-card-hover)]"
                   }`}>
                   <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-[20px] shrink-0 transition-colors ${
-                    active === i ? "bg-green-600" : "bg-gray-100 group-hover:bg-gray-200"
+                    active === i ? "bg-green-600" : "bg-[var(--ds-surface-card-active)] group-hover:bg-[var(--ds-border-primary)]"
                   }`}>
                     {s.icon}
                   </div>
                   <div className="flex-1">
                     <p className={`font-baloo font-black text-[16px] leading-snug transition-colors ${
-                      active === i ? "text-green-700" : "text-gray-700"
+                      active === i ? "text-green-700" : "text-[var(--ds-text-primary)]"
                     }`}>{s.label}</p>
-                    <p className="font-nunito text-gray-500 text-[13px] leading-relaxed mt-0.5">{s.desc}</p>
+                    <p className="font-nunito text-[var(--ds-text-secondary)] text-[13px] leading-relaxed mt-0.5">{s.desc}</p>
                   </div>
                   {active === i && <div className="w-1 self-stretch rounded-full bg-green-400 shrink-0" />}
                 </button>
@@ -151,7 +151,7 @@ export default function LandingAppPreviewSection({ authed }: { authed: boolean }
                   Try It Free →
                 </Link>
                 <Link href="/stories"
-                  className="flex-1 text-center text-gray-600 font-baloo font-black text-[14px] py-3.5 rounded-2xl border-2 border-gray-200 hover:border-green-300 hover:text-green-700 transition-all">
+                  className="flex-1 text-center text-[var(--ds-text-secondary)] font-baloo font-black text-[14px] py-3.5 rounded-2xl border-2 border-[var(--ds-border-primary)] hover:border-green-300 hover:text-green-700 transition-all">
                   Browse Stories
                 </Link>
               </div>
@@ -182,21 +182,21 @@ export default function LandingAppPreviewSection({ authed }: { authed: boolean }
 
                 <motion.div
                   animate={{ y: [0,-6,0] }} transition={{ duration:3, repeat:Infinity, ease:"easeInOut" }}
-                  className="absolute -left-10 top-[28%] bg-white border border-gray-100 shadow-xl rounded-2xl px-3 py-2 flex items-center gap-2">
+                  className="absolute -left-10 top-[28%] bg-[var(--ds-surface-card)] border border-[var(--ds-border-primary)] shadow-xl rounded-2xl px-3 py-2 flex items-center gap-2">
                   <span className="text-xl">⭐</span>
                   <div>
-                    <p className="font-baloo font-black text-gray-900 text-[12px] leading-none">+15 Stars!</p>
-                    <p className="font-nunito text-gray-400 text-[9px]">Mission complete</p>
+                    <p className="font-baloo font-black text-[var(--ds-text-primary)] text-[12px] leading-none">+15 Stars!</p>
+                    <p className="font-nunito text-[var(--ds-text-tertiary)] text-[9px]">Mission complete</p>
                   </div>
                 </motion.div>
 
                 <motion.div
                   animate={{ y: [0,6,0] }} transition={{ duration:3.5, repeat:Infinity, ease:"easeInOut", delay:0.8 }}
-                  className="absolute -right-10 top-[52%] bg-white border border-gray-100 shadow-xl rounded-2xl px-3 py-2 flex items-center gap-2">
+                  className="absolute -right-10 top-[52%] bg-[var(--ds-surface-card)] border border-[var(--ds-border-primary)] shadow-xl rounded-2xl px-3 py-2 flex items-center gap-2">
                   <span className="text-xl">🏅</span>
                   <div>
-                    <p className="font-baloo font-black text-gray-900 text-[12px] leading-none">New Badge!</p>
-                    <p className="font-nunito text-gray-400 text-[9px]">Lion Champion</p>
+                    <p className="font-baloo font-black text-[var(--ds-text-primary)] text-[12px] leading-none">New Badge!</p>
+                    <p className="font-nunito text-[var(--ds-text-tertiary)] text-[9px]">Lion Champion</p>
                   </div>
                 </motion.div>
               </div>

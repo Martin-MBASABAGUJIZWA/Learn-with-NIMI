@@ -83,17 +83,17 @@ export default function Sidebar({ activeChild, isOpen, onClose, onLogoutClick }:
       <button
         onClick={onClose}
         aria-label="Close menu"
-        className="lg:hidden absolute right-3 top-4 text-gray-500 hover:text-[var(--ds-brand-primary)] p-1 transition z-10"
+        className="lg:hidden absolute right-3 top-4 text-[var(--ds-text-secondary)] hover:text-[var(--ds-brand-primary)] p-1 transition z-10"
       >
         <X className="w-6 h-6" />
       </button>
 
       {/* Brand logo */}
-      <Link href="/home" onClick={onClose} className="flex flex-col items-center mb-10 leaf border border-[color:var(--ds-border-primary)]/70 bg-white/90 p-2 shadow-[0_12px_26px_rgba(15,23,42,0.06)] transition-transform duration-200 hover:scale-[1.01]">
+      <Link href="/home" onClick={onClose} className="flex flex-col items-center mb-10 leaf border border-[var(--ds-border-primary)]/70 bg-[var(--ds-surface-card)]/90 p-2 shadow-[0_12px_26px_rgba(15,23,42,0.06)] transition-transform duration-200 hover:scale-[1.01]">
         <Image src={assets.nimiLogo} alt="NIMIPIKO" width={80} height={80}
           className="w-20 h-20 rounded-full border-2 border-white shadow-[0_10px_28px_rgba(15,23,42,0.08)]" />
         <Image src={assets.nimiLogoText} alt="NIMIPIKO" width={140} height={28} className="h-7 mt-2" style={{ width: "auto" }} />
-        <p className="mt-1 px-2 py-0.5 rounded-full bg-[var(--ds-brand-soft)] text-[8px] font-bold text-[var(--ds-brand-primary)] select-none">
+        <p className="mt-1 px-2 py-0.5 rounded-full bg-[var(--ds-brand-soft)] text-5xs font-bold text-[var(--ds-brand-primary)] select-none">
           🌟 Learn • Play • Grow 🌟
         </p>
       </Link>
@@ -106,15 +106,15 @@ export default function Sidebar({ activeChild, isOpen, onClose, onLogoutClick }:
             <Link key={item.label} href={item.href} onClick={onClose}
               aria-label={item.label}
               aria-current={isActive ? "page" : undefined}
-              className={`group relative flex items-center gap-3 px-3 py-2.5 leaf border font-baloo font-black text-[14px] transition-all duration-200 active:scale-[0.97] ${
+              className={`group relative flex items-center gap-3 px-3 py-2.5 leaf border font-baloo font-black text-sm transition-all duration-200 active:scale-[0.97] ${
                 isActive
                   ? `${item.activeBg} ${item.activeText} ${item.activeBorder} shadow-sm`
-                  : "border-transparent text-gray-500 hover:bg-gray-50 hover:text-gray-800"
+                  : "border-transparent text-[var(--ds-text-secondary)] hover:bg-[var(--ds-surface-card-hover)] hover:text-[var(--ds-text-primary)]"
               }`}>
               {isActive && (
                 <span className={`absolute left-0 top-1/2 h-6 w-1.5 -translate-y-1/2 rounded-full ${item.activeBar}`} />
               )}
-              <span className={`text-[20px] shrink-0 transition-transform duration-200 leading-none ${isActive ? "scale-110" : "group-hover:scale-110"}`}>
+              <span className={`text-xl shrink-0 transition-transform duration-200 leading-none ${isActive ? "scale-110" : "group-hover:scale-110"}`}>
                 {item.emoji}
               </span>
               <span>{item.label}</span>
@@ -131,9 +131,9 @@ export default function Sidebar({ activeChild, isOpen, onClose, onLogoutClick }:
           className="mt-10 block border border-amber-200 bg-gradient-to-br from-amber-50 to-yellow-50 leaf p-3 text-center shadow-[0_8px_20px_rgba(245,158,11,0.12)] hover:shadow-[0_10px_24px_rgba(245,158,11,0.2)] transition-all duration-200 hover:scale-[1.01] active:scale-[0.99]"
         >
           <Crown className="w-5 h-5 text-amber-500 mx-auto mb-1" />
-          <p className="font-baloo font-black text-amber-700 text-[12px] leading-tight">Join Club 👑</p>
-          <p className="font-nunito text-amber-600/80 text-[9px] leading-snug mt-0.5">Unlock all themes, Nimi AI & more</p>
-          <div className="mt-2 bg-amber-500 text-white font-baloo font-black text-[11px] px-3 py-1 rounded-full inline-block">
+          <p className="font-baloo font-black text-amber-700 text-xs leading-tight">Join Club 👑</p>
+          <p className="font-nunito text-amber-600/80 text-4xs leading-snug mt-0.5">Unlock all themes, Nimi AI & more</p>
+          <div className="mt-2 bg-amber-500 text-white font-baloo font-black text-2xs px-3 py-1 rounded-full inline-block">
             Upgrade →
           </div>
         </Link>
@@ -142,15 +142,15 @@ export default function Sidebar({ activeChild, isOpen, onClose, onLogoutClick }:
       {isClub === true && (
         <div className="mt-10 border border-green-200 bg-gradient-to-br from-green-50 to-emerald-50 leaf p-3 text-center shadow-sm">
           <Crown className="w-5 h-5 text-green-600 mx-auto mb-1" />
-          <p className="font-baloo font-black text-green-700 text-[12px]">Club Member 👑</p>
-          <p className="font-nunito text-green-600/80 text-[9px] mt-0.5">All features unlocked</p>
+          <p className="font-baloo font-black text-green-700 text-xs">Club Member 👑</p>
+          <p className="font-nunito text-green-600/80 text-4xs mt-0.5">All features unlocked</p>
         </div>
       )}
 
       {isClub === false && (
-        <div className="mt-10 border border-gray-100 bg-gradient-to-br from-white/95 via-[var(--ds-brand-soft)]/80 to-white/95 leaf p-4 text-center shadow-[0_12px_28px_rgba(15,23,42,0.06)]">
-          <p className="font-baloo font-black text-gray-800 text-[13px]">{t("keepGoingLabel")}</p>
-          <p className="font-nunito text-gray-500 text-[9px] leading-snug mt-0.5">{t("keepGoingBody")}</p>
+        <div className="mt-10 border border-[var(--ds-border-primary)] bg-gradient-to-br from-[var(--ds-surface-card)]/95 via-[var(--ds-brand-soft)]/80 to-[var(--ds-surface-card)]/95 leaf p-4 text-center shadow-[0_12px_28px_rgba(15,23,42,0.06)]">
+          <p className="font-baloo font-black text-[var(--ds-text-primary)] text-sml">{t("keepGoingLabel")}</p>
+          <p className="font-nunito text-[var(--ds-text-secondary)] text-4xs leading-snug mt-0.5">{t("keepGoingBody")}</p>
           <div className="text-2xl mt-2">⭐</div>
         </div>
       )}
@@ -159,25 +159,25 @@ export default function Sidebar({ activeChild, isOpen, onClose, onLogoutClick }:
       <Link
         href="/parents"
         onClick={onClose}
-        className="mt-3 flex items-center gap-2 px-3 py-2.5 leaf border border-ds-border bg-white/80 hover:bg-gray-50 transition-all duration-200 group"
+        className="mt-3 flex items-center gap-2 px-3 py-2.5 leaf border border-[var(--ds-border-primary)] bg-[var(--ds-surface-card)]/80 hover:bg-[var(--ds-surface-card-hover)] transition-all duration-200 group"
       >
         <div className="relative shrink-0">
           <div className="w-8 h-8 rounded-full overflow-hidden bg-[var(--ds-brand-subtle)] border-2 border-[var(--ds-brand-primary)]/30 flex items-center justify-center">
             {parentAvatar ? (
               <ChildAvatar avatarUrl={parentAvatar} size={32} />
             ) : (
-              <span className="text-[13px] font-black text-[var(--ds-brand-primary)]">
+              <span className="text-sml font-black text-[var(--ds-brand-primary)]">
                 {parentName.charAt(0).toUpperCase()}
               </span>
             )}
           </div>
-          <span className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-amber-400 border border-white flex items-center justify-center text-[8px]">
+          <span className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-amber-400 border border-white flex items-center justify-center text-5xs">
             👑
           </span>
         </div>
         <div className="flex-1 min-w-0">
-          <p className="font-baloo font-black text-ds-text text-[12px] truncate leading-tight">{parentName}</p>
-          <p className="text-[9px] text-ds-muted font-semibold leading-none mt-0.5">Parent Account</p>
+          <p className="font-baloo font-black text-ds-text text-xs truncate leading-tight">{parentName}</p>
+          <p className="text-4xs text-ds-muted font-semibold leading-none mt-0.5">Parent Account</p>
         </div>
         <ChevronRight className="w-3.5 h-3.5 text-ds-muted shrink-0 group-hover:text-ds-text transition-colors" />
       </Link>
@@ -185,7 +185,7 @@ export default function Sidebar({ activeChild, isOpen, onClose, onLogoutClick }:
       {/* Logout */}
       <button
         onClick={() => { onClose(); onLogoutClick(); }}
-        className="mt-1.5 flex items-center gap-2 px-3 py-2 leaf font-nunito font-bold text-[12px] bg-red-50 text-red-500 hover:bg-red-100 transition-all duration-200 hover:shadow-sm"
+        className="mt-1.5 flex items-center gap-2 px-3 py-2 leaf font-nunito font-bold text-xs bg-red-50 text-red-500 hover:bg-red-100 transition-all duration-200 hover:shadow-sm"
       >
         <LogOut className="w-4 h-4 shrink-0" />
         <span>{t("authLogout")}</span>
@@ -197,7 +197,7 @@ export default function Sidebar({ activeChild, isOpen, onClose, onLogoutClick }:
     <>
       {/* Desktop sidebar — always visible on lg+ */}
       <aside
-        className="hidden lg:flex lg:flex-col lg:fixed lg:inset-y-0 lg:left-0 lg:w-[200px] lg:z-30 border-r border-gray-200 overflow-hidden"
+        className="hidden lg:flex lg:flex-col lg:fixed lg:inset-y-0 lg:left-0 lg:w-[200px] lg:z-30 border-r border-[var(--ds-border-primary)] overflow-hidden"
         style={{
           backgroundImage: `linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,255,255,0.90)), url('${assets.navigation.sidebar}')`,
           backgroundSize: "cover",
@@ -219,7 +219,7 @@ export default function Sidebar({ activeChild, isOpen, onClose, onLogoutClick }:
           />
           {/* Drawer panel */}
           <aside
-            className="lg:hidden fixed inset-y-0 left-0 z-50 w-[240px] border-r border-gray-200 overflow-y-auto"
+            className="lg:hidden fixed inset-y-0 left-0 z-50 w-[240px] border-r border-[var(--ds-border-primary)] overflow-y-auto"
             style={{
               backgroundImage: `linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,255,255,0.90)), url('${assets.navigation.sidebar}')`,
               backgroundSize: "cover",

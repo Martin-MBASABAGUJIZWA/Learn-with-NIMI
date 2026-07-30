@@ -24,7 +24,7 @@ export default function DailyAdventureSidebar({ activitiesCompleted }: Props) {
   return (
     <div className="flex flex-col gap-4">
       {/* Today's Progress */}
-      <div className="bg-white border border-ds-border shadow-ds-card p-4 text-center" style={{ borderRadius: 'var(--leaf-r)' }}>
+      <div className="bg-[var(--ds-surface-card)] border border-ds-border shadow-ds-card p-4 text-center" style={{ borderRadius: 'var(--leaf-r)' }}>
         <div className="relative w-24 h-24 mx-auto">
           <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
             <circle cx="50" cy="50" r={RING_RADIUS} fill="none" stroke="rgba(0,0,0,0.08)" strokeWidth="10" />
@@ -47,20 +47,20 @@ export default function DailyAdventureSidebar({ activitiesCompleted }: Props) {
         <p className="font-black text-ds-text text-sm mt-3">
           {t("activitiesCompletedLabel").replace("{count}", String(activitiesCompleted))}
         </p>
-        <p className="text-gray-500 text-xs mt-1">🏅 {t("completeAllEarnStars")}</p>
+        <p className="text-[var(--ds-text-secondary)] text-xs mt-1">🏅 {t("completeAllEarnStars")}</p>
       </div>
 
       {/* Activity Stars */}
-      <div className="bg-white border border-ds-border shadow-ds-card p-4 text-center" style={{ borderRadius: 'var(--leaf-r)' }}>
+      <div className="bg-[var(--ds-surface-card)] border border-ds-border shadow-ds-card p-4 text-center" style={{ borderRadius: 'var(--leaf-r)' }}>
         <p className="font-black text-ds-text text-sm mb-2">{t("activityStarsTitle")}</p>
         <div className="flex items-center justify-center gap-1 text-2xl">
           {Array.from({ length: 5 }).map((_, i) => (
-            <span key={i} className={i < filledStars ? "" : "text-gray-300"}>
+            <span key={i} className={i < filledStars ? "" : "text-[var(--ds-text-tertiary)]"}>
               {i < filledStars ? "⭐" : "☆"}
             </span>
           ))}
         </div>
-        <p className="text-gray-500 text-xs mt-2">
+        <p className="text-[var(--ds-text-secondary)] text-xs mt-2">
           🎁 {t("activityStarsCount").replace("{count}", String(activitiesCompleted))}
         </p>
       </div>
@@ -80,7 +80,7 @@ export default function DailyAdventureSidebar({ activitiesCompleted }: Props) {
       </div>
 
       {/* Nimi encouragement */}
-      <div className="bg-white/95 border border-ds-border shadow-[0_14px_32px_rgba(15,23,42,0.06)] p-3 flex items-center gap-3" style={{ borderRadius: 'var(--leaf-r)' }}>
+      <div className="bg-[var(--ds-surface-card)]/95 border border-ds-border shadow-card-xl p-3 flex items-center gap-3" style={{ borderRadius: 'var(--leaf-r)' }}>
         <img
           src={assets.nimiCircle}
           alt="Nimi"

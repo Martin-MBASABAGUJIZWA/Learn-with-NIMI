@@ -100,8 +100,8 @@ export default function MyProfilePage() {
               <Image src={assets.nimiCircle} alt="NIMI" width={112} height={112} className="rounded-full object-cover border-4 border-yellow-400 shadow-xl" />
               <span className="absolute -bottom-1 -right-1 text-3xl">🌟</span>
             </div>
-            <div className="bg-white border border-ds-border rounded-2xl rounded-tl-none px-5 py-3 shadow-ds-card">
-              <p className="font-baloo font-black text-ds-text text-[16px] leading-snug">{t("noChildrenYet")}</p>
+            <div className="bg-[var(--ds-surface-card)] border border-ds-border rounded-2xl rounded-tl-none px-5 py-3 shadow-ds-card">
+              <p className="font-baloo font-black text-ds-text text-base leading-snug">{t("noChildrenYet")}</p>
             </div>
             <Link href="/home" className="text-white font-baloo font-black px-8 py-3 shadow-md transition hover:-translate-y-0.5 active:scale-95" style={{ backgroundColor: 'var(--nimi-green)', borderRadius: 'var(--leaf-r)' }}>
               🏠 {t("goHomeBtn")}
@@ -119,11 +119,11 @@ export default function MyProfilePage() {
           <div className="flex items-start sm:items-center justify-between gap-3 flex-wrap">
             <div>
               <h1 className="font-black text-2xl sm:text-3xl text-ds-text">{t("myProfileTitle")}</h1>
-              <p className="text-gray-500 text-sm mt-1">{t("myProfileSubtitle")}</p>
+              <p className="text-[var(--ds-text-secondary)] text-sm mt-1">{t("myProfileSubtitle")}</p>
             </div>
             <button
               onClick={() => setShowEditModal(true)}
-              className="border border-ds-border bg-white text-ds-text font-black rounded-full px-5 py-2.5 text-sm hover:bg-gray-50 shadow-ds-card transition flex items-center gap-2"
+              className="border border-ds-border bg-[var(--ds-surface-card)] text-ds-text font-black rounded-full px-5 py-2.5 text-sm hover:bg-[var(--ds-surface-card-hover)] shadow-ds-card transition flex items-center gap-2"
             >
               <Edit className="w-4 h-4" /> {t("editProfile")}
             </button>
@@ -150,7 +150,7 @@ export default function MyProfilePage() {
           </div>
 
           {/* Theme Picker */}
-          <div className="mt-4 bg-white border border-ds-border shadow-ds-card p-5" style={{ borderRadius: 'var(--leaf-r)' }}>
+          <div className="mt-4 bg-[var(--ds-surface-card)] border border-ds-border shadow-ds-card p-5" style={{ borderRadius: 'var(--leaf-r)' }}>
             <ThemePicker />
           </div>
 

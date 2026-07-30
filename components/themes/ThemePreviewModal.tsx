@@ -111,17 +111,17 @@ export default function ThemePreviewModal({ meta, onClose }: Props) {
           <div className="p-5 space-y-4">
             <div className="flex items-start justify-between gap-2">
               <div>
-                <h2 className="text-lg font-extrabold text-gray-900 flex items-center gap-2">
+                <h2 className="text-lg font-extrabold text-[var(--ds-text-primary)] flex items-center gap-2">
                   <span>{meta.accentIcon}</span>
                   {meta.name}
                 </h2>
-                <p className="text-sm text-gray-500 mt-0.5">{meta.description}</p>
+                <p className="text-sm text-[var(--ds-text-secondary)] mt-0.5">{meta.description}</p>
               </div>
               <ThemeBadge status={status} />
             </div>
 
             <div
-              className="text-sm text-gray-600 p-3 leaf"
+              className="text-sm text-[var(--ds-text-secondary)] p-3 leaf"
               style={{ backgroundColor: `${meta.accentColor}10`, border: `1px solid ${meta.accentColor}20` }}
             >
               <strong>You are now previewing this theme.</strong> Navigate around the app to see
@@ -132,8 +132,8 @@ export default function ThemePreviewModal({ meta, onClose }: Props) {
             <div className="flex gap-3">
               <button
                 onClick={handleCancel}
-                className="flex-1 py-3 leaf text-sm font-semibold border border-gray-200
-                           text-gray-700 hover:bg-gray-50 transition-colors focus-visible:outline-none
+                className="flex-1 py-3 leaf text-sm font-semibold border border-[var(--ds-border-primary)]
+                           text-[var(--ds-text-primary)] hover:bg-[var(--ds-surface-card-hover)] transition-colors focus-visible:outline-none
                            focus-visible:ring-2 focus-visible:ring-offset-1"
               >
                 Cancel Preview

@@ -28,8 +28,8 @@ export default function GalleryCard({ creation, onLike, isLoadingLike = false }:
   const title = creation.description?.trim() || t("myCreationFallback").replace("{name}", creation.childName);
 
   return (
-    <div className="bg-white border border-ds-border shadow-ds-card overflow-hidden hover:shadow-md transition-shadow" style={{ borderRadius: 'var(--leaf-r)' }}>
-      <div className="relative aspect-square bg-gray-100 flex items-center justify-center overflow-hidden">
+    <div className="bg-[var(--ds-surface-card)] border border-ds-border shadow-ds-card overflow-hidden hover:shadow-md transition-shadow" style={{ borderRadius: 'var(--leaf-r)' }}>
+      <div className="relative aspect-square bg-[var(--ds-surface-card-active)] flex items-center justify-center overflow-hidden">
         {creation.imageUrl ? (
           <img
             src={creation.imageUrl}
@@ -41,21 +41,21 @@ export default function GalleryCard({ creation, onLike, isLoadingLike = false }:
           <span className="text-5xl">🎨</span>
         )}
         {creation.type === "challenge" && (
-          <span className="absolute top-2 right-2 bg-gradient-to-r from-yellow-500 to-amber-600 text-white text-[9px] font-black rounded-full px-2 py-0.5 shadow">🏆 Challenge</span>
+          <span className="absolute top-2 right-2 bg-gradient-to-r from-yellow-500 to-amber-600 text-white text-4xs font-black rounded-full px-2 py-0.5 shadow">🏆 Challenge</span>
         )}
         {creation.type === "certificate" && (
-          <span className="absolute top-2 right-2 text-white text-[9px] font-black px-2 py-0.5 shadow" style={{ backgroundColor: 'var(--nimi-green)', borderRadius: 'var(--leaf-r-sm)' }}>📜 Certificate</span>
+          <span className="absolute top-2 right-2 text-white text-4xs font-black px-2 py-0.5 shadow" style={{ backgroundColor: 'var(--nimi-green)', borderRadius: 'var(--leaf-r-sm)' }}>📜 Certificate</span>
         )}
         {creation.type === "sticker" && (
-          <span className="absolute top-2 right-2 bg-gradient-to-r from-pink-500 to-fuchsia-600 text-white text-[9px] font-black rounded-full px-2 py-0.5 shadow">⭐ Sticker</span>
+          <span className="absolute top-2 right-2 bg-gradient-to-r from-pink-500 to-fuchsia-600 text-white text-4xs font-black rounded-full px-2 py-0.5 shadow">⭐ Sticker</span>
         )}
         {creation.status === "pending" && (
-          <span className="absolute top-2 left-2 bg-amber-400 text-amber-900 text-[10px] font-black rounded-full px-2.5 py-1 shadow">
+          <span className="absolute top-2 left-2 bg-amber-400 text-amber-900 text-3xs font-black rounded-full px-2.5 py-1 shadow">
             {t("statusPendingLabel")}
           </span>
         )}
         {creation.status === "rejected" && (
-          <span className="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-black rounded-full px-2.5 py-1 shadow">
+          <span className="absolute top-2 left-2 bg-red-500 text-white text-3xs font-black rounded-full px-2.5 py-1 shadow">
             {t("statusRejectedLabel")}
           </span>
         )}
@@ -63,10 +63,10 @@ export default function GalleryCard({ creation, onLike, isLoadingLike = false }:
 
       <div className="p-3">
         <div className="flex items-center gap-1.5 mb-1">
-          <div className={`w-7 h-7 rounded-full bg-gradient-to-br ${avatarColorFor(creation.childName)} flex items-center justify-center text-[14px] shrink-0 border border-gray-200 shadow-sm`}>
+          <div className={`w-7 h-7 rounded-full bg-gradient-to-br ${avatarColorFor(creation.childName)} flex items-center justify-center text-sm shrink-0 border border-[var(--ds-border-primary)] shadow-sm`}>
             {creation.childAvatar || creation.childName?.[0]?.toUpperCase() || "?"}
           </div>
-          <p className="text-xs font-bold text-gray-500 truncate">{creation.childName}</p>
+          <p className="text-xs font-bold text-[var(--ds-text-secondary)] truncate">{creation.childName}</p>
         </div>
 
         <p className="text-sm font-black text-ds-text truncate">{title}</p>
@@ -74,7 +74,7 @@ export default function GalleryCard({ creation, onLike, isLoadingLike = false }:
         <button
           onClick={() => onLike(creation.id)}
           disabled={isLoadingLike}
-          className="flex items-center gap-1 mt-2 text-sm font-bold text-gray-500 hover:text-pink-500 transition-colors"
+          className="flex items-center gap-1 mt-2 text-sm font-bold text-[var(--ds-text-secondary)] hover:text-pink-500 transition-colors"
         >
           {isLoadingLike ? (
             <Loader2 className="w-4 h-4 animate-spin" />

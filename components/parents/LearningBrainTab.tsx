@@ -214,12 +214,12 @@ export default function LearningBrainTab({ childId, language, childName }: Props
             className="flex items-start gap-3 px-4 py-3.5 bg-rose-50 border border-rose-200 shadow-ds-card"
             style={{ borderRadius: "var(--leaf-r-lg)" }}
           >
-            <span className="text-[20px] shrink-0 leading-none mt-0.5">💬</span>
+            <span className="text-xl shrink-0 leading-none mt-0.5">💬</span>
             <div className="flex-1 min-w-0">
-              <p className="text-[9px] font-black uppercase tracking-widest text-rose-400 mb-0.5">
+              <p className="text-4xs font-black uppercase tracking-widest text-rose-400 mb-0.5">
                 Do this today
               </p>
-              <p className="text-[14px] font-black text-rose-800 leading-snug">
+              <p className="text-sm font-black text-rose-800 leading-snug">
                 {todaysFocus.action}
               </p>
             </div>
@@ -252,11 +252,11 @@ export default function LearningBrainTab({ childId, language, childName }: Props
       />
 
       {/* ── Reading Level ──────────────────────────────────────────────────── */}
-      <div className="bg-white border border-ds-border p-5 shadow-ds-card" style={{ borderRadius: "var(--leaf-r-lg)" }}>
+      <div className="bg-[var(--ds-surface-card)] border border-ds-border p-5 shadow-ds-card" style={{ borderRadius: "var(--leaf-r-lg)" }}>
         <div className="flex items-center gap-2 mb-5">
           <span className="text-xl">📈</span>
-          <h2 className="font-black text-ds-text text-[18px]">Reading Level</h2>
-          <span className={`ml-auto text-[11px] font-black px-3 py-1 rounded-full border ${levelStyle.bg} ${levelStyle.text} ${levelStyle.border}`}>
+          <h2 className="font-black text-ds-text text-lg">Reading Level</h2>
+          <span className={`ml-auto text-2xs font-black px-3 py-1 rounded-full border ${levelStyle.bg} ${levelStyle.text} ${levelStyle.border}`}>
             {LEVEL_LABELS[readingLevel]}
           </span>
         </div>
@@ -274,24 +274,24 @@ export default function LearningBrainTab({ childId, language, childName }: Props
                     initial={{ scale: 0.7, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ delay: i * 0.06, type: "spring", stiffness: 300 }}
-                    className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center font-black text-[12px] transition-all ${
+                    className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center font-black text-xs transition-all ${
                       isCurrent
                         ? `${levelStyle.bg} ${levelStyle.text} ring-2 ring-offset-2 ring-current shadow-md`
                         : isPast
                         ? "bg-[var(--nimi-green)] text-white shadow-sm"
-                        : "bg-gray-100 text-gray-300"
+                        : "bg-[var(--ds-surface-card-active)] text-[var(--ds-text-tertiary)]"
                     }`}
                   >
-                    {isPast ? "✓" : isCurrent ? (levelIdx + 1) : <span className="text-[9px]">{i + 1}</span>}
+                    {isPast ? "✓" : isCurrent ? (levelIdx + 1) : <span className="text-4xs">{i + 1}</span>}
                   </motion.div>
-                  <p className={`mt-1.5 text-[8px] sm:text-[9px] font-bold text-center leading-tight ${
-                    isCurrent ? levelStyle.text : isPast ? "text-[var(--nimi-green)]" : "text-gray-300"
+                  <p className={`mt-1.5 text-5xs sm:text-4xs font-bold text-center leading-tight ${
+                    isCurrent ? levelStyle.text : isPast ? "text-[var(--nimi-green)]" : "text-[var(--ds-text-tertiary)]"
                   }`}>
                     {LEVEL_LABELS[level]}
                   </p>
                 </div>
                 {i < LEVEL_STEPS.length - 1 && (
-                  <div className={`h-0.5 w-full mx-0.5 rounded-full -mt-4 ${isPast || isCurrent ? "bg-[var(--nimi-green)]" : "bg-gray-100"}`} />
+                  <div className={`h-0.5 w-full mx-0.5 rounded-full -mt-4 ${isPast || isCurrent ? "bg-[var(--nimi-green)]" : "bg-[var(--ds-surface-card-active)]"}`} />
                 )}
               </div>
             );
@@ -303,24 +303,24 @@ export default function LearningBrainTab({ childId, language, childName }: Props
             {readingLevel === "emerging" ? "🌱" : readingLevel === "beginning" ? "📖" : readingLevel === "developing" ? "🚀" : readingLevel === "expanding" ? "⭐" : "🏆"}
           </span>
           <div>
-            <p className={`font-black text-[14px] ${levelStyle.text}`}>{childName} is at {LEVEL_LABELS[readingLevel]} level</p>
-            <p className={`text-[12px] mt-0.5 font-semibold opacity-80 ${levelStyle.text}`}>{LEVEL_DESC[readingLevel]}</p>
+            <p className={`font-black text-sm ${levelStyle.text}`}>{childName} is at {LEVEL_LABELS[readingLevel]} level</p>
+            <p className={`text-xs mt-0.5 font-semibold opacity-80 ${levelStyle.text}`}>{LEVEL_DESC[readingLevel]}</p>
           </div>
         </div>
 
         <div className="flex items-center gap-2 mt-4 px-0.5">
-          <span className="text-[12px] font-bold text-ds-muted">Stories completed:</span>
-          <span className="font-black text-ds-text text-[14px]">{profile?.completedStoryCount ?? 0}</span>
+          <span className="text-xs font-bold text-ds-muted">Stories completed:</span>
+          <span className="font-black text-ds-text text-sm">{profile?.completedStoryCount ?? 0}</span>
         </div>
       </div>
 
       {/* ── Vocabulary Growth — only shown when child has vocab data ─────────── */}
       {hasVocab && (
-      <div className="bg-white border border-ds-border p-5 shadow-ds-card" style={{ borderRadius: "var(--leaf-r-lg)" }}>
+      <div className="bg-[var(--ds-surface-card)] border border-ds-border p-5 shadow-ds-card" style={{ borderRadius: "var(--leaf-r-lg)" }}>
         <div className="flex items-center gap-2 mb-5">
           <span className="text-xl">📝</span>
-          <h2 className="font-black text-ds-text text-[18px]">Vocabulary Growth</h2>
-          <span className="ml-auto text-[12px] font-black text-ds-muted">
+          <h2 className="font-black text-ds-text text-lg">Vocabulary Growth</h2>
+          <span className="ml-auto text-xs font-black text-ds-muted">
             {vocab!.masteryPct}% mastered
           </span>
         </div>
@@ -341,15 +341,15 @@ export default function LearningBrainTab({ childId, language, childName }: Props
                   className={`flex flex-col items-center gap-1 p-3 border rounded-2xl ${stat.bg} ${stat.border}`}
                 >
                   <span className="text-xl">{stat.emoji}</span>
-                  <span className={`font-black text-[22px] leading-none ${stat.text}`}>{stat.value}</span>
-                  <span className={`text-[10px] font-bold ${stat.text} opacity-75`}>{stat.label}</span>
+                  <span className={`font-black text-1.5xl leading-none ${stat.text}`}>{stat.value}</span>
+                  <span className={`text-3xs font-bold ${stat.text} opacity-75`}>{stat.label}</span>
                 </motion.div>
               ))}
             </div>
 
             {/* Stacked progress bar */}
             <div className="mb-1.5">
-              <div className="h-4 rounded-full overflow-hidden bg-gray-100 flex">
+              <div className="h-4 rounded-full overflow-hidden bg-[var(--ds-surface-card-active)] flex">
                 <motion.div
                   className="h-full bg-emerald-500"
                   initial={{ width: 0 }}
@@ -370,8 +370,8 @@ export default function LearningBrainTab({ childId, language, childName }: Props
                 />
               </div>
               <div className="flex justify-between mt-1.5">
-                <span className="text-[10px] text-gray-400 font-semibold">0</span>
-                <span className="text-[10px] text-gray-500 font-bold">{vocab!.totalWords} total words</span>
+                <span className="text-3xs text-[var(--ds-text-tertiary)] font-semibold">0</span>
+                <span className="text-3xs text-[var(--ds-text-secondary)] font-bold">{vocab!.totalWords} total words</span>
               </div>
             </div>
 
@@ -384,7 +384,7 @@ export default function LearningBrainTab({ childId, language, childName }: Props
               ].map(l => (
                 <div key={l.label} className="flex items-center gap-1.5">
                   <div className={`w-2.5 h-2.5 rounded-full ${l.color}`} />
-                  <span className="text-[11px] text-ds-muted font-semibold">{l.label}</span>
+                  <span className="text-2xs text-ds-muted font-semibold">{l.label}</span>
                 </div>
               ))}
             </div>
@@ -392,25 +392,25 @@ export default function LearningBrainTab({ childId, language, childName }: Props
             {/* Words needing review */}
             {vocab!.reviewWords.length > 0 && (
               <div className="mt-5 pt-4 border-t border-ds-border">
-                <p className="font-black text-ds-text text-[14px] mb-3">
+                <p className="font-black text-ds-text text-sm mb-3">
                   🔁 Needs more practice ({vocab!.needsReview} word{vocab!.needsReview !== 1 ? "s" : ""})
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {vocab!.reviewWords.slice(0, 8).map(w => (
                     <span
                       key={w.word}
-                      className="px-3 py-1 bg-rose-50 border border-rose-200 text-rose-700 text-[12px] font-bold rounded-full"
+                      className="px-3 py-1 bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold rounded-full"
                     >
                       {w.word}
                     </span>
                   ))}
                   {vocab!.reviewWords.length > 8 && (
-                    <span className="px-3 py-1 bg-gray-50 border border-ds-border text-ds-muted text-[12px] font-bold rounded-full">
+                    <span className="px-3 py-1 bg-[var(--ds-surface-card-hover)] border border-ds-border text-ds-muted text-xs font-bold rounded-full">
                       +{vocab!.reviewWords.length - 8} more
                     </span>
                   )}
                 </div>
-                <p className="text-gray-400 text-[11px] mt-2 font-nunito">
+                <p className="text-[var(--ds-text-tertiary)] text-2xs mt-2 font-nunito">
                   Nimi will naturally weave these into the next conversation to reinforce them.
                 </p>
               </div>
@@ -421,21 +421,21 @@ export default function LearningBrainTab({ childId, language, childName }: Props
       )}
 
       {/* ── Learning Goals ──────────────────────────────────────────────────── */}
-      <div className="bg-white border border-ds-border p-5 shadow-ds-card" style={{ borderRadius: "var(--leaf-r-lg)" }}>
+      <div className="bg-[var(--ds-surface-card)] border border-ds-border p-5 shadow-ds-card" style={{ borderRadius: "var(--leaf-r-lg)" }}>
         <div className="flex items-center gap-2 mb-5">
           <span className="text-xl">🎯</span>
-          <h2 className="font-black text-ds-text text-[18px]">Learning Goals</h2>
+          <h2 className="font-black text-ds-text text-lg">Learning Goals</h2>
         </div>
 
         {!hasGoals ? (
-          <p className="text-ds-muted text-[13px] font-semibold py-4 text-center">
+          <p className="text-ds-muted text-sml font-semibold py-4 text-center">
             Goals are being set up for {childName}…
           </p>
         ) : (
           <div className="space-y-5">
             {dailyGoals.length > 0 && (
               <div>
-                <p className="text-[10px] font-black text-ds-muted uppercase tracking-widest mb-3">Today</p>
+                <p className="text-3xs font-black text-ds-muted uppercase tracking-widest mb-3">Today</p>
                 <div className="space-y-3">
                   {dailyGoals.map((goal, i) => (
                     <GoalRow key={goal.id} goal={goal} index={i} />
@@ -445,7 +445,7 @@ export default function LearningBrainTab({ childId, language, childName }: Props
             )}
             {weeklyGoals.length > 0 && (
               <div>
-                <p className="text-[10px] font-black text-ds-muted uppercase tracking-widest mb-3">This Week</p>
+                <p className="text-3xs font-black text-ds-muted uppercase tracking-widest mb-3">This Week</p>
                 <div className="space-y-3">
                   {weeklyGoals.map((goal, i) => (
                     <GoalRow key={goal.id} goal={goal} index={i} />
@@ -459,10 +459,10 @@ export default function LearningBrainTab({ childId, language, childName }: Props
 
       {/* ── Quiz Performance — only shown when child has quiz data ──────────── */}
       {hasQuizData && (
-      <div className="bg-white border border-ds-border p-5 shadow-ds-card" style={{ borderRadius: "var(--leaf-r-lg)" }}>
+      <div className="bg-[var(--ds-surface-card)] border border-ds-border p-5 shadow-ds-card" style={{ borderRadius: "var(--leaf-r-lg)" }}>
         <div className="flex items-center gap-2 mb-5">
           <span className="text-xl">🧠</span>
-          <h2 className="font-black text-ds-text text-[18px]">Quiz Performance</h2>
+          <h2 className="font-black text-ds-text text-lg">Quiz Performance</h2>
         </div>
 
         <div className="space-y-4">
@@ -486,18 +486,18 @@ export default function LearningBrainTab({ childId, language, childName }: Props
                 />
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="font-black text-ds-text text-[18px] leading-none">{profile?.quiz.accuracyPct ?? 0}%</span>
-                <span className="text-[8px] text-ds-muted font-bold">accuracy</span>
+                <span className="font-black text-ds-text text-lg leading-none">{profile?.quiz.accuracyPct ?? 0}%</span>
+                <span className="text-5xs text-ds-muted font-bold">accuracy</span>
               </div>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="font-black text-ds-text text-[15px]">
+              <p className="font-black text-ds-text text-mbase">
                 {(profile?.quiz.accuracyPct ?? 0) >= 80 ? "Excellent! 🌟" : (profile?.quiz.accuracyPct ?? 0) >= 60 ? "Good progress 👍" : "Keep practicing! 💪"}
               </p>
-              <p className="text-ds-muted text-[12px] font-semibold mt-0.5">
+              <p className="text-ds-muted text-xs font-semibold mt-0.5">
                 {profile?.quiz.totalQuestions ?? 0} question{(profile?.quiz.totalQuestions ?? 0) !== 1 ? "s" : ""} answered
               </p>
-              <p className="text-ds-muted text-[12px] font-semibold">
+              <p className="text-ds-muted text-xs font-semibold">
                 {profile?.quiz.correct ?? 0} correct
               </p>
             </div>
@@ -505,10 +505,10 @@ export default function LearningBrainTab({ childId, language, childName }: Props
 
           {(profile?.strengths?.length ?? 0) > 0 && (
             <div>
-              <p className="text-[11px] font-black text-ds-muted uppercase tracking-widest mb-2">Strengths</p>
+              <p className="text-2xs font-black text-ds-muted uppercase tracking-widest mb-2">Strengths</p>
               <div className="flex flex-wrap gap-2">
                 {profile!.strengths.map(s => (
-                  <span key={s} className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 border border-emerald-200 text-emerald-700 text-[12px] font-bold rounded-full">
+                  <span key={s} className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold rounded-full">
                     ✅ {qtLabel(s)}
                   </span>
                 ))}
@@ -518,22 +518,22 @@ export default function LearningBrainTab({ childId, language, childName }: Props
 
           {(profile?.weaknesses?.length ?? 0) > 0 && (
             <div>
-              <p className="text-[11px] font-black text-ds-muted uppercase tracking-widest mb-2">Needs Practice</p>
+              <p className="text-2xs font-black text-ds-muted uppercase tracking-widest mb-2">Needs Practice</p>
               <div className="flex flex-wrap gap-2">
                 {profile!.weaknesses.map(w => (
-                  <span key={w} className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 border border-amber-200 text-amber-700 text-[12px] font-bold rounded-full">
+                  <span key={w} className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 border border-amber-200 text-amber-700 text-xs font-bold rounded-full">
                     🎯 {qtLabel(w)}
                   </span>
                 ))}
               </div>
-              <p className="text-gray-400 text-[11px] mt-2 font-nunito">
+              <p className="text-[var(--ds-text-tertiary)] text-2xs mt-2 font-nunito">
                 Nimi automatically focuses more on these question types to build the skill.
               </p>
             </div>
           )}
 
           {(profile?.strengths?.length ?? 0) === 0 && (profile?.weaknesses?.length ?? 0) === 0 && (
-            <p className="text-gray-400 text-[12px] font-nunito">
+            <p className="text-[var(--ds-text-tertiary)] text-xs font-nunito">
               Strengths and weaknesses appear once {childName} has answered at least 3 questions per type.
             </p>
           )}
@@ -562,31 +562,31 @@ function GoalRow({ goal, index }: { goal: LearningGoal; index: number }) {
       className={`p-3.5 border-2 transition-all ${
         done
           ? "bg-emerald-50 border-emerald-200"
-          : "bg-gray-50 border-ds-border"
+          : "bg-[var(--ds-surface-card-hover)] border-ds-border"
       }`}
       style={{ borderRadius: "var(--leaf-r)" }}
     >
       <div className="flex items-center gap-3 mb-2">
         <span className="text-xl shrink-0">{GOAL_TYPE_EMOJI[goal.goalType]}</span>
         <div className="flex-1 min-w-0">
-          <p className={`font-black text-[13px] leading-tight ${done ? "text-emerald-700" : "text-ds-text"}`}>
+          <p className={`font-black text-sml leading-tight ${done ? "text-emerald-700" : "text-ds-text"}`}>
             {goal.title || GOAL_TYPE_LABEL[goal.goalType] || goal.goalType.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase())}
           </p>
-          <p className="text-[10px] text-ds-muted font-semibold">{GOAL_TYPE_LABEL[goal.goalType] ?? goal.goalType}</p>
+          <p className="text-3xs text-ds-muted font-semibold">{GOAL_TYPE_LABEL[goal.goalType] ?? goal.goalType}</p>
         </div>
         <div className="shrink-0 flex items-center gap-1.5">
           {done ? (
-            <span className="text-emerald-600 font-black text-[12px]">✅ Done!</span>
+            <span className="text-emerald-600 font-black text-xs">✅ Done!</span>
           ) : (
-            <span className="font-black text-ds-text text-[13px]">{goal.currentValue}/{goal.targetValue}</span>
+            <span className="font-black text-ds-text text-sml">{goal.currentValue}/{goal.targetValue}</span>
           )}
           <div className="flex items-center gap-0.5 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">
-            <span className="text-[10px]">⭐</span>
-            <span className="text-amber-700 font-black text-[10px]">{goal.starsReward}</span>
+            <span className="text-3xs">⭐</span>
+            <span className="text-amber-700 font-black text-3xs">{goal.starsReward}</span>
           </div>
         </div>
       </div>
-      <div className="h-2 rounded-full overflow-hidden bg-gray-200">
+      <div className="h-2 rounded-full overflow-hidden bg-[var(--ds-border-primary)]">
         <motion.div
           className={`h-full rounded-full ${done ? "bg-emerald-500" : "bg-[var(--nimi-green)]"}`}
           initial={{ width: 0 }}

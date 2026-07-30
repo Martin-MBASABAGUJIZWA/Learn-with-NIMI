@@ -43,22 +43,22 @@ function StatCell({ emoji, value, label, gradient, delay, suffix, zeroLabel }: S
       className="flex items-center gap-3 p-4"
     >
       {/* Icon */}
-      <div className={`w-11 h-11 rounded-2xl bg-gradient-to-br ${gradient} flex items-center justify-center text-[22px] shadow-md shrink-0 ${isEmpty ? "opacity-50 grayscale" : ""}`}>
+      <div className={`w-11 h-11 rounded-2xl bg-gradient-to-br ${gradient} flex items-center justify-center text-1.5xl shadow-md shrink-0 ${isEmpty ? "opacity-50 grayscale" : ""}`}>
         {emoji}
       </div>
 
       {/* Value + label */}
       <div className="min-w-0">
         <p className={`font-baloo font-black leading-none tabular-nums ${
-          isEmpty ? "text-ds-muted text-[20px]" : "text-ds-text text-[22px]"
+          isEmpty ? "text-ds-muted text-xl" : "text-ds-text text-1.5xl"
         }`}>
           {isEmpty && zeroLabel ? (
-            <span className="text-[13px] font-bold">{zeroLabel}</span>
+            <span className="text-sml font-bold">{zeroLabel}</span>
           ) : (
-            <>{animated}{suffix && <span className="text-[14px] ml-0.5">{suffix}</span>}</>
+            <>{animated}{suffix && <span className="text-sm ml-0.5">{suffix}</span>}</>
           )}
         </p>
-        <p className="text-ds-muted text-[11px] font-semibold mt-0.5 leading-tight">{label}</p>
+        <p className="text-ds-muted text-2xs font-semibold mt-0.5 leading-tight">{label}</p>
       </div>
     </motion.div>
   );

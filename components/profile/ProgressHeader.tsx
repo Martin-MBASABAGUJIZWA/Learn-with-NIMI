@@ -70,8 +70,8 @@ export default function ProgressHeader({
       {/* ── Hero banner ── */}
       <HeroBanner zone="profile" className="mb-5">
         {/* Decorative blobs */}
-        <div className="absolute -top-10 -right-10 w-48 h-48 rounded-full bg-white/10 pointer-events-none" />
-        <div className="absolute -bottom-12 -left-12 w-56 h-56 rounded-full bg-white/8 pointer-events-none" />
+        <div className="absolute -top-10 -right-10 w-48 h-48 rounded-full bg-[var(--ds-surface-card)]/10 pointer-events-none" />
+        <div className="absolute -bottom-12 -left-12 w-56 h-56 rounded-full bg-[var(--ds-surface-card)]/8 pointer-events-none" />
 
         {/* Floating stars */}
         {STARS.map((d, i) => (
@@ -130,7 +130,7 @@ export default function ProgressHeader({
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.6, type: "spring", stiffness: 260, damping: 20 }}
-              className="absolute -top-1 left-1/2 -translate-x-1/2 z-20 w-6 h-6 rounded-full bg-white shadow-md flex items-center justify-center text-[12px] border border-white/80"
+              className="absolute -top-1 left-1/2 -translate-x-1/2 z-20 w-6 h-6 rounded-full bg-[var(--ds-surface-card)] shadow-md flex items-center justify-center text-xs border border-white/80"
             >
               {meta.emoji}
             </motion.div>
@@ -138,7 +138,7 @@ export default function ProgressHeader({
             {/* Avatar button */}
             <motion.button
               onClick={onEditProfile}
-              className="relative w-24 h-24 sm:w-[108px] sm:h-[108px] rounded-full bg-white/20 ring-4 ring-white/60 flex items-center justify-center overflow-hidden shadow-2xl cursor-pointer transition-transform hover:scale-105 active:scale-95"
+              className="relative w-24 h-24 sm:w-[108px] sm:h-[108px] rounded-full bg-[var(--ds-surface-card)]/20 ring-4 ring-white/60 flex items-center justify-center overflow-hidden shadow-2xl cursor-pointer transition-transform hover:scale-105 active:scale-95"
               whileTap={{ scale: 0.93 }}
               aria-label="Edit profile"
             >
@@ -148,7 +148,7 @@ export default function ProgressHeader({
             {/* Edit pencil */}
             <motion.button
               onClick={onEditProfile}
-              className="absolute -bottom-1 -right-1 w-9 h-9 rounded-full bg-white text-[var(--ds-brand-primary)] shadow-lg flex items-center justify-center border-2 border-white transition-transform hover:scale-110 active:scale-95 z-10"
+              className="absolute -bottom-1 -right-1 w-9 h-9 rounded-full bg-[var(--ds-surface-card)] text-[var(--ds-brand-primary)] shadow-lg flex items-center justify-center border-2 border-white transition-transform hover:scale-110 active:scale-95 z-10"
               whileHover={{ rotate: -10 }}
               aria-label="Edit profile"
             >
@@ -163,7 +163,7 @@ export default function ProgressHeader({
           <div className="flex-1 text-center sm:text-left pb-0 sm:pb-2 min-w-0">
             <motion.h1
               className="font-baloo font-black text-white leading-tight drop-shadow-md
-                         text-[26px] sm:text-[32px] lg:text-[36px]
+                         text-2.5xl sm:text-3xl lg:text-4xl
                          truncate max-w-[280px] sm:max-w-none mx-auto sm:mx-0"
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
@@ -179,16 +179,16 @@ export default function ProgressHeader({
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
             >
-              <span className="inline-flex items-center gap-1.5 bg-white/20 backdrop-blur-sm border border-white/30 text-white font-black text-[11px] px-2.5 py-1 rounded-full">
+              <span className="inline-flex items-center gap-1.5 bg-[var(--ds-surface-card)]/20 backdrop-blur-sm border border-white/30 text-white font-black text-2xs px-2.5 py-1 rounded-full">
                 {meta.emoji} {meta.label} · Level {clampedLevel}
               </span>
               {!isMaxLevel && starsToNext > 0 && (
-                <span className="text-white/75 text-[10px] font-semibold">
+                <span className="text-white/75 text-3xs font-semibold">
                   {starsToNext} ⭐ to next level
                 </span>
               )}
               {isMaxLevel && (
-                <span className="text-white/75 text-[10px] font-semibold">Max level reached 🎉</span>
+                <span className="text-white/75 text-3xs font-semibold">Max level reached 🎉</span>
               )}
             </motion.div>
 
@@ -204,7 +204,7 @@ export default function ProgressHeader({
                   className="w-1.5 h-1.5 rounded-full shrink-0"
                   style={{ backgroundColor: lastActiveDaysAgo === 0 ? "#4ade80" : lastActiveDaysAgo <= 2 ? "#fbbf24" : "#f87171" }}
                 />
-                <span className="text-white/70 text-[10px] font-semibold">
+                <span className="text-white/70 text-3xs font-semibold">
                   {lastActiveLabel(lastActiveDaysAgo)}
                 </span>
               </motion.div>
@@ -214,7 +214,7 @@ export default function ProgressHeader({
             {onEditProfile && (
               <motion.button
                 onClick={onEditProfile}
-                className="mt-2.5 sm:hidden inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/20 text-white text-[11px] font-bold border border-white/30 backdrop-blur-sm"
+                className="mt-2.5 sm:hidden inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--ds-surface-card)]/20 text-white text-2xs font-bold border border-white/30 backdrop-blur-sm"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.4 }}
@@ -235,7 +235,7 @@ export default function ProgressHeader({
           <button
             key={tab.id}
             onClick={() => onTabChange(tab.id)}
-            className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-[12px] sm:text-[13px] font-baloo font-black transition-all whitespace-nowrap shrink-0 ${
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs sm:text-sml font-baloo font-black transition-all whitespace-nowrap shrink-0 ${
               activeTab === tab.id
                 ? "bg-ds-action text-white shadow-sm"
                 : "bg-ds-card border border-ds-border text-ds-muted hover:text-ds-text hover:bg-ds-page"

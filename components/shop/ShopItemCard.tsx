@@ -61,7 +61,7 @@ export default function ShopItemCard({
 
         {/* Character label for costumes */}
         {item.category === "costumes" && (
-          <span className="text-[10px] font-black text-white/75 uppercase tracking-widest mt-0.5">
+          <span className="text-3xs font-black text-white/75 uppercase tracking-widest mt-0.5">
             {item.slot === "nimi_outfit" ? "NIMI" : "PIKO"}
           </span>
         )}
@@ -75,7 +75,7 @@ export default function ShopItemCard({
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0, opacity: 0 }}
               transition={{ type: "spring", stiffness: 400, damping: 22 }}
-              className="absolute top-2 right-2 flex items-center gap-1 text-white text-[9px] font-black uppercase px-2 py-1 rounded-full shadow-lg"
+              className="absolute top-2 right-2 flex items-center gap-1 text-white text-4xs font-black uppercase px-2 py-1 rounded-full shadow-lg"
               style={{ background: "var(--nimi-green)" }}
             >
               <Zap className="w-2.5 h-2.5" />
@@ -88,7 +88,7 @@ export default function ShopItemCard({
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0, opacity: 0 }}
-              className="absolute top-2 right-2 flex items-center gap-1 bg-white/90 backdrop-blur-sm text-gray-600 text-[9px] font-black uppercase px-2 py-1 rounded-full shadow"
+              className="absolute top-2 right-2 flex items-center gap-1 bg-[var(--ds-surface-card)]/90 backdrop-blur-sm text-[var(--ds-text-secondary)] text-4xs font-black uppercase px-2 py-1 rounded-full shadow"
             >
               <Check className="w-2.5 h-2.5" />
               {t("shopOwnedLabel")}
@@ -99,7 +99,7 @@ export default function ShopItemCard({
               key="count"
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
-              className="absolute top-2 right-2 bg-indigo-600 text-white text-[10px] font-black px-2 py-1 rounded-full shadow-lg"
+              className="absolute top-2 right-2 bg-indigo-600 text-white text-3xs font-black px-2 py-1 rounded-full shadow-lg"
             >
               ×{count}
             </motion.div>
@@ -122,7 +122,7 @@ export default function ShopItemCard({
       <div className="flex flex-col flex-1 p-3 gap-2">
         <div>
           <p className="font-black text-ds-text text-sm leading-tight">{t(item.nameKey)}</p>
-          <p className="text-ds-muted text-[10px] leading-snug mt-0.5 line-clamp-2">{t(item.descKey)}</p>
+          <p className="text-ds-muted text-3xs leading-snug mt-0.5 line-clamp-2">{t(item.descKey)}</p>
         </div>
 
         <div className="mt-auto space-y-1.5">
@@ -169,7 +169,7 @@ export default function ShopItemCard({
               <div className="flex items-center justify-between">
                 <span className="text-amber-500 font-black text-sm">⭐ {item.price}</span>
                 {!affordable && (
-                  <span className="text-[10px] text-gray-400 font-bold">
+                  <span className="text-3xs text-[var(--ds-text-tertiary)] font-bold">
                     {t("shopNeedMoreStars").replace("{n}", String(item.price - balance))}
                   </span>
                 )}

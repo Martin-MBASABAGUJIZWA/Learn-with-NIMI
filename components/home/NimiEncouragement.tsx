@@ -16,7 +16,7 @@ export default function NimiEncouragement({ childName }: Props) {
   const m = useThemeMotion();
 
   return (
-    <div className={`relative ${cv.backgroundStyle.accent} ${cv.backgroundStyle.accentBorder} ${cv.cardStyle.radius} overflow-hidden shadow-[0_16px_34px_rgba(15,23,42,0.08)]`}>
+    <div className={`relative ${cv.backgroundStyle.accent} ${cv.backgroundStyle.accentBorder} ${cv.cardStyle.radius} overflow-hidden shadow-card-2xl`}>
 
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.75),transparent_45%)]" />
       <Image src={assets.storyCard.background} alt="" aria-hidden="true" fill
@@ -31,7 +31,7 @@ export default function NimiEncouragement({ childName }: Props) {
         const glow = m.glowPulse;
         return (
           <motion.span key={i}
-            className="absolute text-[var(--ds-brand-primary)] opacity-40 text-[10px] pointer-events-none"
+            className="absolute text-[var(--ds-brand-primary)] opacity-40 text-3xs pointer-events-none"
             style={pos}
             animate={glow.animate}
             transition={{ ...glow.transition, delay }}>✦</motion.span>
@@ -39,7 +39,7 @@ export default function NimiEncouragement({ childName }: Props) {
       })}
 
       <div className="relative z-10 p-5 sm:p-6 flex items-center gap-4">
-        <div className="absolute right-4 top-4 rounded-full border border-white/60 bg-white/70 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.24em] text-[var(--ds-brand-primary)] shadow-sm">
+        <div className="absolute right-4 top-4 rounded-full border border-white/60 bg-[var(--ds-surface-card)]/70 px-2.5 py-1 text-3xs font-black uppercase tracking-[0.24em] text-[var(--ds-brand-primary)] shadow-sm">
           You’ve got this
         </div>
         {/* LEFT — NIMI mascot */}
@@ -54,10 +54,10 @@ export default function NimiEncouragement({ childName }: Props) {
 
         {/* CENTER — message */}
         <div className="flex-1 min-w-0">
-          <p className="font-black font-baloo text-[var(--ds-brand-primary)] text-[24px] sm:text-[28px] leading-tight">
+          <p className="font-black font-baloo text-[var(--ds-brand-primary)] text-2xl sm:text-3.5xl leading-tight">
             You&apos;re doing amazing, {childName}! 🌟
           </p>
-          <p className="font-nunito text-gray-700 text-[16px] mt-1.5 leading-snug">
+          <p className="font-nunito text-[var(--ds-text-primary)] text-base mt-1.5 leading-snug">
             Keep learning, keep smiling, and remember...<br/>
             <span className="font-black text-[var(--ds-brand-primary)]">you can do big things!</span> 💪
           </p>
@@ -68,7 +68,7 @@ export default function NimiEncouragement({ childName }: Props) {
           <motion.img src={assets.starMascot} alt="" className="w-12 h-12" loading="lazy"
             animate={m.floatRotate(8).animate}
             transition={m.floatRotate(8).transition} />
-          <motion.span className="text-[40px] leading-none select-none"
+          <motion.span className="text-5xl leading-none select-none"
             animate={m.floatMd.animate}
             transition={{ ...m.floatMd.transition, delay: 0.3 }}>🏆</motion.span>
           <motion.img src={assets.starMascot} alt="" className="w-10 h-10" loading="lazy"

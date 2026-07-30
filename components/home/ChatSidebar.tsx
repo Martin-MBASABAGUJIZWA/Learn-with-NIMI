@@ -32,39 +32,39 @@ export default function ChatSidebar({ todayStars, chatStreakDays, badges, badgeI
       {/* Today's Stars */}
       <div className="bg-ds-surface border border-ds-border shadow-ds-card p-4 text-center"
         style={{ borderRadius:"var(--leaf-r)" }}>
-        <p className="font-black text-ds-text text-[12px] tracking-wide uppercase">{t("todaysStarsTitle")}</p>
+        <p className="font-black text-ds-text text-xs tracking-wide uppercase">{t("todaysStarsTitle")}</p>
         <motion.p
           key={todayStars}
           initial={{ scale:1.3, opacity:0.6 }}
           animate={{ scale:1,   opacity:1 }}
-          className="text-[28px] font-black text-yellow-500 mt-1 leading-tight"
+          className="text-3.5xl font-black text-yellow-500 mt-1 leading-tight"
         >
           ⭐ {todayStars}
         </motion.p>
-        <p className="text-[11px] text-gray-500 mt-1 leading-snug">{t("todaysStarsEncouragement")}</p>
+        <p className="text-2xs text-[var(--ds-text-secondary)] mt-1 leading-snug">{t("todaysStarsEncouragement")}</p>
       </div>
 
       {/* Chat Streak */}
       <div className="bg-ds-surface border border-ds-border shadow-ds-card p-4 text-center"
         style={{ borderRadius:"var(--leaf-r)" }}>
-        <p className="font-black text-ds-text text-[12px] tracking-wide uppercase">{t("currentStreakLabel")}</p>
+        <p className="font-black text-ds-text text-xs tracking-wide uppercase">{t("currentStreakLabel")}</p>
         <motion.p
           key={chatStreakDays}
           initial={{ scale:1.3, opacity:0.6 }}
           animate={{ scale:1,   opacity:1 }}
-          className="text-[28px] font-black text-orange-500 mt-1 leading-tight"
+          className="text-3.5xl font-black text-orange-500 mt-1 leading-tight"
         >
           🔥 {t("chatStreakDaysLabel").replace("{count}", String(chatStreakDays))}
         </motion.p>
-        <p className="text-[11px] text-gray-500 mt-1 leading-snug">{t("chatStreakEncouragement")}</p>
+        <p className="text-2xs text-[var(--ds-text-secondary)] mt-1 leading-snug">{t("chatStreakEncouragement")}</p>
       </div>
 
       {/* Badges Earned */}
       <div className="bg-ds-surface border border-ds-border shadow-ds-card p-4"
         style={{ borderRadius:"var(--leaf-r)" }}>
         <div className="flex items-center justify-between mb-3">
-          <h3 className="font-black text-ds-text text-[12px] tracking-wide uppercase">{t("badgesEarnedTitle")}</h3>
-          <Link href="/user-profile" className="text-[11px] font-bold text-ds-brand hover:underline">
+          <h3 className="font-black text-ds-text text-xs tracking-wide uppercase">{t("badgesEarnedTitle")}</h3>
+          <Link href="/user-profile" className="text-2xs font-bold text-ds-brand hover:underline">
             {t("viewAll")}
           </Link>
         </div>
@@ -81,8 +81,8 @@ export default function ChatSidebar({ todayStars, chatStreakDays, badges, badgeI
               </motion.div>
             ))}
             {badges.length > 6 && (
-              <div className="w-10 h-10 rounded-full bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center">
-                <span className="text-[10px] font-black text-gray-400">+{badges.length - 6}</span>
+              <div className="w-10 h-10 rounded-full bg-[var(--ds-surface-card-hover)] border-2 border-dashed border-[var(--ds-border-strong)] flex items-center justify-center">
+                <span className="text-3xs font-black text-[var(--ds-text-tertiary)]">+{badges.length - 6}</span>
               </div>
             )}
           </div>
@@ -96,23 +96,23 @@ export default function ChatSidebar({ todayStars, chatStreakDays, badges, badgeI
                 whileHover={{ scale: 1.06 }}
                 title={`🔒 ${badge.desc}`}
                 className="flex flex-col items-center gap-1 cursor-default">
-                <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center relative">
+                <div className="w-10 h-10 rounded-full bg-[var(--ds-surface-card-hover)] flex items-center justify-center relative">
                   <span className="grayscale opacity-25 text-xl">{badge.emoji}</span>
                   <motion.span
                     animate={{ scale: [1, 1.25, 1] }}
                     transition={{ duration: DURATION.loopBase, repeat: Infinity, delay: i * 0.3 }}
-                    className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-white border border-gray-200 shadow flex items-center justify-center">
-                    <Lock className="w-2 h-2 text-gray-400" />
+                    className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-[var(--ds-surface-card)] border border-[var(--ds-border-primary)] shadow flex items-center justify-center">
+                    <Lock className="w-2 h-2 text-[var(--ds-text-tertiary)]" />
                   </motion.span>
                 </div>
-                <p className="text-[9px] font-bold text-center leading-tight text-gray-300">{badge.label}</p>
+                <p className="text-4xs font-bold text-center leading-tight text-[var(--ds-text-tertiary)]">{badge.label}</p>
               </motion.div>
             ))}
           </div>
         )}
 
         {earnedCount === 0 && (
-          <p className="text-center text-[11px] text-ds-muted mt-2">Complete stories to earn badges!</p>
+          <p className="text-center text-2xs text-ds-muted mt-2">Complete stories to earn badges!</p>
         )}
       </div>
 
@@ -120,8 +120,8 @@ export default function ChatSidebar({ todayStars, chatStreakDays, badges, badgeI
       <div className="bg-ds-surface border border-ds-border shadow-ds-card p-4 flex items-start gap-3"
         style={{ borderRadius:"var(--leaf-r)" }}>
         <div className="min-w-0 flex-1">
-          <p className="font-black text-ds-text text-[12px] tracking-wide uppercase mb-1">{t("nimiTipTitle")}</p>
-          <p className="text-[11px] text-gray-500 leading-snug">{t("nimiTipBody")}</p>
+          <p className="font-black text-ds-text text-xs tracking-wide uppercase mb-1">{t("nimiTipTitle")}</p>
+          <p className="text-2xs text-[var(--ds-text-secondary)] leading-snug">{t("nimiTipBody")}</p>
         </div>
         <Image src={assets.nimiCircle} alt="NIMI" width={40} height={40}
           className="w-10 h-10 rounded-full object-cover border-2 border-yellow-300 shadow flex-shrink-0" />

@@ -181,16 +181,16 @@ export default function CreativityChallengesView({
       {/* Header */}
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="font-black text-[20px]" style={{ color: "var(--ds-text-primary,#111827)" }}>
+          <p className="font-black text-xl" style={{ color: "var(--ds-text-primary)" }}>
             🌟 Daily Challenges
           </p>
-          <p className="text-[12px] font-nunito" style={{ color: "#6B7280" }}>
+          <p className="text-xs font-nunito" style={{ color: "var(--ds-text-secondary)" }}>
             Complete all 3 today to earn a bonus!
           </p>
         </div>
         {/* Date chip */}
-        <span className="shrink-0 font-bold text-[10px] px-2.5 py-1 rounded-full"
-          style={{ background: "#F0FDF4", color: G, border: `1px solid #BBF7D0` }}>
+        <span className="shrink-0 font-bold text-3xs px-2.5 py-1 rounded-full"
+          style={{ background: "var(--ds-brand-soft)", color: G, border: `1px solid #BBF7D0` }}>
           {new Date().toLocaleDateString("en-GB", { day:"numeric", month:"short" })}
         </span>
       </div>
@@ -199,14 +199,14 @@ export default function CreativityChallengesView({
       {challenges && (
         <div>
           <div className="flex justify-between mb-1.5">
-            <span className="font-bold text-[11px]" style={{ color: "#6B7280" }}>
+            <span className="font-bold text-2xs" style={{ color: "var(--ds-text-secondary)" }}>
               Progress
             </span>
-            <span className="font-black text-[11px]" style={{ color: G }}>
+            <span className="font-black text-2xs" style={{ color: G }}>
               {completedCount}/3
             </span>
           </div>
-          <div className="h-2.5 rounded-full overflow-hidden" style={{ background: "#E5E7EB" }}>
+          <div className="h-2.5 rounded-full overflow-hidden" style={{ background: "var(--ds-border-primary)" }}>
             <motion.div
               initial={{ width: 0 }}
               animate={{ width: `${(completedCount / 3) * 100}%` }}
@@ -227,8 +227,8 @@ export default function CreativityChallengesView({
             exit={{ opacity: 0, scale: 0.8 }}
             className="flex items-center justify-center gap-2 py-3 rounded-2xl"
             style={{ background: "#FEF9C3", border: "1px solid #FDE047" }}>
-            <span className="text-[22px]">⭐</span>
-            <p className="font-black text-[16px]" style={{ color: "#713F12" }}>
+            <span className="text-1.5xl">⭐</span>
+            <p className="font-black text-base" style={{ color: "#713F12" }}>
               +{starsFlash} stars!
             </p>
           </motion.div>
@@ -240,7 +240,7 @@ export default function CreativityChallengesView({
         <div className="flex flex-col items-center gap-3 py-12">
           <div className="w-10 h-10 rounded-full border-4 border-t-transparent animate-spin"
             style={{ borderColor: `${G} transparent transparent transparent` }} />
-          <p className="font-bold text-[13px]" style={{ color: G }}>
+          <p className="font-bold text-sml" style={{ color: G }}>
             {generating ? "Nimi is creating today's challenges…" : "Loading…"}
           </p>
         </div>
@@ -249,9 +249,9 @@ export default function CreativityChallengesView({
       {/* Error */}
       {error && !loading && (
         <div className="p-4 rounded-2xl text-center" style={{ background: "#FFF1F2", border: "1px solid #FECDD3" }}>
-          <p className="text-[13px] font-bold text-red-600">{error}</p>
+          <p className="text-sml font-bold text-red-600">{error}</p>
           <button onClick={() => void load()}
-            className="mt-3 px-4 py-1.5 rounded-full text-[12px] font-black text-white"
+            className="mt-3 px-4 py-1.5 rounded-full text-xs font-black text-white"
             style={{ background: G }}>
             Try again
           </button>
@@ -269,14 +269,14 @@ export default function CreativityChallengesView({
             return (
               <motion.div key={challenge.id}
                 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-                className="p-4 sm:p-5 rounded-3xl border-2 transition-colors"
+                className="p-4 sm:p-5 leaf-lg border-2 transition-colors"
                 style={{
                   background:   isDone ? cfg.bg       : "white",
-                  borderColor:  isDone ? cfg.color    : "#E5E7EB",
+                  borderColor:  isDone ? cfg.color : "var(--ds-border-primary)",
                 }}>
                 <div className="flex items-start gap-4">
                   {/* Icon */}
-                  <div className="w-11 h-11 rounded-2xl flex items-center justify-center text-[22px] shrink-0"
+                  <div className="w-11 h-11 rounded-2xl flex items-center justify-center text-1.5xl shrink-0"
                     style={{ background: cfg.bg, border: `1px solid ${cfg.border}` }}>
                     {isDone ? "✅" : cfg.emoji}
                   </div>
@@ -284,22 +284,22 @@ export default function CreativityChallengesView({
                   {/* Content */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="font-black text-[10px] uppercase tracking-widest"
+                      <span className="font-black text-3xs uppercase tracking-widest"
                         style={{ color: cfg.color }}>
                         {cfg.label}
                       </span>
-                      <span className="font-bold text-[10px]" style={{ color: "#9CA3AF" }}>
+                      <span className="font-bold text-3xs" style={{ color: "var(--ds-text-tertiary)" }}>
                         +{challenge.stars} ⭐
                       </span>
                     </div>
-                    <p className="font-nunito text-[13px] sm:text-[14px] leading-relaxed"
+                    <p className="font-nunito text-sml sm:text-sm leading-relaxed"
                       style={{ color: isDone ? cfg.color : "#374151",
                                textDecoration: isDone ? "line-through" : "none",
                                opacity: isDone ? 0.7 : 1 }}>
                       {challenge.prompt}
                     </p>
                     {isDone && (
-                      <p className="text-[10px] font-bold mt-1" style={{ color: cfg.color }}>
+                      <p className="text-3xs font-bold mt-1" style={{ color: cfg.color }}>
                         ✓ Completed! Well done {childName}!
                       </p>
                     )}
@@ -310,7 +310,7 @@ export default function CreativityChallengesView({
                     <button
                       onClick={() => void handleComplete(challenge)}
                       disabled={isBusy}
-                      className="shrink-0 px-4 py-2 rounded-xl font-black text-[12px] text-white transition hover:opacity-90 disabled:opacity-40"
+                      className="shrink-0 px-4 py-2 rounded-xl font-black text-xs text-white transition hover:opacity-90 disabled:opacity-40"
                       style={{ background: cfg.color }}>
                       {isBusy ? "…" : "Done! ✓"}
                     </button>
@@ -328,13 +328,13 @@ export default function CreativityChallengesView({
           <motion.div
             key="bonus"
             initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
-            className="p-5 rounded-3xl text-center"
+            className="p-5 leaf-lg text-center"
             style={{ background: G }}>
-            <p className="text-[36px] mb-2">🏆</p>
-            <p className="font-black text-white text-[18px] mb-1">
+            <p className="text-4xl mb-2">🏆</p>
+            <p className="font-black text-white text-lg mb-1">
               All challenges complete!
             </p>
-            <p className="text-green-200 text-[13px] font-nunito">
+            <p className="text-green-200 text-sml font-nunito">
               {bonusEarned
                 ? `+${BONUS_STARS} bonus stars earned! Creative Explorer badge unlocked! 🎖️`
                 : "Amazing work today, " + childName + "!"}
@@ -346,11 +346,11 @@ export default function CreativityChallengesView({
       {/* Hint when nothing loaded */}
       {!loading && !generating && !challenges && !error && (
         <div className="py-12 text-center">
-          <p className="text-[14px] font-nunito" style={{ color: "#9CA3AF" }}>
+          <p className="text-sm font-nunito" style={{ color: "var(--ds-text-tertiary)" }}>
             No challenges yet. Tap refresh.
           </p>
           <button onClick={() => void load()}
-            className="mt-4 px-5 py-2 rounded-full font-black text-[13px] text-white"
+            className="mt-4 px-5 py-2 rounded-full font-black text-sml text-white"
             style={{ background: G }}>
             Load Challenges
           </button>

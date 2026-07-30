@@ -44,7 +44,7 @@ export default function AchievementToast({ visible, config, onDismiss }: Props) 
             <div className="flex-1 min-w-0">
               <p className="font-black text-ds-text text-sm leading-tight truncate">{config.title}</p>
               {config.subtitle && (
-                <p className="text-gray-500 text-xs mt-0.5 truncate">{config.subtitle}</p>
+                <p className="text-[var(--ds-text-secondary)] text-xs mt-0.5 truncate">{config.subtitle}</p>
               )}
             </div>
 

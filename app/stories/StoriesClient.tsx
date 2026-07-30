@@ -153,13 +153,13 @@ export default function StoriesClient({ initialChildren, initialHasSubscription 
   const hasCategories = activeCategories.length > 1;
 
   const categoryTabs = [
-    { key: "all", emoji: "📚", label: t("storyCatAll"), activeClass: "bg-ds-action text-white border-ds-action", inactiveClass: "bg-white text-gray-500 border-ds-border hover:bg-gray-50" },
+    { key: "all", emoji: "📚", label: t("storyCatAll"), activeClass: "bg-ds-action text-white border-ds-action", inactiveClass: "bg-[var(--ds-surface-card)] text-[var(--ds-text-secondary)] border-ds-border hover:bg-[var(--ds-surface-card-hover)]" },
     ...activeCategories.map(c => ({
       key: c,
       emoji: CATEGORY_META[c]?.emoji ?? "📖",
       label: CATEGORY_META[c] ? t(CATEGORY_META[c].key) : c.charAt(0).toUpperCase() + c.slice(1),
       activeClass: CATEGORY_META[c]?.activeClass ?? "bg-ds-action text-white border-ds-action",
-      inactiveClass: CATEGORY_META[c]?.inactiveClass ?? "bg-white text-gray-500 border-ds-border hover:bg-gray-50",
+      inactiveClass: CATEGORY_META[c]?.inactiveClass ?? "bg-[var(--ds-surface-card)] text-[var(--ds-text-secondary)] border-ds-border hover:bg-[var(--ds-surface-card-hover)]",
     })),
   ];
 
@@ -188,8 +188,8 @@ export default function StoriesClient({ initialChildren, initialHasSubscription 
         {/* ═══ HERO BANNER ═══ */}
         <HeroBanner zone="library" className="mb-6 overflow-hidden">
           {/* Background orbs */}
-          <div className="absolute -top-8 -right-8 w-48 h-48 rounded-full bg-white/10 blur-xl" />
-          <div className="absolute -bottom-10 -left-10 w-56 h-56 rounded-full bg-white/8 blur-2xl" />
+          <div className="absolute -top-8 -right-8 w-48 h-48 rounded-full bg-[var(--ds-surface-card)]/10 blur-xl" />
+          <div className="absolute -bottom-10 -left-10 w-56 h-56 rounded-full bg-[var(--ds-surface-card)]/8 blur-2xl" />
 
           {/* Floating sparkle stars */}
           {([
@@ -227,13 +227,13 @@ export default function StoriesClient({ initialChildren, initialHasSubscription 
 
             {/* Text */}
             <div className="flex-1 min-w-0">
-              <p className="text-white/60 text-[10px] font-nunito font-black uppercase tracking-[0.18em] mb-0.5">
+              <p className="text-white/60 text-3xs font-nunito font-black uppercase tracking-[0.18em] mb-0.5">
                 ✨ {t("storyLibraryEyebrow")}
               </p>
-              <h1 className="font-baloo font-black text-white text-[26px] sm:text-[34px] leading-tight drop-shadow-md">
+              <h1 className="font-baloo font-black text-white text-2.5xl sm:text-4xl leading-tight drop-shadow-md">
                 {t("storyLibraryTitle")}
               </h1>
-              <p className="text-white/85 text-[13px] font-nunito font-semibold mt-0.5">
+              <p className="text-white/85 text-sml font-nunito font-semibold mt-0.5">
                 {t("storyLibrarySubtitle")}
               </p>
             </div>
@@ -242,15 +242,15 @@ export default function StoriesClient({ initialChildren, initialHasSubscription 
             <div className="flex flex-col items-end gap-1.5 shrink-0">
               {completedCount > 0 && (
                 <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ ...SPRING.bounce, delay: 0.3 }}
-                  className="flex items-center gap-1.5 bg-white/20 border border-white/30 rounded-full px-3 py-1.5">
+                  className="flex items-center gap-1.5 bg-[var(--ds-surface-card)]/20 border border-white/30 rounded-full px-3 py-1.5">
                   <CheckCircle2 className="w-3.5 h-3.5 text-white" />
-                  <span className="font-baloo font-black text-white text-[13px]">{completedCount} done</span>
+                  <span className="font-baloo font-black text-white text-sml">{completedCount} done</span>
                 </motion.div>
               )}
               {stories.length > 0 && (
-                <div className="flex items-center gap-1.5 bg-white/15 border border-white/20 rounded-full px-3 py-1.5">
-                  <span className="text-[12px]">📚</span>
-                  <span className="font-baloo font-black text-white text-[13px]">{stories.length} stories</span>
+                <div className="flex items-center gap-1.5 bg-[var(--ds-surface-card)]/15 border border-white/20 rounded-full px-3 py-1.5">
+                  <span className="text-xs">📚</span>
+                  <span className="font-baloo font-black text-white text-sml">{stories.length} stories</span>
                 </div>
               )}
             </div>
@@ -275,19 +275,19 @@ export default function StoriesClient({ initialChildren, initialHasSubscription 
                 <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
 
                 <div className="absolute bottom-0 inset-x-0 p-4 sm:p-5">
-                  <p className="text-yellow-300 text-[11px] font-black uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
+                  <p className="text-yellow-300 text-2xs font-black uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
                     <Play className="w-3 h-3 fill-yellow-300" /> {t("storyContinueAdventure")}
                   </p>
-                  <h2 className="font-baloo font-black text-white text-[20px] sm:text-[26px] leading-tight mb-2">
+                  <h2 className="font-baloo font-black text-white text-xl sm:text-2.5xl leading-tight mb-2">
                     {currentStory.theme_emoji} {currentStory.title}
                   </h2>
                   <div className="flex items-center gap-3">
-                    <div className="flex-1 bg-white/20 rounded-full h-2.5 overflow-hidden">
+                    <div className="flex-1 bg-[var(--ds-surface-card)]/20 rounded-full h-2.5 overflow-hidden">
                       <motion.div className="bg-gradient-to-r from-yellow-400 to-orange-400 h-full rounded-full"
                         initial={{ width: 0 }} animate={{ width: `${currentStory.progress * 100}%` }}
                         transition={{ duration: DURATION.loopSpark }} />
                     </div>
-                    <span className="text-white/80 font-baloo font-black text-[13px] shrink-0">
+                    <span className="text-white/80 font-baloo font-black text-sml shrink-0">
                       {Math.round(currentStory.progress * 100)}%
                     </span>
                   </div>
@@ -314,7 +314,7 @@ export default function StoriesClient({ initialChildren, initialHasSubscription 
                 <motion.button key={cat.key}
                   onClick={() => { setCategory(cat.key); setPage(1); }}
                   whileTap={{ scale: 0.94 }}
-                  className={`flex items-center gap-1.5 px-4 py-2 rounded-full font-baloo font-black text-[13px] whitespace-nowrap shrink-0 transition-all border ${
+                  className={`flex items-center gap-1.5 px-4 py-2 rounded-full font-baloo font-black text-sml whitespace-nowrap shrink-0 transition-all border ${
                     category === cat.key ? cat.activeClass : cat.inactiveClass
                   } ${category === cat.key ? "shadow-md" : ""}`}>
                   <span className="text-base leading-none">{cat.emoji}</span>
@@ -324,19 +324,19 @@ export default function StoriesClient({ initialChildren, initialHasSubscription 
             </div>
             {/* Search */}
             <div className="relative">
-              <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+              <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--ds-text-tertiary)]" />
               <input type="text" value={search} onChange={e => { setSearch(e.target.value); setPage(1); }}
                 placeholder={t("storySearchPlaceholder")}
-                className="w-full bg-ds-input border border-ds-border rounded-full pl-10 pr-4 py-2.5 text-[13px] text-ds-text placeholder:text-gray-400 focus:outline-none focus:border-[var(--ds-state-focus)] focus:ring-2 focus:ring-[var(--ds-state-focus)]/20 transition" />
+                className="w-full bg-ds-input border border-ds-border rounded-full pl-10 pr-4 py-2.5 text-sml text-ds-text placeholder:text-[var(--ds-text-tertiary)] focus:outline-none focus:border-[var(--ds-state-focus)] focus:ring-2 focus:ring-[var(--ds-state-focus)]/20 transition" />
             </div>
           </div>
         ) : (
           /* No categories — compact inline search only */
           <div className="mb-5 relative">
-            <Search size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 z-10" />
+            <Search size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ds-text-tertiary)] z-10" />
             <input type="text" value={search} onChange={e => { setSearch(e.target.value); setPage(1); }}
               placeholder="Search for a story..."
-              className="w-full bg-white border border-ds-border rounded-2xl pl-11 pr-4 py-3 text-[13px] text-ds-text placeholder:text-gray-400 focus:outline-none focus:border-[var(--ds-state-focus)] focus:ring-2 focus:ring-[var(--ds-state-focus)]/20 shadow-ds-card transition" />
+              className="w-full bg-[var(--ds-surface-card)] border border-ds-border rounded-2xl pl-11 pr-4 py-3 text-sml text-ds-text placeholder:text-[var(--ds-text-tertiary)] focus:outline-none focus:border-[var(--ds-state-focus)] focus:ring-2 focus:ring-[var(--ds-state-focus)]/20 shadow-ds-card transition" />
           </div>
         )}
 
@@ -350,8 +350,8 @@ export default function StoriesClient({ initialChildren, initialHasSubscription 
             <motion.span className="text-7xl block mb-4"
               animate={{ rotate: [0, 12, -12, 0], scale: [1, 1.1, 1] }}
               transition={{ duration: DURATION.loopBase, repeat: Infinity }}>📚</motion.span>
-            <p className="font-baloo font-black text-ds-text text-[20px] mb-1">{t("storyNoResults")}</p>
-            <p className="font-nunito text-ds-muted text-[13px]">Try a different search or category!</p>
+            <p className="font-baloo font-black text-ds-text text-xl mb-1">{t("storyNoResults")}</p>
+            <p className="font-nunito text-ds-muted text-sml">Try a different search or category!</p>
           </div>
         ) : (
           <>
@@ -362,16 +362,16 @@ export default function StoriesClient({ initialChildren, initialHasSubscription 
                   whileHover={{ scale: 1.01 }} whileTap={m.buttonPress}
                   className="flex items-center gap-4 rounded-2xl px-5 py-4 cursor-pointer group bg-ds-club shadow-ds-club">
                   <motion.div animate={{ y: [0, -4, 0] }} transition={{ duration: DURATION.loopSlow, repeat: Infinity }}
-                    className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center shrink-0 border border-white/30">
+                    className="w-12 h-12 rounded-2xl bg-[var(--ds-surface-card)]/20 flex items-center justify-center shrink-0 border border-white/30">
                     <Crown className="w-6 h-6 text-yellow-300" />
                   </motion.div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-baloo font-black text-white text-[16px] leading-tight">You&apos;ve reached the end of your free stories!</p>
+                    <p className="font-baloo font-black text-white text-base leading-tight">You&apos;ve reached the end of your free stories!</p>
                     <p className="text-white/70 text-xs mt-0.5">
                       {stories.filter(s => !s.is_free && !s.unlocked).length} more adventures are waiting — join Club to unlock them all.
                     </p>
                   </div>
-                  <span className="shrink-0 font-baloo font-black text-yellow-300 text-[13px] group-hover:text-yellow-200 transition-colors whitespace-nowrap">
+                  <span className="shrink-0 font-baloo font-black text-yellow-300 text-sml group-hover:text-yellow-200 transition-colors whitespace-nowrap">
                     Unlock All →
                   </span>
                 </motion.div>
@@ -443,7 +443,7 @@ export default function StoriesClient({ initialChildren, initialHasSubscription 
 
                             {/* Hover CTA — slides up from bottom */}
                             <div className="absolute inset-x-0 bottom-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out px-3 pb-2.5">
-                              <div className="bg-white/95 backdrop-blur-sm text-ds-action font-baloo font-black text-[12px] py-2 rounded-xl text-center shadow-lg">
+                              <div className="bg-[var(--ds-surface-card)]/95 backdrop-blur-sm text-ds-action font-baloo font-black text-xs py-2 rounded-xl text-center shadow-lg">
                                 {ctaLabel}
                               </div>
                             </div>
@@ -460,7 +460,7 @@ export default function StoriesClient({ initialChildren, initialHasSubscription 
 
                           {/* Card footer */}
                           <div className={`p-3 ${story.complete ? "bg-ds-action-subtle" : "bg-ds-card"}`}>
-                            <h3 className="font-baloo font-black text-ds-text text-[14px] sm:text-[15px] leading-tight truncate">
+                            <h3 className="font-baloo font-black text-ds-text text-sm sm:text-mbase leading-tight truncate">
                               {story.title}
                             </h3>
                             {story.progress > 0 ? (
@@ -505,14 +505,14 @@ export default function StoriesClient({ initialChildren, initialHasSubscription 
                             <div className="absolute inset-0 bg-[var(--ds-club-hover)]/30 group-hover:bg-[var(--ds-club-hover)]/10 transition-colors" />
                             <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
                               <motion.div whileHover={{ scale: 1.1 }}
-                                className="w-12 h-12 bg-white/95 shadow-md rounded-full flex items-center justify-center group-hover:bg-yellow-300 transition-colors">
+                                className="w-12 h-12 bg-[var(--ds-surface-card)]/95 shadow-md rounded-full flex items-center justify-center group-hover:bg-yellow-300 transition-colors">
                                 <Crown className="w-5 h-5 text-ds-club group-hover:text-ds-club-text" />
                               </motion.div>
-                              <span className="font-baloo font-black text-white text-[11px] group-hover:text-yellow-200 transition-colors drop-shadow">Club Only</span>
+                              <span className="font-baloo font-black text-white text-2xs group-hover:text-yellow-200 transition-colors drop-shadow">Club Only</span>
                             </div>
                           </div>
                           <div className="p-3 bg-ds-club-subtle group-hover:bg-ds-club-soft transition-colors">
-                            <h3 className="font-baloo font-black text-ds-club-text text-[14px] sm:text-[15px] leading-tight truncate">{story.title}</h3>
+                            <h3 className="font-baloo font-black text-ds-club-text text-sm sm:text-mbase leading-tight truncate">{story.title}</h3>
                             <p className="text-ds-club text-2xs font-semibold mt-1.5 flex items-center gap-1">
                               <Crown className="w-2.5 h-2.5" /> Subscribe to unlock
                             </p>
@@ -535,8 +535,8 @@ export default function StoriesClient({ initialChildren, initialHasSubscription 
                             </div>
                           )}
                           <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
-                            <div className="w-12 h-12 bg-white/90 shadow-md rounded-full flex items-center justify-center">
-                              <Lock className="w-5 h-5 text-gray-500" />
+                            <div className="w-12 h-12 bg-[var(--ds-surface-card)]/90 shadow-md rounded-full flex items-center justify-center">
+                              <Lock className="w-5 h-5 text-[var(--ds-text-secondary)]" />
                             </div>
                             <div className="bg-gray-800/80 text-white text-2xs font-black px-3 py-1 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm">
                               🔒 {t("storyUnlockHint")}
@@ -544,8 +544,8 @@ export default function StoriesClient({ initialChildren, initialHasSubscription 
                           </div>
                         </div>
                         <div className="p-3">
-                          <h3 className="font-baloo font-black text-gray-400 text-[14px] sm:text-[15px] leading-tight truncate">{story.title}</h3>
-                          <p className="text-gray-400 text-2xs font-semibold mt-1.5 flex items-center gap-1">
+                          <h3 className="font-baloo font-black text-[var(--ds-text-tertiary)] text-sm sm:text-mbase leading-tight truncate">{story.title}</h3>
+                          <p className="text-[var(--ds-text-tertiary)] text-2xs font-semibold mt-1.5 flex items-center gap-1">
                             <Lock className="w-2.5 h-2.5" /> {t("storyUnlockHint")}
                           </p>
                         </div>
@@ -564,23 +564,23 @@ export default function StoriesClient({ initialChildren, initialHasSubscription 
           <div className="flex items-center justify-center gap-2 mt-8">
             <motion.button whileTap={m.buttonPress}
               onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1}
-              className="w-10 h-10 rounded-full bg-white border border-ds-border flex items-center justify-center text-gray-400 disabled:opacity-20 hover:border-[var(--ds-border-brand)] hover:text-ds-brand transition">
+              className="w-10 h-10 rounded-full bg-[var(--ds-surface-card)] border border-ds-border flex items-center justify-center text-[var(--ds-text-tertiary)] disabled:opacity-20 hover:border-[var(--ds-border-brand)] hover:text-ds-brand transition">
               <ChevronLeft size={18} />
             </motion.button>
             {Array.from({ length: totalPages }).map((_, i) => (
               <motion.button key={i} whileTap={m.buttonPress}
                 onClick={() => setPage(i + 1)}
-                className={`w-10 h-10 rounded-full font-baloo font-black text-[14px] transition ${
+                className={`w-10 h-10 rounded-full font-baloo font-black text-sm transition ${
                   page === i + 1
                     ? "bg-ds-action text-white shadow-md scale-110"
-                    : "bg-white border border-ds-border text-gray-500 hover:text-gray-700 hover:border-[var(--ds-border-brand)]"
+                    : "bg-[var(--ds-surface-card)] border border-ds-border text-[var(--ds-text-secondary)] hover:text-[var(--ds-text-primary)] hover:border-[var(--ds-border-brand)]"
                 }`}>
                 {i + 1}
               </motion.button>
             ))}
             <motion.button whileTap={m.buttonPress}
               onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page >= totalPages}
-              className="w-10 h-10 rounded-full bg-white border border-ds-border flex items-center justify-center text-gray-400 disabled:opacity-20 hover:border-[var(--ds-border-brand)] hover:text-ds-brand transition">
+              className="w-10 h-10 rounded-full bg-[var(--ds-surface-card)] border border-ds-border flex items-center justify-center text-[var(--ds-text-tertiary)] disabled:opacity-20 hover:border-[var(--ds-border-brand)] hover:text-ds-brand transition">
               <ChevronRight size={18} />
             </motion.button>
           </div>

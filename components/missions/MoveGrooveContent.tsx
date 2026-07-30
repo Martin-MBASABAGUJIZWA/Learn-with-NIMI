@@ -99,9 +99,9 @@ export default function MoveGrooveContent({ mission, onComplete, completed, savi
           ))}
         </div>
 
-        <p className="relative z-10 font-baloo font-black text-ds-text text-[20px]">{mission.title}</p>
+        <p className="relative z-10 font-baloo font-black text-ds-text text-xl">{mission.title}</p>
         {mission.subtitle && (
-          <p className="relative z-10 font-nunito text-gray-500 text-[14px] mt-1">{mission.subtitle}</p>
+          <p className="relative z-10 font-nunito text-[var(--ds-text-secondary)] text-sm mt-1">{mission.subtitle}</p>
         )}
       </div>
 
@@ -110,7 +110,7 @@ export default function MoveGrooveContent({ mission, onComplete, completed, savi
         <div className="space-y-2">
           <div className="flex items-center gap-2 px-1">
             <div className="h-[2px] flex-1 rounded-full bg-gradient-to-r from-pink-200 to-transparent" />
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-pink-500">Watch &amp; Move! 🎬</span>
+            <span className="text-3xs font-black uppercase tracking-[0.2em] text-pink-500">Watch &amp; Move! 🎬</span>
             <div className="h-[2px] flex-1 rounded-full bg-gradient-to-l from-orange-200 to-transparent" />
           </div>
           <div className="bg-black rounded-2xl overflow-hidden shadow-2xl">
@@ -133,7 +133,7 @@ export default function MoveGrooveContent({ mission, onComplete, completed, savi
               <div className="flex-1 h-1.5 bg-pink-100 rounded-full overflow-hidden">
                 <div className="h-full bg-gradient-to-r from-pink-400 to-orange-400 rounded-full transition-all" style={{ width: `${videoProgress}%` }} />
               </div>
-              <span className="font-baloo font-black text-[11px] text-pink-500">{Math.round(videoProgress)}%</span>
+              <span className="font-baloo font-black text-2xs text-pink-500">{Math.round(videoProgress)}%</span>
             </div>
           )}
         </div>
@@ -145,7 +145,7 @@ export default function MoveGrooveContent({ mission, onComplete, completed, savi
           <video src={getStorageUrl(activeVideo)} controls autoPlay playsInline className="w-full rounded-2xl"
             onEnded={() => setActiveVideo(null)} />
           <button onClick={() => setActiveVideo(null)}
-            className="absolute top-3 right-3 bg-black/60 text-white rounded-full w-8 h-8 flex items-center justify-center text-[13px] font-bold">
+            className="absolute top-3 right-3 bg-black/60 text-white rounded-full w-8 h-8 flex items-center justify-center text-sml font-bold">
             ✕
           </button>
         </div>
@@ -174,18 +174,18 @@ export default function MoveGrooveContent({ mission, onComplete, completed, savi
                 !mainVideoUrl && tappedCards.has(i)
                   ? 'border-pink-400 bg-gradient-to-br from-pink-50 via-white to-orange-50'
                   : imgUrl ? 'border-pink-100 bg-gradient-to-br from-white via-pink-50/70 to-amber-50/60 hover:border-pink-300'
-                  : 'border-pink-100 bg-white p-4 hover:border-pink-300'
+                  : 'border-pink-100 bg-[var(--ds-surface-card)] p-4 hover:border-pink-300'
               }`}>
 
               {/* Visual card with image */}
               {imgUrl ? (
                 <>
-                  <div className="relative aspect-square bg-gray-100">
+                  <div className="relative aspect-square bg-[var(--ds-surface-card-hover)]">
                     <Image src={imgUrl} alt={p.label ?? ''} fill className="object-cover" />
                     {vidUrl && (
                       <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                        <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center shadow-lg">
-                          <Play size={18} className="text-gray-500 ml-0.5" />
+                        <div className="w-10 h-10 rounded-full bg-[var(--ds-surface-card)]/90 flex items-center justify-center shadow-lg">
+                          <Play size={18} className="text-[var(--ds-text-secondary)] ml-0.5" />
                         </div>
                       </div>
                     )}
@@ -193,7 +193,7 @@ export default function MoveGrooveContent({ mission, onComplete, completed, savi
                   {(p.label || audioUrl) && (
                     <div className="flex items-center justify-center gap-1.5 px-2 py-2.5">
                       {audioUrl && <Volume2 size={12} className="text-pink-500 shrink-0" />}
-                      {p.label && <p className="font-nunito font-bold text-gray-600 text-[12px] sm:text-[13px]">{p.label}</p>}
+                      {p.label && <p className="font-nunito font-bold text-[var(--ds-text-secondary)] text-xs sm:text-sml">{p.label}</p>}
                     </div>
                   )}
                 </>
@@ -206,7 +206,7 @@ export default function MoveGrooveContent({ mission, onComplete, completed, savi
                   </motion.span>
                   <div className="flex items-center justify-center gap-1">
                     {audioUrl && <Volume2 size={11} className="text-pink-500" />}
-                    <p className="font-nunito font-bold text-gray-700 text-[13px]">{p.label}</p>
+                    <p className="font-nunito font-bold text-[var(--ds-text-primary)] text-sml">{p.label}</p>
                   </div>
                 </>
               )}
@@ -220,7 +220,7 @@ export default function MoveGrooveContent({ mission, onComplete, completed, savi
         <div className="leaf border border-pink-100 bg-pink-50/50 px-4 py-3 flex items-center gap-3">
           <Lock className="w-4 h-4 text-pink-400 flex-shrink-0" />
           <div className="flex-1">
-            <p className="font-nunito font-bold text-[11px] text-pink-500 mb-1">{t("moveToUnlock")} ({tappedCards.size}/{requiredCardTaps})</p>
+            <p className="font-nunito font-bold text-2xs text-pink-500 mb-1">{t("moveToUnlock")} ({tappedCards.size}/{requiredCardTaps})</p>
             <div className="h-2 w-full bg-pink-100 rounded-full overflow-hidden">
               <div className="h-full bg-gradient-to-r from-pink-400 to-orange-400 rounded-full transition-all"
                 style={{ width: `${Math.min(100, (tappedCards.size / requiredCardTaps) * 100)}%` }} />
@@ -237,13 +237,13 @@ export default function MoveGrooveContent({ mission, onComplete, completed, savi
             initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
             transition={{ type: "spring", stiffness: 300, damping: 22, delay: 0.1 }}
             whileTap={{ scale: 0.96 }}
-            className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-pink-500 to-orange-500 py-4 font-baloo font-black text-[18px] text-white shadow-[0_10px_24px_rgba(236,72,153,0.28)] transition disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-pink-500 to-orange-500 py-4 font-baloo font-black text-lg text-white shadow-[0_10px_24px_rgba(236,72,153,0.28)] transition disabled:opacity-50"
           >
             {saving ? t("saving") : <><Check className="w-5 h-5" /> {t("iDidItBtn")}</>}
           </motion.button>
         ) : (
           <button disabled
-            className="flex w-full items-center justify-center gap-2 rounded-full bg-gray-100 py-4 font-baloo font-black text-[18px] text-gray-400 cursor-not-allowed border border-gray-200">
+            className="flex w-full items-center justify-center gap-2 rounded-full bg-[var(--ds-surface-card-hover)] py-4 font-baloo font-black text-lg text-[var(--ds-text-tertiary)] cursor-not-allowed border border-[var(--ds-border-primary)]">
             <Lock className="w-5 h-5" /> {t("moveToUnlock")}
           </button>
         )

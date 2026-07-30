@@ -31,7 +31,7 @@ export default function UploadStorybookPDF() {
   };
 
   return (
-    <div className="p-4 border rounded-xl shadow-md bg-white w-full max-w-md mx-auto">
+    <div className="p-4 border rounded-xl shadow-md bg-[var(--ds-surface-card)] w-full max-w-md mx-auto">
       <h2 className="text-xl font-bold mb-2">📤 Upload Today’s Storybook</h2>
       <input
         type="file"

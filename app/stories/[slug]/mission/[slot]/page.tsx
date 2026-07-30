@@ -308,27 +308,27 @@ export default function StoryMissionPage() {
         <main className="max-w-4xl mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6 pb-24 flex-1 w-full">
 
           {/* Header */}
-          <div className={`mb-5 border ${missionStyle.headerBorder} ${missionStyle.headerBg} p-4 shadow-[0_16px_34px_rgba(15,23,42,0.08)]`} style={{ borderRadius: 'var(--leaf-r-lg)' }}>
+          <div className={`mb-5 border ${missionStyle.headerBorder} ${missionStyle.headerBg} p-4 shadow-card-2xl`} style={{ borderRadius: 'var(--leaf-r-lg)' }}>
             <div className="flex items-center gap-3">
               <button onClick={() => router.push(`/stories/${slug}`)}
-                className="w-10 h-10 bg-white border border-ds-border rounded-full flex items-center justify-center text-ds-text transition hover:bg-gray-50 shadow-sm">
+                className="w-10 h-10 bg-[var(--ds-surface-card)] border border-ds-border rounded-full flex items-center justify-center text-ds-text transition hover:bg-[var(--ds-surface-card)] shadow-sm">
                 <ArrowLeft className="w-5 h-5" />
               </button>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className={`rounded-full border ${missionStyle.badgeBorder} ${missionStyle.badgeBg} px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.24em] ${missionStyle.badgeText}`}>
+                  <span className={`rounded-full border ${missionStyle.badgeBorder} ${missionStyle.badgeBg} px-2.5 py-1 text-3xs font-black uppercase tracking-[0.24em] ${missionStyle.badgeText}`}>
                     {missionStyle.emoji} {missionStyle.label}
                   </span>
                   {completed && (
-                    <span className="rounded-full border border-[var(--ds-border-brand)]/30 bg-[var(--ds-brand-subtle)] px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.24em] text-[var(--ds-brand-primary)]">
+                    <span className="rounded-full border border-[var(--ds-border-brand)]/30 bg-[var(--ds-brand-subtle)] px-2.5 py-1 text-3xs font-black uppercase tracking-[0.24em] text-[var(--ds-brand-primary)]">
                       Completed
                     </span>
                   )}
                 </div>
-                <h1 className="font-baloo font-black text-[20px] sm:text-[24px] text-ds-text leading-tight mt-1">
+                <h1 className="font-baloo font-black text-xl sm:text-2xl text-ds-text leading-tight mt-1">
                   {slot?.title || t(SLOT_T_KEYS[slotKey] ?? '') || slotKey}
                 </h1>
-                <p className="text-gray-500 text-[13px] mt-1">
+                <p className="text-[var(--ds-text-secondary)] text-sml mt-1">
                   Activity {slot?.slot_order} of {allSlots.length || 6} · {slot?.subtitle}
                 </p>
               </div>
@@ -350,7 +350,7 @@ export default function StoryMissionPage() {
               {/* Track + nodes */}
               <div className="relative flex items-center justify-between">
                 {/* Background track */}
-                <div className="absolute inset-x-5 top-1/2 -translate-y-1/2 h-[2px] bg-gray-100 rounded-full" />
+                <div className="absolute inset-x-5 top-1/2 -translate-y-1/2 h-[2px] bg-[var(--ds-surface-card-hover)] rounded-full" />
                 {/* Completed-segment overlay — scaleX from left so it covers exactly the same span as the track */}
                 {(() => {
                   const currentIdx = allSlots.findIndex(s => s.slot_key === slotKey);
@@ -380,10 +380,10 @@ export default function StoryMissionPage() {
                         transition={{ type: "spring", stiffness: 300, damping: 22, delay: (s.slot_order ?? 0) * 0.06 }}
                         className={`flex items-center justify-center rounded-full transition-all ${
                           isDone
-                            ? "w-8 h-8 bg-[var(--nimi-green)] shadow-[0_2px_8px_rgba(16,185,129,0.35)] text-white text-[13px] font-black"
+                            ? "w-8 h-8 bg-[var(--nimi-green)] shadow-[0_2px_8px_rgba(16,185,129,0.35)] text-white text-sml font-black"
                             : isCurrent
-                              ? `w-9 h-9 border-2 ${missionStyle.badgeBorder} ${missionStyle.badgeBg} text-[18px] shadow-md`
-                              : "w-7 h-7 bg-white border border-gray-200 text-[14px] opacity-40"
+                              ? `w-9 h-9 border-2 ${missionStyle.badgeBorder} ${missionStyle.badgeBg} text-lg shadow-md`
+                              : "w-7 h-7 bg-[var(--ds-surface-card)] border border-[var(--ds-border-primary)] text-sm opacity-40"
                         }`}
                       >
                         {isDone ? "✓" : emoji}
@@ -393,7 +393,7 @@ export default function StoryMissionPage() {
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                           transition={{ delay: 0.4 }}
-                          className={`text-[8px] font-black uppercase tracking-[0.18em] ${missionStyle.badgeText}`}
+                          className={`text-5xs font-black uppercase tracking-[0.18em] ${missionStyle.badgeText}`}
                         >
                           Now
                         </motion.span>
@@ -407,7 +407,7 @@ export default function StoryMissionPage() {
 
           {/* Renderer */}
           {mission && (
-            <div className="bg-white border border-ds-border shadow-[0_16px_34px_rgba(15,23,42,0.08)] overflow-hidden p-4 sm:p-5" style={{ borderRadius: 'var(--leaf-r)' }}>
+            <div className="bg-[var(--ds-surface-card)] border border-ds-border shadow-card-2xl overflow-hidden p-4 sm:p-5" style={{ borderRadius: 'var(--leaf-r)' }}>
               {mission.type === "story" && (
                 <StoryContent mission={mission} storyPages={storyPages} onComplete={handleComplete} completed={completed} saving={saving} pagesLoading={pagesLoading} storySlug={slug} />
               )}
@@ -434,10 +434,10 @@ export default function StoryMissionPage() {
             <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
               className="mt-4 flex items-center gap-3 bg-red-50 border border-red-200 px-4 py-3 shadow-sm"
               style={{ borderRadius: 'var(--leaf-r)' }}>
-              <span className="text-[20px]">😬</span>
+              <span className="text-xl">😬</span>
               <div className="flex-1 min-w-0">
-                <p className="font-baloo font-black text-red-700 text-[14px] leading-tight">Oops, something went wrong!</p>
-                <p className="font-nunito text-red-500 text-[12px]">Your internet might be sleepy. Tap the button again to try!</p>
+                <p className="font-baloo font-black text-red-700 text-sm leading-tight">Oops, something went wrong!</p>
+                <p className="font-nunito text-red-500 text-xs">Your internet might be sleepy. Tap the button again to try!</p>
               </div>
             </motion.div>
           )}
@@ -498,39 +498,39 @@ export default function StoryMissionPage() {
                   <AnimatedCheckmark className="mx-auto mb-3" />
 
                   {outcome.queued ? (
-                    <div className="mx-auto inline-flex items-center justify-center gap-2 rounded-full border border-blue-200 bg-white/90 px-4 py-2 mb-3 shadow-sm">
-                      <span className="font-nunito text-blue-700 text-[13px] font-bold">{t("slotSavedOffline")}</span>
+                    <div className="mx-auto inline-flex items-center justify-center gap-2 rounded-full border border-blue-200 bg-[var(--ds-surface-card)]/90 px-4 py-2 mb-3 shadow-sm">
+                      <span className="font-nunito text-blue-700 text-sml font-bold">{t("slotSavedOffline")}</span>
                     </div>
                   ) : (
-                    <div className="mx-auto inline-flex items-center justify-center gap-2 rounded-full border border-amber-200 bg-white/90 px-4 py-2 mb-3 shadow-sm">
+                    <div className="mx-auto inline-flex items-center justify-center gap-2 rounded-full border border-amber-200 bg-[var(--ds-surface-card)]/90 px-4 py-2 mb-3 shadow-sm">
                       <Image src={assets.starMascot} alt="" width={24} height={24} className="w-6 h-6" />
-                      <span className="font-baloo font-black text-amber-500 text-[28px]">+{outcome.result.stars_earned}</span>
-                      <span className="font-nunito text-gray-600 text-[14px] font-bold">{t("storyStarsLabel")}</span>
+                      <span className="font-baloo font-black text-amber-500 text-3.5xl">+{outcome.result.stars_earned}</span>
+                      <span className="font-nunito text-[var(--ds-text-secondary)] text-sm font-bold">{t("storyStarsLabel")}</span>
                     </div>
                   )}
 
                   {res?.story_complete && (
                     <motion.div initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.5 }}
                       className="mb-3">
-                      <p className="font-baloo font-black text-emerald-700 text-[22px]">{t("storyCompleteResult")}</p>
-                      <p className="font-nunito text-ds-text text-[14px]">{t("storyEarnedCert")}</p>
+                      <p className="font-baloo font-black text-emerald-700 text-1.5xl">{t("storyCompleteResult")}</p>
+                      <p className="font-nunito text-ds-text text-sm">{t("storyEarnedCert")}</p>
                     </motion.div>
                   )}
 
                   {res?.next_story_unlocked && (
                     <motion.div initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.7 }}
                       className="mb-3 bg-[var(--ds-brand-subtle)] border border-[var(--ds-border-brand)]/30 leaf px-4 py-2 inline-block">
-                      <p className="font-nunito text-ds-text text-[14px] font-bold">{t("storyNextUnlocked")}</p>
+                      <p className="font-nunito text-ds-text text-sm font-bold">{t("storyNextUnlocked")}</p>
                     </motion.div>
                   )}
 
                   {(!res?.story_complete) && (
-                    <p className="font-nunito text-ds-text text-[14px] mb-3">{t("storyGreatJob")}</p>
+                    <p className="font-nunito text-ds-text text-sm mb-3">{t("storyGreatJob")}</p>
                   )}
 
                   <motion.button initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.9 }}
                     onClick={() => router.push(`/stories/${slug}`)}
-                    className="font-baloo font-black bg-cta-gradient text-white text-[16px] rounded-full px-7 py-3 shadow-lg shadow-ds-cta transition hover:shadow-ds-hover">
+                    className="font-baloo font-black bg-cta-gradient text-white text-base rounded-full px-7 py-3 shadow-lg shadow-ds-cta transition hover:shadow-ds-hover">
                     {res?.story_complete ? t("storyViewCert") : t("storyContinueArrow")}
                   </motion.button>
 
@@ -558,9 +558,9 @@ export default function StoryMissionPage() {
                           await navigator.clipboard.writeText(`${text}\n${url}`).catch(() => {});
                         }
                       }}
-                      className="w-full flex items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white hover:bg-gray-50 px-4 py-3 font-baloo font-black text-[14px] text-gray-600 transition shadow-sm"
+                      className="w-full flex items-center justify-center gap-2 rounded-2xl border border-[var(--ds-border-primary)] bg-[var(--ds-surface-card)] hover:bg-[var(--ds-surface-card)] px-4 py-3 font-baloo font-black text-sm text-[var(--ds-text-secondary)] transition shadow-sm"
                     >
-                      <Share2 className="w-4 h-4 text-gray-500" />
+                      <Share2 className="w-4 h-4 text-[var(--ds-text-secondary)]" />
                       {t("shareFriendsBtn")}
                     </button>
                   </motion.div>

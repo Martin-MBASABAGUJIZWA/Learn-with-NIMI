@@ -55,14 +55,14 @@ export default function AccountSettingsCard({ childId, childName, avatarUrl, onC
           )}
           <button
             onClick={() => setOpenModal("avatar")}
-            className="absolute -bottom-1 -right-1 w-6 h-6 bg-white border border-ds-border rounded-full flex items-center justify-center shadow-sm hover:bg-gray-50 transition"
+            className="absolute -bottom-1 -right-1 w-6 h-6 bg-[var(--ds-surface-card)] border border-ds-border rounded-full flex items-center justify-center shadow-sm hover:bg-[var(--ds-surface-card-hover)] transition"
           >
             <ImagePlus size={10} className="text-ds-muted" />
           </button>
         </div>
         <div className="flex-1 min-w-0">
-          <p className="font-baloo font-black text-ds-text text-[18px] leading-tight truncate">{childName}</p>
-          <p className="text-ds-muted text-[11px] mt-0.5">{t("accountSettingsTitle")}</p>
+          <p className="font-baloo font-black text-ds-text text-lg leading-tight truncate">{childName}</p>
+          <p className="text-ds-muted text-2xs mt-0.5">{t("accountSettingsTitle")}</p>
         </div>
       </div>
 
@@ -75,16 +75,16 @@ export default function AccountSettingsCard({ childId, childName, avatarUrl, onC
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: i * 0.05 }}
             onClick={() => setOpenModal(row.id)}
-            className="flex items-center gap-4 px-5 py-3.5 w-full text-left hover:bg-gray-50 transition group"
+            className="flex items-center gap-4 px-5 py-3.5 w-full text-left hover:bg-[var(--ds-surface-card-hover)] transition group"
           >
             <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${row.gradient} flex items-center justify-center shadow-sm shrink-0`}>
               <row.icon size={17} className="text-white" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="font-bold text-[13px] text-ds-text leading-tight">{t(row.labelKey)}</p>
-              <p className="text-[11px] text-ds-muted mt-0.5">{t(row.descKey)}</p>
+              <p className="font-bold text-sml text-ds-text leading-tight">{t(row.labelKey)}</p>
+              <p className="text-2xs text-ds-muted mt-0.5">{t(row.descKey)}</p>
             </div>
-            <ChevronRight size={16} className="text-gray-300 group-hover:text-ds-muted transition-transform group-hover:translate-x-0.5 shrink-0" />
+            <ChevronRight size={16} className="text-[var(--ds-text-tertiary)] group-hover:text-ds-muted transition-transform group-hover:translate-x-0.5 shrink-0" />
           </motion.button>
         ))}
       </div>

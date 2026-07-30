@@ -21,9 +21,9 @@ export default function ShopHeader({ balance }: Props) {
   return (
     <HeroBanner zone="treasureRoom">
       {/* Decorative bubbles */}
-      <div className="absolute -top-8 -right-8 w-40 h-40 rounded-full bg-white/10" />
-      <div className="absolute -bottom-6 -left-6 w-32 h-32 rounded-full bg-white/10" />
-      <div className="absolute top-3 left-1/3 w-12 h-12 rounded-full bg-white/10" />
+      <div className="absolute -top-8 -right-8 w-40 h-40 rounded-full bg-[var(--ds-surface-card)]/10" />
+      <div className="absolute -bottom-6 -left-6 w-32 h-32 rounded-full bg-[var(--ds-surface-card)]/10" />
+      <div className="absolute top-3 left-1/3 w-12 h-12 rounded-full bg-[var(--ds-surface-card)]/10" />
 
       {/* Floating emoji decorations */}
       {([
@@ -49,7 +49,7 @@ export default function ShopHeader({ balance }: Props) {
         {/* Back button */}
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-1.5 text-white/80 hover:text-white text-[13px] font-bold mb-3 transition-colors"
+          className="flex items-center gap-1.5 text-white/80 hover:text-white text-sml font-bold mb-3 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           Back
@@ -60,17 +60,17 @@ export default function ShopHeader({ balance }: Props) {
           <motion.div
             animate={{ y: [0, -5, 0], rotate: [0, 5, -5, 0] }}
             transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-            className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-white/20 flex items-center justify-center shrink-0 shadow-lg border-2 border-white/30"
+            className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-[var(--ds-surface-card)]/20 flex items-center justify-center shrink-0 shadow-lg border-2 border-white/30"
           >
             <span className="text-3xl sm:text-4xl">🛍️</span>
           </motion.div>
 
           <div className="flex-1 min-w-0">
-            <p className="text-white/55 text-[10px] font-nunito font-bold uppercase tracking-[0.14em] mb-0.5">The Treasure Room</p>
-            <h1 className="font-baloo font-black text-white text-[24px] sm:text-[32px] leading-tight drop-shadow-md">
+            <p className="text-white/55 text-3xs font-nunito font-bold uppercase tracking-[0.14em] mb-0.5">The Treasure Room</p>
+            <h1 className="font-baloo font-black text-white text-2xl sm:text-3xl leading-tight drop-shadow-md">
               {t("rewardShopTitle")}
             </h1>
-            <p className="text-white/75 text-[12px] sm:text-[13px] font-nunito font-semibold mt-0.5">
+            <p className="text-white/75 text-xs sm:text-sml font-nunito font-semibold mt-0.5">
               {t("rewardShopSubtitle")}
             </p>
           </div>
@@ -91,11 +91,11 @@ export default function ShopHeader({ balance }: Props) {
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.15, type: "spring", stiffness: 260 }}
-            className="flex items-center gap-2 bg-white/20 border border-white/30 text-white font-baloo font-black text-[14px] px-4 py-2 rounded-full backdrop-blur-sm"
+            className="flex items-center gap-2 bg-[var(--ds-surface-card)]/20 border border-white/30 text-white font-baloo font-black text-sm px-4 py-2 rounded-full backdrop-blur-sm"
           >
-            <span className="text-[18px]">⭐</span>
+            <span className="text-lg">⭐</span>
             <span>{balance}</span>
-            <span className="text-[10px] uppercase font-bold text-white/70 tracking-wide">{t("shopStarsAvailable")}</span>
+            <span className="text-3xs uppercase font-bold text-white/70 tracking-wide">{t("shopStarsAvailable")}</span>
           </motion.div>
         </div>
       </div>

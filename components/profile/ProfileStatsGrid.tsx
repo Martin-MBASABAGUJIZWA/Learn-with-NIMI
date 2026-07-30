@@ -23,12 +23,12 @@ export default function ProfileStatsGrid({ activitiesCompleted, starsCollected, 
   return (
     <div className="grid grid-cols-2 gap-3 h-full">
       {stats.map((stat, i) => (
-        <div key={i} className="bg-white border border-ds-border shadow-ds-card p-4" style={{ borderRadius: 'var(--leaf-r)' }}>
+        <div key={i} className="bg-[var(--ds-surface-card)] border border-ds-border shadow-ds-card p-4" style={{ borderRadius: 'var(--leaf-r)' }}>
           <div className={`w-10 h-10 ${stat.iconBg} rounded-full flex items-center justify-center mb-2`}>
             <stat.icon className={`w-5 h-5 ${stat.iconColor}`} />
           </div>
           <p className="font-black text-2xl text-ds-text">{stat.value}</p>
-          <p className="text-gray-500 text-xs font-semibold mt-0.5">{t(stat.labelKey)}</p>
+          <p className="text-[var(--ds-text-secondary)] text-xs font-semibold mt-0.5">{t(stat.labelKey)}</p>
         </div>
       ))}
     </div>

@@ -11,10 +11,10 @@ const badgeVariants = cva(
         default:
           "border-transparent bg-[var(--ds-brand-subtle)] text-[var(--ds-brand-primary)] hover:bg-[var(--ds-brand-subtle)]",
         secondary:
-          "border-transparent bg-gray-100 text-gray-600 hover:bg-gray-200",
+          "border-transparent bg-[var(--ds-surface-card-hover)] text-[var(--ds-text-secondary)] hover:bg-[var(--ds-surface-card-active)]",
         destructive:
           "border-transparent bg-red-100 text-red-600 hover:bg-red-200",
-        outline: "border-gray-200 text-gray-700",
+        outline: "border-[var(--ds-border-primary)] text-[var(--ds-text-primary)]",
       },
     },
     defaultVariants: {

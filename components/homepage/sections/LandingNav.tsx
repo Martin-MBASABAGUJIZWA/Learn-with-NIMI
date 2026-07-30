@@ -74,7 +74,7 @@ export default function LandingNav({ scrolled, menuOpen, setMenuOpen, authed }: 
   return (
     <>
       <nav className={`fixed top-0 left-0 right-0 z-[60] transition-all duration-300 ${
-        scrolled ? "bg-white/95 backdrop-blur-2xl border-b-2 border-gray-300 shadow-[0_8px_40px_rgba(0,0,0,0.14)]" : ""
+        scrolled ? "bg-[var(--ds-surface-card)]/95 backdrop-blur-2xl border-b-2 border-[var(--ds-border-strong)] shadow-[0_8px_40px_rgba(0,0,0,0.14)]" : ""
       }`}>
         <div className="flex items-center justify-between px-4 sm:px-6 lg:px-10 py-3 w-full">
 
@@ -105,7 +105,7 @@ export default function LandingNav({ scrolled, menuOpen, setMenuOpen, authed }: 
               </Link>
             ) : (
               <>
-                <Link href="/loginpage" className="font-baloo font-bold text-[13px] xl:text-[14px] text-gray-700 px-4 xl:px-5 py-2 rounded-full border border-gray-200/80 hover:bg-gray-50/80 transition-all whitespace-nowrap backdrop-blur-sm">
+                <Link href="/loginpage" className="font-baloo font-bold text-[13px] xl:text-[14px] text-[var(--ds-text-primary)] px-4 xl:px-5 py-2 rounded-full border border-[var(--ds-border-primary)]/80 hover:bg-[var(--ds-surface-card)]/80 transition-all whitespace-nowrap backdrop-blur-sm">
                   Log In
                 </Link>
                 <Link href="/signuppage" className="font-baloo font-bold text-[13px] xl:text-[14px] text-white px-4 xl:px-5 py-2 rounded-full shadow-sm transition-all hover:-translate-y-px whitespace-nowrap" style={{backgroundColor:'var(--nimi-green)', boxShadow:'0 2px 12px rgba(21,128,61,0.30)'}}>
@@ -116,7 +116,7 @@ export default function LandingNav({ scrolled, menuOpen, setMenuOpen, authed }: 
           </div>
 
           <button onClick={() => setMenuOpen(o => !o)} aria-label="Toggle menu" aria-expanded={menuOpen}
-            className="lg:hidden w-10 h-10 flex flex-col items-center justify-center gap-[5px] rounded-full hover:bg-gray-100/70 transition-colors shrink-0">
+            className="lg:hidden w-10 h-10 flex flex-col items-center justify-center gap-[5px] rounded-full hover:bg-[var(--ds-surface-card-hover)]/70 transition-colors shrink-0">
             {(["a","b","c"] as const).map((k,i) => (
               <motion.span key={k}
                 className="block w-[22px] h-[2px] rounded-full bg-gray-700"
@@ -161,7 +161,7 @@ export default function LandingNav({ scrolled, menuOpen, setMenuOpen, authed }: 
                 ) : (
                   <>
                     <Link href="/loginpage" onClick={() => setMenuOpen(() => false)}
-                      className="w-full text-center font-baloo font-bold text-gray-700 border border-gray-300 py-2.5 rounded-full text-[14px] hover:bg-black/5 transition-colors">
+                      className="w-full text-center font-baloo font-bold text-[var(--ds-text-primary)] border border-[var(--ds-border-strong)] py-2.5 rounded-full text-[14px] hover:bg-black/5 transition-colors">
                       Log In
                     </Link>
                     <Link href="/signuppage" onClick={() => setMenuOpen(() => false)}

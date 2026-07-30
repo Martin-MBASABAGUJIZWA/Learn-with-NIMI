@@ -251,7 +251,7 @@ export default function PricingGiftModal({ currency, onClose }: Props) {
           transition={{ ...SPRING.dialog }}
           className="w-full sm:max-w-md bg-ds-card rounded-t-3xl sm:rounded-3xl border border-ds-border shadow-ds-card p-6 pb-8 sm:pb-6 sm:mx-4">
 
-          <div className="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-4 sm:hidden" />
+          <div className="w-10 h-1 bg-[var(--ds-border-primary)] rounded-full mx-auto mb-4 sm:hidden" />
 
           {/* ── Recipient form ────────────────────────────────────────── */}
           {step === "form" && (
@@ -264,12 +264,12 @@ export default function PricingGiftModal({ currency, onClose }: Props) {
                   className="text-5xl mb-2"
                 >🎁</motion.div>
                 <h3 className="font-baloo font-black text-ds-text text-[22px]">Spread some joy 🌟</h3>
-                <p className="text-gray-500 text-[13px] mt-1">A gift of stories, songs & adventures — any amount, any reason!</p>
+                <p className="text-[var(--ds-text-secondary)] text-[13px] mt-1">A gift of stories, songs & adventures — any amount, any reason!</p>
               </div>
 
               {/* Amount picker */}
               <div className="mb-4">
-                <p className="text-[11px] font-bold text-gray-500 mb-2 uppercase tracking-wide">Choose your gift amount</p>
+                <p className="text-[11px] font-bold text-[var(--ds-text-secondary)] mb-2 uppercase tracking-wide">Choose your gift amount</p>
                 <div className="flex gap-2 mb-2">
                   {QUICK_PICKS[currency].map((amt, i) => (
                     <button
@@ -300,7 +300,7 @@ export default function PricingGiftModal({ currency, onClose }: Props) {
                 {isCustom && (
                   <div className="flex items-center gap-2 border border-ds-border bg-ds-input leaf px-3 py-2.5 focus-within:ring-2 focus-within:ring-[var(--ds-state-focus)] transition">
                     {CURRENCY_SYMBOL[currency] && (
-                      <span className="text-gray-400 font-bold text-[14px]">{CURRENCY_SYMBOL[currency]}</span>
+                      <span className="text-[var(--ds-text-tertiary)] font-bold text-[14px]">{CURRENCY_SYMBOL[currency]}</span>
                     )}
                     <input
                       type="number"
@@ -309,14 +309,14 @@ export default function PricingGiftModal({ currency, onClose }: Props) {
                       value={customAmount}
                       onChange={e => setCustomAmount(e.target.value)}
                       placeholder={`Minimum ${formatAmount(MINIMUMS[currency], currency)}`}
-                      className="flex-1 bg-transparent text-ds-text text-[14px] focus:outline-none placeholder:text-gray-400"
+                      className="flex-1 bg-transparent text-ds-text text-[14px] focus:outline-none placeholder:text-[var(--ds-text-tertiary)]"
                     />
                     {currency === "RWF" && (
-                      <span className="text-gray-400 font-bold text-[12px]">RWF</span>
+                      <span className="text-[var(--ds-text-tertiary)] font-bold text-[12px]">RWF</span>
                     )}
                   </div>
                 )}
-                <p className="text-[10px] text-gray-400 mt-1.5">
+                <p className="text-[10px] text-[var(--ds-text-tertiary)] mt-1.5">
                   From {formatAmount(MINIMUMS[currency], currency)} — covers at least a full month of stories & songs 🎶
                 </p>
                 {giftAmount != null && giftAmount >= MINIMUMS[currency] && (
@@ -332,34 +332,34 @@ export default function PricingGiftModal({ currency, onClose }: Props) {
 
               <div className="space-y-3">
                 <div>
-                  <label className="text-[11px] font-bold text-gray-500 mb-1 block">
+                  <label className="text-[11px] font-bold text-[var(--ds-text-secondary)] mb-1 block">
                     Their email address
-                    <span className="ml-1 font-normal text-gray-400">(optional)</span>
+                    <span className="ml-1 font-normal text-[var(--ds-text-tertiary)]">(optional)</span>
                   </label>
                   <input type="email" value={recipientEmail} onChange={e => setRecipientEmail(e.target.value)}
                     placeholder="their@email.com"
-                    className="w-full border border-ds-border bg-ds-input leaf px-4 py-3 text-ds-text text-[14px] focus:outline-none focus:ring-2 focus:ring-[var(--ds-state-focus)] transition placeholder:text-gray-400" />
-                  <p className="text-[10px] text-gray-400 mt-1">
+                    className="w-full border border-ds-border bg-ds-input leaf px-4 py-3 text-ds-text text-[14px] focus:outline-none focus:ring-2 focus:ring-[var(--ds-state-focus)] transition placeholder:text-[var(--ds-text-tertiary)]" />
+                  <p className="text-[10px] text-[var(--ds-text-tertiary)] mt-1">
                     Don&apos;t have it? No worries! 💬 We&apos;ll give you a secret code to share on WhatsApp.
                   </p>
                 </div>
                 <div>
-                  <label className="text-[11px] font-bold text-gray-500 mb-1 block">Who&apos;s this for? <span className="font-normal text-gray-400">(optional)</span></label>
+                  <label className="text-[11px] font-bold text-[var(--ds-text-secondary)] mb-1 block">Who&apos;s this for? <span className="font-normal text-[var(--ds-text-tertiary)]">(optional)</span></label>
                   <input type="text" value={recipientName} onChange={e => setRecipientName(e.target.value)}
                     placeholder="Emma, Amara, Little Champ..."
-                    className="w-full border border-ds-border bg-ds-input leaf px-4 py-3 text-ds-text text-[14px] focus:outline-none focus:ring-2 focus:ring-[var(--ds-state-focus)] transition placeholder:text-gray-400" />
+                    className="w-full border border-ds-border bg-ds-input leaf px-4 py-3 text-ds-text text-[14px] focus:outline-none focus:ring-2 focus:ring-[var(--ds-state-focus)] transition placeholder:text-[var(--ds-text-tertiary)]" />
                 </div>
                 <div>
-                  <label className="text-[11px] font-bold text-gray-500 mb-1 block">Add a personal note 💌 <span className="font-normal text-gray-400">(optional)</span></label>
+                  <label className="text-[11px] font-bold text-[var(--ds-text-secondary)] mb-1 block">Add a personal note 💌 <span className="font-normal text-[var(--ds-text-tertiary)]">(optional)</span></label>
                   <textarea value={message} onChange={e => setMessage(e.target.value)}
                     placeholder="Hey! I got you something special — your little one is going to LOVE these stories 🌟"
                     rows={3}
-                    className="w-full border border-ds-border bg-ds-input leaf px-4 py-3 text-ds-text text-[14px] focus:outline-none focus:ring-2 focus:ring-[var(--ds-state-focus)] transition placeholder:text-gray-400 resize-none" />
+                    className="w-full border border-ds-border bg-ds-input leaf px-4 py-3 text-ds-text text-[14px] focus:outline-none focus:ring-2 focus:ring-[var(--ds-state-focus)] transition placeholder:text-[var(--ds-text-tertiary)] resize-none" />
                 </div>
 
               {/* Send timing */}
               <div className="mt-3">
-                <p className="text-[11px] font-bold text-gray-500 mb-2 uppercase tracking-wide">When should it arrive? 📬</p>
+                <p className="text-[11px] font-bold text-[var(--ds-text-secondary)] mb-2 uppercase tracking-wide">When should it arrive? 📬</p>
                 <div className="flex gap-2">
                   <button
                     onClick={() => setSendNow(true)}
@@ -396,7 +396,7 @@ export default function PricingGiftModal({ currency, onClose }: Props) {
               </div>
               {errorMsg && <p className="text-red-500 text-[12px] mt-2 font-semibold">⚠️ {errorMsg}</p>}
               <div className="flex gap-3 mt-5">
-                <button onClick={onClose} className="flex-1 py-3 leaf border border-ds-border text-gray-400 font-bold text-[13px] hover:bg-gray-50 transition">Cancel</button>
+                <button onClick={onClose} className="flex-1 py-3 leaf border border-ds-border text-[var(--ds-text-tertiary)] font-bold text-[13px] hover:bg-[var(--ds-surface-card-hover)] transition">Cancel</button>
                 <motion.button whileTap={m.buttonPress} onClick={handleFormContinue}
                   disabled={!giftAmount}
                   className="flex-1 py-3 leaf bg-gradient-to-r from-rose-500 to-pink-500 text-white font-black text-[14px] shadow-md disabled:opacity-50 disabled:cursor-not-allowed">
@@ -415,11 +415,11 @@ export default function PricingGiftModal({ currency, onClose }: Props) {
             <>
               <div className="mb-4">
                 <button onClick={() => setStep("form")}
-                  className="text-gray-400 hover:text-ds-text transition text-[12px] font-bold mb-3 block">← Back</button>
+                  className="text-[var(--ds-text-tertiary)] hover:text-ds-text transition text-[12px] font-bold mb-3 block">← Back</button>
                 <div className="text-center">
                   <div className="text-3xl mb-1">🎁</div>
                   <h3 className="font-baloo font-black text-ds-text text-[20px]">Almost there!</h3>
-                  <p className="text-gray-500 text-[13px] mt-0.5">
+                  <p className="text-[var(--ds-text-secondary)] text-[13px] mt-0.5">
                     Your <strong className="text-ds-text">{giftAmountFormatted}</strong> gift is ready to go — pick how to pay
                   </p>
                 </div>
@@ -429,16 +429,16 @@ export default function PricingGiftModal({ currency, onClose }: Props) {
                   className="flex flex-col items-center gap-2 p-4 leaf border-2 border-yellow-400 bg-yellow-50 dark:bg-yellow-900/20 hover:bg-yellow-100 dark:hover:bg-yellow-900/30 transition text-center">
                   <span className="text-3xl">📱</span>
                   <span className="font-baloo font-black text-ds-text text-[14px]">MTN MoMo</span>
-                  <span className="text-gray-500 dark:text-gray-400 text-[11px]">Pay with mobile money</span>
+                  <span className="text-[var(--ds-text-secondary)] dark:text-[var(--ds-text-tertiary)] text-[11px]">Pay with mobile money</span>
                 </motion.button>
                 <motion.button whileTap={m.buttonPress} onClick={() => handleGiftPay("cybersource")}
                   className="flex flex-col items-center gap-2 p-4 leaf border-2 border-blue-400 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 transition text-center">
                   <CreditCard className="w-8 h-8 text-blue-600 dark:text-blue-400" />
                   <span className="font-baloo font-black text-ds-text text-[14px]">Debit / Card</span>
-                  <span className="text-gray-500 dark:text-gray-400 text-[11px]">Visa, Mastercard, Amex</span>
+                  <span className="text-[var(--ds-text-secondary)] dark:text-[var(--ds-text-tertiary)] text-[11px]">Visa, Mastercard, Amex</span>
                 </motion.button>
               </div>
-              <button onClick={onClose} className="w-full py-2.5 leaf border border-ds-border text-gray-400 font-bold text-[13px] hover:bg-gray-50 transition">Cancel</button>
+              <button onClick={onClose} className="w-full py-2.5 leaf border border-ds-border text-[var(--ds-text-tertiary)] font-bold text-[13px] hover:bg-[var(--ds-surface-card-hover)] transition">Cancel</button>
             </>
           )}
 
@@ -448,7 +448,7 @@ export default function PricingGiftModal({ currency, onClose }: Props) {
               <motion.div animate={{ scale: [1, 1.12, 1], rotate: [0, 5, -5, 0] }} transition={{ duration: 1.4, repeat: Infinity }}
                 className="text-5xl mb-4">🎁</motion.div>
               <p className="font-baloo font-black text-ds-text text-[16px]">Setting up your gift... ✨</p>
-              <p className="text-gray-400 text-[12px] mt-1">Just a moment!</p>
+              <p className="text-[var(--ds-text-tertiary)] text-[12px] mt-1">Just a moment!</p>
             </div>
           )}
 
@@ -458,20 +458,20 @@ export default function PricingGiftModal({ currency, onClose }: Props) {
               <div className="flex items-center gap-2 mb-1">
                 {isRwanda && (
                   <button onClick={() => setStep("choose")}
-                    className="text-gray-400 hover:text-ds-text transition text-[12px] font-bold">← Back</button>
+                    className="text-[var(--ds-text-tertiary)] hover:text-ds-text transition text-[12px] font-bold">← Back</button>
                 )}
                 <h3 className="font-baloo font-black text-ds-text text-[20px]">🎁 Gift · {giftAmountFormatted}</h3>
               </div>
-              <p className="text-gray-400 text-[12px] mb-3">
+              <p className="text-[var(--ds-text-tertiary)] text-[12px] mb-3">
                 {recipientEmail.trim() ? <>Will be sent to <strong>{recipientEmail}</strong></> : "Code ready to share after payment"}
               </p>
               <div id="cs-gift-list" className="mb-3" />
               <div id="cs-gift-form" className="min-h-[200px] leaf overflow-hidden" />
               <div className="flex items-center gap-2 mt-3">
                 <Shield className="w-4 h-4 text-[var(--ds-brand-primary)]" />
-                <p className="text-gray-500 text-[10px]">256-bit SSL encrypted — Visa, Mastercard, Amex</p>
+                <p className="text-[var(--ds-text-secondary)] text-[10px]">256-bit SSL encrypted — Visa, Mastercard, Amex</p>
               </div>
-              <button onClick={onClose} className="w-full mt-3 py-2.5 leaf border border-ds-border text-gray-400 font-bold text-[12px] hover:bg-gray-50 transition">Cancel</button>
+              <button onClick={onClose} className="w-full mt-3 py-2.5 leaf border border-ds-border text-[var(--ds-text-tertiary)] font-bold text-[12px] hover:bg-[var(--ds-surface-card-hover)] transition">Cancel</button>
             </>
           )}
 
@@ -481,24 +481,24 @@ export default function PricingGiftModal({ currency, onClose }: Props) {
               <div className="flex items-center gap-2 mb-1">
                 {isRwanda && (
                   <button onClick={() => setStep("choose")}
-                    className="text-gray-400 hover:text-ds-text transition text-[12px] font-bold">← Back</button>
+                    className="text-[var(--ds-text-tertiary)] hover:text-ds-text transition text-[12px] font-bold">← Back</button>
                 )}
                 <h3 className="font-baloo font-black text-ds-text text-[20px]">📱 Pay with MoMo</h3>
               </div>
-              <p className="text-gray-400 text-[12px] mb-4">
+              <p className="text-[var(--ds-text-tertiary)] text-[12px] mb-4">
                 🎁 Gifting <strong className="text-ds-text">{giftAmountFormatted}</strong>
                 {recipientName ? ` for ${recipientName}` : ""}
               </p>
               <div>
-                <label className="text-[11px] font-bold text-gray-500 mb-1 block">Your MTN number</label>
+                <label className="text-[11px] font-bold text-[var(--ds-text-secondary)] mb-1 block">Your MTN number</label>
                 <input type="tel" value={phone} onChange={e => setPhone(e.target.value)}
                   placeholder="078 XXX XXXX"
-                  className="w-full border border-ds-border bg-ds-input leaf px-4 py-3 text-ds-text text-[14px] focus:outline-none focus:ring-2 focus:ring-[var(--ds-state-focus)] transition placeholder:text-gray-400" />
-                <p className="text-[10px] text-gray-400 mt-1">You&apos;ll get a prompt on your phone to approve the payment</p>
+                  className="w-full border border-ds-border bg-ds-input leaf px-4 py-3 text-ds-text text-[14px] focus:outline-none focus:ring-2 focus:ring-[var(--ds-state-focus)] transition placeholder:text-[var(--ds-text-tertiary)]" />
+                <p className="text-[10px] text-[var(--ds-text-tertiary)] mt-1">You&apos;ll get a prompt on your phone to approve the payment</p>
               </div>
               {errorMsg && <p className="text-red-500 text-[11px] mt-2 font-semibold">⚠️ {errorMsg}</p>}
               <div className="flex gap-3 mt-4">
-                <button onClick={onClose} className="flex-1 py-3 leaf border border-ds-border text-gray-400 font-bold text-[13px] hover:bg-gray-50 transition">Cancel</button>
+                <button onClick={onClose} className="flex-1 py-3 leaf border border-ds-border text-[var(--ds-text-tertiary)] font-bold text-[13px] hover:bg-[var(--ds-surface-card-hover)] transition">Cancel</button>
                 <motion.button whileTap={m.buttonPress} onClick={handleMomoPay}
                   className="flex-1 py-3 leaf bg-[var(--nimi-green)] text-white font-black text-[14px] shadow-md">
                   Send Gift 🎁
@@ -524,7 +524,7 @@ export default function PricingGiftModal({ currency, onClose }: Props) {
               <p className="font-baloo font-black text-ds-text text-[18px]">
                 {activeProvider === "mtn_momo" ? "Check your phone! 📲" : "Wrapping up your gift..."}
               </p>
-              <p className="text-gray-500 text-[13px] mt-2">
+              <p className="text-[var(--ds-text-secondary)] text-[13px] mt-2">
                 {activeProvider === "mtn_momo"
                   ? "Tap 'Approve' on the MoMo prompt and enter your PIN"
                   : "Almost done — hang tight! ✨"}
@@ -550,7 +550,7 @@ export default function PricingGiftModal({ currency, onClose }: Props) {
                     className="text-5xl mb-2"
                   >🎉</motion.div>
                   <h3 className="font-baloo font-black text-ds-text text-[22px]">You just made someone&apos;s day!</h3>
-                  <p className="text-gray-400 text-[12px] mt-0.5">
+                  <p className="text-[var(--ds-text-tertiary)] text-[12px] mt-0.5">
                     {recipientEmail.trim()
                       ? sendNow
                         ? `✉️ A surprise email is headed to ${recipientEmail}`
@@ -569,8 +569,8 @@ export default function PricingGiftModal({ currency, onClose }: Props) {
                   style={{ background: "linear-gradient(135deg, #f43f5e 0%, #ec4899 45%, #fb923c 100%)" }}
                 >
                   {/* Decorative circles */}
-                  <div className="absolute -top-8 -right-8 w-40 h-40 rounded-full bg-white/10" />
-                  <div className="absolute -bottom-6 -left-6 w-32 h-32 rounded-full bg-white/10" />
+                  <div className="absolute -top-8 -right-8 w-40 h-40 rounded-full bg-[var(--ds-surface-card)]/10" />
+                  <div className="absolute -bottom-6 -left-6 w-32 h-32 rounded-full bg-[var(--ds-surface-card)]/10" />
 
                   <div className="relative z-10 p-5">
                     {/* Top row */}
@@ -589,13 +589,13 @@ export default function PricingGiftModal({ currency, onClose }: Props) {
 
                     {/* Message */}
                     {message.trim() && (
-                      <div className="bg-white/15 rounded-2xl px-3 py-2.5 mb-4">
+                      <div className="bg-[var(--ds-surface-card)]/15 rounded-2xl px-3 py-2.5 mb-4">
                         <p className="text-white text-[12px] italic leading-relaxed">"{message.trim()}"</p>
                       </div>
                     )}
 
                     {/* Code */}
-                    <div className="bg-white/20 rounded-2xl px-4 py-3 flex items-center justify-between">
+                    <div className="bg-[var(--ds-surface-card)]/20 rounded-2xl px-4 py-3 flex items-center justify-between">
                       <div>
                         <p className="text-white/70 text-[9px] font-bold uppercase tracking-widest">Redemption code</p>
                         <p className="font-baloo font-black text-white text-[20px] tracking-widest">{codeRef.current}</p>
@@ -606,7 +606,7 @@ export default function PricingGiftModal({ currency, onClose }: Props) {
                           setCopied(true);
                           setTimeout(() => setCopied(false), 2000);
                         }}
-                        className="bg-white/25 hover:bg-white/35 text-white font-black text-[11px] px-3 py-1.5 rounded-full transition"
+                        className="bg-[var(--ds-surface-card)]/25 hover:bg-[var(--ds-surface-card)]/35 text-white font-black text-[11px] px-3 py-1.5 rounded-full transition"
                       >
                         {copied ? "✓ Copied!" : "Copy"}
                       </button>
@@ -639,13 +639,13 @@ export default function PricingGiftModal({ currency, onClose }: Props) {
                       setCopied(true);
                       setTimeout(() => setCopied(false), 2000);
                     }}
-                    className="w-full flex items-center justify-center gap-2 py-3 leaf border border-ds-border bg-ds-input text-ds-text font-bold text-[13px] hover:bg-gray-50 dark:hover:bg-white/5 transition"
+                    className="w-full flex items-center justify-center gap-2 py-3 leaf border border-ds-border bg-ds-input text-ds-text font-bold text-[13px] hover:bg-[var(--ds-surface-card-hover)] dark:hover:bg-[var(--ds-surface-card)]/5 transition"
                   >
                     🔗 {copied ? "✓ Link copied!" : "Copy gift link"}
                   </button>
 
                   <button onClick={onClose}
-                    className="w-full py-2.5 text-gray-400 font-bold text-[13px] hover:text-ds-text transition">
+                    className="w-full py-2.5 text-[var(--ds-text-tertiary)] font-bold text-[13px] hover:text-ds-text transition">
                     All done! 🌟
                   </button>
                 </motion.div>
@@ -659,9 +659,9 @@ export default function PricingGiftModal({ currency, onClose }: Props) {
               <div className="text-5xl mb-4">😕</div>
               <h3 className="font-baloo font-black text-ds-text text-[18px]">Hmm, something went wrong</h3>
               <p className="text-red-500 text-[13px] mt-2 max-w-[280px] mx-auto leading-relaxed">{errorMsg}</p>
-              <p className="text-gray-400 text-[12px] mt-1">Your card has not been charged.</p>
+              <p className="text-[var(--ds-text-tertiary)] text-[12px] mt-1">Your card has not been charged.</p>
               <div className="flex gap-3 mt-5 justify-center">
-                <button onClick={onClose} className="px-6 py-3 leaf border border-ds-border text-gray-500 font-bold text-[13px] hover:bg-gray-50 transition">Close</button>
+                <button onClick={onClose} className="px-6 py-3 leaf border border-ds-border text-[var(--ds-text-secondary)] font-bold text-[13px] hover:bg-[var(--ds-surface-card-hover)] transition">Close</button>
                 {isRwanda
                   ? <button onClick={() => { setErrorMsg(""); setStep("choose"); }} className="px-6 py-3 leaf bg-rose-50 dark:bg-rose-900/20 text-rose-600 font-bold text-[13px] hover:bg-rose-100 transition">Try a different method</button>
                   : <button onClick={() => { setErrorMsg(""); setStep("form"); }} className="px-6 py-3 leaf bg-rose-50 dark:bg-rose-900/20 text-rose-600 font-bold text-[13px] hover:bg-rose-100 transition">Let&apos;s try again 💪</button>

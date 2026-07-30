@@ -119,7 +119,7 @@ export default function NimiProactiveBanner({ childId, language = "en" }: Props)
         {/* dismiss */}
         <button
           onClick={handleDismiss}
-          className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center rounded-full text-gray-400 hover:text-gray-600 hover:bg-black/5 transition"
+          className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center rounded-full text-[var(--ds-text-tertiary)] hover:text-[var(--ds-text-secondary)] hover:bg-black/5 transition"
           aria-label="Dismiss"
         >
           ×
@@ -128,8 +128,8 @@ export default function NimiProactiveBanner({ childId, language = "en" }: Props)
         <div className="flex gap-3 items-start pr-6">
           <span className="text-2xl leading-none shrink-0 mt-0.5">{emoji}</span>
           <div className="flex-1 min-w-0">
-            <p className="font-bold text-sm text-gray-800 leading-snug">{suggestion.title}</p>
-            <p className="text-xs text-gray-500 mt-0.5 leading-snug line-clamp-2">{suggestion.message}</p>
+            <p className="font-bold text-sm text-[var(--ds-text-primary)] leading-snug">{suggestion.title}</p>
+            <p className="text-xs text-[var(--ds-text-secondary)] mt-0.5 leading-snug line-clamp-2">{suggestion.message}</p>
             <Link
               href={href}
               className="inline-block mt-2 text-xs font-bold px-3 py-1 rounded-full text-white transition hover:opacity-90"

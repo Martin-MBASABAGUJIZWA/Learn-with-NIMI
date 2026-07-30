@@ -33,11 +33,11 @@ export default function ThemeFilters({ filters, onChange, className = "" }: Prop
     <div className={`flex flex-wrap items-center gap-3 ${className}`}>
       {/* Rarity filter */}
       <div className="flex items-center gap-1.5">
-        <span className="text-xs text-gray-500 font-medium shrink-0">Rarity:</span>
+        <span className="text-xs text-[var(--ds-text-secondary)] font-medium shrink-0">Rarity:</span>
         <div className="flex gap-1">
           {RARITIES.map(r => {
             const isActive = filters.rarity === r;
-            const colorCls = r === "all" ? "text-gray-600 bg-gray-100" : RARITY_COLORS[r];
+            const colorCls = r === "all" ? "text-[var(--ds-text-secondary)] bg-[var(--ds-surface-card-active)]" : RARITY_COLORS[r];
             return (
               <button
                 key={r}
@@ -47,7 +47,7 @@ export default function ThemeFilters({ filters, onChange, className = "" }: Prop
                   focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1
                   ${isActive
                     ? `${colorCls} ring-2 ring-offset-1 ring-current/30`
-                    : "text-gray-500 bg-gray-50 hover:bg-gray-100"
+                    : "text-[var(--ds-text-secondary)] bg-[var(--ds-surface-card-hover)] hover:bg-[var(--ds-surface-card-active)]"
                   }`}
               >
                 {r === "all" ? "All" : RARITY_LABELS[r]}
@@ -59,12 +59,12 @@ export default function ThemeFilters({ filters, onChange, className = "" }: Prop
 
       {/* Unlock type filter */}
       <div className="flex items-center gap-1.5">
-        <span className="text-xs text-gray-500 font-medium shrink-0">Unlock:</span>
+        <span className="text-xs text-[var(--ds-text-secondary)] font-medium shrink-0">Unlock:</span>
         <select
           value={filters.unlockType}
           onChange={e => setUnlockType(e.target.value as ThemeUnlockType | "all")}
           aria-label="Filter by unlock type"
-          className="text-xs text-gray-700 bg-white border border-gray-200 rounded-lg px-2 py-1
+          className="text-xs text-[var(--ds-text-primary)] bg-[var(--ds-surface-card)] border border-[var(--ds-border-primary)] rounded-lg px-2 py-1
                      focus:outline-none focus:ring-2 focus:ring-offset-0 cursor-pointer"
         >
           {UNLOCK_TYPES.map(ut => (

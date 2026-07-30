@@ -25,7 +25,7 @@ export default function ActivityIconRow({ className = "" }: { className?: string
             style={{ backgroundColor: color }}>
             <Icon className="w-5 h-5 text-white" strokeWidth={2.25} />
           </div>
-          <span className="font-nunito font-bold text-gray-600 text-[12px]">{label}</span>
+          <span className="font-nunito font-bold text-[var(--ds-text-secondary)] text-xs">{label}</span>
         </Link>
       ))}
     </div>

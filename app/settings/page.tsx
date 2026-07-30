@@ -19,11 +19,11 @@ export default function SettingsPage() {
         <main className="max-w-5xl mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6 pb-24 w-full">
           <div>
             <h1 className="font-baloo font-black text-2xl sm:text-3xl text-ds-text">{t("settingsTitle")}</h1>
-            <p className="text-gray-400 text-sm mt-1">{t("settingsSubtitle")}</p>
+            <p className="text-[var(--ds-text-tertiary)] text-sm mt-1">{t("settingsSubtitle")}</p>
           </div>
 
           {/* Theme Picker */}
-          <div className="mt-6 border border-white/70 bg-white/90 p-5 shadow-[0_16px_34px_rgba(15,23,42,0.08)]" style={{ borderRadius: 'var(--leaf-r-lg)' }}>
+          <div className="mt-6 border border-white/70 bg-[var(--ds-surface-card)]/90 p-5 shadow-card-2xl" style={{ borderRadius: 'var(--leaf-r-lg)' }}>
             <ThemePicker />
           </div>
 
@@ -39,7 +39,7 @@ export default function SettingsPage() {
             <SentGiftsCard />
           </div>
 
-          <p className="text-center text-gray-400 text-xs mt-6">{t("appVersionLabel")} 1.0.0</p>
+          <p className="text-center text-[var(--ds-text-tertiary)] text-xs mt-6">{t("appVersionLabel")} 1.0.0</p>
         </main>
       </PageSurface>
     </AppShell>

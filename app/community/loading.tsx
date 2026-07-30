@@ -18,7 +18,7 @@ export default function CommunityLoading() {
         {/* Creation card grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="leaf-lg overflow-hidden border border-gray-100">
+            <div key={i} className="leaf-lg overflow-hidden border border-[var(--ds-border-primary)]">
               <Bone className="w-full h-44 rounded-none" />
               <div className="p-4 space-y-2">
                 <Bone className="h-4 w-3/4" />

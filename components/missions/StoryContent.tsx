@@ -29,12 +29,12 @@ function BookSkeleton() {
   return (
     <div className="flex flex-col gap-3 animate-pulse">
       {/* toolbar row */}
-      <div className="leaf border border-emerald-100 bg-white/80 px-3 py-2.5 flex items-center gap-3">
+      <div className="leaf border border-emerald-100 bg-[var(--ds-surface-card)]/80 px-3 py-2.5 flex items-center gap-3">
         <div className="flex-1 space-y-2">
-          <div className="h-3 rounded-full bg-gray-200 w-2/3" />
-          <div className="h-1.5 rounded-full bg-gray-100 w-full" />
+          <div className="h-3 rounded-full bg-[var(--ds-surface-card-active)] w-2/3" />
+          <div className="h-1.5 rounded-full bg-[var(--ds-surface-card-hover)] w-full" />
         </div>
-        <div className="h-3 w-8 rounded-full bg-gray-200 shrink-0" />
+        <div className="h-3 w-8 rounded-full bg-[var(--ds-surface-card-active)] shrink-0" />
       </div>
       {/* page area — same 3/4 aspect ratio as MobilePageViewer */}
       <div
@@ -44,9 +44,9 @@ function BookSkeleton() {
         <div className="w-12 h-12 border-[3px] border-amber-200 border-t-amber-500 rounded-full animate-spin" />
       </div>
       {/* controls row */}
-      <div className="flex items-center justify-center gap-3 leaf border border-emerald-100 bg-white/80 py-3">
+      <div className="flex items-center justify-center gap-3 leaf border border-emerald-100 bg-[var(--ds-surface-card)]/80 py-3">
         {[48, 40, 64, 40, 48].map((s, i) => (
-          <div key={i} className="rounded-full bg-gray-200" style={{ width: s, height: s }} />
+          <div key={i} className="rounded-full bg-[var(--ds-surface-card-active)]" style={{ width: s, height: s }} />
         ))}
       </div>
     </div>
@@ -98,28 +98,28 @@ export default function StoryContent({ mission, storyPages, onComplete, complete
 
         <div className="relative z-10 mb-2 flex items-center justify-center gap-2">
           <span className="select-none text-base">📚</span>
-          <span className="rounded-full border border-amber-200 bg-amber-50 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-[0.2em] text-amber-700">
+          <span className="rounded-full border border-amber-200 bg-amber-50 px-2.5 py-0.5 text-3xs font-black uppercase tracking-[0.2em] text-amber-700">
             {t("storyTime")}
           </span>
           <span className="select-none text-base">🎧</span>
         </div>
 
-        <p className="relative z-10 font-baloo font-black text-[18px] text-ds-text">{mission.title}</p>
+        <p className="relative z-10 font-baloo font-black text-lg text-ds-text">{mission.title}</p>
         {mission.subtitle && (
-          <p className="relative z-10 mt-1 text-center text-[13px] text-gray-500">{mission.subtitle}</p>
+          <p className="relative z-10 mt-1 text-center text-sml text-[var(--ds-text-secondary)]">{mission.subtitle}</p>
         )}
       </div>
 
       {pagesLoading ? (
         <BookSkeleton />
       ) : storyPages.length === 0 ? (
-        <div className="leaf-lg border border-amber-100 bg-gradient-to-br from-amber-50/80 via-yellow-50/40 to-[#fffdf8] p-8 text-center shadow-[0_16px_34px_rgba(15,23,42,0.08)]">
+        <div className="leaf-lg border border-amber-100 bg-gradient-to-br from-amber-50/80 via-yellow-50/40 to-[#fffdf8] p-8 text-center shadow-card-2xl">
           <motion.div animate={{ y: [0, -6, 0] }} transition={{ duration: 2.5, repeat: Infinity }}
-            className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-white shadow-sm text-2xl select-none">
+            className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--ds-surface-card)] shadow-sm text-2xl select-none">
             📚
           </motion.div>
-          <p className="font-baloo font-bold text-ds-text text-[18px]">{t("noPagesTitle")}</p>
-          <p className="text-gray-500 text-[13px] mt-1">{t("noPagesHint")}</p>
+          <p className="font-baloo font-bold text-ds-text text-lg">{t("noPagesTitle")}</p>
+          <p className="text-[var(--ds-text-secondary)] text-sml mt-1">{t("noPagesHint")}</p>
         </div>
       ) : (
         <StoryBook

@@ -12,8 +12,8 @@ const AuthGate = () => {
       <div className="bg-blue-100 p-6 rounded-full">
         <Baby className="h-12 w-12 text-blue-600" />
       </div>
-      <h2 className="text-2xl font-bold text-gray-800">Parent Access Required</h2>
-      <p className="text-gray-600 max-w-md">
+      <h2 className="text-2xl font-bold text-[var(--ds-text-primary)]">Parent Access Required</h2>
+      <p className="text-[var(--ds-text-secondary)] max-w-md">
         Please sign in to view and manage your child's activities and settings.
       </p>
       <div className="flex gap-4 mt-4">

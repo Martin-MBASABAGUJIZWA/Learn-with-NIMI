@@ -23,7 +23,7 @@ export default function NimiAssistant({ mood = "happy", phrase = "" }) {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 10 }}
-      className="flex items-center gap-3 bg-white rounded-xl shadow p-3 max-w-xs"
+      className="flex items-center gap-3 bg-[var(--ds-surface-card)] rounded-xl shadow p-3 max-w-xs"
     >
       <Image
         src={src}
@@ -32,7 +32,7 @@ export default function NimiAssistant({ mood = "happy", phrase = "" }) {
         height={50}
         className="rounded-full"
       />
-      <p className="text-gray-700 font-medium">{phrase}</p>
+      <p className="text-[var(--ds-text-primary)] font-medium">{phrase}</p>
     </motion.div>
   );
 }

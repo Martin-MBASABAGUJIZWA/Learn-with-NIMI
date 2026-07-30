@@ -32,7 +32,7 @@ export default function MotivationMessage({ type }: { type: string }) {
   }, [type]);
 
   return (
-    <p className="text-lg font-medium text-gray-700" aria-live="polite">
+    <p className="text-lg font-medium text-[var(--ds-text-primary)]" aria-live="polite">
       {message}
     </p>
   );

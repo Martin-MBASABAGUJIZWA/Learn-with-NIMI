@@ -8,7 +8,7 @@ export default function VocabLoading() {
         <Bone className="h-10 w-48 mt-4" />
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
           {Array.from({ length: 12 }).map((_, i) => (
-            <div key={i} className="leaf border border-gray-100 p-4 space-y-3">
+            <div key={i} className="leaf border border-[var(--ds-border-primary)] p-4 space-y-3">
               <Bone className="w-14 h-14 rounded-2xl mx-auto" />
               <Bone className="h-5 w-3/4 mx-auto" />
               <Bone className="h-4 w-1/2 mx-auto" />

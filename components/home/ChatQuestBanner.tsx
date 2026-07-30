@@ -32,7 +32,7 @@ export default function ChatQuestBanner({ exchangeCount, target, claimed, canCla
         transition={{ duration:3.5, repeat:Infinity, ease:"easeInOut" }} />
 
       <div className="flex-1 min-w-0">
-        <p className="font-black text-ds-text text-[14px] sm:text-[16px] flex items-center gap-1.5 mb-2">
+        <p className="font-black text-ds-text text-sm sm:text-base flex items-center gap-1.5 mb-2">
           <Sparkles className="w-4 h-4 text-yellow-400 shrink-0" />
           {t("nimiChatQuestTitle")}
         </p>
@@ -40,16 +40,16 @@ export default function ChatQuestBanner({ exchangeCount, target, claimed, canCla
         <div className="flex items-center justify-between gap-3 flex-wrap">
           {/* Goal + progress dots */}
           <div className="flex-1 min-w-0">
-            <p className="text-[10px] font-black uppercase tracking-wide text-gray-400 mb-1">
+            <p className="text-3xs font-black uppercase tracking-wide text-[var(--ds-text-tertiary)] mb-1">
               {t("chatQuestGoalLabel")}
             </p>
             <div className="flex items-center gap-2">
-              <p className="text-[12px] font-bold text-ds-text truncate">{t("chatQuestGoalDesc")}</p>
+              <p className="text-xs font-bold text-ds-text truncate">{t("chatQuestGoalDesc")}</p>
               <div className="flex gap-1 shrink-0">
                 {Array.from({ length: target }).map((_, i) => (
                   <motion.div key={i}
                     className={`w-2.5 h-2.5 rounded-full transition-colors duration-300 ${
-                      i < exchangeCount ? "bg-nimi-green" : "bg-gray-200"
+                      i < exchangeCount ? "bg-nimi-green" : "bg-[var(--ds-border-primary)]"
                     }`}
                     animate={i === exchangeCount - 1 && exchangeCount <= target ? { scale:[1,1.5,1] } : {}}
                     transition={{ duration:0.4 }}
@@ -65,7 +65,7 @@ export default function ChatQuestBanner({ exchangeCount, target, claimed, canCla
               {claimed ? (
                 <motion.div key="claimed"
                   initial={{ opacity:0, scale:0.8 }} animate={{ opacity:1, scale:1 }}
-                  className="flex items-center gap-1.5 bg-emerald-50 border border-emerald-200 text-emerald-600 font-black text-[12px] px-3 py-2 rounded-2xl">
+                  className="flex items-center gap-1.5 bg-emerald-50 border border-emerald-200 text-emerald-600 font-black text-xs px-3 py-2 rounded-2xl">
                   <CheckCircle2 className="w-4 h-4" />
                   Claimed!
                 </motion.div>
@@ -74,7 +74,7 @@ export default function ChatQuestBanner({ exchangeCount, target, claimed, canCla
                   initial={{ opacity:0, scale:0.85 }} animate={{ opacity:1, scale:1 }}
                   whileTap={{ scale:0.93 }}
                   onClick={onClaim}
-                  className="flex items-center gap-1.5 text-white font-black text-[13px] px-4 py-2 rounded-2xl shadow-md"
+                  className="flex items-center gap-1.5 text-white font-black text-sml px-4 py-2 rounded-2xl shadow-md"
                   style={{ backgroundColor:"var(--nimi-green)" }}
                 >
                   <Star className="w-4 h-4 fill-yellow-300 text-yellow-300" />
@@ -86,8 +86,8 @@ export default function ChatQuestBanner({ exchangeCount, target, claimed, canCla
                   className="flex items-center gap-1.5 bg-yellow-50 border border-yellow-200 px-3 py-2 rounded-2xl">
                   <Star className="w-4 h-4 text-yellow-500 fill-yellow-500 shrink-0" />
                   <div>
-                    <p className="text-[9px] font-black uppercase tracking-wide text-yellow-600">{t("chatQuestRewardLabel")}</p>
-                    <p className="text-[13px] font-black text-yellow-700">{t("chatQuestRewardValue")}</p>
+                    <p className="text-4xs font-black uppercase tracking-wide text-yellow-600">{t("chatQuestRewardLabel")}</p>
+                    <p className="text-sml font-black text-yellow-700">{t("chatQuestRewardValue")}</p>
                   </div>
                 </motion.div>
               )}

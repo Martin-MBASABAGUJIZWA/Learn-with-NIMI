@@ -34,7 +34,7 @@ export default function ThemeCard({ meta, onPreview, onApply, onShowDetails, cla
     <article
       className={`
         group relative flex flex-col overflow-hidden cursor-pointer
-        bg-white border border-gray-100
+        bg-[var(--ds-surface-card)] border border-[var(--ds-border-primary)]
         ${cv.cardStyle.radius} ${cv.cardStyle.shadow}
         transition-all duration-300 hover:-translate-y-1 hover:shadow-lg
         focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-current/30
@@ -61,7 +61,7 @@ export default function ThemeCard({ meta, onPreview, onApply, onShowDetails, cla
         </div>
 
         {/* Rarity badge */}
-        <div className={`absolute top-2 right-2 px-2 py-0.5 rounded-full text-[10px] font-semibold ${RARITY_COLORS[meta.rarity]}`}>
+        <div className={`absolute top-2 right-2 px-2 py-0.5 rounded-full text-3xs font-semibold ${RARITY_COLORS[meta.rarity]}`}>
           {RARITY_LABELS[meta.rarity]}
         </div>
 
@@ -77,12 +77,12 @@ export default function ThemeCard({ meta, onPreview, onApply, onShowDetails, cla
       <div className="flex-1 p-3 flex flex-col gap-2">
         {/* Name + status */}
         <div className="flex items-start justify-between gap-2">
-          <h3 className="text-sm font-bold text-gray-900 leading-tight">{meta.name}</h3>
+          <h3 className="text-sm font-bold text-[var(--ds-text-primary)] leading-tight">{meta.name}</h3>
           <ThemeBadge status={status} />
         </div>
 
         {/* Description */}
-        <p className="text-xs text-gray-500 leading-relaxed line-clamp-2">{meta.description}</p>
+        <p className="text-xs text-[var(--ds-text-secondary)] leading-relaxed line-clamp-2">{meta.description}</p>
 
         {/* Unlock info for locked themes */}
         {isLocked && meta.unlockCost && (
@@ -92,7 +92,7 @@ export default function ThemeCard({ meta, onPreview, onApply, onShowDetails, cla
           </div>
         )}
         {isLocked && meta.estimatedUnlock && (
-          <div className="text-xs text-gray-400">{meta.estimatedUnlock}</div>
+          <div className="text-xs text-[var(--ds-text-tertiary)]">{meta.estimatedUnlock}</div>
         )}
 
         {/* Actions */}
@@ -103,8 +103,8 @@ export default function ThemeCard({ meta, onPreview, onApply, onShowDetails, cla
           {canPreview && (
             <button
               onClick={() => onPreview(meta)}
-              className="flex-1 py-1.5 rounded-lg text-xs font-semibold border border-gray-200
-                         text-gray-700 hover:bg-gray-50 transition-colors focus-visible:outline-none
+              className="flex-1 py-1.5 rounded-lg text-xs font-semibold border border-[var(--ds-border-primary)]
+                         text-[var(--ds-text-primary)] hover:bg-[var(--ds-surface-card-hover)] transition-colors focus-visible:outline-none
                          focus-visible:ring-2 focus-visible:ring-offset-1"
             >
               Preview
@@ -132,7 +132,7 @@ export default function ThemeCard({ meta, onPreview, onApply, onShowDetails, cla
           {isLocked && (
             <button
               disabled
-              className="flex-1 py-1.5 rounded-lg text-xs font-semibold text-gray-400 bg-gray-100 cursor-not-allowed"
+              className="flex-1 py-1.5 rounded-lg text-xs font-semibold text-[var(--ds-text-tertiary)] bg-[var(--ds-surface-card-active)] cursor-not-allowed"
             >
               {status === "coming_soon" ? "Coming Soon" : "Unlock"}
             </button>

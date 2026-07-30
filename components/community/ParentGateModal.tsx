@@ -23,10 +23,10 @@ export default function ParentGateModal({ isOpen, onConfirm, onCancel, childName
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
             transition={{ type: "spring", stiffness: 300, damping: 25 }}
-            className="relative z-10 bg-white border border-ds-border shadow-2xl leaf p-6 max-w-sm w-full text-center"
+            className="relative z-10 bg-[var(--ds-surface-card)] border border-ds-border shadow-2xl leaf p-6 max-w-sm w-full text-center"
           >
             <button onClick={onCancel}
-              className="absolute top-3 right-3 w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center text-gray-500 transition">
+              className="absolute top-3 right-3 w-8 h-8 bg-[var(--ds-surface-card-hover)] hover:bg-[var(--ds-surface-card-active)] rounded-full flex items-center justify-center text-[var(--ds-text-secondary)] transition">
               <X className="w-4 h-4" />
             </button>
 
@@ -35,17 +35,17 @@ export default function ParentGateModal({ isOpen, onConfirm, onCancel, childName
             </div>
 
             <h2 className="font-black text-ds-text text-lg">Parent Confirmation</h2>
-            <p className="text-gray-500 text-[13px] mt-2 leading-relaxed">
+            <p className="text-[var(--ds-text-secondary)] text-sml mt-2 leading-relaxed">
               Share {childName}&apos;s {shareType} to the Nimi Community? This will be visible to other families.
             </p>
 
             <div className="flex gap-3 mt-5">
               <button onClick={onCancel}
-                className="flex-1 bg-gray-50 hover:bg-gray-100 border border-ds-border text-gray-600 font-black rounded-full py-3 text-[13px] transition">
+                className="flex-1 bg-[var(--ds-surface-card)] hover:bg-[var(--ds-surface-card-hover)] border border-ds-border text-[var(--ds-text-secondary)] font-black rounded-full py-3 text-sml transition">
                 Cancel
               </button>
               <button onClick={onConfirm}
-                className="flex-1 bg-cta-gradient text-white font-black rounded-full py-3 text-[13px] shadow-lg shadow-ds-cta transition">
+                className="flex-1 bg-cta-gradient text-white font-black rounded-full py-3 text-sml shadow-lg shadow-ds-cta transition">
                 ✅ Yes, Share
               </button>
             </div>

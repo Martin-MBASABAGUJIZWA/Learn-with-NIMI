@@ -10,7 +10,7 @@ function cn(...classes: (string | undefined | null | false)[]): string {
 
 // ─── PageSurface ──────────────────────────────────────────────────────────
 // Theme-aware page body wrapper. Replaces every
-//   <div className="min-h-screen bg-gray-50 flex flex-col">
+//   <div className="min-h-screen bg-[var(--ds-surface-card)] flex flex-col">
 // pattern so page files never reference a background color directly.
 
 interface PageSurfaceProps {
@@ -61,7 +61,7 @@ export function HeroBanner({ zone, children, className, direction = "br" }: Hero
 
 // ─── ContentSurface ───────────────────────────────────────────────────────
 // Theme-aware card surface. Replaces
-//   <div className="bg-white border border-ds-border rounded-2xl shadow-ds-card">
+//   <div className="bg-[var(--ds-surface-card)] border border-ds-border rounded-2xl shadow-ds-card">
 // so card surfaces adopt the active theme's card style automatically.
 
 interface ContentSurfaceProps {
@@ -73,7 +73,7 @@ export function ContentSurface({ children, className }: ContentSurfaceProps) {
   const { themeId } = useAppTheme();
   const v = getComponentVariant(themeId);
   return (
-    <div className={cn("bg-white/90 backdrop-blur-sm", v.cardStyle.border, "leaf", "shadow-[0_16px_34px_rgba(15,23,42,0.08)]", className)}>
+    <div className={cn("bg-[var(--ds-surface-card)]/90 backdrop-blur-sm", v.cardStyle.border, "leaf", "shadow-card-2xl", className)}>
       {children}
     </div>
   );

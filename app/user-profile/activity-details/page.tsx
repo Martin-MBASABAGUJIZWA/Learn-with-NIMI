@@ -45,15 +45,15 @@ export default function ActivityDetailsPage() {
           <div className="flex items-start sm:items-center justify-between gap-3 flex-wrap">
             <div>
               <h1 className="font-black text-2xl sm:text-3xl text-ds-text">{t("activityDetailsTitle")}</h1>
-              <p className="text-gray-500 text-sm mt-1">{t("activityDetailsSubtitle")}</p>
+              <p className="text-[var(--ds-text-secondary)] text-sm mt-1">{t("activityDetailsSubtitle")}</p>
             </div>
-            <div className="inline-flex bg-white border border-ds-border rounded-full p-1 gap-1 shrink-0">
+            <div className="inline-flex bg-[var(--ds-surface-card)] border border-ds-border rounded-full p-1 gap-1 shrink-0">
               {(["week", "all"] as const).map(r => (
                 <button
                   key={r}
                   onClick={() => setRange(r)}
                   className={`px-4 py-1.5 rounded-full text-xs font-black transition-colors ${
-                    range === r ? "bg-gray-100 text-ds-text shadow-sm" : "text-gray-500 hover:text-ds-text"
+                    range === r ? "bg-[var(--ds-surface-card-active)] text-ds-text shadow-sm" : "text-[var(--ds-text-secondary)] hover:text-ds-text"
                   }`}
                 >
                   {r === "week" ? t("weeklyRangeThisWeek") : t("weeklyRangeAllTime")}
@@ -66,12 +66,12 @@ export default function ActivityDetailsPage() {
             {loading ? (
               <div className="space-y-3 animate-pulse">
                 {Array.from({ length: 7 }).map((_, i) => (
-                  <div key={i} className="h-16 bg-gray-100 rounded-2xl w-full" />
+                  <div key={i} className="h-16 bg-[var(--ds-surface-card-active)] rounded-2xl w-full" />
                 ))}
               </div>
             ) : error ? (
               <div className="flex flex-col items-center gap-3 py-16 text-center">
-                <p className="text-gray-500 text-sm">Couldn&apos;t load your activity. Check your connection and try again.</p>
+                <p className="text-[var(--ds-text-secondary)] text-sm">Couldn&apos;t load your activity. Check your connection and try again.</p>
                 <button
                   onClick={load}
                   className="px-5 py-2 rounded-full bg-ds-accent text-white text-sm font-black"

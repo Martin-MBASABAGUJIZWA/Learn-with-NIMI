@@ -141,7 +141,7 @@ function EarnedAchievementsCard({
 
   return (
     <div className="bg-ds-card border border-ds-border shadow-ds-card p-5" style={{ borderRadius: "var(--leaf-r)" }}>
-      <h2 className="font-baloo font-black text-ds-text text-[17px] mb-4">
+      <h2 className="font-baloo font-black text-ds-text text-mlg mb-4">
         🏆 {t("myAchievementsTitle")}
       </h2>
 
@@ -164,13 +164,13 @@ function EarnedAchievementsCard({
               </motion.div>
             ))}
           </div>
-          <p className="font-baloo font-black text-ds-text text-[14px]">No achievements yet</p>
-          <p className="text-ds-muted text-[11px] font-semibold max-w-[200px] leading-snug">
+          <p className="font-baloo font-black text-ds-text text-sm">No achievements yet</p>
+          <p className="text-ds-muted text-2xs font-semibold max-w-[200px] leading-snug">
             Complete stories to earn badges and certificates!
           </p>
           <Link
             href="/stories"
-            className="mt-1 inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-white font-baloo font-black text-[12px] transition hover:-translate-y-0.5"
+            className="mt-1 inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-white font-baloo font-black text-xs transition hover:-translate-y-0.5"
             style={{ background: "var(--ds-brand-primary)" }}
           >
             📖 Read a Story →
@@ -180,7 +180,7 @@ function EarnedAchievementsCard({
 
       {earnedSlugs.length > 0 && (
         <div className="mb-4">
-          <p className="text-ds-muted font-bold text-[11px] uppercase tracking-wider mb-3">
+          <p className="text-ds-muted font-bold text-2xs uppercase tracking-wider mb-3">
             {t("badgesLabel")} · {earnedSlugs.length}
           </p>
           <div className="flex flex-wrap gap-3">
@@ -200,7 +200,7 @@ function EarnedAchievementsCard({
                   <div className="w-14 h-14 rounded-full ring-2 ring-amber-400 shadow-[0_4px_14px_rgba(251,191,36,0.35)] flex items-center justify-center overflow-hidden bg-gradient-to-b from-amber-400/20 to-yellow-500/10">
                     <BadgeImg slug={slug} emoji={meta?.emoji ?? "🏅"} imageUrl={imageUrl} />
                   </div>
-                  <p className="font-nunito font-bold text-[10px] leading-tight text-ds-text">{label}</p>
+                  <p className="font-nunito font-bold text-3xs leading-tight text-ds-text">{label}</p>
                 </motion.div>
               );
             })}
@@ -209,13 +209,13 @@ function EarnedAchievementsCard({
       )}
 
       {downloadError && (
-        <p className="text-red-500 text-[11px] font-semibold text-center mt-2 mb-1">{downloadError}</p>
+        <p className="text-red-500 text-2xs font-semibold text-center mt-2 mb-1">{downloadError}</p>
       )}
 
       {certificates.length > 0 && (
         <div>
           {earnedSlugs.length > 0 && <div className="border-t border-ds-border my-3" />}
-          <p className="text-ds-muted font-bold text-[11px] uppercase tracking-wider mb-3">
+          <p className="text-ds-muted font-bold text-2xs uppercase tracking-wider mb-3">
             {t("certificatesLabel")} · {certificates.length}
           </p>
           <div className="space-y-2">
@@ -231,16 +231,16 @@ function EarnedAchievementsCard({
                 >
                   {/* Certificate mini-thumbnail */}
                   <div className="w-10 h-12 rounded-lg bg-gradient-to-b from-amber-300 to-amber-500 flex flex-col items-center justify-center gap-0.5 shrink-0 shadow-sm overflow-hidden border border-amber-400/40">
-                    <span className="text-white text-[18px] leading-none">🎓</span>
-                    <div className="w-6 h-px bg-white/60" />
-                    <div className="w-5 h-px bg-white/40" />
-                    <div className="w-4 h-px bg-white/30" />
+                    <span className="text-white text-lg leading-none">🎓</span>
+                    <div className="w-6 h-px bg-[var(--ds-surface-card)]/60" />
+                    <div className="w-5 h-px bg-[var(--ds-surface-card)]/40" />
+                    <div className="w-4 h-px bg-[var(--ds-surface-card)]/30" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-nunito font-black text-ds-text text-[13px] leading-tight truncate">
+                    <p className="font-nunito font-black text-ds-text text-sml leading-tight truncate">
                       {certLabelFromSlug(cert.slug)}
                     </p>
-                    <p className="text-ds-muted text-[10px] font-medium mt-0.5">
+                    <p className="text-ds-muted text-3xs font-medium mt-0.5">
                       {cert.earned_at ? new Date(cert.earned_at).toLocaleDateString() : ""}
                       {cert.language && <span className="ml-1.5 uppercase">{cert.language}</span>}
                     </p>
@@ -251,7 +251,7 @@ function EarnedAchievementsCard({
                     whileTap={{ scale: 0.93 }}
                     onClick={() => void downloadCert(cert)}
                     disabled={isDownloading}
-                    className={`flex items-center gap-1.5 text-[11px] font-black px-2.5 py-1.5 rounded-xl shrink-0 transition ${
+                    className={`flex items-center gap-1.5 text-2xs font-black px-2.5 py-1.5 rounded-xl shrink-0 transition ${
                       hasSubscription
                         ? "bg-amber-100 text-amber-700 hover:bg-amber-200"
                         : "bg-violet-100 text-violet-700 hover:bg-violet-200"
@@ -424,14 +424,14 @@ export default function UserProfileClient({ initialChildren, initialHasSubscript
     return (
       <AppShell>
         <div className="max-w-lg mx-auto w-full pb-24 px-4 space-y-4 pt-2">
-          <div className="rounded-3xl border border-gray-100 p-5 flex items-center gap-4">
+          <div className="leaf-lg border border-[var(--ds-border-primary)] p-5 flex items-center gap-4">
             <Bone className="w-16 h-16 rounded-full shrink-0" />
             <div className="flex-1 space-y-2">
               <Bone className="h-5 w-36" />
               <Bone className="h-3 w-24" />
             </div>
           </div>
-          <div className="rounded-3xl border border-gray-100 p-5 grid grid-cols-4 gap-3">
+          <div className="leaf-lg border border-[var(--ds-border-primary)] p-5 grid grid-cols-4 gap-3">
             {Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="text-center space-y-2">
                 <Bone className="h-7 w-12 mx-auto" />
@@ -442,7 +442,7 @@ export default function UserProfileClient({ initialChildren, initialHasSubscript
           <div className="flex gap-2">
             {Array.from({ length: 4 }).map((_, i) => <Bone key={i} className="h-9 flex-1 rounded-full" />)}
           </div>
-          <div className="rounded-3xl border border-gray-100 p-5 space-y-3">
+          <div className="leaf-lg border border-[var(--ds-border-primary)] p-5 space-y-3">
             <div className="flex items-center gap-4">
               <Bone className="w-[72px] h-[72px] rounded-full shrink-0" />
               <div className="flex-1 space-y-2">
@@ -462,7 +462,7 @@ export default function UserProfileClient({ initialChildren, initialHasSubscript
             <Bone className="h-28 rounded-3xl" />
             <Bone className="h-28 rounded-3xl" />
           </div>
-          <div className="rounded-3xl border border-gray-100 p-5 space-y-3">
+          <div className="leaf-lg border border-[var(--ds-border-primary)] p-5 space-y-3">
             <Bone className="h-4 w-28" />
             <Bone className="h-2 w-full rounded-full" />
             <div className="grid grid-cols-5 gap-3">

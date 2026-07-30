@@ -71,7 +71,7 @@ export default function CertificatePanel({ completedSteps, level }: Props) {
     return (
       <>
         {/* In-Progress card */}
-        <div className="relative bg-white border border-ds-border shadow-ds-card overflow-hidden" style={{ borderRadius: 'var(--leaf-r-lg)' }}>
+        <div className="relative bg-[var(--ds-surface-card)] border border-ds-border shadow-ds-card overflow-hidden" style={{ borderRadius: 'var(--leaf-r-lg)' }}>
           {/* World certificate frame texture */}
           <Image src={assets.rewards.certificateFrame} alt="" aria-hidden="true"
             fill className="object-fill pointer-events-none opacity-[0.06]" />
@@ -92,18 +92,18 @@ export default function CertificatePanel({ completedSteps, level }: Props) {
             </div>
 
             <div className="px-5 pt-5 pb-4 text-center">
-              <p className="font-bold text-gray-900 text-base leading-tight">{t("keepGoingLabel")}</p>
-              <p className="text-gray-500 text-sm mt-0.5 mb-4">
+              <p className="font-bold text-[var(--ds-text-primary)] text-base leading-tight">{t("keepGoingLabel")}</p>
+              <p className="text-[var(--ds-text-secondary)] text-sm mt-0.5 mb-4">
                 {t("completeLevelStepsLabel").replace("{steps}", String(TOTAL_STEPS)).replace("{level}", String(level))}
               </p>
 
               {/* Progress bar */}
               <div className="mb-3">
-                <div className="flex justify-between text-[10px] font-bold text-gray-500 mb-1">
+                <div className="flex justify-between text-3xs font-bold text-[var(--ds-text-secondary)] mb-1">
                   <span>{t("storyCertProgress")}</span>
                   <span>{done}/{TOTAL_STEPS} steps</span>
                 </div>
-                <div className="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
+                <div className="w-full bg-[var(--ds-surface-card-active)] rounded-full h-3 overflow-hidden">
                   <motion.div
                     className={`bg-gradient-to-r ${assets.storyCard.progressFill} h-full rounded-full`}
                     initial={{ width: 0 }}
@@ -120,7 +120,7 @@ export default function CertificatePanel({ completedSteps, level }: Props) {
                     <Link key={item.step} href={item.href}>
                       <div className="relative">
                         <div className={`w-9 h-9 rounded-full flex items-center justify-center text-lg shadow-sm border-2 transition-all ${
-                          isComplete ? `${item.bg} border-transparent` : "bg-gray-100 border-gray-200 grayscale opacity-50"
+                          isComplete ? `${item.bg} border-transparent` : "bg-[var(--ds-surface-card-active)] border-[var(--ds-border-primary)] grayscale opacity-50"
                         }`}>
                           {item.icon}
                         </div>
@@ -140,7 +140,7 @@ export default function CertificatePanel({ completedSteps, level }: Props) {
                 <div className="text-center">
                   <Image src={assets.nimiCircle} alt="NIMI" width={60} height={60}
                     className="rounded-full object-cover mx-auto border-4 border-yellow-200 shadow-xl" />
-                  <p className="text-[10px] mt-1.5 text-gray-500 leading-tight">
+                  <p className="text-3xs mt-1.5 text-[var(--ds-text-secondary)] leading-tight">
                     Cheer: <span className="font-black italic text-ds-text">Nimi</span>
                   </p>
                 </div>
@@ -155,7 +155,7 @@ export default function CertificatePanel({ completedSteps, level }: Props) {
                 <div className="text-center">
                   <Image src={assets.pikoCircle} alt="PIKO" width={60} height={60}
                     className="rounded-full object-cover mx-auto border-4 border-blue-200 shadow-xl" />
-                  <p className="text-[10px] mt-1.5 text-gray-500 leading-tight">
+                  <p className="text-3xs mt-1.5 text-[var(--ds-text-secondary)] leading-tight">
                     Cheer: <span className="font-black italic text-ds-text">Piko</span>
                   </p>
                 </div>
@@ -180,7 +180,7 @@ export default function CertificatePanel({ completedSteps, level }: Props) {
   return (
     <>
       {/* STORY COMPLETE card */}
-      <div className="relative bg-white border border-ds-border shadow-ds-card overflow-hidden" style={{ borderRadius: 'var(--leaf-r-lg)' }}>
+      <div className="relative bg-[var(--ds-surface-card)] border border-ds-border shadow-ds-card overflow-hidden" style={{ borderRadius: 'var(--leaf-r-lg)' }}>
         {/* World certificate frame texture */}
         <Image src={assets.rewards.certificateFrame} alt="" aria-hidden="true" fill
           className="object-fill pointer-events-none opacity-[0.07]" />
@@ -207,8 +207,8 @@ export default function CertificatePanel({ completedSteps, level }: Props) {
           </div>
 
           <div className="px-5 pt-5 pb-4 text-center">
-            <p className="font-bold text-gray-900 text-base leading-tight">{t("congratulationsLabel")}</p>
-            <p className="text-gray-500 text-sm mt-0.5">{t("youEarnedYourLabel")}</p>
+            <p className="font-bold text-[var(--ds-text-primary)] text-base leading-tight">{t("congratulationsLabel")}</p>
+            <p className="text-[var(--ds-text-secondary)] text-sm mt-0.5">{t("youEarnedYourLabel")}</p>
 
             <div className="my-3 relative">
               <span className="absolute -top-1 left-3 text-yellow-400 text-lg">★</span>
@@ -220,9 +220,9 @@ export default function CertificatePanel({ completedSteps, level }: Props) {
             </div>
 
             <div className="flex items-center gap-2 mb-4">
-              <div className="flex-1 h-px bg-gray-200" />
+              <div className="flex-1 h-px bg-[var(--ds-border-primary)]" />
               <span className="text-yellow-400 text-sm">✦</span>
-              <div className="flex-1 h-px bg-gray-200" />
+              <div className="flex-1 h-px bg-[var(--ds-border-primary)]" />
             </div>
 
             <div className="flex flex-wrap justify-center gap-2 mb-5">
@@ -242,7 +242,7 @@ export default function CertificatePanel({ completedSteps, level }: Props) {
               <div className="text-center">
                 <Image src={assets.nimiCircle} alt="NIMI" width={72} height={72}
                   className="rounded-full object-cover mx-auto border-4 border-yellow-300 shadow-xl" />
-                <p className="text-[11px] mt-2 text-gray-500 leading-tight">
+                <p className="text-2xs mt-2 text-[var(--ds-text-secondary)] leading-tight">
                   {t("signedByLabel").replace("{name}", "Nimi")}
                 </p>
               </div>
@@ -261,7 +261,7 @@ export default function CertificatePanel({ completedSteps, level }: Props) {
               <div className="text-center">
                 <Image src={assets.pikoCircle} alt="PIKO" width={72} height={72}
                   className="rounded-full object-cover mx-auto border-4 border-blue-300 shadow-xl" />
-                <p className="text-[11px] mt-2 text-gray-500 leading-tight">
+                <p className="text-2xs mt-2 text-[var(--ds-text-secondary)] leading-tight">
                   {t("signedByLabel").replace("{name}", "Piko")}
                 </p>
               </div>
@@ -271,16 +271,16 @@ export default function CertificatePanel({ completedSteps, level }: Props) {
       </div>
 
       {/* Download / Share card */}
-      <div className="bg-white border border-ds-border shadow-sm p-4" style={{ borderRadius: 'var(--leaf-r-lg)' }}>
-        <h3 className="font-black text-ds-text text-[11px] uppercase mb-3 text-center tracking-widest">
+      <div className="bg-[var(--ds-surface-card)] border border-ds-border shadow-sm p-4" style={{ borderRadius: 'var(--leaf-r-lg)' }}>
+        <h3 className="font-black text-ds-text text-2xs uppercase mb-3 text-center tracking-widest">
           {t("downloadShareCertTitle")}
         </h3>
         <div className="flex flex-col sm:flex-row gap-3 mb-3 sm:items-center">
           <div className="flex-shrink-0 w-full sm:w-[110px] bg-gradient-to-br from-yellow-50 to-purple-50 border-4 border-double border-yellow-400 leaf p-2 text-center shadow-sm">
-            <p className="text-[9px] sm:text-[7px] font-black text-gray-500 uppercase leading-tight">
+            <p className="text-4xs sm:text-6xs font-black text-[var(--ds-text-secondary)] uppercase leading-tight">
               🌟 {t("levelCertificateLabel").replace("{level}", String(level))}
             </p>
-            <p className="text-[9px] sm:text-[7px] text-gray-500 mt-0.5 leading-tight">
+            <p className="text-4xs sm:text-6xs text-[var(--ds-text-secondary)] mt-0.5 leading-tight">
               {t("levelCompleteLabel").replace("{level}", String(level))}
             </p>
             <div className="flex justify-center gap-1 mt-2 items-center">
@@ -289,7 +289,7 @@ export default function CertificatePanel({ completedSteps, level }: Props) {
               <Image src={assets.pikoCircle} alt="PIKO" width={28} height={28} className="rounded-full object-cover border border-blue-300" />
             </div>
           </div>
-          <p className="text-[11px] text-gray-500 leading-relaxed flex-1 min-w-0">
+          <p className="text-2xs text-[var(--ds-text-secondary)] leading-relaxed flex-1 min-w-0">
             {t("shareAchievementText")}
           </p>
         </div>

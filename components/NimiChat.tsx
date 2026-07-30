@@ -124,7 +124,7 @@ export default function NimiChat({
       {/* Chat Log */}
       <div
         ref={chatRef}
-        className="w-full max-w-xl h-64 overflow-y-auto p-4 bg-white leaf shadow-inner text-lg font-semibold space-y-2"
+        className="w-full max-w-xl h-64 overflow-y-auto p-4 bg-[var(--ds-surface-card)] leaf shadow-inner text-lg font-semibold space-y-2"
       >
         {chatLog.map((line, i) => (
           <div key={i} className="whitespace-pre-wrap">{line}</div>
@@ -147,7 +147,7 @@ export default function NimiChat({
         </button>
         <button
           onClick={handleVoiceInput}
-          className={`p-2 rounded-full ${isListening ? "bg-[var(--nimi-green)]" : "bg-gray-300"}`}
+          className={`p-2 rounded-full ${isListening ? "bg-[var(--nimi-green)]" : "bg-[var(--ds-surface-input)]"}`}
         >
           <Mic />
         </button>

@@ -31,16 +31,16 @@ export default function ThemeHeader({ resultCount, className = "" }: Props) {
         >
           <div className="flex items-center gap-2">
             <span>{previewMeta.accentIcon}</span>
-            <span className="font-medium text-gray-800">
+            <span className="font-medium text-[var(--ds-text-primary)]">
               Previewing <strong>{previewMeta.name}</strong>
             </span>
-            <span className="text-gray-500">— navigate the app to see changes</span>
+            <span className="text-[var(--ds-text-secondary)]">— navigate the app to see changes</span>
           </div>
           <div className="flex gap-2 flex-shrink-0">
             <button
               onClick={cancelPreview}
-              className="px-3 py-1 rounded-lg text-xs font-semibold text-gray-600 border border-gray-200
-                         hover:bg-white transition-colors focus-visible:outline-none focus-visible:ring-2"
+              className="px-3 py-1 rounded-lg text-xs font-semibold text-[var(--ds-text-secondary)] border border-[var(--ds-border-primary)]
+                         hover:bg-[var(--ds-surface-card)] transition-colors focus-visible:outline-none focus-visible:ring-2"
             >
               Cancel
             </button>
@@ -59,14 +59,14 @@ export default function ThemeHeader({ resultCount, className = "" }: Props) {
       {/* Page title */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[var(--ds-text-primary)] tracking-tight">
             Theme Gallery
           </h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-sm text-[var(--ds-text-secondary)]">
             {resultCount} theme{resultCount !== 1 ? "s" : ""} available
             {currentMeta && (
-              <span className="ml-1 text-gray-400">
-                · Active: <span className="font-medium text-gray-600">{currentMeta.name}</span>
+              <span className="ml-1 text-[var(--ds-text-tertiary)]">
+                · Active: <span className="font-medium text-[var(--ds-text-secondary)]">{currentMeta.name}</span>
               </span>
             )}
           </p>

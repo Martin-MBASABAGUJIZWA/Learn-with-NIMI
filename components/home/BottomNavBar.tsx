@@ -59,7 +59,7 @@ export default function BottomNavBar() {
         <div className="absolute left-1/2 -translate-x-1/2 -top-7 z-20">
           <Link href="/talk-to-nimi" aria-label="Talk to Nimi">
             <div className={`w-[64px] h-[64px] rounded-full p-[3px] ${cv.navigationStyle.fabGradient} ${cv.navigationStyle.fabShadow} active:scale-90 transition-transform duration-100`}>
-              <div className="w-full h-full rounded-full bg-white flex items-center justify-center border-2 border-ds-border">
+              <div className="w-full h-full rounded-full bg-[var(--ds-surface-card)] flex items-center justify-center border-2 border-ds-border">
                 <Image src={assets.nimiCircle} alt="" aria-hidden="true" width={40} height={40} className="rounded-full object-cover" />
               </div>
             </div>
@@ -114,7 +114,7 @@ export default function BottomNavBar() {
 
                   {/* Label */}
                   <span
-                    className={`text-[8px] font-black uppercase tracking-[0.05em] leading-none transition-colors duration-200 ${
+                    className={`text-5xs font-black uppercase tracking-[0.05em] leading-none transition-colors duration-200 ${
                       active
                         ? cv.navigationStyle.activeIconColor
                         : cv.navigationStyle.inactiveIconColor

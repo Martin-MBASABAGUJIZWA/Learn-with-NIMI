@@ -104,8 +104,8 @@ export default function CertificatesPage() {
               <Image src={assets.nimiCircle} alt="NIMI" width={112} height={112} className="rounded-full object-cover border-4 border-yellow-400 shadow-xl" />
               <span className="absolute -bottom-1 -right-1 text-3xl">🏆</span>
             </div>
-            <div className="bg-white border border-ds-border rounded-2xl rounded-tl-none px-5 py-3 shadow-ds-card">
-              <p className="font-baloo font-black text-ds-text text-[16px] leading-snug">{t("noChildrenCertMsg")}</p>
+            <div className="bg-[var(--ds-surface-card)] border border-ds-border rounded-2xl rounded-tl-none px-5 py-3 shadow-ds-card">
+              <p className="font-baloo font-black text-ds-text text-base leading-snug">{t("noChildrenCertMsg")}</p>
             </div>
             <Link href="/home" className="text-white font-baloo font-black px-8 py-3 shadow-md transition hover:-translate-y-0.5 active:scale-95" style={{ backgroundColor: 'var(--nimi-green)', borderRadius: 'var(--leaf-r)' }}>
               🏠 {t("goHomeBtn")}
@@ -125,9 +125,9 @@ export default function CertificatesPage() {
               <Image src={assets.nimiCircle} alt="NIMI" width={112} height={112} className="rounded-full object-cover border-4 border-yellow-400 shadow-xl" />
               <span className="absolute -bottom-1 -right-1 text-3xl">😵</span>
             </div>
-            <div className="bg-white border border-ds-border rounded-2xl rounded-tl-none px-5 py-3 shadow-ds-card">
-              <p className="font-baloo font-black text-ds-text text-[16px] leading-snug">{t("missionLoadErrorTitle")}</p>
-              <p className="text-gray-500 text-sm mt-1">{t("missionLoadErrorHint")}</p>
+            <div className="bg-[var(--ds-surface-card)] border border-ds-border rounded-2xl rounded-tl-none px-5 py-3 shadow-ds-card">
+              <p className="font-baloo font-black text-ds-text text-base leading-snug">{t("missionLoadErrorTitle")}</p>
+              <p className="text-[var(--ds-text-secondary)] text-sm mt-1">{t("missionLoadErrorHint")}</p>
             </div>
             <button
               onClick={() => setReloadKey(k => k + 1)}

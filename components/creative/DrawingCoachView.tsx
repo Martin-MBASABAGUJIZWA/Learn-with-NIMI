@@ -132,10 +132,10 @@ export default function DrawingCoachView({
 
       {/* Header */}
       <div>
-        <p className="font-black text-[20px]" style={{ color: "var(--ds-text-primary,#111827)" }}>
+        <p className="font-black text-xl" style={{ color: "var(--ds-text-primary)" }}>
           ✏️ Drawing Coach
         </p>
-        <p className="text-[12px] font-nunito" style={{ color: "#6B7280" }}>
+        <p className="text-xs font-nunito" style={{ color: "var(--ds-text-secondary)" }}>
           Follow the steps and draw something amazing!
         </p>
       </div>
@@ -145,7 +145,7 @@ export default function DrawingCoachView({
         {/* ── CHOOSE ── */}
         {(step === "choose" || step === "loading") && (
           <motion.div key="choose" initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0 }}>
-            <p className="font-bold text-[13px] mb-3" style={{ color: "#374151" }}>
+            <p className="font-bold text-sml mb-3" style={{ color: "var(--ds-text-primary)" }}>
               What would you like to draw today?
             </p>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
@@ -154,13 +154,13 @@ export default function DrawingCoachView({
                   whileTap={{ scale: 0.95 }}
                   disabled={step === "loading"}
                   onClick={() => void handleChoose(sub.id)}
-                  className="flex flex-col items-center gap-2 p-3.5 rounded-2xl border-2 hover:border-green-400 transition-colors bg-white shadow-sm disabled:opacity-50"
+                  className="flex flex-col items-center gap-2 p-3.5 rounded-2xl border-2 hover:border-green-400 transition-colors bg-[var(--ds-surface-card)] shadow-sm disabled:opacity-50"
                   style={{
-                    borderColor: subjectId === sub.id ? G : "#E5E7EB",
+                    borderColor: subjectId === sub.id ? G : "var(--ds-border-primary)",
                     background:  subjectId === sub.id ? "#F0FDF4" : "white",
                   }}>
                   <span className="text-3xl">{sub.emoji}</span>
-                  <p className="font-baloo font-black text-[11px] text-center leading-tight" style={{ color: "#111827" }}>
+                  <p className="font-baloo font-black text-2xs text-center leading-tight" style={{ color: "var(--ds-text-primary)" }}>
                     {sub.label}
                   </p>
                 </motion.button>
@@ -170,10 +170,10 @@ export default function DrawingCoachView({
               <div className="flex items-center justify-center gap-3 mt-6">
                 <div className="w-8 h-8 rounded-full border-4 border-t-transparent animate-spin"
                   style={{ borderColor: `${G} transparent transparent transparent` }} />
-                <p className="font-bold text-[13px]" style={{ color: G }}>Getting your drawing steps…</p>
+                <p className="font-bold text-sml" style={{ color: G }}>Getting your drawing steps…</p>
               </div>
             )}
-            {error && <p className="text-[12px] font-bold text-red-500 mt-3">{error}</p>}
+            {error && <p className="text-xs font-bold text-red-500 mt-3">{error}</p>}
           </motion.div>
         )}
 
@@ -185,12 +185,12 @@ export default function DrawingCoachView({
             {/* Back + title */}
             <div className="flex items-center gap-3">
               <button onClick={handleReset}
-                className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 transition text-[16px]">
+                className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[var(--ds-surface-card-hover)] transition text-base">
                 ←
               </button>
               <div>
-                <p className="font-black text-[15px]" style={{ color: "#111827" }}>{lesson.title}</p>
-                <p className="text-[11px] font-nunito" style={{ color: "#6B7280" }}>{lesson.intro}</p>
+                <p className="font-black text-mbase" style={{ color: "var(--ds-text-primary)" }}>{lesson.title}</p>
+                <p className="text-2xs font-nunito" style={{ color: "var(--ds-text-secondary)" }}>{lesson.intro}</p>
               </div>
             </div>
 
@@ -201,11 +201,11 @@ export default function DrawingCoachView({
                   className="h-2 rounded-full transition-all duration-300"
                   style={{
                     width:      i === curStep ? 24 : 8,
-                    background: i < curStep ? G : i === curStep ? G : "#E5E7EB",
+                    background: i < curStep ? G : i === curStep ? G : "var(--ds-border-primary)",
                     opacity:    i > curStep ? 0.4 : 1,
                   }} />
               ))}
-              <span className="ml-1 font-bold text-[11px]" style={{ color: "#6B7280" }}>
+              <span className="ml-1 font-bold text-2xs" style={{ color: "var(--ds-text-secondary)" }}>
                 {curStep + 1}/{lesson.steps.length}
               </span>
             </div>
@@ -215,16 +215,16 @@ export default function DrawingCoachView({
               <motion.div key={curStep}
                 initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -30 }} transition={{ duration: 0.25 }}
-                className="p-6 rounded-3xl text-center"
+                className="p-6 leaf-lg text-center"
                 style={{ background: G }}>
-                <p className="text-[60px] mb-3 leading-none select-none">{currentStepData.shape_hint}</p>
-                <p className="font-black text-white text-[11px] uppercase tracking-widest mb-2">
+                <p className="text-6xl mb-3 leading-none select-none">{currentStepData.shape_hint}</p>
+                <p className="font-black text-white text-2xs uppercase tracking-widest mb-2">
                   Step {currentStepData.step}
                 </p>
-                <p className="font-baloo font-black text-white text-[19px] sm:text-[22px] leading-snug mb-3">
+                <p className="font-baloo font-black text-white text-xl sm:text-1.5xl leading-snug mb-3">
                   {currentStepData.instruction}
                 </p>
-                <p className="text-green-200 text-[12px] font-nunito italic">
+                <p className="text-green-200 text-xs font-nunito italic">
                   💡 {currentStepData.tip}
                 </p>
               </motion.div>
@@ -234,20 +234,20 @@ export default function DrawingCoachView({
             <div className="flex gap-3">
               {curStep > 0 && (
                 <button onClick={() => setCurStep(n => n - 1)}
-                  className="px-5 py-2.5 rounded-2xl font-black text-[13px] border hover:bg-gray-50 transition"
-                  style={{ borderColor: "#E5E7EB", color: "#6B7280" }}>
+                  className="px-5 py-2.5 rounded-2xl font-black text-sml border hover:bg-[var(--ds-surface-card)] transition"
+                  style={{ borderColor: "var(--ds-border-primary)", color: "var(--ds-text-secondary)" }}>
                   ← Back
                 </button>
               )}
               {!isLastStep ? (
                 <button onClick={() => setCurStep(n => n + 1)}
-                  className="flex-1 py-2.5 rounded-2xl font-black text-[14px] text-white hover:opacity-90 transition"
+                  className="flex-1 py-2.5 rounded-2xl font-black text-sm text-white hover:opacity-90 transition"
                   style={{ background: G }}>
                   Next Step →
                 </button>
               ) : (
                 <button onClick={() => setStep("finished")}
-                  className="flex-1 py-2.5 rounded-2xl font-black text-[14px] text-white hover:opacity-90 transition"
+                  className="flex-1 py-2.5 rounded-2xl font-black text-sm text-white hover:opacity-90 transition"
                   style={{ background: "#7C3AED" }}>
                   🎉 I finished drawing!
                 </button>
@@ -261,29 +261,29 @@ export default function DrawingCoachView({
           <motion.div key="finished" initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0 }}
             className="flex flex-col gap-4">
 
-            <div className="p-5 rounded-3xl text-center" style={{ background: "#F5F3FF", border: "1px solid #DDD6FE" }}>
-              <p className="text-[40px] mb-2">🎨</p>
-              <p className="font-black text-[16px]" style={{ color: "#6D28D9" }}>
+            <div className="p-5 leaf-lg text-center" style={{ background: "#F5F3FF", border: "1px solid #DDD6FE" }}>
+              <p className="text-5xl mb-2">🎨</p>
+              <p className="font-black text-base" style={{ color: "#6D28D9" }}>
                 {lesson.finish_msg}
               </p>
             </div>
 
-            <p className="font-bold text-[13px]" style={{ color: "#374151" }}>
+            <p className="font-bold text-sml" style={{ color: "var(--ds-text-primary)" }}>
               Want to tell Nimi about your drawing?
             </p>
             <textarea
               value={childNote}
               onChange={e => setChildNote(e.target.value)}
               rows={2}
-              className="w-full text-[14px] font-nunito p-3 rounded-2xl border focus:outline-none resize-none"
-              style={{ borderColor: "#D1D5DB", color: "#111827", background: "#FAFAFA" }} />
+              className="w-full text-sm font-nunito p-3 rounded-2xl border focus:outline-none resize-none"
+              style={{ borderColor: "var(--ds-border-strong)", color: "var(--ds-text-primary)", background: "var(--ds-surface-card)" }} />
 
-            {error && <p className="text-[12px] font-bold text-red-500">{error}</p>}
+            {error && <p className="text-xs font-bold text-red-500">{error}</p>}
 
             <button
               onClick={() => void handleFinish()}
               disabled={loading}
-              className="w-full py-3 rounded-2xl font-black text-[14px] text-white hover:opacity-90 transition disabled:opacity-40"
+              className="w-full py-3 rounded-2xl font-black text-sm text-white hover:opacity-90 transition disabled:opacity-40"
               style={{ background: G }}>
               {loading ? "Getting feedback…" : "✓ Get Nimi's feedback & stars!"}
             </button>
@@ -295,12 +295,12 @@ export default function DrawingCoachView({
           <motion.div key="done" initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }}
             className="flex flex-col gap-4">
 
-            <div className="p-5 rounded-3xl text-center" style={{ background: G }}>
-              <p className="text-green-200 text-[10px] font-black uppercase tracking-widest mb-2">Stars Earned</p>
-              <p className="font-baloo font-black text-[52px] text-white leading-none">+{STARS_AWARD}</p>
+            <div className="p-5 leaf-lg text-center" style={{ background: G }}>
+              <p className="text-green-200 text-3xs font-black uppercase tracking-widest mb-2">Stars Earned</p>
+              <p className="font-baloo font-black text-5.5xl text-white leading-none">+{STARS_AWARD}</p>
               <div className="flex justify-center gap-1 mt-2">
                 {Array.from({ length: Math.min(STARS_AWARD, 10) }).map((_, i) => (
-                  <motion.span key={i} className="text-[18px]"
+                  <motion.span key={i} className="text-lg"
                     initial={{ scale:0 }} animate={{ scale:1 }}
                     transition={{ delay: 0.2 + i * 0.06, type:"spring", stiffness:300 }}>
                     ⭐
@@ -309,17 +309,17 @@ export default function DrawingCoachView({
               </div>
             </div>
 
-            <div className="p-4 rounded-2xl" style={{ background: "#F0FDF4", border: "1px solid #BBF7D0" }}>
-              <p className="text-[14px] font-nunito leading-relaxed" style={{ color: "#166534" }}>
+            <div className="p-4 rounded-2xl" style={{ background: "var(--ds-brand-soft)", border: "1px solid #BBF7D0" }}>
+              <p className="text-sm font-nunito leading-relaxed" style={{ color: "#166534" }}>
                 💬 {feedback.praise}
               </p>
-              <p className="text-[12px] font-bold mt-2" style={{ color: "#15803D" }}>
+              <p className="text-xs font-bold mt-2" style={{ color: "var(--nimi-green)" }}>
                 {feedback.encourage}
               </p>
             </div>
 
             <button onClick={handleReset}
-              className="w-full py-3 rounded-2xl font-black text-[14px] text-white hover:opacity-90 transition"
+              className="w-full py-3 rounded-2xl font-black text-sm text-white hover:opacity-90 transition"
               style={{ background: G }}>
               ✏️ Draw Something Else
             </button>

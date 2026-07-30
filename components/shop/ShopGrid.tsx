@@ -46,8 +46,8 @@ export default function ShopGrid({ filter, balance, ownedIds, purchaseCounts, co
               <div className="flex items-center gap-2 mb-3">
                 <span className="text-xl">{meta.emoji}</span>
                 <div>
-                  <p className="font-black text-ds-text text-[15px] leading-tight">{t(`filter${cat.charAt(0).toUpperCase() + cat.slice(1)}`)}</p>
-                  <p className="text-ds-muted text-[11px]">{t(meta.descKey)}</p>
+                  <p className="font-black text-ds-text text-mbase leading-tight">{t(`filter${cat.charAt(0).toUpperCase() + cat.slice(1)}`)}</p>
+                  <p className="text-ds-muted text-2xs">{t(meta.descKey)}</p>
                 </div>
               </div>
               <GridRow items={items} balance={balance} ownedIds={ownedIds} purchaseCounts={purchaseCounts}
@@ -74,7 +74,7 @@ export default function ShopGrid({ filter, balance, ownedIds, purchaseCounts, co
           <div className="flex flex-col items-center text-center gap-3 py-16">
             <span className="text-5xl">🛒</span>
             <p className="font-black text-ds-text">{t("noToysTitle")}</p>
-            <p className="text-gray-400 text-sm">{t("noToysBody")}</p>
+            <p className="text-[var(--ds-text-tertiary)] text-sm">{t("noToysBody")}</p>
           </div>
         ) : (
           <GridRow items={items} balance={balance} ownedIds={ownedIds} purchaseCounts={purchaseCounts}

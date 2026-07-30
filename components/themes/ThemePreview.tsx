@@ -30,7 +30,7 @@ export default function ThemePreview({ meta, size = "sm", className = "" }: Prop
     >
       {/* Background gradient */}
       <div className={`absolute inset-0 bg-gradient-to-br ${meta.gradientClass} opacity-20`} />
-      <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px]" />
+      <div className="absolute inset-0 bg-[var(--ds-surface-card)]/60 backdrop-blur-[2px]" />
 
       {/* Content */}
       <div className="relative p-2 space-y-2">

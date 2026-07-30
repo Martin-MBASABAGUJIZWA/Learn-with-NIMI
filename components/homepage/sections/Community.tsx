@@ -27,10 +27,10 @@ export default function Community() {
           <span className="inline-flex items-center gap-2 bg-pink-50 text-pink-600 font-nunito font-bold text-xs tracking-wider uppercase px-4 py-1.5 rounded-full mb-4">
             <Users className="w-3.5 h-3.5" /> Families Learning Together
           </span>
-          <h2 className="font-baloo font-black text-gray-900 text-3xl sm:text-4xl leading-tight" style={{textWrap:"balance"}}>
+          <h2 className="font-baloo font-black text-[var(--ds-text-primary)] text-3xl sm:text-4xl leading-tight" style={{textWrap:"balance"}}>
             A gallery of <span className="text-nimi-green">young creators</span>
           </h2>
-          <p className="font-nunito text-gray-500 mt-3 max-w-md mx-auto text-sm sm:text-base">
+          <p className="font-nunito text-[var(--ds-text-secondary)] mt-3 max-w-md mx-auto text-sm sm:text-base">
             Kids share their stories, colorings, and artwork. Families cheer each other on.
           </p>
         </div>
@@ -40,9 +40,9 @@ export default function Community() {
           {CREATIONS.map((c) => (
             <div key={c.name} className={`${c.bg} rounded-2xl p-4 flex flex-col gap-2 hover:shadow-md transition-shadow`}>
               <div className="text-3xl">{c.emoji}</div>
-              <p className="font-baloo font-black text-gray-900 text-xs leading-snug">{c.title}</p>
-              <p className="font-nunito text-[10px] text-gray-500 font-semibold">{c.name}</p>
-              <div className="flex items-center gap-1 mt-auto text-[10px] font-bold text-gray-500">
+              <p className="font-baloo font-black text-[var(--ds-text-primary)] text-xs leading-snug">{c.title}</p>
+              <p className="font-nunito text-[10px] text-[var(--ds-text-secondary)] font-semibold">{c.name}</p>
+              <div className="flex items-center gap-1 mt-auto text-[10px] font-bold text-[var(--ds-text-secondary)]">
                 <Heart className="w-3 h-3 text-red-400 fill-red-400" /> {c.likes}
               </div>
             </div>
@@ -52,13 +52,13 @@ export default function Community() {
         {/* Testimonials */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
           {TESTIMONIALS.map((t) => (
-            <div key={t.name} className="bg-gray-50 border border-gray-100 rounded-2xl p-6">
-              <p className="font-nunito text-gray-700 text-sm leading-relaxed italic">"{t.quote}"</p>
+            <div key={t.name} className="bg-[var(--ds-surface-card)] border border-[var(--ds-border-primary)] rounded-2xl p-6">
+              <p className="font-nunito text-[var(--ds-text-primary)] text-sm leading-relaxed italic">"{t.quote}"</p>
               <div className="mt-4 flex items-center gap-3">
                 <div className="w-8 h-8 bg-nimi-green rounded-full flex items-center justify-center text-white font-baloo font-black text-sm">{t.name[0]}</div>
                 <div>
-                  <p className="font-baloo font-black text-gray-900 text-sm">{t.name}</p>
-                  <p className="font-nunito text-xs text-gray-500">{t.role}</p>
+                  <p className="font-baloo font-black text-[var(--ds-text-primary)] text-sm">{t.name}</p>
+                  <p className="font-nunito text-xs text-[var(--ds-text-secondary)]">{t.role}</p>
                 </div>
               </div>
             </div>

@@ -26,9 +26,9 @@ const CAT_BADGE_DISPLAY: Record<string, BadgeDisplay> = {
 };
 
 const LOCKED_PLACEHOLDERS: BadgeDisplay[] = [
-  { emoji: "🎨", label: "Art Star",    bg: "bg-gray-100", text: "text-gray-300", ring: "border-gray-100" },
-  { emoji: "🧩", label: "Puzzle Pro",  bg: "bg-gray-100", text: "text-gray-300", ring: "border-gray-100" },
-  { emoji: "🔥", label: "Streak Hero", bg: "bg-gray-100", text: "text-gray-300", ring: "border-gray-100" },
+  { emoji: "🎨", label: "Art Star",    bg: "bg-[var(--ds-surface-card-hover)]", text: "text-[var(--ds-text-tertiary)]", ring: "border-[var(--ds-border-primary)]" },
+  { emoji: "🧩", label: "Puzzle Pro",  bg: "bg-[var(--ds-surface-card-hover)]", text: "text-[var(--ds-text-tertiary)]", ring: "border-[var(--ds-border-primary)]" },
+  { emoji: "🔥", label: "Streak Hero", bg: "bg-[var(--ds-surface-card-hover)]", text: "text-[var(--ds-text-tertiary)]", ring: "border-[var(--ds-border-primary)]" },
 ];
 
 function parseBadgeSlug(slug: string): BadgeDisplay {
@@ -57,30 +57,30 @@ export default function HomeAchievementsPanel({ achievements }: Props) {
   const earned = achievements.slice(-3).reverse();
 
   return (
-    <div className="overflow-hidden leaf-lg border border-gray-100 bg-white shadow-[0_8px_24px_rgba(15,23,42,0.07)]">
+    <div className="overflow-hidden leaf-lg border border-[var(--ds-border-primary)] bg-[var(--ds-surface-card)] shadow-card-md">
 
       {/* Header */}
       <div className="flex items-center justify-between px-4 pt-4 pb-3">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center text-[20px] shadow-sm shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center text-xl shadow-sm shrink-0">
             🏆
           </div>
           <div>
-            <p className="font-nunito text-amber-500 text-[10px] uppercase tracking-widest leading-none mb-0.5">
+            <p className="font-nunito text-amber-500 text-3xs uppercase tracking-widest leading-none mb-0.5">
               {t("homeTrophyRoomEyebrow")}
             </p>
-            <h3 className="font-baloo font-black text-gray-900 text-[17px] leading-tight">
+            <h3 className="font-baloo font-black text-[var(--ds-text-primary)] text-mlg leading-tight">
               {t("homeMyTreasuresTitle")}
             </h3>
           </div>
         </div>
         <Link href="/user-profile"
-          className="flex items-center gap-0.5 font-nunito font-bold text-amber-500 text-[11px] hover:text-amber-600 transition-colors">
+          className="flex items-center gap-0.5 font-nunito font-bold text-amber-500 text-2xs hover:text-amber-600 transition-colors">
           {t("homeViewAllBadges")} <ChevronRight className="w-3.5 h-3.5" />
         </Link>
       </div>
 
-      <div className="h-px bg-gray-100 mx-4" />
+      <div className="h-px bg-[var(--ds-surface-card-hover)] mx-4" />
 
       {/* Badges grid */}
       <div className="px-4 py-5">
@@ -93,22 +93,22 @@ export default function HomeAchievementsPanel({ achievements }: Props) {
               <div key={i} className="flex flex-col items-center gap-2 flex-1">
                 <div className="relative">
                   <motion.div
-                    className={`w-[72px] h-[72px] rounded-2xl flex items-center justify-center text-[34px] border-2 ${badge.bg} ${badge.ring}`}
+                    className={`w-[72px] h-[72px] rounded-2xl flex items-center justify-center text-4xl border-2 ${badge.bg} ${badge.ring}`}
                     animate={isEarned ? { scale: [1, 1.05, 1] } : undefined}
                     transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: i * 0.5 }}>
-                    {isEarned ? badge.emoji : <span className="text-[28px] opacity-30">🔒</span>}
+                    {isEarned ? badge.emoji : <span className="text-3.5xl opacity-30">🔒</span>}
                   </motion.div>
 
                   {/* Earned check */}
                   {isEarned && (
-                    <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center text-white text-[10px] font-black shadow-md">
+                    <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center text-white text-3xs font-black shadow-md">
                       ✓
                     </div>
                   )}
                 </div>
 
-                <p className={`font-nunito font-bold text-[10px] text-center leading-tight ${
-                  isEarned ? badge.text : "text-gray-300"
+                <p className={`font-nunito font-bold text-3xs text-center leading-tight ${
+                  isEarned ? badge.text : "text-[var(--ds-text-tertiary)]"
                 }`}>
                   {isEarned ? badge.label : "Locked"}
                 </p>
@@ -118,7 +118,7 @@ export default function HomeAchievementsPanel({ achievements }: Props) {
         </div>
 
         {earned.length === 0 && (
-          <p className="text-center font-nunito text-gray-400 text-[11px] mt-3">
+          <p className="text-center font-nunito text-[var(--ds-text-tertiary)] text-2xs mt-3">
             Complete missions to unlock badges ✨
           </p>
         )}

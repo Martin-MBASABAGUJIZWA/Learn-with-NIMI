@@ -13,7 +13,7 @@ const STAR_POSITIONS = [
 
 export default function HomeMasterpiecePanel() {
   return (
-    <div className="overflow-hidden leaf-lg border border-gray-100 bg-white shadow-[0_8px_24px_rgba(15,23,42,0.07)]">
+    <div className="overflow-hidden leaf-lg border border-[var(--ds-border-primary)] bg-[var(--ds-surface-card)] shadow-card-md">
 
       {/* Header */}
       <div className="flex items-center justify-between px-4 pt-4 pb-3">
@@ -22,15 +22,15 @@ export default function HomeMasterpiecePanel() {
             <Sparkles className="w-5 h-5 text-amber-600" />
           </div>
           <div>
-            <p className="font-nunito text-amber-500 text-[10px] uppercase tracking-widest leading-none mb-0.5">Story Forge</p>
-            <h3 className="font-baloo font-black text-gray-900 text-[17px] leading-tight">My Masterpiece</h3>
+            <p className="font-nunito text-amber-500 text-3xs uppercase tracking-widest leading-none mb-0.5">Story Forge</p>
+            <h3 className="font-baloo font-black text-[var(--ds-text-primary)] text-mlg leading-tight">My Masterpiece</h3>
           </div>
         </div>
-        <Link href="/masterpiece" className="flex items-center gap-0.5 font-nunito font-bold text-gray-400 text-[11px] hover:text-amber-600 transition-colors">
+        <Link href="/masterpiece" className="flex items-center gap-0.5 font-nunito font-bold text-[var(--ds-text-tertiary)] text-2xs hover:text-amber-600 transition-colors">
           Create <ChevronRight className="w-3.5 h-3.5" />
         </Link>
       </div>
-      <div className="h-px bg-gray-100 mx-4" />
+      <div className="h-px bg-[var(--ds-surface-card-hover)] mx-4" />
 
       <div className="px-4 py-4">
         {/* Story book preview */}
@@ -47,24 +47,24 @@ export default function HomeMasterpiecePanel() {
           ))}
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-1">
             <motion.span
-              className="text-[40px] leading-none drop-shadow-lg"
+              className="text-5xl leading-none drop-shadow-lg"
               animate={{ y: [0, -7, 0], rotate: [0, 6, -6, 0] }}
               transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}>
               👑
             </motion.span>
-            <p className="font-baloo font-black text-amber-900/60 text-[10px] tracking-widest uppercase">Your story here</p>
+            <p className="font-baloo font-black text-amber-900/60 text-3xs tracking-widest uppercase">Your story here</p>
           </div>
         </div>
 
         <div className="text-center mb-3">
-          <p className="font-baloo font-black text-gray-800 text-[14px] leading-tight">Become the Hero!</p>
-          <p className="font-nunito text-gray-500 text-[11px] leading-relaxed mt-0.5">
+          <p className="font-baloo font-black text-[var(--ds-text-primary)] text-sm leading-tight">Become the Hero!</p>
+          <p className="font-nunito text-[var(--ds-text-secondary)] text-2xs leading-relaxed mt-0.5">
             Create a personalised story book starring your child.
           </p>
         </div>
 
         <Link href="/masterpiece"
-          className="flex items-center justify-center gap-2 w-full font-baloo font-black text-white text-[13px] py-3 leaf transition-all hover:-translate-y-0.5 active:scale-95"
+          className="flex items-center justify-center gap-2 w-full font-baloo font-black text-white text-sml py-3 leaf transition-all hover:-translate-y-0.5 active:scale-95"
           style={{ background: "linear-gradient(135deg,#d97706,#b45309)", boxShadow: "0 4px 14px rgba(217,119,6,0.35)" }}>
           Create Masterpiece ✨
         </Link>

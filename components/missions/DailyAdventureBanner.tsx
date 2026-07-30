@@ -31,8 +31,8 @@ export default function DailyAdventureBanner({ themeTitle, themeEmoji, level }: 
   return (
     <HeroBanner zone="activityGrounds" className="overflow-hidden">
       {/* Decorative circles */}
-      <div className="absolute -top-6 -right-6 w-36 h-36 rounded-full bg-white/10" />
-      <div className="absolute -bottom-8 -left-8 w-44 h-44 rounded-full bg-white/10" />
+      <div className="absolute -top-6 -right-6 w-36 h-36 rounded-full bg-[var(--ds-surface-card)]/10" />
+      <div className="absolute -bottom-8 -left-8 w-44 h-44 rounded-full bg-[var(--ds-surface-card)]/10" />
 
       {/* Floating emojis */}
       <div className="absolute inset-0 pointer-events-none select-none">
@@ -75,14 +75,14 @@ export default function DailyAdventureBanner({ themeTitle, themeEmoji, level }: 
               clipPath: "polygon(2% 0%, 98% 0%, 100% 50%, 98% 100%, 2% 100%, 0% 50%)",
             }}
           >
-            <p className="text-white/60 text-[9px] sm:text-[10px] font-nunito font-bold uppercase tracking-[0.14em] mb-1">The Activity Grounds</p>
+            <p className="text-white/60 text-4xs sm:text-3xs font-nunito font-bold uppercase tracking-[0.14em] mb-1">The Activity Grounds</p>
             <p className="text-white font-black text-base sm:text-2xl md:text-3xl tracking-widest uppercase">
               ⭐ {t("levelAdventureTitle").replace("{level}", String(level))} ⭐
             </p>
           </div>
 
           <motion.div
-            className="flex-shrink-0 w-12 h-12 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full bg-white/20 border-4 border-white/30 flex items-center justify-center shadow-lg text-3xl sm:text-5xl select-none"
+            className="flex-shrink-0 w-12 h-12 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full bg-[var(--ds-surface-card)]/20 border-4 border-white/30 flex items-center justify-center shadow-lg text-3xl sm:text-5xl select-none"
             animate={m.floatLg.animate}
             transition={{ ...m.floatLg.transition, delay: 1.8 }}
           >
@@ -96,7 +96,7 @@ export default function DailyAdventureBanner({ themeTitle, themeEmoji, level }: 
         </p>
 
         {/* Today's Theme box */}
-        <div className="mt-3 mx-auto max-w-sm bg-white/20 border border-white/30 py-2 px-4 text-center backdrop-blur-sm" style={{ borderRadius: 'var(--leaf-r)' }}>
+        <div className="mt-3 mx-auto max-w-sm bg-[var(--ds-surface-card)]/20 border border-white/30 py-2 px-4 text-center backdrop-blur-sm" style={{ borderRadius: 'var(--leaf-r)' }}>
           <p className="text-white font-black text-sm sm:text-base">
             ⭐ {t("todaysThemeLabel").replace("{title}", themeTitle).replace("{emoji}", themeEmoji)} ⭐
           </p>
@@ -104,7 +104,7 @@ export default function DailyAdventureBanner({ themeTitle, themeEmoji, level }: 
 
         {/* Divider */}
         <div className="mt-4 flex items-center justify-center">
-          <div className="bg-white/20 border border-white/30 text-white font-black text-[10px] sm:text-xs uppercase tracking-wider rounded-full px-4 py-1.5 shadow">
+          <div className="bg-[var(--ds-surface-card)]/20 border border-white/30 text-white font-black text-3xs sm:text-xs uppercase tracking-wider rounded-full px-4 py-1.5 shadow">
             {t("activitiesDivider")}
           </div>
         </div>

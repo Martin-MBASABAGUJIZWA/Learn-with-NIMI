@@ -118,13 +118,13 @@ function CreativeStudioPage() {
           {/* ── HERO ── */}
           <HeroBanner zone="creative" className="mb-4">
             {/* Decorative circles */}
-            <div className="absolute -top-10 -right-10 w-52 h-52 rounded-full bg-white/10 pointer-events-none" />
-            <div className="absolute -bottom-12 -left-12 w-56 h-56 rounded-full bg-white/10 pointer-events-none" />
+            <div className="absolute -top-10 -right-10 w-52 h-52 rounded-full bg-[var(--ds-surface-card)]/10 pointer-events-none" />
+            <div className="absolute -bottom-12 -left-12 w-56 h-56 rounded-full bg-[var(--ds-surface-card)]/10 pointer-events-none" />
 
             {/* Floating emojis */}
             {["🎨","✏️","⭐","📖","🌟","🎉"].map((em, i) => (
               <motion.span key={i}
-                className="absolute pointer-events-none select-none text-[14px] sm:text-[16px]"
+                className="absolute pointer-events-none select-none text-sm sm:text-base"
                 style={{
                   top:   ["12%","72%","18%","70%","38%","55%"][i],
                   left:  ["6%","5%",undefined,"88%",undefined,"90%"][i] ?? undefined,
@@ -144,18 +144,18 @@ function CreativeStudioPage() {
                 className="w-14 h-14 sm:w-16 sm:h-16 rounded-full border-2 border-white/40 shadow-lg shrink-0"
                 loading="lazy" />
               <div>
-                <p className="text-white/60 text-[10px] font-bold uppercase tracking-[0.15em] mb-0.5">
+                <p className="text-white/60 text-3xs font-bold uppercase tracking-[0.15em] mb-0.5">
                   Creative Studio
                 </p>
-                <h1 className="font-baloo font-black text-white text-[22px] sm:text-[28px] leading-tight drop-shadow-md">
+                <h1 className="font-baloo font-black text-white text-1.5xl sm:text-3.5xl leading-tight drop-shadow-md">
                   Create with Nimi!
                 </h1>
                 <div className="flex items-center gap-2 mt-1">
-                  <span className="text-[12px] text-white/80 font-bold">
+                  <span className="text-xs text-white/80 font-bold">
                     ⭐ {todayStars} stars today
                   </span>
                   {childName && (
-                    <span className="text-[11px] text-white/60 font-semibold">
+                    <span className="text-2xs text-white/60 font-semibold">
                       · {childName}
                     </span>
                   )}
@@ -169,7 +169,7 @@ function CreativeStudioPage() {
             {TABS.map(tab => (
               <button key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className="shrink-0 flex items-center gap-1.5 px-4 py-2.5 rounded-2xl text-[13px] font-black transition-all"
+                className="shrink-0 flex items-center gap-1.5 px-4 py-2.5 rounded-2xl text-sml font-black transition-all"
                 style={{
                   background: activeTab === tab.id ? "var(--nimi-green,#15803D)" : "var(--ds-surface-card,#fff)",
                   color:      activeTab === tab.id ? "#fff" : "var(--ds-text-secondary,#6B7280)",
@@ -184,7 +184,7 @@ function CreativeStudioPage() {
           {/* ── TAB CONTENT ── */}
           {!childId ? (
             <div className="py-16 text-center">
-              <p className="text-[14px] font-nunito" style={{ color: "#9CA3AF" }}>
+              <p className="text-sm font-nunito" style={{ color: "var(--ds-text-tertiary)" }}>
                 Add a child to your account to start creating!
               </p>
             </div>

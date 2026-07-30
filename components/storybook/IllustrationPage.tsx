@@ -38,7 +38,7 @@ const IllustrationPage = forwardRef<HTMLDivElement, Props>(({ imageUrl, side, te
 
       {!loaded && (
         <div className="absolute inset-0 bg-[#faf6ee] flex items-center justify-center">
-          <div className="w-8 h-8 border-3 border-gray-400 border-t-transparent rounded-full animate-spin" />
+          <div className="w-8 h-8 border-3 border-[var(--ds-border-strong)] border-t-transparent rounded-full animate-spin" />
         </div>
       )}
 

@@ -73,10 +73,10 @@ export default function LogoutModal({ isOpen, onClose }: LogoutModalProps) {
           <div className="relative z-10 flex flex-col items-center px-4 py-10 sm:py-14 min-h-full">
 
             {/* Header */}
-            <h1 className="text-3xl sm:text-4xl font-black text-gray-900 text-center drop-shadow-sm">
+            <h1 className="text-3xl sm:text-4xl font-black text-[var(--ds-text-primary)] text-center drop-shadow-sm">
               {t("logoutTakeCare")}
             </h1>
-            <p className="text-gray-500 text-sm sm:text-base font-semibold mt-2 text-center max-w-md">
+            <p className="text-[var(--ds-text-secondary)] text-sm sm:text-base font-semibold mt-2 text-center max-w-md">
               {t("logoutSubtitle")}
             </p>
 
@@ -103,10 +103,10 @@ export default function LogoutModal({ isOpen, onClose }: LogoutModalProps) {
                 🚪
               </div>
 
-              <h2 className="text-xl sm:text-2xl font-black text-gray-900 mt-4">
+              <h2 className="text-xl sm:text-2xl font-black text-[var(--ds-text-primary)] mt-4">
                 {t("logoutConfirmTitle")}
               </h2>
-              <p className="text-gray-500 text-sm mt-2">
+              <p className="text-[var(--ds-text-secondary)] text-sm mt-2">
                 {t("logoutConfirmSubtitle")}
               </p>
 
@@ -121,7 +121,7 @@ export default function LogoutModal({ isOpen, onClose }: LogoutModalProps) {
                 <button
                   onClick={onClose}
                   disabled={signingOut}
-                  className="flex-1 border-2 border-gray-200 text-gray-700 font-black rounded-full py-3 text-sm hover:bg-gray-50 transition disabled:opacity-60"
+                  className="flex-1 border-2 border-[var(--ds-border-primary)] text-[var(--ds-text-primary)] font-black rounded-full py-3 text-sm hover:bg-[var(--ds-surface-card-hover)] transition disabled:opacity-60"
                 >
                   {t("logoutConfirmCancel")}
                 </button>
@@ -132,8 +132,8 @@ export default function LogoutModal({ isOpen, onClose }: LogoutModalProps) {
             <div className="flex items-end gap-4 mt-8">
               <div className={`relative ${cv.panelStyle.background} ${cv.panelStyle.border} ${cv.panelStyle.shadow} ${cv.panelStyle.radius} px-4 py-3 max-w-[220px]`}>
                 <span className="absolute top-2 right-2 text-yellow-400 text-sm leading-none">★</span>
-                <span className="absolute bottom-2 left-2 text-gray-500 text-xs leading-none">✦</span>
-                <p className="text-sm font-bold text-gray-800 leading-snug">
+                <span className="absolute bottom-2 left-2 text-[var(--ds-text-secondary)] text-xs leading-none">✦</span>
+                <p className="text-sm font-bold text-[var(--ds-text-primary)] leading-snug">
                   {t("logoutFarewell")}
                 </p>
                 <span
@@ -150,7 +150,7 @@ export default function LogoutModal({ isOpen, onClose }: LogoutModalProps) {
                 <div className="relative w-16 h-16 rounded-full overflow-hidden border-4 border-yellow-400 shadow-xl">
                   <Image src={assets.nimiCircle} alt="NIMI" fill className="object-cover" />
                 </div>
-                <div className="absolute -bottom-2 -right-3 bg-white text-gray-800 text-[10px] font-black px-2 py-0.5 rounded-md shadow-sm border border-gray-200 rotate-6">
+                <div className="absolute -bottom-2 -right-3 bg-[var(--ds-surface-card)] text-[var(--ds-text-primary)] text-3xs font-black px-2 py-0.5 rounded-md shadow-sm border border-[var(--ds-border-primary)] rotate-6">
                   BYE!
                 </div>
               </div>

@@ -49,28 +49,28 @@ function FlipCard({ word, index }: { word: VocabWord; index: number }) {
       >
         {/* Front — word + emoji */}
         <div
-          className="absolute inset-0 rounded-2xl border-2 border-teal-200/60 bg-gradient-to-br from-teal-50 via-white to-cyan-50 flex flex-col items-center justify-center gap-2 p-4 shadow-[0_8px_24px_rgba(15,23,42,0.07)]"
+          className="absolute inset-0 rounded-2xl border-2 border-teal-200/60 bg-gradient-to-br from-teal-50 via-white to-cyan-50 flex flex-col items-center justify-center gap-2 p-4 shadow-card-md"
           style={{ backfaceVisibility: "hidden" }}
         >
           <span className="text-4xl leading-none">{word.emoji ?? "📖"}</span>
-          <p className="font-baloo font-black text-teal-800 text-[17px] text-center leading-tight">
+          <p className="font-baloo font-black text-teal-800 text-mlg text-center leading-tight">
             {word.word}
           </p>
-          <p className="font-nunito text-teal-400 text-[10px] uppercase tracking-widest">tap to reveal</p>
+          <p className="font-nunito text-teal-400 text-3xs uppercase tracking-widest">tap to reveal</p>
         </div>
 
         {/* Back — meaning + audio */}
         <div
-          className="absolute inset-0 rounded-2xl border-2 border-violet-200/60 bg-gradient-to-br from-violet-50 via-white to-indigo-50 flex flex-col items-center justify-center gap-3 p-4 shadow-[0_8px_24px_rgba(15,23,42,0.07)]"
+          className="absolute inset-0 rounded-2xl border-2 border-violet-200/60 bg-gradient-to-br from-violet-50 via-white to-indigo-50 flex flex-col items-center justify-center gap-3 p-4 shadow-card-md"
           style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
         >
-          <p className="font-baloo font-black text-violet-700 text-[15px] text-center leading-snug">
+          <p className="font-baloo font-black text-violet-700 text-mbase text-center leading-snug">
             {word.meaning}
           </p>
           {word.audio_url && (
             <button
               onClick={playAudio}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-black transition ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black transition ${
                 played
                   ? "bg-teal-500 text-white"
                   : "bg-teal-100 text-teal-600 hover:bg-teal-200"
@@ -80,7 +80,7 @@ function FlipCard({ word, index }: { word: VocabWord; index: number }) {
               {played ? "Played!" : "Hear it"}
             </button>
           )}
-          <p className="font-nunito text-violet-300 text-[10px] uppercase tracking-widest">tap to flip back</p>
+          <p className="font-nunito text-violet-300 text-3xs uppercase tracking-widest">tap to flip back</p>
         </div>
       </motion.div>
     </motion.div>
@@ -163,12 +163,12 @@ export default function VocabClient({ initialChildren }: Props = {}) {
 
           {/* Header */}
           <div className="flex items-center gap-3 mb-5">
-            <Link href="/user-profile" className="w-9 h-9 rounded-full bg-ds-surface border border-ds-border flex items-center justify-center text-ds-muted hover:bg-gray-100 transition shrink-0">
+            <Link href="/user-profile" className="w-9 h-9 rounded-full bg-ds-surface border border-ds-border flex items-center justify-center text-ds-muted hover:bg-[var(--ds-surface-card-hover)] transition shrink-0">
               <ArrowLeft className="w-4 h-4" />
             </Link>
             <div>
-              <h1 className="font-baloo font-black text-ds-text text-[22px] leading-tight">My Word Library 📚</h1>
-              <p className="font-nunito text-ds-muted text-[12px]">
+              <h1 className="font-baloo font-black text-ds-text text-1.5xl leading-tight">My Word Library 📚</h1>
+              <p className="font-nunito text-ds-muted text-xs">
                 {words.length === 0 ? "Complete missions to collect words" : `${words.length} word${words.length === 1 ? "" : "s"} collected`}
               </p>
             </div>
@@ -181,12 +181,12 @@ export default function VocabClient({ initialChildren }: Props = {}) {
               className="flex flex-col items-center justify-center gap-4 py-16 text-center"
             >
               <span className="text-6xl">📖</span>
-              <p className="font-baloo font-black text-ds-text text-[20px]">No words yet!</p>
-              <p className="font-nunito text-ds-muted text-[14px] max-w-xs">
+              <p className="font-baloo font-black text-ds-text text-xl">No words yet!</p>
+              <p className="font-nunito text-ds-muted text-sm max-w-xs">
                 Finish story missions and new vocabulary words will appear here.
               </p>
               <Link href="/stories"
-                className="mt-2 font-baloo font-black text-white px-6 py-2.5 rounded-full shadow-md text-[14px] transition"
+                className="mt-2 font-baloo font-black text-white px-6 py-2.5 rounded-full shadow-md text-sm transition"
                 style={{ backgroundColor: "var(--nimi-green)" }}>
                 Start a Story →
               </Link>
@@ -202,12 +202,12 @@ export default function VocabClient({ initialChildren }: Props = {}) {
                     placeholder="Search words…"
                     value={search}
                     onChange={e => setSearch(e.target.value)}
-                    className="w-full pl-9 pr-4 py-2.5 rounded-full border-2 border-ds-border bg-ds-surface text-ds-text font-nunito font-bold text-[13px] outline-none focus:border-teal-400 transition"
+                    className="w-full pl-9 pr-4 py-2.5 rounded-full border-2 border-ds-border bg-ds-surface text-ds-text font-nunito font-bold text-sml outline-none focus:border-teal-400 transition"
                   />
                 </div>
                 <button
                   onClick={() => setFilter(f => f === "all" ? "audio" : "all")}
-                  className={`px-4 py-2.5 rounded-full border-2 font-nunito font-black text-[12px] transition shrink-0 ${
+                  className={`px-4 py-2.5 rounded-full border-2 font-nunito font-black text-xs transition shrink-0 ${
                     filter === "audio"
                       ? "bg-teal-500 border-teal-500 text-white"
                       : "bg-ds-surface border-ds-border text-ds-muted hover:border-teal-300"
@@ -221,7 +221,7 @@ export default function VocabClient({ initialChildren }: Props = {}) {
                 <p className="text-center text-ds-muted font-nunito py-10">No words match your search.</p>
               ) : (
                 <>
-                  <p className="font-nunito text-ds-muted text-[11px] mb-3 text-center">
+                  <p className="font-nunito text-ds-muted text-2xs mb-3 text-center">
                     Tap a card to reveal the meaning
                   </p>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">

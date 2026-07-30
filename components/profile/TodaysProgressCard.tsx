@@ -54,27 +54,27 @@ export default function TodaysProgressCard({ completedCategories }: Props) {
               <span className="text-2xl">🏆</span>
             ) : (
               <>
-                <span className="font-black text-ds-text text-[15px] leading-none">{done}</span>
-                <span className="text-ds-muted text-[9px] font-bold">/{total}</span>
+                <span className="font-black text-ds-text text-mbase leading-none">{done}</span>
+                <span className="text-ds-muted text-4xs font-bold">/{total}</span>
               </>
             )}
           </div>
         </div>
 
         <div className="flex-1 min-w-0">
-          <p className="font-baloo font-black text-ds-text text-[16px] leading-tight">
+          <p className="font-baloo font-black text-ds-text text-base leading-tight">
             {t("todaysProgressTitle")}
           </p>
           {allDone ? (
             <motion.p
               initial={{ opacity: 0, y: 4 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-amber-500 text-[12px] font-bold mt-1"
+              className="text-amber-500 text-xs font-bold mt-1"
             >
               🎉 {t("allDoneMsg")}
             </motion.p>
           ) : (
-            <p className="text-ds-muted text-[12px] mt-1">
+            <p className="text-ds-muted text-xs mt-1">
               {done === 0
                 ? t("todayGetStartedLabel")
                 : t("todayLeftLabel").replace("{count}", String(total - done))}
@@ -88,7 +88,7 @@ export default function TodaysProgressCard({ completedCategories }: Props) {
             >
               <Link
                 href="/missions/morning"
-                className="inline-flex items-center gap-1 mt-2 px-3 py-1 rounded-full text-[11px] font-black text-white bg-[var(--ds-brand-primary)] hover:opacity-90 transition-opacity shadow-sm"
+                className="inline-flex items-center gap-1 mt-2 px-3 py-1 rounded-full text-2xs font-black text-white bg-[var(--ds-brand-primary)] hover:opacity-90 transition-opacity shadow-sm"
               >
                 {t("startNowLabel")} →
               </Link>
@@ -114,10 +114,10 @@ export default function TodaysProgressCard({ completedCategories }: Props) {
               }`}
             >
               {/* Colored icon bubble matching home grid */}
-              <div className={`w-8 h-8 ${activity.numBg} rounded-xl flex items-center justify-center text-[15px] shrink-0 shadow-sm`}>
+              <div className={`w-8 h-8 ${activity.numBg} rounded-xl flex items-center justify-center text-mbase shrink-0 shadow-sm`}>
                 {activity.emoji}
               </div>
-              <span className={`flex-1 text-[13px] font-semibold truncate ${
+              <span className={`flex-1 text-sml font-semibold truncate ${
                 isDone ? "text-[var(--ds-brand-primary)]" : "text-ds-text"
               }`}>
                 {t(activity.titleKey)}

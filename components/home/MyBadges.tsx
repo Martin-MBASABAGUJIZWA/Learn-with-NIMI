@@ -32,8 +32,8 @@ export default function MyBadges({ completedSteps }: Props) {
   const { t } = useLanguage();
 
   return (
-    <div className="bg-white border border-ds-border shadow-ds-card p-4 flex flex-col h-full" style={{ borderRadius: 'var(--leaf-r)' }}>
-      <h3 className="font-black text-ds-text text-[12px] mb-3 text-center tracking-wide">My Badges</h3>
+    <div className="bg-[var(--ds-surface-card)] border border-ds-border shadow-ds-card p-4 flex flex-col h-full" style={{ borderRadius: 'var(--leaf-r)' }}>
+      <h3 className="font-black text-ds-text text-xs mb-3 text-center tracking-wide">My Badges</h3>
       <div className="grid grid-cols-3 gap-2 flex-1">
         {BADGE_MAP.map(badge => {
           const earned = completedSteps.includes(badge.step);
@@ -48,29 +48,29 @@ export default function MyBadges({ completedSteps }: Props) {
                   </motion.div>
                 </Link>
               ) : (
-                <div className="w-12 h-12 bg-gray-100 opacity-50 rounded-full flex items-center justify-center text-2xl relative">
+                <div className="w-12 h-12 bg-[var(--ds-surface-card-hover)] opacity-50 rounded-full flex items-center justify-center text-2xl relative">
                   {badge.icon}
                   <div className="absolute inset-0 flex items-center justify-center bg-black/20 rounded-full">
                     <span className="text-sm">🔒</span>
                   </div>
                 </div>
               )}
-              <p className={`text-[8px] text-center leading-tight font-semibold ${earned ? "text-ds-text" : "text-gray-400"}`}>
+              <p className={`text-5xs text-center leading-tight font-semibold ${earned ? "text-ds-text" : "text-[var(--ds-text-tertiary)]"}`}>
                 {badge.title}
               </p>
-              <span className={`text-xs leading-none ${earned ? "text-yellow-500" : "text-gray-400"}`}>⭐</span>
+              <span className={`text-xs leading-none ${earned ? "text-yellow-500" : "text-[var(--ds-text-tertiary)]"}`}>⭐</span>
             </div>
           );
         })}
       </div>
       {completedSteps.length === 0 && (
-        <p className="text-[9px] text-gray-500 text-center mt-2 leading-snug">
+        <p className="text-4xs text-[var(--ds-text-secondary)] text-center mt-2 leading-snug">
           Complete steps to earn badges!
         </p>
       )}
       <Link
         href="/certificates"
-        className="block text-center text-[10px] font-black text-nimi-green mt-2 pt-2 border-t border-ds-border hover:underline"
+        className="block text-center text-3xs font-black text-nimi-green mt-2 pt-2 border-t border-ds-border hover:underline"
       >
         {t("viewAllAchievements")} →
       </Link>

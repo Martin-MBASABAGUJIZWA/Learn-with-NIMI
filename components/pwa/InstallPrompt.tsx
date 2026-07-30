@@ -81,11 +81,11 @@ export default function InstallPrompt() {
   };
 
   return (
-    <div className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:w-80 z-50 bg-white border border-ds-border shadow-ds-card p-4 flex flex-col gap-2" style={{ borderRadius: 'var(--leaf-r)' }}>
+    <div className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:w-80 z-50 bg-[var(--ds-surface-card)] border border-ds-border shadow-ds-card p-4 flex flex-col gap-2" style={{ borderRadius: 'var(--leaf-r)' }}>
       <button
         onClick={dismiss}
         aria-label="Dismiss"
-        className="absolute top-2 right-2 text-gray-400 hover:text-ds-text transition"
+        className="absolute top-2 right-2 text-[var(--ds-text-tertiary)] hover:text-ds-text transition"
       >
         <X className="w-4 h-4" />
       </button>
@@ -93,9 +93,9 @@ export default function InstallPrompt() {
         <Download className="w-5 h-5 text-[var(--ds-brand-primary)]" />
         <p className="font-black text-ds-text text-sm">{t("installPromptTitle")}</p>
       </div>
-      <p className="text-gray-500 text-xs leading-relaxed">{t("installPromptBody")}</p>
+      <p className="text-[var(--ds-text-secondary)] text-xs leading-relaxed">{t("installPromptBody")}</p>
       {ios ? (
-        <p className="text-ds-text text-xs font-semibold bg-gray-100 rounded-lg px-3 py-2 mt-1">
+        <p className="text-ds-text text-xs font-semibold bg-[var(--ds-surface-card-hover)] rounded-lg px-3 py-2 mt-1">
           {t("iosInstallInstructions")}
         </p>
       ) : (
@@ -108,7 +108,7 @@ export default function InstallPrompt() {
           </button>
           <button
             onClick={dismiss}
-            className="text-gray-400 hover:text-ds-text text-xs font-semibold px-2"
+            className="text-[var(--ds-text-tertiary)] hover:text-ds-text text-xs font-semibold px-2"
           >
             {t("installLaterBtn")}
           </button>

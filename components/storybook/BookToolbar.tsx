@@ -22,29 +22,29 @@ export default function BookToolbar({ title, onExit }: Props) {
       <div className="flex items-center gap-3">
         {onExit && (
           <button onClick={onExit}
-            className="w-9 h-9 rounded-full bg-white border border-ds-border flex items-center justify-center text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition shrink-0 shadow-sm">
+            className="w-9 h-9 rounded-full bg-[var(--ds-surface-card)] border border-ds-border flex items-center justify-center text-[var(--ds-text-secondary)] hover:text-[var(--ds-text-primary)] hover:bg-[var(--ds-surface-card-hover)] transition shrink-0 shadow-sm">
             <X size={18} />
           </button>
         )}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <div className="rounded-full bg-white p-1.5 shadow-sm">
+            <div className="rounded-full bg-[var(--ds-surface-card)] p-1.5 shadow-sm">
               <BookOpen className="h-3.5 w-3.5 text-emerald-600" />
             </div>
             <div className="relative flex-1">
               <Image src={assets.reader.chapterHeader} alt="" aria-hidden="true" fill
                 className="object-fill pointer-events-none opacity-[0.18]" />
-              <p className="relative font-baloo font-bold text-ds-text text-[14px] truncate">{title}</p>
+              <p className="relative font-baloo font-bold text-ds-text text-sm truncate">{title}</p>
             </div>
           </div>
           <div className="flex items-center gap-2 mt-0.5">
-            <div className="relative flex-1 bg-white/80 rounded-full h-1.5 overflow-hidden border border-emerald-100">
+            <div className="relative flex-1 bg-[var(--ds-surface-card)]/80 rounded-full h-1.5 overflow-hidden border border-emerald-100">
               <Image src={assets.reader.progress} alt="" aria-hidden="true" fill
                 className="object-fill pointer-events-none opacity-[0.45]" />
               <div className={`relative h-full bg-gradient-to-r ${assets.storyCard.progressFill} rounded-full transition-all duration-500`}
                 style={{ width: `${progress}%` }} />
             </div>
-            <span className="text-ds-muted text-[10px] font-bold shrink-0">{currentPage + 1}/{totalPages}</span>
+            <span className="text-ds-muted text-3xs font-bold shrink-0">{currentPage + 1}/{totalPages}</span>
           </div>
         </div>
       </div>

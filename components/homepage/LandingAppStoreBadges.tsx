@@ -41,7 +41,7 @@ export default function AppStoreBadges({ className = "", size = "md" }: { classN
             <circle cx="14.5" cy="6" r="0.75" fill="#3DDC84"/>
           </svg>
           <div className="flex flex-col leading-tight">
-            <span className={`${textSm} text-gray-400 font-medium`}>Download</span>
+            <span className={`${textSm} text-[var(--ds-text-tertiary)] font-medium`}>Download</span>
             <span className={`${textLg} text-white font-bold`}>Android APK</span>
           </div>
         </a>

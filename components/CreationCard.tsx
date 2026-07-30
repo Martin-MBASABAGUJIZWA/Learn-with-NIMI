@@ -77,7 +77,7 @@ export default function CreationCard({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       onClick={() => onClick?.(creation)}
-      className={`bg-white border border-ds-border shadow-ds-card hover:shadow-lg ${m.transitionSlow} hover:scale-[1.02] overflow-hidden leaf-lg cursor-pointer`}
+      className={`bg-[var(--ds-surface-card)] border border-ds-border shadow-ds-card hover:shadow-lg ${m.transitionSlow} hover:scale-[1.02] overflow-hidden leaf-lg cursor-pointer`}
     >
       <div className="relative h-48 w-full">
         <img
@@ -105,7 +105,7 @@ export default function CreationCard({
           </Badge>
         </div>
         <div className="absolute bottom-2 left-2">
-          <Badge className="bg-white text-gray-800 font-semibold border border-ds-border">
+          <Badge className="bg-[var(--ds-surface-card)] text-[var(--ds-text-primary)] font-semibold border border-ds-border">
             {creation.type}
           </Badge>
         </div>
@@ -116,7 +116,7 @@ export default function CreationCard({
         <p className="text-sm text-muted-foreground">
           {creation.childName}, {creation.age} yrs
         </p>
-        <p className="text-xs text-gray-500">from {creation.mission}</p>
+        <p className="text-xs text-[var(--ds-text-secondary)]">from {creation.mission}</p>
 
         <div className="flex gap-2 pt-2">
           <motion.button

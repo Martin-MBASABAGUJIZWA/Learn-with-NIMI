@@ -129,7 +129,7 @@ export default function GreetingCard({ childName, cosmetics = EMPTY }: Props) {
 
         {/* Text block */}
         <div className="min-w-0 flex flex-col gap-1.5">
-          <p className="font-black text-white text-[22px] sm:text-[26px] leading-tight drop-shadow-sm">
+          <p className="font-black text-white text-1.5xl sm:text-2.5xl leading-tight drop-shadow-sm">
             {t("progressGreatJob").replace("{name}", childName)}
           </p>
 
@@ -141,7 +141,7 @@ export default function GreetingCard({ childName, cosmetics = EMPTY }: Props) {
                 initial={{ opacity: 0, x: -8 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -8 }}
-                className="inline-flex items-center gap-1.5 self-start text-[13px] font-black px-3 py-1 rounded-full bg-white/25 text-white backdrop-blur-sm border border-white/30 shadow-sm"
+                className="inline-flex items-center gap-1.5 self-start text-sml font-black px-3 py-1 rounded-full bg-[var(--ds-surface-card)]/25 text-white backdrop-blur-sm border border-white/30 shadow-sm"
               >
                 {titleBadge.emoji} {t(titleBadge.nameKey)}
               </motion.span>
@@ -150,7 +150,7 @@ export default function GreetingCard({ childName, cosmetics = EMPTY }: Props) {
                 key="encouragement"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="text-white/80 text-[13px] font-bold"
+                className="text-white/80 text-sml font-bold"
               >
                 {t("progressEncouragement")}
               </motion.p>
@@ -159,7 +159,7 @@ export default function GreetingCard({ childName, cosmetics = EMPTY }: Props) {
 
           {/* Encouragement line shows when title badge is on */}
           {titleBadge && (
-            <p className="text-white/75 text-[12px] font-semibold leading-tight">
+            <p className="text-white/75 text-xs font-semibold leading-tight">
               {t("progressEncouragement")}
             </p>
           )}

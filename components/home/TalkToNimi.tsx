@@ -69,19 +69,19 @@ export default function TalkToNimi({ childName }: Props) {
   const showMic = micSupported && language !== "rw";
 
   return (
-    <div className="bg-white border border-ds-border shadow-ds-card overflow-hidden flex flex-col h-full" style={{ borderRadius: 'var(--leaf-r)' }}>
+    <div className="bg-[var(--ds-surface-card)] border border-ds-border shadow-ds-card overflow-hidden flex flex-col h-full" style={{ borderRadius: 'var(--leaf-r)' }}>
 
       {/* Header */}
       <div className="px-3 py-2.5 flex items-center gap-2 flex-shrink-0" style={{ backgroundColor: 'var(--nimi-green)' }}>
         <motion.button whileTap={m.buttonPress}
-          className="w-7 h-7 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-full flex items-center justify-center flex-shrink-0 transition">
+          className="w-7 h-7 bg-[var(--ds-surface-card-hover)] hover:bg-[var(--ds-surface-card-active)] text-[var(--ds-text-secondary)] rounded-full flex items-center justify-center flex-shrink-0 transition">
           <ChevronRight className="w-4 h-4 rotate-180" />
         </motion.button>
         <Image src={assets.nimiCircle} alt="NIMI" width={28} height={28}
           className="rounded-full object-cover border-2 border-yellow-300 flex-shrink-0 shadow" />
-        <span className="font-black text-white text-[12px] tracking-wide flex-1">{t("talkToNimiTitle")}</span>
+        <span className="font-black text-white text-xs tracking-wide flex-1">{t("talkToNimiTitle")}</span>
         <motion.button whileTap={m.buttonPress}
-          className="w-7 h-7 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-full flex items-center justify-center flex-shrink-0 transition font-black text-sm">
+          className="w-7 h-7 bg-[var(--ds-surface-card-hover)] hover:bg-[var(--ds-surface-card-active)] text-[var(--ds-text-secondary)] rounded-full flex items-center justify-center flex-shrink-0 transition font-black text-sm">
           ✕
         </motion.button>
       </div>
@@ -101,7 +101,7 @@ export default function TalkToNimi({ childName }: Props) {
                 )}
                 <div className={`text-[10.5px] leading-snug px-3 py-2 max-w-[72%] shadow-sm ${
                   msg.from === "nimi"
-                    ? "bg-gray-100 border border-ds-border text-ds-text rounded-2xl rounded-bl-sm"
+                    ? "bg-[var(--ds-surface-card-hover)] border border-ds-border text-ds-text rounded-2xl rounded-bl-sm"
                     : "text-white rounded-2xl rounded-br-sm"
                 }`}
                 style={msg.from === "user" ? { backgroundColor: 'var(--nimi-green)' } : undefined}>
@@ -132,10 +132,10 @@ export default function TalkToNimi({ childName }: Props) {
             className="flex items-center gap-2 bg-gradient-to-r from-violet-500 to-purple-600 rounded-2xl px-3 py-2.5 mb-2 mt-1 cursor-pointer group">
             <Crown className="w-4 h-4 text-yellow-300 shrink-0" />
             <div className="flex-1 min-w-0">
-              <p className="font-baloo font-black text-white text-[11px] leading-tight">Daily limit reached</p>
+              <p className="font-baloo font-black text-white text-2xs leading-tight">Daily limit reached</p>
               <p className="text-purple-200 text-[9.5px] leading-tight">Upgrade for unlimited Nimi chats 👑</p>
             </div>
-            <span className="text-yellow-300 font-black text-[10px] shrink-0 group-hover:text-yellow-200">Upgrade →</span>
+            <span className="text-yellow-300 font-black text-3xs shrink-0 group-hover:text-yellow-200">Upgrade →</span>
           </motion.a>
         )}
 
@@ -148,12 +148,12 @@ export default function TalkToNimi({ childName }: Props) {
 
         {/* Input */}
         <div className={`flex items-center gap-2 rounded-full border px-3 py-1 shadow-sm mb-3 mt-2 flex-shrink-0 ${
-          dailyLimitReached ? "bg-gray-50 border-gray-200 opacity-50 pointer-events-none" : "bg-gray-100 border-ds-border"
+          dailyLimitReached ? "bg-[var(--ds-surface-card)] border-[var(--ds-border-primary)] opacity-50 pointer-events-none" : "bg-[var(--ds-surface-card-hover)] border-ds-border"
         }`}>
           {language !== "rw" && (
             <motion.button onClick={toggleSpeak} whileTap={m.buttonPress} disabled={isTyping || dailyLimitReached}
               aria-label={isSpeaking ? t("stopReadingLabel") : t("readAloudLabel")}
-              className="w-7 h-7 bg-gray-200 hover:bg-gray-300 rounded-full flex items-center justify-center text-gray-600 flex-shrink-0 transition disabled:opacity-50">
+              className="w-7 h-7 bg-[var(--ds-surface-card-active)] hover:bg-[var(--ds-surface-input)] rounded-full flex items-center justify-center text-[var(--ds-text-secondary)] flex-shrink-0 transition disabled:opacity-50">
               {isSpeaking ? (
                 <motion.span animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 0.8, repeat: Infinity }}>
                   <VolumeX className="w-3.5 h-3.5" />
@@ -185,7 +185,7 @@ export default function TalkToNimi({ childName }: Props) {
           )}
           <motion.button onClick={() => sendChat()} whileTap={m.buttonPress}
             disabled={isTyping || !chatInput.trim() || dailyLimitReached}
-            className="w-7 h-7 disabled:bg-gray-200 flex items-center justify-center text-white flex-shrink-0 transition shadow"
+            className="w-7 h-7 disabled:bg-[var(--ds-surface-card-active)] flex items-center justify-center text-white flex-shrink-0 transition shadow"
             style={{ backgroundColor: 'var(--nimi-green)', borderRadius: 'var(--leaf-r-sm)' }}>
             <Send className="w-3 h-3" />
           </motion.button>

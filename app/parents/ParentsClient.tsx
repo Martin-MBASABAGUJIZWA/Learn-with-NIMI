@@ -357,8 +357,8 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
       <AppShell>
         <PageSurface className="items-center justify-center gap-4 px-4">
           <span className="text-5xl">👶</span>
-          <p className="text-ds-text font-bold text-center text-[16px]">No children profiles yet</p>
-          <Link href="/home" className="text-white font-black px-6 py-3 shadow-lg text-[14px]" style={{ backgroundColor: 'var(--nimi-green)', borderRadius: 'var(--leaf-r-sm)' }}>
+          <p className="text-ds-text font-bold text-center text-base">No children profiles yet</p>
+          <Link href="/home" className="text-white font-black px-6 py-3 shadow-lg text-sm" style={{ backgroundColor: 'var(--nimi-green)', borderRadius: 'var(--leaf-r-sm)' }}>
             Create a Profile
           </Link>
         </PageSurface>
@@ -383,8 +383,8 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
 
         {/* ═══ HERO ═══ */}
         <HeroBanner zone="familyHub" className="shadow-ds-card">
-          <div className="absolute -top-6 -right-6 w-40 h-40 rounded-full bg-white/10 pointer-events-none" />
-          <div className="absolute -bottom-10 -left-10 w-52 h-52 rounded-full bg-white/8 pointer-events-none" />
+          <div className="absolute -top-6 -right-6 w-40 h-40 rounded-full bg-[var(--ds-surface-card)]/10 pointer-events-none" />
+          <div className="absolute -bottom-10 -left-10 w-52 h-52 rounded-full bg-[var(--ds-surface-card)]/8 pointer-events-none" />
           {/* Floating particles */}
           {[
             { top: "10%", left:  "8%",  emoji: "📚", size: 14, delay: 0    },
@@ -411,7 +411,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
             <div className="relative shrink-0">
               {/* Glow ring */}
               <motion.div
-                className="absolute inset-0 rounded-full bg-white/30"
+                className="absolute inset-0 rounded-full bg-[var(--ds-surface-card)]/30"
                 animate={{ scale: [1, 1.14, 1], opacity: [0.3, 0.6, 0.3] }}
                 transition={{ duration: 3, repeat: Infinity }}
               />
@@ -427,7 +427,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                 {parentAvatarUrl ? (
                   <ChildAvatar avatarUrl={parentAvatarUrl} name={parentName} size={80} className="translate-y-[4px]" />
                 ) : (
-                  <span className="font-baloo font-black text-white text-[28px] sm:text-[34px] select-none">
+                  <span className="font-baloo font-black text-white text-3.5xl sm:text-4xl select-none">
                     {parentInitial}
                   </span>
                 )}
@@ -436,7 +436,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
               {/* Edit pencil badge — decorative, parent avatar button handles the click */}
               <motion.div
                 aria-hidden="true"
-                className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-lg border-2 border-white pointer-events-none"
+                className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-[var(--ds-surface-card)] flex items-center justify-center shadow-lg border-2 border-white pointer-events-none"
               >
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={parentColor} strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
@@ -446,7 +446,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
 
             {/* Name + subtitle */}
             <div className="flex-1 min-w-0">
-              <p className="text-white/60 text-[10px] font-nunito font-bold uppercase tracking-[0.14em] mb-0.5">
+              <p className="text-white/60 text-3xs font-nunito font-bold uppercase tracking-[0.14em] mb-0.5">
                 {getTimeGreeting()} 👋
               </p>
               {editingName ? (
@@ -456,25 +456,25 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                     value={nameInput}
                     onChange={e => setNameInput(e.target.value.slice(0, 32))}
                     onKeyDown={e => { if (e.key === "Enter") void handleSaveName(); if (e.key === "Escape") setEditingName(false); }}
-                    className="font-baloo font-black text-[22px] bg-white/20 text-white placeholder-white/50 border-b-2 border-white/60 focus:outline-none focus:border-white rounded px-1 min-w-0 flex-1"
+                    className="font-baloo font-black text-1.5xl bg-[var(--ds-surface-card)]/20 text-white placeholder-white/50 border-b-2 border-white/60 focus:outline-none focus:border-white rounded px-1 min-w-0 flex-1"
                     placeholder={parentName}
                     autoComplete="off"
                   />
                   <button
                     onClick={() => void handleSaveName()}
                     disabled={savingName}
-                    className="shrink-0 px-3 py-1 rounded-full bg-white/25 text-white text-[12px] font-black hover:bg-white/35 transition disabled:opacity-50"
+                    className="shrink-0 px-3 py-1 rounded-full bg-[var(--ds-surface-card)]/25 text-white text-xs font-black hover:bg-[var(--ds-surface-card)]/35 transition disabled:opacity-50"
                   >
                     {savingName ? "…" : "Save"}
                   </button>
-                  <button onClick={() => setEditingName(false)} className="shrink-0 text-white/60 hover:text-white text-[12px]">✕</button>
+                  <button onClick={() => setEditingName(false)} className="shrink-0 text-white/60 hover:text-white text-xs">✕</button>
                 </div>
               ) : (
                 <button
                   onClick={() => { setNameInput(parentName); setEditingName(true); setTimeout(() => nameInputRef.current?.focus(), 60); }}
                   className="group flex items-center gap-2"
                 >
-                  <h1 className="font-baloo font-black text-white text-[24px] sm:text-[28px] leading-tight truncate">
+                  <h1 className="font-baloo font-black text-white text-2xl sm:text-3.5xl leading-tight truncate">
                     {parentName}
                   </h1>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="opacity-0 group-hover:opacity-70 transition-opacity shrink-0">
@@ -482,10 +482,10 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                   </svg>
                 </button>
               )}
-              <p className="text-white/75 text-[12px] font-nunito mt-1 leading-snug">
+              <p className="text-white/75 text-xs font-nunito mt-1 leading-snug">
                 {getWeeklyInsight(childrenData.find(d => d.child.id === selectedChild) ?? childrenData[0], (todayActivity.length > 0))}
               </p>
-              <p className="text-white/45 text-[10px] font-nunito mt-1">
+              <p className="text-white/45 text-3xs font-nunito mt-1">
                 {childrenData.length} {childrenData.length === 1 ? "learner" : "learners"} · Family Hub
               </p>
             </div>
@@ -493,23 +493,23 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
             {/* Sub status pill */}
             {hasSubscription && !isTrial ? (
               <Link href="/pricing" className="shrink-0">
-                <div className="bg-white/20 border border-white/30 rounded-full px-3 py-1.5 flex items-center gap-1.5">
-                  <span className="text-[14px]">👑</span>
-                  <span className="text-white text-[10px] font-black">CLUB</span>
+                <div className="bg-[var(--ds-surface-card)]/20 border border-white/30 rounded-full px-3 py-1.5 flex items-center gap-1.5">
+                  <span className="text-sm">👑</span>
+                  <span className="text-white text-3xs font-black">CLUB</span>
                 </div>
               </Link>
             ) : isTrial ? (
               <Link href="/pricing" className="shrink-0">
                 <div className="bg-amber-400/90 border border-amber-300/60 rounded-full px-3 py-1.5 flex items-center gap-1.5 hover:bg-amber-400 transition">
-                  <span className="text-[14px]">⏳</span>
-                  <span className="text-amber-900 text-[10px] font-black">{trialDaysLeft}d LEFT</span>
+                  <span className="text-sm">⏳</span>
+                  <span className="text-amber-900 text-3xs font-black">{trialDaysLeft}d LEFT</span>
                 </div>
               </Link>
             ) : (
               <Link href="/pricing" className="shrink-0">
-                <div className="bg-white/20 border border-white/30 rounded-full px-3 py-1.5 flex items-center gap-1.5 hover:bg-white/30 transition">
-                  <span className="text-[14px]">🚀</span>
-                  <span className="text-white text-[10px] font-black">UPGRADE</span>
+                <div className="bg-[var(--ds-surface-card)]/20 border border-white/30 rounded-full px-3 py-1.5 flex items-center gap-1.5 hover:bg-[var(--ds-surface-card)]/30 transition">
+                  <span className="text-sm">🚀</span>
+                  <span className="text-white text-3xs font-black">UPGRADE</span>
                 </div>
               </Link>
             )}
@@ -524,7 +524,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
               initial={{ opacity: 0, y: -12 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -12 }}
-              className="fixed top-20 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-4 py-2.5 rounded-full bg-emerald-600 text-white text-[13px] font-black shadow-xl"
+              className="fixed top-20 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-4 py-2.5 rounded-full bg-emerald-600 text-white text-sml font-black shadow-xl"
             >
               {`🎮 Switched to ${childrenData.find(d => d.child.id === playingChildId)?.child.name ?? "kid"} — whole app updated!`}
             </motion.div>
@@ -542,18 +542,18 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                 <div className="p-4 flex items-center gap-3">
                   <div className="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center text-xl shrink-0">⚠️</div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-baloo font-black text-red-800 text-[15px]">Payment failed</p>
-                    <p className="text-red-600 text-[11px] font-bold">Your Club access is on hold — please update your payment to continue</p>
+                    <p className="font-baloo font-black text-red-800 text-mbase">Payment failed</p>
+                    <p className="text-red-600 text-2xs font-bold">Your Club access is on hold — please update your payment to continue</p>
                   </div>
                 </div>
                 <div className="px-4 pb-4 border-t border-red-100 pt-3 flex gap-2">
-                  <a href="/pricing" className="flex-1 text-center py-2 text-[12px] font-black text-white rounded-xl transition"
+                  <a href="/pricing" className="flex-1 text-center py-2 text-xs font-black text-white rounded-xl transition"
                     style={{ backgroundColor: "var(--nimi-green)" }}>
                     Resubscribe →
                   </a>
                   {subscription?.payment_provider === "cybersource" && (
                     <button onClick={() => setShowUpdateCard(true)}
-                      className="flex-1 py-2 text-[12px] font-black text-red-700 bg-white border border-red-200 rounded-xl hover:bg-red-50 transition">
+                      className="flex-1 py-2 text-xs font-black text-red-700 bg-[var(--ds-surface-card)] border border-red-200 rounded-xl hover:bg-red-50 transition">
                       Update card
                     </button>
                   )}
@@ -565,17 +565,17 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                 <div className="p-4 flex items-center gap-3">
                   <div className="w-10 h-10 bg-ds-club rounded-xl flex items-center justify-center text-xl shadow-sm shrink-0">👑</div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-baloo font-black text-ds-text text-[15px]">NIMIPIKO Club Active</p>
+                    <p className="font-baloo font-black text-ds-text text-mbase">NIMIPIKO Club Active</p>
                     {subscription?.cancel_at_period_end ? (
-                      <p className="text-ds-danger text-[11px] font-bold">
+                      <p className="text-ds-danger text-2xs font-bold">
                         Cancels {subscription.current_period_end ? new Date(subscription.current_period_end).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "—"}
                       </p>
                     ) : subscription?.current_period_end ? (
-                      <p className="text-ds-club-text text-[11px] font-bold">
+                      <p className="text-ds-club-text text-2xs font-bold">
                         Renews {new Date(subscription.current_period_end).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
                       </p>
                     ) : (
-                      <p className="text-ds-club-text text-[11px] font-bold">All premium stories unlocked ✓</p>
+                      <p className="text-ds-club-text text-2xs font-bold">All premium stories unlocked ✓</p>
                     )}
                   </div>
                   <button onClick={() => { setShowManageSub(s => !s); setConfirmCancel(false); }} className="text-ds-club hover:opacity-75 transition shrink-0">
@@ -585,7 +585,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                 {showManageSub && (
                   <div className="px-4 pb-4 border-t border-ds-club pt-3 space-y-2">
                     {cancelSubError && (
-                      <p className="text-ds-danger text-[11px] font-bold flex items-center gap-1">
+                      <p className="text-ds-danger text-2xs font-bold flex items-center gap-1">
                         <AlertTriangle className="w-3 h-3 shrink-0" /> {cancelSubError}
                       </p>
                     )}
@@ -593,7 +593,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                       <button
                         onClick={() => void handleCancelSub("reactivate")}
                         disabled={cancellingSubscription}
-                        className="w-full py-2 text-[12px] font-black text-ds-club-text bg-ds-club-subtle hover:opacity-90 rounded-xl transition flex items-center justify-center gap-2"
+                        className="w-full py-2 text-xs font-black text-ds-club-text bg-ds-club-subtle hover:opacity-90 rounded-xl transition flex items-center justify-center gap-2"
                       >
                         {cancellingSubscription ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
                         Reactivate Subscription
@@ -601,17 +601,17 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                     ) : confirmCancel ? (
                       <div className="space-y-2">
                         {/* Retention offer */}
-                        <div className="bg-ds-warn-surface border border-ds-warn rounded-xl p-3 text-[11px]">
+                        <div className="bg-ds-warn-surface border border-ds-warn rounded-xl p-3 text-2xs">
                           <p className="font-black text-ds-warn mb-1">💛 Before you go...</p>
                           <p className="text-ds-warn mb-2 opacity-90">Use code <strong>STAY20</strong> for 20% off your next renewal — keep everything you love.</p>
                           <a
                             href="/pricing?code=STAY20"
-                            className="block w-full text-center py-1.5 font-black text-[11px] text-white bg-[var(--ds-warn-icon)] hover:opacity-90 rounded-lg transition"
+                            className="block w-full text-center py-1.5 font-black text-2xs text-white bg-[var(--ds-warn-icon)] hover:opacity-90 rounded-lg transition"
                           >
                             Claim 20% Off →
                           </a>
                         </div>
-                        <div className="bg-ds-danger-surface border border-ds-danger rounded-xl p-3 text-[11px] space-y-1.5">
+                        <div className="bg-ds-danger-surface border border-ds-danger rounded-xl p-3 text-2xs space-y-1.5">
                           <p className="font-black text-ds-danger">You&apos;ll lose access to:</p>
                           <ul className="text-ds-danger/80 space-y-0.5 list-none">
                             <li>📚 All premium stories (locked after period ends)</li>
@@ -622,14 +622,14 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                         </div>
                         <button
                           onClick={() => setConfirmCancel(false)}
-                          className="w-full py-2 text-[12px] font-black text-ds-club-text bg-ds-club-subtle hover:opacity-90 rounded-xl transition"
+                          className="w-full py-2 text-xs font-black text-ds-club-text bg-ds-club-subtle hover:opacity-90 rounded-xl transition"
                         >
                           Keep Subscription
                         </button>
                         <button
                           onClick={() => { void handleCancelSub("cancel"); setConfirmCancel(false); }}
                           disabled={cancellingSubscription}
-                          className="w-full py-1.5 text-[11px] font-semibold text-red-500 hover:text-red-700 transition flex items-center justify-center gap-1.5"
+                          className="w-full py-1.5 text-2xs font-semibold text-red-500 hover:text-red-700 transition flex items-center justify-center gap-1.5"
                         >
                           {cancellingSubscription ? <Loader2 className="w-3 h-3 animate-spin" /> : null}
                           Cancel anyway
@@ -639,13 +639,13 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                       <button
                         onClick={() => setConfirmCancel(true)}
                         disabled={cancellingSubscription}
-                        className="w-full py-2 text-[12px] font-black text-red-600 bg-red-50 hover:bg-red-100 rounded-xl transition flex items-center justify-center gap-2"
+                        className="w-full py-2 text-xs font-black text-red-600 bg-red-50 hover:bg-red-100 rounded-xl transition flex items-center justify-center gap-2"
                       >
                         Cancel at Period End
                       </button>
                     )}
                     {!confirmCancel && (
-                      <p className="text-[10px] text-ds-muted text-center">
+                      <p className="text-3xs text-ds-muted text-center">
                         {subscription?.cancel_at_period_end
                           ? "Your access continues until the period ends."
                           : "You won't be charged again. Access continues until period end."}
@@ -662,14 +662,14 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                   <div className="p-4 flex items-center gap-3 bg-ds-warn-surface">
                     <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-orange-400 rounded-xl flex items-center justify-center text-xl shadow-sm shrink-0">⏳</div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-baloo font-black text-ds-text text-[15px]">Free Trial — {trialDaysLeft} {trialDaysLeft === 1 ? "day" : "days"} left</p>
-                      <p className="text-amber-700 text-[11px] font-bold">
+                      <p className="font-baloo font-black text-ds-text text-mbase">Free Trial — {trialDaysLeft} {trialDaysLeft === 1 ? "day" : "days"} left</p>
+                      <p className="text-amber-700 text-2xs font-bold">
                         {trialDaysLeft <= 2
                           ? "Trial ends soon — upgrade to keep access!"
                           : "Enjoying Club? Subscribe to keep it going."}
                       </p>
                     </div>
-                    <span className="bg-amber-400 text-amber-900 font-black text-[11px] px-3 py-1 shrink-0" style={{ borderRadius: 'var(--leaf-r-sm)' }}>Upgrade</span>
+                    <span className="bg-amber-400 text-amber-900 font-black text-2xs px-3 py-1 shrink-0" style={{ borderRadius: 'var(--leaf-r-sm)' }}>Upgrade</span>
                   </div>
                 </motion.div>
               </Link>
@@ -681,10 +681,10 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                   <div className="p-4 flex items-center gap-3">
                     <div className="w-10 h-10 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center text-xl shadow-sm shrink-0">🚀</div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-baloo font-black text-ds-text text-[15px]">{t("unlockPremium")}</p>
-                      <p className="text-gray-500 text-[11px]">{t("allStoriesAllLanguages")}</p>
+                      <p className="font-baloo font-black text-ds-text text-mbase">{t("unlockPremium")}</p>
+                      <p className="text-[var(--ds-text-secondary)] text-2xs">{t("allStoriesAllLanguages")}</p>
                     </div>
-                    <span className="bg-yellow-400 text-black font-black text-[11px] px-3 py-1 shrink-0" style={{ borderRadius: 'var(--leaf-r-sm)' }}>{t("seePlans")}</span>
+                    <span className="bg-yellow-400 text-black font-black text-2xs px-3 py-1 shrink-0" style={{ borderRadius: 'var(--leaf-r-sm)' }}>{t("seePlans")}</span>
                   </div>
                 </motion.div>
               </Link>
@@ -701,19 +701,19 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                   <motion.button
                     initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.07 }}
                     onClick={() => { setSelectedChild(d.child.id); setParentTab("overview"); }}
-                    className={`flex items-center gap-2.5 px-3.5 py-2.5 font-bold text-[13px] transition border-2 ${
-                      isSelected ? "text-white shadow-sm" : "bg-white text-ds-text border-ds-border hover:bg-gray-50"
+                    className={`flex items-center gap-2.5 px-3.5 py-2.5 font-bold text-sml transition border-2 ${
+                      isSelected ? "text-white shadow-sm" : "bg-[var(--ds-surface-card)] text-ds-text border-ds-border hover:bg-[var(--ds-surface-card-hover)]"
                     }`}
                     style={{ borderRadius: 'var(--leaf-r)', ...(isSelected ? { backgroundColor: 'var(--nimi-green)', borderColor: 'var(--nimi-green)' } : {}) }}>
-                    <div className="relative w-8 h-8 rounded-full overflow-hidden shrink-0 bg-white/20 flex items-center justify-center">
+                    <div className="relative w-8 h-8 rounded-full overflow-hidden shrink-0 bg-[var(--ds-surface-card)]/20 flex items-center justify-center">
                       <ChildAvatar avatarUrl={d.child.avatar_url} name={d.child.name} size={32} />
                       {isPlaying && (
-                        <span className="absolute -bottom-0.5 -right-0.5 text-[10px] leading-none">🎮</span>
+                        <span className="absolute -bottom-0.5 -right-0.5 text-3xs leading-none">🎮</span>
                       )}
                     </div>
                     <div className="text-left">
                       <p className="font-black leading-none">{d.child.name}</p>
-                      <p className={`text-[10px] mt-0.5 ${isSelected ? "text-white/75" : "text-gray-400"}`}>
+                      <p className={`text-3xs mt-0.5 ${isSelected ? "text-white/75" : "text-[var(--ds-text-tertiary)]"}`}>
                         {isPlaying ? t("nowPlaying") : `${d.stories.filter(s => s.complete).length}/${d.stories.length} stories`}
                       </p>
                     </div>
@@ -722,7 +722,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                   {!isPlaying && childrenData.length > 1 && (
                     <button
                       onClick={() => switchPlaying(d.child.id)}
-                      className="text-[10px] font-black text-[var(--ds-brand-primary)] bg-[var(--ds-brand-subtle)] border border-[var(--ds-border-brand)]/40 px-2 py-1 text-center hover:bg-[var(--ds-brand-primary)] hover:text-white transition"
+                      className="text-3xs font-black text-[var(--ds-brand-primary)] bg-[var(--ds-brand-subtle)] border border-[var(--ds-border-brand)]/40 px-2 py-1 text-center hover:bg-[var(--ds-brand-primary)] hover:text-white transition"
                       style={{ borderRadius: 'var(--leaf-r-sm)' }}
                     >
                       {t("switchToThisKid")}
@@ -734,7 +734,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
             <motion.button
               initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: childrenData.length * 0.07 }}
               onClick={handleAddKid}
-              className="flex items-center gap-2 px-3.5 py-2.5 font-black text-[13px] bg-[var(--ds-brand-subtle)] text-[var(--ds-brand-primary)] border-2 border-dashed border-[var(--ds-border-brand)]/40 transition shrink-0 self-start"
+              className="flex items-center gap-2 px-3.5 py-2.5 font-black text-sml bg-[var(--ds-brand-subtle)] text-[var(--ds-brand-primary)] border-2 border-dashed border-[var(--ds-border-brand)]/40 transition shrink-0 self-start"
               style={{ borderRadius: 'var(--leaf-r)' }}>
               {childrenData.length >= 1 && !hasSubscription ? <Lock className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
               {t("addKid")}
@@ -753,18 +753,18 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                   <div className="p-3 flex items-center gap-2.5">
                     <div className="w-9 h-9 bg-red-100 rounded-xl flex items-center justify-center text-base shrink-0">⚠️</div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-black text-red-800 text-[13px]">Payment failed</p>
-                      <p className="text-red-600 text-[10px] font-bold leading-tight">Club access on hold</p>
+                      <p className="font-black text-red-800 text-sml">Payment failed</p>
+                      <p className="text-red-600 text-3xs font-bold leading-tight">Club access on hold</p>
                     </div>
                   </div>
                   <div className="px-3 pb-3 border-t border-red-100 pt-2 space-y-1.5">
-                    <a href="/pricing" className="block text-center py-1.5 text-[11px] font-black text-white rounded-xl transition"
+                    <a href="/pricing" className="block text-center py-1.5 text-2xs font-black text-white rounded-xl transition"
                       style={{ backgroundColor: "var(--nimi-green)" }}>
                       Resubscribe →
                     </a>
                     {subscription?.payment_provider === "cybersource" && (
                       <button onClick={() => setShowUpdateCard(true)}
-                        className="w-full py-1.5 text-[11px] font-black text-red-700 bg-white border border-red-200 rounded-xl hover:bg-red-50 transition">
+                        className="w-full py-1.5 text-2xs font-black text-red-700 bg-[var(--ds-surface-card)] border border-red-200 rounded-xl hover:bg-red-50 transition">
                         Update card
                       </button>
                     )}
@@ -775,17 +775,17 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                   <div className="p-4 flex items-center gap-3">
                     <div className="w-9 h-9 bg-ds-club rounded-xl flex items-center justify-center text-lg shadow-sm shrink-0">👑</div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-black text-ds-text text-[13px]">{t("clubActive")}</p>
+                      <p className="font-black text-ds-text text-sml">{t("clubActive")}</p>
                       {subscription?.cancel_at_period_end ? (
-                        <p className="text-ds-danger text-[10px] font-bold">
+                        <p className="text-ds-danger text-3xs font-bold">
                           Cancels {subscription.current_period_end ? new Date(subscription.current_period_end).toLocaleDateString("en-GB", { day: "numeric", month: "short" }) : "—"}
                         </p>
                       ) : subscription?.current_period_end ? (
-                        <p className="text-ds-club-text text-[10px] font-bold">
+                        <p className="text-ds-club-text text-3xs font-bold">
                           Renews {new Date(subscription.current_period_end).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
                         </p>
                       ) : (
-                        <p className="text-ds-club-text text-[10px] font-bold">{t("allStoriesUnlocked")}</p>
+                        <p className="text-ds-club-text text-3xs font-bold">{t("allStoriesUnlocked")}</p>
                       )}
                     </div>
                     <button onClick={() => { setShowManageSub(s => !s); setConfirmCancel(false); }} className="text-ds-club hover:opacity-75 transition shrink-0">
@@ -795,7 +795,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                   {showManageSub && (
                     <div className="px-3 pb-3 border-t border-ds-club pt-2.5 space-y-2">
                       {cancelSubError && (
-                        <p className="text-ds-danger text-[10px] font-bold flex items-center gap-1">
+                        <p className="text-ds-danger text-3xs font-bold flex items-center gap-1">
                           <AlertTriangle className="w-3 h-3 shrink-0" /> {cancelSubError}
                         </p>
                       )}
@@ -803,7 +803,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                         <button
                           onClick={() => void handleCancelSub("reactivate")}
                           disabled={cancellingSubscription}
-                          className="w-full py-1.5 text-[11px] font-black text-ds-club-text bg-ds-club-subtle hover:opacity-90 rounded-xl transition flex items-center justify-center gap-1.5"
+                          className="w-full py-1.5 text-2xs font-black text-ds-club-text bg-ds-club-subtle hover:opacity-90 rounded-xl transition flex items-center justify-center gap-1.5"
                         >
                           {cancellingSubscription ? <Loader2 className="w-3 h-3 animate-spin" /> : null}
                           Reactivate
@@ -811,17 +811,17 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                       ) : confirmCancel ? (
                         <div className="space-y-2">
                           {/* Retention offer */}
-                          <div className="bg-ds-warn-surface border border-ds-warn rounded-xl p-2.5 text-[10px]">
+                          <div className="bg-ds-warn-surface border border-ds-warn rounded-xl p-2.5 text-3xs">
                             <p className="font-black text-ds-warn mb-1">💛 Before you go...</p>
                             <p className="text-ds-warn opacity-90 mb-1.5">Code <strong>STAY20</strong> = 20% off next renewal</p>
                             <a
                               href="/pricing?code=STAY20"
-                              className="block w-full text-center py-1 font-black text-[10px] text-white bg-[var(--ds-warn-icon)] hover:opacity-90 rounded-lg transition"
+                              className="block w-full text-center py-1 font-black text-3xs text-white bg-[var(--ds-warn-icon)] hover:opacity-90 rounded-lg transition"
                             >
                               Claim 20% Off →
                             </a>
                           </div>
-                          <div className="bg-ds-danger-surface border border-ds-danger rounded-xl p-2.5 text-[10px] space-y-1">
+                          <div className="bg-ds-danger-surface border border-ds-danger rounded-xl p-2.5 text-3xs space-y-1">
                             <p className="font-black text-ds-danger">You&apos;ll lose:</p>
                             <ul className="text-ds-danger/80 space-y-0.5">
                               <li>📚 All premium stories</li>
@@ -832,14 +832,14 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                           </div>
                           <button
                             onClick={() => setConfirmCancel(false)}
-                            className="w-full py-1.5 text-[11px] font-black text-ds-club-text bg-ds-club-subtle hover:opacity-90 rounded-xl transition"
+                            className="w-full py-1.5 text-2xs font-black text-ds-club-text bg-ds-club-subtle hover:opacity-90 rounded-xl transition"
                           >
                             Keep Subscription
                           </button>
                           <button
                             onClick={() => { void handleCancelSub("cancel"); setConfirmCancel(false); }}
                             disabled={cancellingSubscription}
-                            className="w-full py-1 text-[10px] font-semibold text-ds-danger hover:opacity-80 transition flex items-center justify-center gap-1"
+                            className="w-full py-1 text-3xs font-semibold text-ds-danger hover:opacity-80 transition flex items-center justify-center gap-1"
                           >
                             {cancellingSubscription ? <Loader2 className="w-3 h-3 animate-spin" /> : null}
                             Cancel anyway
@@ -849,13 +849,13 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                         <button
                           onClick={() => setConfirmCancel(true)}
                           disabled={cancellingSubscription}
-                          className="w-full py-1.5 text-[11px] font-black text-red-600 bg-red-50 hover:bg-red-100 rounded-xl transition flex items-center justify-center gap-1.5"
+                          className="w-full py-1.5 text-2xs font-black text-red-600 bg-red-50 hover:bg-red-100 rounded-xl transition flex items-center justify-center gap-1.5"
                         >
                           Cancel at period end
                         </button>
                       )}
                       {!confirmCancel && (
-                        <p className="text-[9px] text-ds-muted text-center leading-tight">
+                        <p className="text-4xs text-ds-muted text-center leading-tight">
                           {subscription?.cancel_at_period_end
                             ? "Access continues until period ends."
                             : "Access continues until your current period ends."}
@@ -869,8 +869,8 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                   <div className="overflow-hidden shadow-ds-card p-4 flex items-center gap-3 cursor-pointer hover:shadow-md transition" style={{ borderRadius: 'var(--leaf-r-lg)', border: '1px solid #fbbf24', background: 'linear-gradient(to right, #fffbeb, #fef3c7)' }}>
                     <div className="w-9 h-9 bg-gradient-to-br from-amber-400 to-orange-400 rounded-xl flex items-center justify-center text-lg shadow-sm shrink-0">⏳</div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-black text-ds-text text-[13px]">Trial — {trialDaysLeft}d left</p>
-                      <p className="text-[10px] font-bold" style={{ color: trialDaysLeft <= 2 ? '#dc2626' : '#b45309' }}>
+                      <p className="font-black text-ds-text text-sml">Trial — {trialDaysLeft}d left</p>
+                      <p className="text-3xs font-bold" style={{ color: trialDaysLeft <= 2 ? '#dc2626' : '#b45309' }}>
                         {trialDaysLeft <= 2 ? "Expires soon — upgrade!" : "Upgrade to keep access"}
                       </p>
                     </div>
@@ -882,8 +882,8 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                   <div className="overflow-hidden border border-yellow-200/80 bg-gradient-to-r from-yellow-50 to-orange-50 shadow-ds-card p-4 flex items-center gap-3 cursor-pointer hover:shadow-md transition" style={{ borderRadius: 'var(--leaf-r-lg)' }}>
                     <div className="w-9 h-9 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center text-lg shadow-sm shrink-0">🚀</div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-black text-ds-text text-[13px]">{t("goPremium")}</p>
-                      <p className="text-gray-500 text-[10px]">{t("allStoriesAllLanguages")}</p>
+                      <p className="font-black text-ds-text text-sml">{t("goPremium")}</p>
+                      <p className="text-[var(--ds-text-secondary)] text-3xs">{t("allStoriesAllLanguages")}</p>
                     </div>
                     <ChevronRight className="w-4 h-4 text-yellow-600 shrink-0" />
                   </div>
@@ -891,9 +891,9 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
               )}
 
               {/* Child cards */}
-              <div className="bg-white border border-ds-border shadow-ds-card overflow-hidden" style={{ borderRadius: 'var(--leaf-r-lg)' }}>
+              <div className="bg-[var(--ds-surface-card)] border border-ds-border shadow-ds-card overflow-hidden" style={{ borderRadius: 'var(--leaf-r-lg)' }}>
                 <div className="px-4 pt-4 pb-2">
-                  <p className="text-[10px] font-black text-ds-muted uppercase tracking-widest">{t("myKids")}</p>
+                  <p className="text-3xs font-black text-ds-muted uppercase tracking-widest">{t("myKids")}</p>
                 </div>
                 <div className="px-2 pb-2 space-y-1">
                   {childrenData.map((d, i) => {
@@ -909,7 +909,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                           className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-left ${
                             isActive
                               ? "bg-[var(--ds-brand-subtle)] border border-[var(--ds-border-brand)]/40"
-                              : "hover:bg-gray-50 border border-transparent"
+                              : "hover:bg-[var(--ds-surface-card-hover)] border border-transparent"
                           }`}
                         >
                           <div className={`relative w-10 h-10 rounded-full overflow-visible shrink-0 flex items-center justify-center`}>
@@ -917,28 +917,28 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                               <ChildAvatar avatarUrl={d.child.avatar_url} name={d.child.name} size={40} />
                             </div>
                             {isPlaying && (
-                              <span className="absolute -bottom-0.5 -right-0.5 text-[11px] leading-none bg-white rounded-full p-0.5 shadow-sm">🎮</span>
+                              <span className="absolute -bottom-0.5 -right-0.5 text-2xs leading-none bg-[var(--ds-surface-card)] rounded-full p-0.5 shadow-sm">🎮</span>
                             )}
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-1.5">
-                              <p className={`font-black text-[14px] leading-tight truncate ${isActive ? "text-[var(--ds-brand-primary)]" : "text-ds-text"}`}>
+                              <p className={`font-black text-sm leading-tight truncate ${isActive ? "text-[var(--ds-brand-primary)]" : "text-ds-text"}`}>
                                 {d.child.name}
                               </p>
                               {isPlaying && (
-                                <span className="shrink-0 text-[9px] font-black text-emerald-600 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-full leading-none">
+                                <span className="shrink-0 text-4xs font-black text-emerald-600 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-full leading-none">
                                   PLAYING
                                 </span>
                               )}
                             </div>
                             <div className="flex items-center gap-1.5 mt-1">
-                              <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                              <div className="flex-1 h-1.5 bg-[var(--ds-surface-card-active)] rounded-full overflow-hidden">
                                 <div
                                   className="h-full rounded-full bg-[var(--nimi-green)] transition-all duration-500"
                                   style={{ width: `${total > 0 ? (done / total) * 100 : 0}%` }}
                                 />
                               </div>
-                              <span className="text-[10px] font-bold text-ds-muted shrink-0">{done}/{total}</span>
+                              <span className="text-3xs font-bold text-ds-muted shrink-0">{done}/{total}</span>
                             </div>
                             {/* Today's sessions + streak */}
                             <div className="flex items-center gap-2 mt-1">
@@ -947,15 +947,15 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                                 const todaySessions = d.weekActivity[todayIdx] ?? 0;
                                 return (
                                   <>
-                                    <span className={`text-[9px] font-black px-1.5 py-0.5 rounded-full leading-none ${
+                                    <span className={`text-4xs font-black px-1.5 py-0.5 rounded-full leading-none ${
                                       todaySessions > 0
                                         ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                                        : "bg-gray-50 text-gray-400 border border-gray-200"
+                                        : "bg-[var(--ds-surface-card-hover)] text-[var(--ds-text-tertiary)] border border-[var(--ds-border-primary)]"
                                     }`}>
                                       {todaySessions > 0 ? `${todaySessions} today` : "0 today"}
                                     </span>
                                     {d.streak > 0 && (
-                                      <span className="text-[9px] font-black text-orange-600">🔥 {d.streak}</span>
+                                      <span className="text-4xs font-black text-orange-600">🔥 {d.streak}</span>
                                     )}
                                   </>
                                 );
@@ -967,7 +967,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                         {!isPlaying && childrenData.length > 1 && (
                           <button
                             onClick={() => switchPlaying(d.child.id)}
-                            className="w-full text-[10px] font-black text-[var(--ds-brand-primary)] bg-[var(--ds-brand-subtle)] border border-[var(--ds-border-brand)]/30 px-3 py-1.5 rounded-lg hover:bg-[var(--ds-brand-primary)] hover:text-white transition text-center"
+                            className="w-full text-3xs font-black text-[var(--ds-brand-primary)] bg-[var(--ds-brand-subtle)] border border-[var(--ds-border-brand)]/30 px-3 py-1.5 rounded-lg hover:bg-[var(--ds-brand-primary)] hover:text-white transition text-center"
                           >
                             {t("switchToChild").replace("{name}", d.child.name)}
                           </button>
@@ -979,7 +979,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                 <div className="px-2 pb-3">
                   <button
                     onClick={handleAddKid}
-                    className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border-2 border-dashed border-[var(--ds-border-brand)]/40 text-[var(--ds-brand-primary)] font-black text-[12px] hover:bg-[var(--ds-brand-subtle)] transition"
+                    className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border-2 border-dashed border-[var(--ds-border-brand)]/40 text-[var(--ds-brand-primary)] font-black text-xs hover:bg-[var(--ds-brand-subtle)] transition"
                   >
                     {childrenData.length >= 1 && !hasSubscription ? <Lock className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
                     {t("addKid")}
@@ -993,18 +993,18 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
           {active && (
             <>
               {/* ═══ MOBILE STICKY VIEWING BAR ═══ */}
-              <div className="lg:hidden sticky top-16 z-10 -mx-3 sm:-mx-4 mb-4 px-3 sm:px-4 py-2.5 bg-white/90 backdrop-blur-md border-b border-ds-border flex items-center gap-3 shadow-sm">
-                <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 flex items-center justify-center bg-gray-100">
+              <div className="lg:hidden sticky top-16 z-10 -mx-3 sm:-mx-4 mb-4 px-3 sm:px-4 py-2.5 bg-[var(--ds-surface-card)]/90 backdrop-blur-md border-b border-ds-border flex items-center gap-3 shadow-sm">
+                <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 flex items-center justify-center bg-[var(--ds-surface-card-active)]">
                   <ChildAvatar avatarUrl={active.child.avatar_url} name={active.child.name} size={32} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-black text-ds-text text-[13px] leading-none truncate">{active.child.name}</p>
-                  <p className="text-ds-muted text-[10px] font-semibold mt-0.5">
+                  <p className="font-black text-ds-text text-sml leading-none truncate">{active.child.name}</p>
+                  <p className="text-ds-muted text-3xs font-semibold mt-0.5">
                     {storiesComplete}/{totalStories} stories · {active.streak}🔥 · {active.totalStars}⭐
                   </p>
                 </div>
                 <div className="shrink-0 flex items-center gap-2">
-                  <div className="w-20 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                  <div className="w-20 h-1.5 bg-[var(--ds-surface-card-active)] rounded-full overflow-hidden">
                     <div
                       className="h-full rounded-full bg-[var(--nimi-green)]"
                       style={{ width: `${totalStories > 0 ? (storiesComplete / totalStories) * 100 : 0}%` }}
@@ -1025,17 +1025,17 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                   <button
                     key={tab.id}
                     onClick={() => setParentTab(tab.id)}
-                    className={`relative flex items-center gap-1.5 px-4 py-2 rounded-full text-[13px] font-baloo font-black transition-all shrink-0 ${
+                    className={`relative flex items-center gap-1.5 px-4 py-2 rounded-full text-sml font-baloo font-black transition-all shrink-0 ${
                       parentTab === tab.id
                         ? "bg-ds-action text-white shadow-sm"
-                        : "bg-white border border-ds-border text-gray-500 hover:text-ds-text hover:bg-gray-50"
+                        : "bg-[var(--ds-surface-card)] border border-ds-border text-[var(--ds-text-secondary)] hover:text-ds-text hover:bg-[var(--ds-surface-card-hover)]"
                     }`}
                   >
                     <span>{tab.emoji}</span>
                     {tab.label}
                     {tab.badge && (
-                      <span className={`ml-0.5 text-[9px] font-black px-1.5 py-0.5 rounded-full leading-none ${
-                        parentTab === tab.id ? "bg-white/25 text-white" : "bg-[var(--ds-brand-primary)] text-white"
+                      <span className={`ml-0.5 text-4xs font-black px-1.5 py-0.5 rounded-full leading-none ${
+                        parentTab === tab.id ? "bg-[var(--ds-surface-card)]/25 text-white" : "bg-[var(--ds-brand-primary)] text-white"
                       }`}>
                         {tab.badge}
                       </span>
@@ -1065,10 +1065,10 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                           key={a.label} href={a.href}
                           initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: i * 0.06 }}
-                          className={`flex items-center gap-2 px-4 py-2.5 border font-baloo font-black text-[12px] shrink-0 transition ${a.color}`}
+                          className={`flex items-center gap-2 px-4 py-2.5 border font-baloo font-black text-xs shrink-0 transition ${a.color}`}
                           style={{ borderRadius: "var(--leaf-r)" }}
                         >
-                          <span className="text-[16px]">{a.emoji}</span>
+                          <span className="text-base">{a.emoji}</span>
                           {a.label}
                         </motion.a>
                       ))}
@@ -1078,10 +1078,10 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                             initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.18 }}
                             onClick={() => setShowSwitchMenu(v => !v)}
-                            className="flex items-center gap-2 px-4 py-2.5 border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-baloo font-black text-[12px] transition"
+                            className="flex items-center gap-2 px-4 py-2.5 border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-baloo font-black text-xs transition"
                             style={{ borderRadius: "var(--leaf-r)" }}
                           >
-                            <span className="text-[16px]">🔄</span>
+                            <span className="text-base">🔄</span>
                             Switch Child
                             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`transition-transform ${showSwitchMenu ? "rotate-180" : ""}`}><path d="M6 9l6 6 6-6"/></svg>
                           </motion.button>
@@ -1096,9 +1096,9 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                                   animate={{ opacity: 1, y: 0, scale: 1 }}
                                   exit={{ opacity: 0, y: -6, scale: 0.96 }}
                                   transition={{ duration: 0.15 }}
-                                  className="absolute top-full left-0 mt-1.5 z-50 bg-white border border-ds-border shadow-xl rounded-2xl overflow-hidden min-w-[200px]"
+                                  className="absolute top-full left-0 mt-1.5 z-50 bg-[var(--ds-surface-card)] border border-ds-border shadow-xl rounded-2xl overflow-hidden min-w-[200px]"
                                 >
-                                  <p className="px-3 pt-2.5 pb-1 text-[9px] font-black text-ds-muted uppercase tracking-widest">Switch playing to</p>
+                                  <p className="px-3 pt-2.5 pb-1 text-4xs font-black text-ds-muted uppercase tracking-widest">Switch playing to</p>
                                   {childrenData
                                     .filter(d => d.child.id !== playingChildId)
                                     .map(d => (
@@ -1107,12 +1107,12 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                                         onClick={() => { switchPlaying(d.child.id); setShowSwitchMenu(false); }}
                                         className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-emerald-50 transition text-left"
                                       >
-                                        <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 bg-gray-100 flex items-center justify-center">
+                                        <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 bg-[var(--ds-surface-card-active)] flex items-center justify-center">
                                           <ChildAvatar avatarUrl={d.child.avatar_url} name={d.child.name} size={32} />
                                         </div>
                                         <div className="min-w-0">
-                                          <p className="font-black text-ds-text text-[13px] leading-tight truncate">{d.child.name}</p>
-                                          <p className="text-ds-muted text-[10px] font-semibold">{d.stories.filter(s => s.complete).length}/{d.stories.length} stories · {d.streak}🔥</p>
+                                          <p className="font-black text-ds-text text-sml leading-tight truncate">{d.child.name}</p>
+                                          <p className="text-ds-muted text-3xs font-semibold">{d.stories.filter(s => s.complete).length}/{d.stories.length} stories · {d.streak}🔥</p>
                                         </div>
                                       </button>
                                     ))
@@ -1128,7 +1128,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                     {/* Family Children Snapshot — only when 2+ children */}
                     {childrenData.length > 1 && (
                       <div>
-                        <p className="text-[10px] font-black text-ds-muted uppercase tracking-widest mb-2">All Learners</p>
+                        <p className="text-3xs font-black text-ds-muted uppercase tracking-widest mb-2">All Learners</p>
                         <div className="flex gap-3 overflow-x-auto pb-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                           {childrenData.map((d, i) => {
                             const isPlaying = d.child.id === playingChildId;
@@ -1145,7 +1145,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                                 className={`shrink-0 flex flex-col items-center gap-2 p-3 border-2 transition w-[110px] ${
                                   isViewing
                                     ? "bg-[var(--ds-brand-subtle)] border-[var(--ds-border-brand)]/50"
-                                    : "bg-white border-ds-border hover:border-[var(--ds-border-brand)]/40 hover:bg-gray-50"
+                                    : "bg-[var(--ds-surface-card)] border-ds-border hover:border-[var(--ds-border-brand)]/40 hover:bg-[var(--ds-surface-card-hover)]"
                                 }`}
                                 style={{ borderRadius: "var(--leaf-r-lg)" }}
                               >
@@ -1154,19 +1154,19 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                                     <ChildAvatar avatarUrl={d.child.avatar_url} name={d.child.name} size={48} />
                                   </div>
                                   {isPlaying && (
-                                    <span className="absolute -bottom-0.5 -right-0.5 text-[11px] leading-none bg-white rounded-full p-0.5 shadow-sm">🎮</span>
+                                    <span className="absolute -bottom-0.5 -right-0.5 text-2xs leading-none bg-[var(--ds-surface-card)] rounded-full p-0.5 shadow-sm">🎮</span>
                                   )}
                                 </div>
-                                <p className="font-baloo font-black text-[12px] text-ds-text truncate w-full text-center leading-tight">{d.child.name}</p>
+                                <p className="font-baloo font-black text-xs text-ds-text truncate w-full text-center leading-tight">{d.child.name}</p>
                                 <div className="w-full">
-                                  <div className="flex justify-between text-[9px] font-bold text-ds-muted mb-1">
+                                  <div className="flex justify-between text-4xs font-bold text-ds-muted mb-1">
                                     <span>⭐ {d.totalStars}</span>
                                     <span>🔥 {d.streak}</span>
                                   </div>
-                                  <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                                  <div className="h-1.5 bg-[var(--ds-surface-card-active)] rounded-full overflow-hidden">
                                     <div className="h-full rounded-full bg-[var(--nimi-green)] transition-all" style={{ width: `${pct * 100}%` }} />
                                   </div>
-                                  <p className="text-[9px] text-ds-muted font-semibold mt-0.5 text-center">{done}/{total} stories</p>
+                                  <p className="text-4xs text-ds-muted font-semibold mt-0.5 text-center">{done}/{total} stories</p>
                                 </div>
                               </motion.button>
                             );
@@ -1189,10 +1189,10 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                           className={`bg-gradient-to-br ${s.color} border ${s.border} p-4 shadow-sm`}
                           style={{ borderRadius: "var(--leaf-r-lg)" }}
                         >
-                          <span className="text-[24px] leading-none block mb-2">{s.emoji}</span>
-                          <p className={`font-baloo font-black text-[28px] leading-none ${s.text}`}>{s.value}</p>
-                          <p className="font-baloo font-black text-ds-text text-[11px] mt-1">{s.label}</p>
-                          <p className="text-ds-muted text-[9px] font-semibold mt-0.5">{s.sub}</p>
+                          <span className="text-2xl leading-none block mb-2">{s.emoji}</span>
+                          <p className={`font-baloo font-black text-3.5xl leading-none ${s.text}`}>{s.value}</p>
+                          <p className="font-baloo font-black text-ds-text text-2xs mt-1">{s.label}</p>
+                          <p className="text-ds-muted text-4xs font-semibold mt-0.5">{s.sub}</p>
                         </motion.div>
                       ))}
                     </div>
@@ -1207,15 +1207,15 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                         : `${estMinutes}m`;
                       const perfStars = activeDays >= 5 ? 3 : activeDays >= 3 ? 2 : activeDays >= 1 ? 1 : 0;
                       const perfLabel = ["Not started 😴", "Getting going 🌱", "On track 📈", "On fire! 🔥"][perfStars];
-                      const perfColor = ["text-gray-400", "text-blue-600", "text-amber-600", "text-orange-600"][perfStars];
-                      const perfBg = ["bg-gray-50", "bg-blue-50", "bg-amber-50", "bg-orange-50"][perfStars];
-                      const perfBorder = ["border-gray-200", "border-blue-200", "border-amber-200", "border-orange-200"][perfStars];
+                      const perfColor = ["text-[var(--ds-text-tertiary)]", "text-blue-600", "text-amber-600", "text-orange-600"][perfStars];
+                      const perfBg = ["bg-[var(--ds-surface-card-hover)]", "bg-blue-50", "bg-amber-50", "bg-orange-50"][perfStars];
+                      const perfBorder = ["border-[var(--ds-border-primary)]", "border-blue-200", "border-amber-200", "border-orange-200"][perfStars];
                       return (
                         <div className={`${perfBg} border ${perfBorder} p-4 shadow-sm`} style={{ borderRadius: "var(--leaf-r-lg)" }}>
                           <div className="flex items-center justify-between mb-3">
-                            <p className="font-baloo font-black text-ds-text text-[15px]">📅 This Week&apos;s Report</p>
+                            <p className="font-baloo font-black text-ds-text text-mbase">📅 This Week&apos;s Report</p>
                             <div className="flex items-center gap-2">
-                              <span className={`font-black text-[12px] ${perfColor}`}>{perfLabel}</span>
+                              <span className={`font-black text-xs ${perfColor}`}>{perfLabel}</span>
                               <button
                                 onClick={async () => {
                                   const name = active.child.name;
@@ -1238,7 +1238,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                                     else { await navigator.clipboard.writeText(text); setShareToast(true); setTimeout(() => setShareToast(false), 2500); }
                                   } catch { /* cancelled */ }
                                 }}
-                                className="flex items-center gap-1 text-[11px] font-black text-[var(--ds-brand-primary)] bg-[var(--ds-brand-subtle)] border border-[var(--ds-border-brand)]/30 px-2.5 py-1 rounded-full hover:opacity-80 transition"
+                                className="flex items-center gap-1 text-2xs font-black text-[var(--ds-brand-primary)] bg-[var(--ds-brand-subtle)] border border-[var(--ds-border-brand)]/30 px-2.5 py-1 rounded-full hover:opacity-80 transition"
                               >
                                 {shareToast ? "✅ Copied!" : "📤 Share"}
                               </button>
@@ -1251,14 +1251,14 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                               { label: "Days active", value: `${activeDays}/7`,  icon: "📆" },
                             ].map(s => (
                               <div key={s.label} className="text-center">
-                                <p className="text-[20px] leading-none">{s.icon}</p>
-                                <p className="font-baloo font-black text-ds-text text-[18px] mt-1 leading-none">{s.value}</p>
-                                <p className="text-ds-muted text-[9px] font-semibold mt-0.5">{s.label}</p>
+                                <p className="text-xl leading-none">{s.icon}</p>
+                                <p className="font-baloo font-black text-ds-text text-lg mt-1 leading-none">{s.value}</p>
+                                <p className="text-ds-muted text-4xs font-semibold mt-0.5">{s.label}</p>
                               </div>
                             ))}
                           </div>
                           {totalSessions === 0 && (
-                            <p className="mt-3 text-center text-ds-muted text-[11px] font-semibold">
+                            <p className="mt-3 text-center text-ds-muted text-2xs font-semibold">
                               No sessions logged yet — open NIMIPIKO together to begin! 🚀
                             </p>
                           )}
@@ -1304,16 +1304,16 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                       };
 
                       return (
-                        <div className="bg-white border border-ds-border p-5 shadow-ds-card" style={{ borderRadius: 'var(--leaf-r-lg)' }}>
+                        <div className="bg-[var(--ds-surface-card)] border border-ds-border p-5 shadow-ds-card" style={{ borderRadius: 'var(--leaf-r-lg)' }}>
                           <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center gap-2">
                               <span className="text-xl">📚</span>
-                              <h2 className="font-black text-ds-text text-[18px]">Today&apos;s Learning</h2>
+                              <h2 className="font-black text-ds-text text-lg">Today&apos;s Learning</h2>
                             </div>
                             {todayActivity.length > 0 && (
                               <button
                                 onClick={handleShare}
-                                className="flex items-center gap-1.5 text-[12px] font-bold text-[var(--ds-brand-primary)] bg-[var(--ds-brand-subtle)] border border-[var(--ds-border-brand)]/30 px-3 py-1.5 rounded-full hover:opacity-80 transition-opacity"
+                                className="flex items-center gap-1.5 text-xs font-bold text-[var(--ds-brand-primary)] bg-[var(--ds-brand-subtle)] border border-[var(--ds-border-brand)]/30 px-3 py-1.5 rounded-full hover:opacity-80 transition-opacity"
                               >
                                 {shareToast ? "✅ Copied!" : "📤 Share"}
                               </button>
@@ -1323,7 +1323,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                           {todayActivity.length === 0 ? (
                             <div className="flex flex-col items-center gap-2 py-3 text-center">
                               <span className="text-3xl">🌅</span>
-                              <p className="font-nunito text-ds-muted text-[13px]">
+                              <p className="font-nunito text-ds-muted text-sml">
                                 Nothing yet today — open NIMIPIKO to start the adventure!
                               </p>
                             </div>
@@ -1336,28 +1336,28 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                                   transition={{ delay: i * 0.06 }}
                                   className="flex items-center gap-3 bg-[var(--ds-brand-subtle)] border border-[var(--ds-border-brand)]/20 px-3.5 py-2.5 rounded-xl"
                                 >
-                                  <span className="text-[22px] shrink-0">{CAT_EMOJI[m.category] ?? "⭐"}</span>
+                                  <span className="text-1.5xl shrink-0">{CAT_EMOJI[m.category] ?? "⭐"}</span>
                                   <div className="flex-1 min-w-0">
-                                    <p className="font-black text-ds-text text-[13px] leading-tight">
+                                    <p className="font-black text-ds-text text-sml leading-tight">
                                       {CAT_LABEL[m.category] ?? m.category}
                                     </p>
                                     {m.story_title && (
-                                      <p className="font-nunito text-ds-muted text-[11px] truncate">{m.story_title}</p>
+                                      <p className="font-nunito text-ds-muted text-2xs truncate">{m.story_title}</p>
                                     )}
                                   </div>
                                   <div className="flex items-center gap-1 shrink-0">
                                     <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                                    <span className="font-black text-amber-700 text-[13px]">+{m.stars_earned}</span>
+                                    <span className="font-black text-amber-700 text-sml">+{m.stars_earned}</span>
                                   </div>
                                 </motion.div>
                               ))}
                               <div className="flex items-center justify-between pt-1 px-0.5">
-                                <span className="font-nunito text-ds-muted text-[12px]">
+                                <span className="font-nunito text-ds-muted text-xs">
                                   {todayActivity.length} {todayActivity.length === 1 ? "mission" : "missions"} completed
                                 </span>
                                 <div className="flex items-center gap-1">
                                   <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                                  <span className="font-black text-amber-700 text-[14px]">{totalStarsToday} today</span>
+                                  <span className="font-black text-amber-700 text-sm">{totalStarsToday} today</span>
                                 </div>
                               </div>
                             </div>
@@ -1376,7 +1376,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                       const done = todaySessions >= dailyGoal;
                       const C = 2 * Math.PI * 28; // r=28
                       return (
-                        <div className="bg-white border border-ds-border p-5 shadow-ds-card" style={{ borderRadius: "var(--leaf-r-lg)" }}>
+                        <div className="bg-[var(--ds-surface-card)] border border-ds-border p-5 shadow-ds-card" style={{ borderRadius: "var(--leaf-r-lg)" }}>
                           <div className="flex items-center gap-4">
                             {/* Circular ring */}
                             <div className="relative shrink-0 w-[72px] h-[72px] flex items-center justify-center">
@@ -1395,23 +1395,23 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                                 />
                               </svg>
                               <div className="text-center z-10">
-                                <p className={`font-baloo font-black text-[18px] leading-none ${done ? "text-[var(--nimi-green)]" : "text-indigo-600"}`}>
+                                <p className={`font-baloo font-black text-lg leading-none ${done ? "text-[var(--nimi-green)]" : "text-indigo-600"}`}>
                                   {todaySessions}
                                 </p>
-                                <p className="text-ds-muted text-[9px] font-bold leading-none">/{dailyGoal}</p>
+                                <p className="text-ds-muted text-4xs font-bold leading-none">/{dailyGoal}</p>
                               </div>
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p className="font-baloo font-black text-ds-text text-[16px] leading-tight">
+                              <p className="font-baloo font-black text-ds-text text-base leading-tight">
                                 {done ? "🎉 Goal Complete!" : "🎯 Today's Goal"}
                               </p>
-                              <p className="text-ds-muted text-[12px] font-semibold mt-0.5">
+                              <p className="text-ds-muted text-xs font-semibold mt-0.5">
                                 {done
                                   ? `${active.child.name} hit ${dailyGoal} sessions — great day!`
                                   : `${Math.max(0, dailyGoal - todaySessions)} more ${dailyGoal - todaySessions === 1 ? "session" : "sessions"} to reach the daily target`}
                               </p>
                               {!done && (
-                                <div className="mt-2 h-1.5 bg-gray-100 rounded-full overflow-hidden w-full">
+                                <div className="mt-2 h-1.5 bg-[var(--ds-surface-card-active)] rounded-full overflow-hidden w-full">
                                   <motion.div
                                     className="h-full rounded-full bg-gradient-to-r from-indigo-400 to-violet-500"
                                     initial={{ width: 0 }}
@@ -1427,15 +1427,15 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                     })()}
 
                     {/* This Week */}
-                    <div className="bg-white border border-ds-border p-5 shadow-ds-card" style={{ borderRadius: 'var(--leaf-r-lg)' }}>
+                    <div className="bg-[var(--ds-surface-card)] border border-ds-border p-5 shadow-ds-card" style={{ borderRadius: 'var(--leaf-r-lg)' }}>
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-2">
                           <span className="text-xl">📅</span>
-                          <h2 className="font-black text-ds-text text-[18px]">This Week</h2>
+                          <h2 className="font-black text-ds-text text-lg">This Week</h2>
                         </div>
                         <div className="flex items-center gap-1.5 bg-orange-50 border border-orange-200 rounded-full px-3 py-1">
                           <span className="text-orange-500">🔥</span>
-                          <span className="font-black text-orange-700 text-[13px]">{active.streak}d streak</span>
+                          <span className="font-black text-orange-700 text-sml">{active.streak}d streak</span>
                         </div>
                       </div>
                       <div className="flex gap-2 sm:gap-3">
@@ -1445,24 +1445,24 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                           const isFuture = i > todayIdx;
                           const isToday = i === todayIdx;
                           const intensity = count === 0 ? 0 : count < 3 ? 1 : count < 6 ? 2 : 3;
-                          const bgColors = ["bg-gray-100", "bg-emerald-200", "bg-emerald-400", "bg-emerald-600"];
-                          const textColors = ["text-gray-400", "text-emerald-800", "text-white", "text-white"];
+                          const bgColors = ["bg-[var(--ds-surface-card-active)]", "bg-emerald-200", "bg-emerald-400", "bg-emerald-600"];
+                          const textColors = ["text-[var(--ds-text-tertiary)]", "text-emerald-800", "text-white", "text-white"];
                           return (
                             <div key={day} className="flex flex-col items-center gap-1.5 flex-1">
                               <motion.div
                                 initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
                                 transition={{ delay: i * 0.05, type: "spring" }}
-                                className={`w-full aspect-square rounded-xl flex items-center justify-center text-[14px] font-black transition-all ${
-                                  isFuture ? "bg-gray-50 border-2 border-dashed border-gray-200"
+                                className={`w-full aspect-square rounded-xl flex items-center justify-center text-sm font-black transition-all ${
+                                  isFuture ? "bg-[var(--ds-surface-card-hover)] border-2 border-dashed border-[var(--ds-border-primary)]"
                                   : bgColors[intensity]
                                 } ${isToday && !isFuture ? "ring-2 ring-offset-1 ring-[var(--ds-brand-primary)]" : ""}`}
                                 title={`${count} activities`}>
                                 {!isFuture && (
-                                  count === 0 ? <span className="text-gray-300 text-[10px]">—</span>
+                                  count === 0 ? <span className="text-[var(--ds-text-tertiary)] text-3xs">—</span>
                                   : <span className={textColors[intensity]}>{count}</span>
                                 )}
                               </motion.div>
-                              <span className={`font-nunito font-bold text-[9px] sm:text-[10px] ${isToday ? "text-[var(--ds-brand-primary)]" : "text-gray-400"}`}>
+                              <span className={`font-nunito font-bold text-4xs sm:text-3xs ${isToday ? "text-[var(--ds-brand-primary)]" : "text-[var(--ds-text-tertiary)]"}`}>
                                 {day}
                               </span>
                             </div>
@@ -1476,19 +1476,19 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                         if (activeDays === 0) return (
                           <div className="mt-3 flex items-center gap-2 p-3 bg-orange-50 border border-orange-200 rounded-xl">
                             <span className="text-xl">🌅</span>
-                            <p className="text-orange-700 text-[12px] font-semibold">No activity yet this week — encourage {active.child.name} to start a story! 🚀</p>
+                            <p className="text-orange-700 text-xs font-semibold">No activity yet this week — encourage {active.child.name} to start a story! 🚀</p>
                           </div>
                         );
                         if (activeDays >= 5) return (
                           <div className="mt-3 flex items-center gap-2 p-3 bg-emerald-50 border border-emerald-200 rounded-xl">
                             <span className="text-xl">🏆</span>
-                            <p className="text-emerald-700 text-[12px] font-semibold">{activeDays}/7 days active · {totalSessions} total sessions — incredible week!</p>
+                            <p className="text-emerald-700 text-xs font-semibold">{activeDays}/7 days active · {totalSessions} total sessions — incredible week!</p>
                           </div>
                         );
                         return (
                           <div className="mt-3 flex items-center gap-2 p-3 bg-blue-50 border border-blue-200 rounded-xl">
                             <span className="text-xl">📊</span>
-                            <p className="text-blue-700 text-[12px] font-semibold">{activeDays}/7 days active this week · {totalSessions} sessions completed</p>
+                            <p className="text-blue-700 text-xs font-semibold">{activeDays}/7 days active this week · {totalSessions} sessions completed</p>
                           </div>
                         );
                       })()}
@@ -1522,13 +1522,13 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                       }).filter(s => dates.has(s)).length;
                       const DAY_LABELS = ["M", "T", "W", "T", "F", "S", "S"];
                       return (
-                        <div className="bg-white border border-ds-border p-5 shadow-ds-card" style={{ borderRadius: "var(--leaf-r-lg)" }}>
+                        <div className="bg-[var(--ds-surface-card)] border border-ds-border p-5 shadow-ds-card" style={{ borderRadius: "var(--leaf-r-lg)" }}>
                           <div className="flex items-center justify-between mb-3">
                             <div className="flex items-center gap-2">
                               <span className="text-xl">🗓️</span>
-                              <h2 className="font-black text-ds-text text-[18px]">Activity Calendar</h2>
+                              <h2 className="font-black text-ds-text text-lg">Activity Calendar</h2>
                             </div>
-                            <span className="text-[11px] font-black text-[var(--ds-brand-primary)] bg-[var(--ds-brand-subtle)] px-2.5 py-1 rounded-full border border-[var(--ds-border-brand)]/30">
+                            <span className="text-2xs font-black text-[var(--ds-brand-primary)] bg-[var(--ds-brand-subtle)] px-2.5 py-1 rounded-full border border-[var(--ds-border-brand)]/30">
                               {totalActive} days active
                             </span>
                           </div>
@@ -1538,7 +1538,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                             <div className="flex flex-col gap-1 shrink-0 pt-5">
                               {DAY_LABELS.map((l, i) => (
                                 <div key={i} className="h-5 flex items-center">
-                                  <span className="text-[9px] font-bold text-ds-muted w-3">{i % 2 === 0 ? l : ""}</span>
+                                  <span className="text-4xs font-bold text-ds-muted w-3">{i % 2 === 0 ? l : ""}</span>
                                 </div>
                               ))}
                             </div>
@@ -1548,7 +1548,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                               return (
                                 <div key={wi} className="flex flex-col gap-1 shrink-0">
                                   <div className="h-4 flex items-end justify-center">
-                                    <span className="text-[8px] font-bold text-ds-muted leading-none">
+                                    <span className="text-5xs font-bold text-ds-muted leading-none">
                                       {showMonth ? new Date(weekStart.str).toLocaleString("default", { month: "short" }) : ""}
                                     </span>
                                   </div>
@@ -1561,10 +1561,10 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                                       transition={{ delay: (wi * 7 + di) * 0.003 }}
                                       className={`w-5 h-5 rounded-sm transition-all ${
                                         day.future
-                                          ? "bg-gray-50 border border-dashed border-gray-200"
+                                          ? "bg-[var(--ds-surface-card-hover)] border border-dashed border-[var(--ds-border-primary)]"
                                           : day.active
                                             ? "bg-[var(--ds-brand-primary)] shadow-[0_2px_6px_var(--ds-brand-primary)/40]"
-                                            : "bg-gray-100"
+                                            : "bg-[var(--ds-surface-card-active)]"
                                       } ${day.today ? "ring-2 ring-[var(--ds-brand-primary)] ring-offset-1" : ""}`}
                                     />
                                   ))}
@@ -1576,15 +1576,15 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                           <div className="flex items-center gap-4 mt-3 pt-3 border-t border-ds-border">
                             <div className="flex items-center gap-1.5">
                               <div className="w-3.5 h-3.5 rounded-sm bg-[var(--ds-brand-primary)]" />
-                              <span className="text-[10px] text-ds-muted font-semibold">Active day</span>
+                              <span className="text-3xs text-ds-muted font-semibold">Active day</span>
                             </div>
                             <div className="flex items-center gap-1.5">
-                              <div className="w-3.5 h-3.5 rounded-sm bg-gray-100" />
-                              <span className="text-[10px] text-ds-muted font-semibold">No activity</span>
+                              <div className="w-3.5 h-3.5 rounded-sm bg-[var(--ds-surface-card-active)]" />
+                              <span className="text-3xs text-ds-muted font-semibold">No activity</span>
                             </div>
                             <div className="flex items-center gap-1.5">
                               <div className="w-3.5 h-3.5 rounded-sm ring-2 ring-[var(--ds-brand-primary)] ring-offset-1" />
-                              <span className="text-[10px] text-ds-muted font-semibold">Today</span>
+                              <span className="text-3xs text-ds-muted font-semibold">Today</span>
                             </div>
                           </div>
                         </div>
@@ -1593,11 +1593,11 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
 
                     {/* How They Felt — overview card (most recent 4) */}
                     {feelings.length > 0 && (
-                      <div className="bg-white border border-ds-border p-5 shadow-ds-card" style={{ borderRadius: "var(--leaf-r-lg)" }}>
+                      <div className="bg-[var(--ds-surface-card)] border border-ds-border p-5 shadow-ds-card" style={{ borderRadius: "var(--leaf-r-lg)" }}>
                         <div className="flex items-center gap-2 mb-3">
                           <span className="text-xl">💭</span>
-                          <h2 className="font-black text-ds-text text-[18px]">Emotional Snapshots</h2>
-                          <span className="ml-auto text-[11px] text-ds-muted font-semibold">After stories</span>
+                          <h2 className="font-black text-ds-text text-lg">Emotional Snapshots</h2>
+                          <span className="ml-auto text-2xs text-ds-muted font-semibold">After stories</span>
                         </div>
                         <div className="grid grid-cols-2 gap-2">
                           {feelings.slice(0, 4).map((f, i) => (
@@ -1607,10 +1607,10 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                               className="flex items-center gap-3 bg-pink-50 border border-pink-100 px-3 py-2.5"
                               style={{ borderRadius: "var(--leaf-r)" }}
                             >
-                              <span className="text-[26px] shrink-0 leading-none">{f.feeling}</span>
+                              <span className="text-2.5xl shrink-0 leading-none">{f.feeling}</span>
                               <div className="min-w-0">
-                                <p className="font-black text-ds-text text-[12px] truncate leading-tight">{f.title}</p>
-                                <p className="text-pink-400 text-[10px] font-semibold mt-0.5">
+                                <p className="font-black text-ds-text text-xs truncate leading-tight">{f.title}</p>
+                                <p className="text-pink-400 text-3xs font-semibold mt-0.5">
                                   {new Date(f.felt_at).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
                                 </p>
                               </div>
@@ -1620,7 +1620,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                         {feelings.length > 4 && (
                           <button
                             onClick={() => setParentTab("achievements")}
-                            className="mt-2.5 w-full text-[11px] font-black text-[var(--ds-brand-primary)] hover:underline"
+                            className="mt-2.5 w-full text-2xs font-black text-[var(--ds-brand-primary)] hover:underline"
                           >
                             See all {feelings.length} reactions →
                           </button>
@@ -1648,12 +1648,12 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                       }
                       return (
                         <div className={`${tip.bg} border ${tip.border} p-4 flex items-start gap-3`} style={{ borderRadius: "var(--leaf-r-lg)" }}>
-                          <span className="text-[28px] leading-none shrink-0 mt-0.5">{tip.emoji}</span>
+                          <span className="text-3.5xl leading-none shrink-0 mt-0.5">{tip.emoji}</span>
                           <div className="flex-1 min-w-0">
-                            <p className={`font-baloo font-black text-[15px] ${tip.text}`}>{tip.title}</p>
-                            <p className="text-ds-muted text-[12px] font-semibold mt-0.5 leading-snug">{tip.desc}</p>
+                            <p className={`font-baloo font-black text-mbase ${tip.text}`}>{tip.title}</p>
+                            <p className="text-ds-muted text-xs font-semibold mt-0.5 leading-snug">{tip.desc}</p>
                             {tip.href !== "#" && (
-                              <Link href={tip.href} className={`inline-block mt-2 text-[11px] font-black ${tip.text} hover:underline`}>
+                              <Link href={tip.href} className={`inline-block mt-2 text-2xs font-black ${tip.text} hover:underline`}>
                                 {tip.cta}
                               </Link>
                             )}
@@ -1663,20 +1663,20 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                     })()}
 
                     {/* Current Story */}
-                    <div className="bg-white border border-ds-border p-5 shadow-ds-card" style={{ borderRadius: 'var(--leaf-r-lg)' }}>
+                    <div className="bg-[var(--ds-surface-card)] border border-ds-border p-5 shadow-ds-card" style={{ borderRadius: 'var(--leaf-r-lg)' }}>
                       <div className="flex items-center gap-2 mb-4">
                         <span className="text-xl">📖</span>
-                        <h2 className="font-black text-ds-text text-[18px]">Current Story</h2>
+                        <h2 className="font-black text-ds-text text-lg">Current Story</h2>
                       </div>
                       {currentStory ? (
                         <>
                           <div className="flex items-center justify-between mb-4">
                             <div>
-                              <p className="font-black text-ds-text text-[20px]">{currentStory.theme_emoji} {currentStory.title}</p>
-                              <p className="text-gray-500 text-[12px] mt-0.5">Story {currentStory.sort_order} of {totalStories}</p>
+                              <p className="font-black text-ds-text text-xl">{currentStory.theme_emoji} {currentStory.title}</p>
+                              <p className="text-[var(--ds-text-secondary)] text-xs mt-0.5">Story {currentStory.sort_order} of {totalStories}</p>
                             </div>
                             <div className="bg-yellow-50 border border-yellow-200 rounded-full px-4 py-2">
-                              <span className="text-yellow-700 font-black text-[14px]">{missionsComplete}/{totalMissions}</span>
+                              <span className="text-yellow-700 font-black text-sm">{missionsComplete}/{totalMissions}</span>
                             </div>
                           </div>
                           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4">
@@ -1690,13 +1690,13 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                                   className={`flex items-center gap-2.5 p-3 border-2 transition ${
                                     slot.completed
                                       ? "bg-[var(--ds-brand-subtle)] border-[var(--ds-border-brand)]/30"
-                                      : "bg-gray-50 border-ds-border"
+                                      : "bg-[var(--ds-surface-card-hover)] border-ds-border"
                                   }`}
                                   style={{ borderRadius: 'var(--leaf-r)' }}>
                                   <Image src={`/assets/icon-${iconMap[slot.slot_key] ?? "flipflop"}.svg`}
                                     alt="" width={32} height={32} className="w-8 h-8 rounded-lg shrink-0" />
                                   <div className="flex-1 min-w-0">
-                                    <p className={`text-[12px] font-bold truncate ${slot.completed ? "text-ds-text" : "text-gray-400"}`}>
+                                    <p className={`text-xs font-bold truncate ${slot.completed ? "text-ds-text" : "text-[var(--ds-text-tertiary)]"}`}>
                                       {slot.title || slot.slot_key.replace(/_/g, " ")}
                                     </p>
                                   </div>
@@ -1709,7 +1709,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                               );
                             })}
                           </div>
-                          <div className="bg-gray-100 rounded-full h-4 overflow-hidden">
+                          <div className="bg-[var(--ds-surface-card-active)] rounded-full h-4 overflow-hidden">
                             <motion.div
                               className="bg-cta-gradient h-full rounded-full"
                               initial={{ width: 0 }}
@@ -1721,8 +1721,8 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                       ) : (
                         <div className="text-center py-4">
                           <span className="text-4xl">🎉</span>
-                          <p className="text-ds-text font-black text-[16px] mt-2">{t("allStoriesCompleted")}</p>
-                          <p className="text-gray-500 text-[12px]">{t("amazingWorkBy").replace("{name}", active.child.name)}</p>
+                          <p className="text-ds-text font-black text-base mt-2">{t("allStoriesCompleted")}</p>
+                          <p className="text-[var(--ds-text-secondary)] text-xs">{t("amazingWorkBy").replace("{name}", active.child.name)}</p>
                         </div>
                       )}
                     </div>
@@ -1737,8 +1737,8 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                       >
                         <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-2xl shadow-md shrink-0">🎁</div>
                         <div className="flex-1 min-w-0">
-                          <p className="font-baloo font-black text-ds-text text-[15px]">Know another parent?</p>
-                          <p className="text-ds-muted text-[12px] font-semibold mt-0.5">Share your code <strong className="text-indigo-600">{referralCode}</strong> — you both get 1 free month when they subscribe!</p>
+                          <p className="font-baloo font-black text-ds-text text-mbase">Know another parent?</p>
+                          <p className="text-ds-muted text-xs font-semibold mt-0.5">Share your code <strong className="text-indigo-600">{referralCode}</strong> — you both get 1 free month when they subscribe!</p>
                         </div>
                         <button
                           onClick={async () => {
@@ -1748,7 +1748,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                               else { await navigator.clipboard.writeText(text); setShareToast(true); setTimeout(() => setShareToast(false), 2500); }
                             } catch { /* cancelled */ }
                           }}
-                          className="shrink-0 px-3 py-2 bg-indigo-600 text-white font-black text-[11px] rounded-xl hover:bg-indigo-700 transition"
+                          className="shrink-0 px-3 py-2 bg-indigo-600 text-white font-black text-2xs rounded-xl hover:bg-indigo-700 transition"
                         >
                           {shareToast ? "✅ Copied!" : "Invite"}
                         </button>
@@ -1791,16 +1791,16 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                               />
                             </svg>
                             <div className="text-center z-10">
-                              <p className="font-baloo font-black text-sky-700 text-[20px] leading-none">{Math.round(pct * 100)}%</p>
-                              <p className="text-sky-500 text-[9px] font-bold leading-none mt-0.5">done</p>
+                              <p className="font-baloo font-black text-sky-700 text-xl leading-none">{Math.round(pct * 100)}%</p>
+                              <p className="text-sky-500 text-4xs font-bold leading-none mt-0.5">done</p>
                             </div>
                           </div>
                           {/* Info */}
                           <div className="flex-1 min-w-0">
-                            <p className="font-baloo font-black text-ds-text text-[16px] leading-tight">
+                            <p className="font-baloo font-black text-ds-text text-base leading-tight">
                               {active.child.name}&apos;s {langLabel} Journey
                             </p>
-                            <p className="text-sky-600 font-bold text-[12px] mt-0.5">
+                            <p className="text-sky-600 font-bold text-xs mt-0.5">
                               {storiesComplete} of {totalStories} stories complete
                             </p>
                             {nextMilestone && pct < 1 && (
@@ -1813,13 +1813,13 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                                     transition={{ duration: 0.9, ease: "easeOut", delay: 0.4 }}
                                   />
                                 </div>
-                                <span className="text-[10px] font-black text-sky-600 shrink-0">
+                                <span className="text-3xs font-black text-sky-600 shrink-0">
                                   {nextMilestone.emoji} {nextMilestone.label}
                                 </span>
                               </div>
                             )}
                             {pct >= 1 && (
-                              <p className="mt-1 text-[12px] font-black text-emerald-600">👑 Curriculum complete!</p>
+                              <p className="mt-1 text-xs font-black text-emerald-600">👑 Curriculum complete!</p>
                             )}
                           </div>
                         </div>
@@ -1840,36 +1840,36 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                               ? "bg-[var(--ds-brand-subtle)] border-[var(--ds-border-brand)]/30"
                               : story.unlocked
                                 ? "bg-yellow-50 border-yellow-200"
-                                : "bg-gray-50 border-ds-border opacity-70"
+                                : "bg-[var(--ds-surface-card-hover)] border-ds-border opacity-70"
                           }`}
                           style={{ borderRadius: "var(--leaf-r)" }}
                         >
-                          <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-[16px] font-black shadow-sm shrink-0 ${
-                            story.complete ? "bg-[var(--nimi-green)] text-white" : story.unlocked ? "bg-yellow-500 text-white" : "bg-gray-200 text-gray-400"
+                          <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-base font-black shadow-sm shrink-0 ${
+                            story.complete ? "bg-[var(--nimi-green)] text-white" : story.unlocked ? "bg-yellow-500 text-white" : "bg-[var(--ds-border-primary)] text-[var(--ds-text-tertiary)]"
                           }`}>
                             {story.sort_order}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className={`font-black text-[13px] truncate ${story.unlocked ? "text-ds-text" : "text-gray-400"}`}>
+                            <p className={`font-black text-sml truncate ${story.unlocked ? "text-ds-text" : "text-[var(--ds-text-tertiary)]"}`}>
                               {story.theme_emoji} {story.title}
                             </p>
                             {story.unlocked && !story.complete && (
                               <div className="mt-1.5 flex items-center gap-2">
-                                <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                                <div className="flex-1 h-1.5 bg-[var(--ds-surface-card-active)] rounded-full overflow-hidden">
                                   <div className="bg-yellow-400 h-full rounded-full" style={{ width: `${story.progress * 100}%` }} />
                                 </div>
-                                <span className="text-[10px] font-black text-yellow-600">{Math.round(story.progress * 100)}%</span>
+                                <span className="text-3xs font-black text-yellow-600">{Math.round(story.progress * 100)}%</span>
                               </div>
                             )}
                           </div>
-                          {story.complete && <span className="text-emerald-600 text-[11px] font-black shrink-0">✅ Done</span>}
-                          {!story.unlocked && <Lock className="w-3.5 h-3.5 text-gray-400 shrink-0" />}
+                          {story.complete && <span className="text-emerald-600 text-2xs font-black shrink-0">✅ Done</span>}
+                          {!story.unlocked && <Lock className="w-3.5 h-3.5 text-[var(--ds-text-tertiary)] shrink-0" />}
                         </motion.div>
                       );
 
                       const Section = ({ label, emoji, color, children }: { label: string; emoji: string; color: string; children: React.ReactNode }) => (
-                        <div className="bg-white border border-ds-border p-5 shadow-ds-card space-y-2" style={{ borderRadius: "var(--leaf-r-lg)" }}>
-                          <p className={`font-baloo font-black text-[13px] uppercase tracking-wide flex items-center gap-1.5 mb-3 ${color}`}>
+                        <div className="bg-[var(--ds-surface-card)] border border-ds-border p-5 shadow-ds-card space-y-2" style={{ borderRadius: "var(--leaf-r-lg)" }}>
+                          <p className={`font-baloo font-black text-sml uppercase tracking-wide flex items-center gap-1.5 mb-3 ${color}`}>
                             <span>{emoji}</span>{label}
                           </p>
                           {children}
@@ -1889,15 +1889,15 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                             </Section>
                           )}
                           {upcoming.length > 0 && (
-                            <Section label={`Coming Up · ${upcoming.length}`} emoji="🔒" color="text-gray-500">
+                            <Section label={`Coming Up · ${upcoming.length}`} emoji="🔒" color="text-[var(--ds-text-secondary)]">
                               {upcoming.map((s, i) => <StoryRow key={s.sid} story={s} i={i} />)}
                             </Section>
                           )}
                           {active.stories.length === 0 && (
-                            <div className="bg-white border border-ds-border p-8 text-center shadow-ds-card" style={{ borderRadius: "var(--leaf-r-lg)" }}>
+                            <div className="bg-[var(--ds-surface-card)] border border-ds-border p-8 text-center shadow-ds-card" style={{ borderRadius: "var(--leaf-r-lg)" }}>
                               <p className="text-4xl mb-3">📚</p>
-                              <p className="font-black text-ds-text text-[15px]">No stories yet</p>
-                              <p className="text-ds-muted text-[12px] mt-1">Stories will appear as {active.child.name} starts learning.</p>
+                              <p className="font-black text-ds-text text-mbase">No stories yet</p>
+                              <p className="text-ds-muted text-xs mt-1">Stories will appear as {active.child.name} starts learning.</p>
                             </div>
                           )}
                         </div>
@@ -1914,18 +1914,18 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                     className="space-y-5"
                   >
                     {/* ── Visual badge showcase ── */}
-                    <div className="bg-white border border-ds-border p-5 shadow-ds-card" style={{ borderRadius: 'var(--leaf-r-lg)' }}>
+                    <div className="bg-[var(--ds-surface-card)] border border-ds-border p-5 shadow-ds-card" style={{ borderRadius: 'var(--leaf-r-lg)' }}>
                       <div className="flex items-center justify-between mb-1">
                         <div className="flex items-center gap-2">
                           <span className="text-xl">🏅</span>
-                          <h2 className="font-black text-ds-text text-[18px]">Badges Earned</h2>
+                          <h2 className="font-black text-ds-text text-lg">Badges Earned</h2>
                         </div>
-                        <span className="text-[12px] font-bold text-ds-muted">{badges.length} badge{badges.length !== 1 ? "s" : ""}</span>
+                        <span className="text-xs font-bold text-ds-muted">{badges.length} badge{badges.length !== 1 ? "s" : ""}</span>
                       </div>
                       {badges.length > 0 ? (
                         <>
                           {/* Celebration bar */}
-                          <div className="w-full h-1.5 bg-gray-100 rounded-full mb-5 overflow-hidden">
+                          <div className="w-full h-1.5 bg-[var(--ds-surface-card-active)] rounded-full mb-5 overflow-hidden">
                             <motion.div
                               className="h-full rounded-full bg-gradient-to-r from-amber-400 to-yellow-500"
                               initial={{ width: 0 }}
@@ -1950,11 +1950,11 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                                 >
                                   <span className="text-3xl leading-none select-none">{meta.emoji}</span>
                                   <div className="absolute -top-1 -right-1 w-5 h-5 bg-emerald-500 rounded-full flex items-center justify-center shadow-sm">
-                                    <span className="text-[8px] text-white font-black">✓</span>
+                                    <span className="text-5xs text-white font-black">✓</span>
                                   </div>
                                 </motion.div>
-                                <p className="font-nunito font-bold text-[11px] text-ds-text leading-tight max-w-[72px]">{meta.label}</p>
-                                <p className="text-[9px] text-ds-muted">
+                                <p className="font-nunito font-bold text-2xs text-ds-text leading-tight max-w-[72px]">{meta.label}</p>
+                                <p className="text-4xs text-ds-muted">
                                   {new Date(b.earned_at).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
                                 </p>
                               </motion.div>
@@ -1967,11 +1967,11 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                               transition={{ delay: badges.length * 0.06 + 0.1, type: "spring" }}
                               className="flex flex-col items-center gap-2 text-center"
                             >
-                              <div className="w-16 h-16 rounded-full flex items-center justify-center bg-gray-100 ring-[3px] ring-gray-200 ring-dashed opacity-60">
+                              <div className="w-16 h-16 rounded-full flex items-center justify-center bg-[var(--ds-surface-card-active)] ring-[3px] ring-gray-200 ring-dashed opacity-60">
                                 <span className="text-2xl">🔒</span>
                               </div>
-                              <p className="font-nunito font-bold text-[11px] text-ds-muted leading-tight">Next badge</p>
-                              <p className="text-[9px] text-ds-muted">Keep learning!</p>
+                              <p className="font-nunito font-bold text-2xs text-ds-muted leading-tight">Next badge</p>
+                              <p className="text-4xs text-ds-muted">Keep learning!</p>
                             </motion.div>
                           </div>
                         </>
@@ -1983,8 +1983,8 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                           >
                             <Image src={assets.starMascot} alt="" width={64} height={64} className="w-16 h-16 mx-auto mb-3 opacity-40" />
                           </motion.div>
-                          <p className="text-ds-text font-black text-[15px] mb-1">No badges yet</p>
-                          <p className="text-gray-400 text-[12px] font-nunito">
+                          <p className="text-ds-text font-black text-mbase mb-1">No badges yet</p>
+                          <p className="text-[var(--ds-text-tertiary)] text-xs font-nunito">
                             Complete missions to earn the first badge!
                           </p>
                         </div>
@@ -1993,11 +1993,11 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
 
                     {/* ── Certificates ── */}
                     {certs.length > 0 && (
-                      <div className="bg-white border border-ds-border p-5 shadow-ds-card" style={{ borderRadius: 'var(--leaf-r-lg)' }}>
+                      <div className="bg-[var(--ds-surface-card)] border border-ds-border p-5 shadow-ds-card" style={{ borderRadius: 'var(--leaf-r-lg)' }}>
                         <div className="flex items-center gap-2 mb-4">
                           <span className="text-xl">🎓</span>
-                          <h2 className="font-black text-ds-text text-[18px]">Certificates</h2>
-                          <span className="ml-auto text-[12px] font-bold text-ds-muted">{certs.length} earned</span>
+                          <h2 className="font-black text-ds-text text-lg">Certificates</h2>
+                          <span className="ml-auto text-xs font-bold text-ds-muted">{certs.length} earned</span>
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                           {certs.map((c, i) => {
@@ -2013,14 +2013,14 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                             >
                               {/* Mini cert thumbnail */}
                               <div className="w-11 h-14 rounded-lg bg-gradient-to-b from-amber-300 to-amber-500 flex flex-col items-center justify-center gap-0.5 shrink-0 shadow-sm border border-amber-400/40">
-                                <span className="text-white text-[20px] leading-none">🎓</span>
-                                <div className="w-7 h-px bg-white/60" />
-                                <div className="w-5 h-px bg-white/40" />
+                                <span className="text-white text-xl leading-none">🎓</span>
+                                <div className="w-7 h-px bg-[var(--ds-surface-card)]/60" />
+                                <div className="w-5 h-px bg-[var(--ds-surface-card)]/40" />
                               </div>
                               <div className="flex-1 min-w-0">
-                                <p className="text-ds-text text-[13px] font-black leading-tight truncate">{certLabel}</p>
-                                <p className="text-amber-600 text-[10px] font-semibold mt-0.5 uppercase">{c.language}</p>
-                                <p className="text-ds-muted text-[10px] mt-0.5">{new Date(c.earned_at).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}</p>
+                                <p className="text-ds-text text-sml font-black leading-tight truncate">{certLabel}</p>
+                                <p className="text-amber-600 text-3xs font-semibold mt-0.5 uppercase">{c.language}</p>
+                                <p className="text-ds-muted text-3xs mt-0.5">{new Date(c.earned_at).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}</p>
                               </div>
                               <CheckCircle2 className="w-5 h-5 text-amber-500 shrink-0" />
                             </motion.div>
@@ -2032,11 +2032,11 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
 
                     {/* ── How They Felt ── */}
                     {feelings.length > 0 && (
-                      <div className="bg-white border border-ds-border p-5 shadow-ds-card" style={{ borderRadius: 'var(--leaf-r-lg)' }}>
+                      <div className="bg-[var(--ds-surface-card)] border border-ds-border p-5 shadow-ds-card" style={{ borderRadius: 'var(--leaf-r-lg)' }}>
                         <div className="flex items-center gap-2 mb-4">
                           <span className="text-xl">💭</span>
-                          <h2 className="font-black text-ds-text text-[18px]">How They Felt</h2>
-                          <span className="text-gray-400 text-[12px] font-semibold ml-auto">After each story</span>
+                          <h2 className="font-black text-ds-text text-lg">How They Felt</h2>
+                          <span className="text-[var(--ds-text-tertiary)] text-xs font-semibold ml-auto">After each story</span>
                         </div>
                         <div className="space-y-2">
                           {feelings.map((f, i) => (
@@ -2047,8 +2047,8 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                               style={{ borderRadius: 'var(--leaf-r)' }}>
                               <span className="text-3xl shrink-0">{f.feeling}</span>
                               <div className="flex-1 min-w-0">
-                                <p className="font-black text-ds-text text-[13px] truncate">{f.title}</p>
-                                <p className="text-gray-400 text-[11px]">{new Date(f.felt_at).toLocaleDateString()}</p>
+                                <p className="font-black text-ds-text text-sml truncate">{f.title}</p>
+                                <p className="text-[var(--ds-text-tertiary)] text-2xs">{new Date(f.felt_at).toLocaleDateString()}</p>
                               </div>
                             </motion.div>
                           ))}
@@ -2057,10 +2057,10 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                     )}
 
                     {/* ── Tips ── */}
-                    <div className="bg-white border border-ds-border p-5 shadow-ds-card" style={{ borderRadius: 'var(--leaf-r-lg)' }}>
+                    <div className="bg-[var(--ds-surface-card)] border border-ds-border p-5 shadow-ds-card" style={{ borderRadius: 'var(--leaf-r-lg)' }}>
                       <div className="flex items-center gap-2 mb-4">
                         <span className="text-xl">💡</span>
-                        <h2 className="font-black text-ds-text text-[18px]">Keep {active.child.name} Engaged</h2>
+                        <h2 className="font-black text-ds-text text-lg">Keep {active.child.name} Engaged</h2>
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         {[
@@ -2074,8 +2074,8 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                             style={{ borderRadius: 'var(--leaf-r)' }}>
                             <span className="text-3xl shrink-0">{tip.emoji}</span>
                             <div>
-                              <p className="text-ds-text text-[14px] font-black">{tip.title}</p>
-                              <p className="text-gray-600 text-[11px] mt-1 leading-snug">{tip.desc}</p>
+                              <p className="text-ds-text text-sm font-black">{tip.title}</p>
+                              <p className="text-[var(--ds-text-secondary)] text-2xs mt-1 leading-snug">{tip.desc}</p>
                             </div>
                           </motion.div>
                         ))}

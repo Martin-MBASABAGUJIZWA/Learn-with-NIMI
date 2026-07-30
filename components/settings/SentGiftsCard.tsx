@@ -41,28 +41,28 @@ export default function SentGiftsCard() {
           <Gift className="w-4 h-4 text-amber-500" />
         </div>
         <div>
-          <h3 className="font-baloo font-black text-ds-text text-[15px] leading-tight">Gifts Sent</h3>
-          <p className="text-gray-400 text-[11px]">{gifts.length} gift{gifts.length !== 1 ? "s" : ""} sent</p>
+          <h3 className="font-baloo font-black text-ds-text text-mbase leading-tight">Gifts Sent</h3>
+          <p className="text-[var(--ds-text-tertiary)] text-2xs">{gifts.length} gift{gifts.length !== 1 ? "s" : ""} sent</p>
         </div>
       </div>
       <div className="space-y-2.5">
         {gifts.map(g => (
-          <div key={g.id} className="flex items-center gap-3 bg-gray-50 rounded-xl p-3">
+          <div key={g.id} className="flex items-center gap-3 bg-[var(--ds-surface-card)] rounded-xl p-3">
             <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${g.redeemed_at ? "bg-green-100" : "bg-amber-100"}`}>
               {g.redeemed_at
                 ? <CheckCircle className="w-4 h-4 text-green-600" />
                 : <Clock className="w-4 h-4 text-amber-500" />}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-ds-text font-bold text-[13px] truncate">
+              <p className="text-ds-text font-bold text-sml truncate">
                 {g.recipient_name ?? g.recipient_email}
               </p>
-              <p className="text-gray-400 text-[11px]">
+              <p className="text-[var(--ds-text-tertiary)] text-2xs">
                 {g.products?.name ?? "Nimipiko Club"} ·{" "}
                 {g.redeemed_at ? "Claimed ✓" : "Awaiting claim"}
               </p>
             </div>
-            <p className="text-gray-400 text-[10px] flex-shrink-0">
+            <p className="text-[var(--ds-text-tertiary)] text-3xs flex-shrink-0">
               {new Date(g.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
             </p>
           </div>

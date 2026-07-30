@@ -47,13 +47,13 @@ interface Props {
 function TalkToNimiSkeleton() {
   return (
     <div className="flex flex-col h-full animate-pulse px-4 py-6 gap-4 max-w-2xl mx-auto w-full">
-      <div className="h-10 w-48 bg-gray-100 rounded-2xl" />
+      <div className="h-10 w-48 bg-[var(--ds-surface-card-active)] rounded-2xl" />
       <div className="flex-1 flex flex-col gap-3">
-        <div className="h-16 w-3/4 bg-gray-100 rounded-2xl self-start" />
-        <div className="h-12 w-1/2 bg-gray-100 rounded-2xl self-end" />
-        <div className="h-16 w-2/3 bg-gray-100 rounded-2xl self-start" />
+        <div className="h-16 w-3/4 bg-[var(--ds-surface-card-active)] rounded-2xl self-start" />
+        <div className="h-12 w-1/2 bg-[var(--ds-surface-card-active)] rounded-2xl self-end" />
+        <div className="h-16 w-2/3 bg-[var(--ds-surface-card-active)] rounded-2xl self-start" />
       </div>
-      <div className="h-14 w-full bg-gray-100 rounded-full mt-auto" />
+      <div className="h-14 w-full bg-[var(--ds-surface-card-active)] rounded-full mt-auto" />
     </div>
   );
 }
@@ -313,14 +313,14 @@ function NimiChatPageContent({
         <HeroBanner zone="nimiChat" className="mb-4">
           <button
             onClick={() => window.history.back()}
-            className="absolute top-4 left-5 z-20 flex items-center gap-1.5 text-white/80 hover:text-white text-[13px] font-bold transition-colors"
+            className="absolute top-4 left-5 z-20 flex items-center gap-1.5 text-white/80 hover:text-white text-sml font-bold transition-colors"
           >
             <ArrowLeft className="w-4 h-4" /> {t("storyBackBtn")}
           </button>
 
           {/* Decorative circles */}
-          <div className="absolute -top-8 -right-8 w-44 h-44 rounded-full bg-white/10 pointer-events-none" />
-          <div className="absolute -bottom-10 -left-10 w-48 h-48 rounded-full bg-white/10 pointer-events-none" />
+          <div className="absolute -top-8 -right-8 w-44 h-44 rounded-full bg-[var(--ds-surface-card)]/10 pointer-events-none" />
+          <div className="absolute -bottom-10 -left-10 w-48 h-48 rounded-full bg-[var(--ds-surface-card)]/10 pointer-events-none" />
 
           {/* Floaters */}
           {(([
@@ -329,7 +329,7 @@ function NimiChatPageContent({
             { top:"18%", right:"5%", emoji:"💬", delay:0.3 },
             { top:"66%", right:"8%", emoji:"⭐", delay:1   },
           ]) as Array<{top:string;emoji:string;delay:number;left?:string;right?:string}>).map((d, i) => (
-            <motion.span key={i} className="absolute pointer-events-none select-none text-[14px]"
+            <motion.span key={i} className="absolute pointer-events-none select-none text-sm"
               style={{ top:d.top, left:d.left, right:d.right }}
               animate={noMotion ? {} : { opacity:[0.3,1,0.3], y:[0,-5,0] }}
               transition={noMotion ? {} : { duration:2.4, repeat:Infinity, delay:d.delay }}
@@ -345,11 +345,11 @@ function NimiChatPageContent({
               className="w-14 h-14 sm:w-16 sm:h-16 rounded-full border-2 border-white/40 shadow-lg shrink-0"
               loading="lazy" />
             <div>
-              <p className="text-white/60 text-[10px] font-bold uppercase tracking-[0.15em] mb-0.5">{t("nimiChatAIFriend")}</p>
-              <h1 className="font-baloo font-black text-white text-[22px] sm:text-[28px] leading-tight drop-shadow-md">
+              <p className="text-white/60 text-3xs font-bold uppercase tracking-[0.15em] mb-0.5">{t("nimiChatAIFriend")}</p>
+              <h1 className="font-baloo font-black text-white text-1.5xl sm:text-3.5xl leading-tight drop-shadow-md">
                 {t("nimiChatPageTitle")}
               </h1>
-              <p className="text-white/75 text-[12px] sm:text-[13px] font-semibold mt-0.5">
+              <p className="text-white/75 text-xs sm:text-sml font-semibold mt-0.5">
                 {t("nimiChatPageSubtitle")}
               </p>
             </div>
@@ -364,7 +364,7 @@ function NimiChatPageContent({
               { val: "practice", label: "🎤 Practice Reading" },
             ] as const).map(({ val, label }) => (
               <button key={val} onClick={() => setPageMode(val)}
-                className="px-5 py-2 text-[13px] font-black transition"
+                className="px-5 py-2 text-sml font-black transition"
                 style={{
                   background: pageMode === val ? "var(--nimi-green,#15803D)" : "var(--ds-surface-card,#fff)",
                   color:      pageMode === val ? "#fff" : "var(--ds-text-secondary,#6B7280)",
@@ -403,7 +403,7 @@ function NimiChatPageContent({
                   className="bg-ds-surface border border-ds-border shadow-sm px-4 py-3 text-center"
                   style={{ borderRadius:"var(--leaf-r)" }}
                 >
-                  <p className="text-[13px] font-bold text-ds-text leading-snug">{NIMI_PROMPTS[promptIdx]}</p>
+                  <p className="text-sml font-bold text-ds-text leading-snug">{NIMI_PROMPTS[promptIdx]}</p>
                 </motion.div>
               </AnimatePresence>
               {/* Downward pointer */}
@@ -433,8 +433,8 @@ function NimiChatPageContent({
               >
                 <span className="text-2xl leading-none">🔥</span>
                 <div>
-                  <p className="font-black text-orange-600 text-[13px] leading-tight">{chatStreakDays} {t("nimiChatStreakLabel")}</p>
-                  <p className="text-[10px] text-orange-400 font-semibold">{t("nimiChatKeepGoing")}</p>
+                  <p className="font-black text-orange-600 text-sml leading-tight">{chatStreakDays} {t("nimiChatStreakLabel")}</p>
+                  <p className="text-3xs text-orange-400 font-semibold">{t("nimiChatKeepGoing")}</p>
                 </div>
               </motion.div>
             )}
@@ -444,8 +444,8 @@ function NimiChatPageContent({
               <div className="flex items-center gap-2.5 bg-yellow-50 border border-yellow-100 px-4 py-2.5 rounded-2xl w-full">
                 <span className="text-2xl leading-none">⭐</span>
                 <div>
-                  <p className="font-black text-yellow-600 text-[13px] leading-tight">{todayStars} {t("nimiChatStarsLabel")}</p>
-                  <p className="text-[10px] text-yellow-500 font-semibold">{t("nimiChatAmazingWork")}</p>
+                  <p className="font-black text-yellow-600 text-sml leading-tight">{todayStars} {t("nimiChatStarsLabel")}</p>
+                  <p className="text-3xs text-yellow-500 font-semibold">{t("nimiChatAmazingWork")}</p>
                 </div>
               </div>
             )}
@@ -474,7 +474,7 @@ function NimiChatPageContent({
             {/* Chat header */}
             <div className="relative flex items-center gap-3 px-4 py-3 flex-shrink-0 overflow-hidden"
               style={{ backgroundColor:"var(--nimi-green)" }}>
-              <div className="absolute -top-6 -right-6 w-24 h-24 rounded-full bg-white/10 pointer-events-none" />
+              <div className="absolute -top-6 -right-6 w-24 h-24 rounded-full bg-[var(--ds-surface-card)]/10 pointer-events-none" />
 
               <motion.img src={assets.nimiCircle} alt="NIMI"
                 className="w-11 h-11 rounded-full object-cover border-2 border-white/50 shadow-md flex-shrink-0"
@@ -483,8 +483,8 @@ function NimiChatPageContent({
                 loading="lazy" />
 
               <div className="flex-1 min-w-0">
-                <p className="font-black text-white text-[15px]">NIMI</p>
-                <p className="text-white/80 text-[11px] flex items-center gap-1.5">
+                <p className="font-black text-white text-mbase">NIMI</p>
+                <p className="text-white/80 text-2xs flex items-center gap-1.5">
                   <motion.span
                     className="w-2 h-2 rounded-full bg-green-300 inline-block shrink-0"
                     animate={noMotion ? {} : { scale:[1,1.4,1], opacity:[1,0.5,1] }}
@@ -498,12 +498,12 @@ function NimiChatPageContent({
                 <motion.div
                   initial={{ opacity: 0, scale: 0.85 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-black shrink-0 ${
+                  className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-2xs font-black shrink-0 ${
                     nimiMessagesUsed >= 9
                       ? "bg-red-500/90 text-white"
                       : nimiMessagesUsed >= 7
                       ? "bg-amber-400/90 text-amber-900"
-                      : "bg-white/20 text-white"
+                      : "bg-[var(--ds-surface-card)]/20 text-white"
                   }`}>
                   {nimiMessagesUsed}/10
                 </motion.div>
@@ -512,7 +512,7 @@ function NimiChatPageContent({
               {/* Read-aloud toggle — lives in the header now */}
               {language !== "rw" && (
                 <motion.button whileTap={m.buttonPress} onClick={toggleSpeak} disabled={isTyping}
-                  className="flex items-center gap-1.5 bg-white/20 hover:bg-white/30 text-white text-[11px] font-bold px-3 py-1.5 rounded-full transition disabled:opacity-50 shrink-0">
+                  className="flex items-center gap-1.5 bg-[var(--ds-surface-card)]/20 hover:bg-[var(--ds-surface-card)]/30 text-white text-2xs font-bold px-3 py-1.5 rounded-full transition disabled:opacity-50 shrink-0">
                   {isSpeaking
                     ? <><VolumeX className="w-3.5 h-3.5" /> {t("stopReadingLabel")}</>
                     : <><Volume2 className="w-3.5 h-3.5" /> {t("readAloudLabel")}</>
@@ -541,7 +541,7 @@ function NimiChatPageContent({
                           width={36} height={36}
                           className="rounded-full object-cover flex-shrink-0 shadow border-2 border-emerald-100" />
                       )}
-                      <div className={`text-[14px] leading-relaxed px-4 py-2.5 shadow-sm max-w-[78%] ${
+                      <div className={`text-sm leading-relaxed px-4 py-2.5 shadow-sm max-w-[78%] ${
                         isNimi
                           ? "bg-emerald-50 border border-emerald-100 text-ds-text rounded-2xl rounded-bl-sm"
                           : "text-white rounded-2xl rounded-br-sm shadow-md"
@@ -594,7 +594,7 @@ function NimiChatPageContent({
                 className="mx-3 mb-2 mt-3 flex items-center gap-3 rounded-2xl px-4 py-3 cursor-pointer group bg-ds-club shadow-ds-club">
                 <Crown className="w-5 h-5 text-yellow-300 shrink-0" />
                 <div className="flex-1 min-w-0">
-                  <p className="font-baloo font-black text-white text-[13px] leading-tight">You&apos;ve reached today&apos;s free limit</p>
+                  <p className="font-baloo font-black text-white text-sml leading-tight">You&apos;ve reached today&apos;s free limit</p>
                   <p className="text-white/70 text-2xs leading-tight">Upgrade to NIMIPIKO Club for unlimited Nimi chats, every day.</p>
                 </div>
                 <span className="shrink-0 font-baloo font-black text-yellow-300 text-xs group-hover:text-yellow-200">Upgrade →</span>
@@ -611,7 +611,7 @@ function NimiChatPageContent({
 
             {/* Mic error */}
             {micError && (
-              <p className="px-4 py-1 text-[11px] font-bold text-red-500 text-center">
+              <p className="px-4 py-1 text-2xs font-bold text-red-500 text-center">
                 {t(speechErrorKey(micError))}
               </p>
             )}
@@ -620,8 +620,8 @@ function NimiChatPageContent({
             <div className="px-3 py-3 flex-shrink-0 bg-ds-surface border-t border-ds-border">
               <div className={`flex items-center gap-2 border shadow-sm px-3 py-2 transition-shadow ${
                 dailyLimitReached
-                  ? "bg-gray-50 border-gray-200 opacity-50 pointer-events-none"
-                  : "bg-white border-gray-200 focus-within:border-[var(--nimi-green)] focus-within:ring-2 focus-within:ring-[var(--nimi-green)] focus-within:ring-opacity-20"
+                  ? "bg-[var(--ds-surface-card-hover)] border-[var(--ds-border-primary)] opacity-50 pointer-events-none"
+                  : "bg-[var(--ds-surface-card)] border-[var(--ds-border-primary)] focus-within:border-[var(--nimi-green)] focus-within:ring-2 focus-within:ring-[var(--nimi-green)] focus-within:ring-opacity-20"
               }`} style={{ borderRadius:"var(--leaf-r)" }}>
                 {showMic && (
                   <motion.button
@@ -634,7 +634,7 @@ function NimiChatPageContent({
                     className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition disabled:opacity-40 ${
                       listening
                         ? "bg-red-500 text-white shadow-md shadow-red-200"
-                        : "bg-gray-100 hover:bg-gray-200 text-gray-500"
+                        : "bg-[var(--ds-surface-card-active)] hover:bg-[var(--ds-border-primary)] text-[var(--ds-text-secondary)]"
                     }`}>
                     <Mic className="w-4 h-4" />
                   </motion.button>
@@ -645,7 +645,7 @@ function NimiChatPageContent({
                   onKeyDown={e => e.key === "Enter" && sendChat()}
                   placeholder={dailyLimitReached ? "Daily limit reached" : listening ? (interimText || t("listeningLabel")) : t("chatPlaceholder")}
                   disabled={isTyping || listening || dailyLimitReached}
-                  className="flex-1 min-w-0 text-[14px] bg-transparent py-1.5 focus:outline-none text-gray-800 placeholder:text-gray-400 disabled:opacity-60 font-nunito" />
+                  className="flex-1 min-w-0 text-sm bg-transparent py-1.5 focus:outline-none text-[var(--ds-text-primary)] placeholder:text-[var(--ds-text-tertiary)] disabled:opacity-60 font-nunito" />
                 <motion.button onClick={() => sendChat()} whileTap={m.buttonPress}
                   disabled={isTyping || !chatInput.trim() || dailyLimitReached}
                   className="w-9 h-9 flex items-center justify-center flex-shrink-0 transition disabled:opacity-30 text-white shadow hover:opacity-90 disabled:shadow-none"

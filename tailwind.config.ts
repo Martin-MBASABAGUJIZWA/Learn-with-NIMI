@@ -176,6 +176,18 @@ const config: Config = {
         "hp-shadow-card":  "0 4px 16px rgba(0,0,0,0.08)",
         "hp-shadow-nav":   "0 2px 8px rgba(0,0,0,0.06)",
         "hp-shadow-hover": "0 8px 28px rgba(0,0,0,0.14)",
+        // Learner-UI depth scale — slate-tinted, three levels of lift
+        "card-xs":  "0 4px 12px rgba(15,23,42,0.06)",
+        "card-sm2": "0 8px 20px rgba(15,23,42,0.05)",
+        "card-md":  "0 8px 24px rgba(15,23,42,0.07)",
+        "card-lg":  "0 12px 28px rgba(15,23,42,0.10)",
+        "card-xl":  "0 14px 32px rgba(15,23,42,0.06)",
+        "card-2xl": "0 16px 34px rgba(15,23,42,0.08)",
+        "card-3xl": "0 16px 34px rgba(15,23,42,0.12)",
+        "card-4xl": "0 24px 60px rgba(15,23,42,0.08)",
+        // Brand-tinted glow (green)
+        "brand-glow-sm": "0 8px 24px rgba(5,150,105,0.12)",
+        "brand-glow-md": "0 24px 60px rgba(5,150,105,0.12)",
       },
 
       // ─── BORDER RADIUS ─────────────────────────────────────────────
@@ -239,6 +251,29 @@ const config: Config = {
         "hp-body":    ["1.125rem",  { lineHeight: "1.6" }],
         "hp-sm":      ["0.875rem",  { lineHeight: "1.4" }],
         "hp-xs":      ["0.8125rem", { lineHeight: "1.3" }],
+        // Sub-xs scale — used throughout the learner UI for tight labels/badges
+        "2xs":   ["11px", { lineHeight: "1.4" }],
+        "3xs":   ["10px", { lineHeight: "1.4" }],
+        "4xs":   ["9px",  { lineHeight: "1.3" }],
+        "5xs":   ["8px",  { lineHeight: "1.3" }],
+        "6xs":   ["7px",  { lineHeight: "1.3" }],
+        // Between xs (12px) and sm (14px)
+        "sml":   ["13px", { lineHeight: "1.45" }],
+        // Between sm (14px) and base (16px)
+        "mbase": ["15px", { lineHeight: "1.5" }],
+        // Between base (16px) and lg (18px)
+        "mlg":   ["17px", { lineHeight: "1.5" }],
+        // Between xl (20px) and 2xl (24px)
+        "1.5xl": ["22px", { lineHeight: "1.3" }],
+        // Between 2xl (24px) and 3xl (30px)
+        "2.5xl": ["26px", { lineHeight: "1.25" }],
+        // Between 3xl (30px) and 4xl (36px)
+        "3.5xl": ["28px", { lineHeight: "1.2" }],
+        // Display scale gap-fillers
+        "4.5xl": ["42px", { lineHeight: "1.1" }],
+        "5.5xl": ["52px", { lineHeight: "1.05" }],
+        "6.5xl": ["64px", { lineHeight: "1.03" }],
+        "7.5xl": ["88px", { lineHeight: "1.0" }],
       },
 
       // ─── KEYFRAMES ─────────────────────────────────────────────────

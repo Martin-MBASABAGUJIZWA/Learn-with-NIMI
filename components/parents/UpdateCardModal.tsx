@@ -108,11 +108,11 @@ export default function UpdateCardModal({ onClose, onSuccess }: Props) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div className="relative bg-white w-full max-w-md shadow-2xl" style={{ borderRadius: "var(--leaf-r-lg)" }}>
+      <div className="relative bg-[var(--ds-surface-card)] w-full max-w-md shadow-2xl" style={{ borderRadius: "var(--leaf-r-lg)" }}>
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-ds-border">
-          <h2 className="font-black text-ds-text text-[16px]">Update Payment Card</h2>
-          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition text-gray-400 hover:text-gray-600">
+          <h2 className="font-black text-ds-text text-base">Update Payment Card</h2>
+          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[var(--ds-surface-card-hover)] transition text-[var(--ds-text-tertiary)] hover:text-[var(--ds-text-secondary)]">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -147,7 +147,7 @@ export default function UpdateCardModal({ onClose, onSuccess }: Props) {
           {step === "success" && (
             <div className="flex flex-col items-center gap-3 py-8">
               <CheckCircle2 className="w-12 h-12 text-green-500" />
-              <p className="text-[16px] font-black text-ds-text">Card updated!</p>
+              <p className="text-base font-black text-ds-text">Card updated!</p>
               <p className="text-sm text-ds-muted text-center">Your new card will be used for future renewals. Your subscription is now active.</p>
             </div>
           )}
@@ -159,19 +159,19 @@ export default function UpdateCardModal({ onClose, onSuccess }: Props) {
                 <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
                 <div>
                   <p className="font-bold text-amber-800 text-sm mb-1">Card update not available</p>
-                  <p className="text-amber-700 text-[13px] leading-relaxed">
+                  <p className="text-amber-700 text-sml leading-relaxed">
                     Our payment system is not yet configured for card-on-file updates. The quickest fix is to resubscribe — it only takes a moment and your child's progress is saved.
                   </p>
                 </div>
               </div>
               <a
                 href="/pricing"
-                className="flex items-center justify-center gap-2 w-full py-3 bg-ds-brand-primary text-white font-black text-[14px] rounded-xl hover:opacity-90 transition"
+                className="flex items-center justify-center gap-2 w-full py-3 bg-ds-brand-primary text-white font-black text-sm rounded-xl hover:opacity-90 transition"
                 style={{ backgroundColor: "var(--nimi-green)" }}
               >
                 Resubscribe now <ExternalLink className="w-3.5 h-3.5" />
               </a>
-              <button onClick={onClose} className="w-full text-[12px] text-ds-muted hover:text-ds-text transition text-center">
+              <button onClick={onClose} className="w-full text-xs text-ds-muted hover:text-ds-text transition text-center">
                 Cancel
               </button>
             </div>
@@ -184,17 +184,17 @@ export default function UpdateCardModal({ onClose, onSuccess }: Props) {
                 <AlertTriangle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
                 <div>
                   <p className="font-bold text-red-700 text-sm mb-1">Something went wrong</p>
-                  <p className="text-red-600 text-[13px] leading-relaxed">{errorMsg ?? "Please try resubscribing from the pricing page."}</p>
+                  <p className="text-red-600 text-sml leading-relaxed">{errorMsg ?? "Please try resubscribing from the pricing page."}</p>
                 </div>
               </div>
               <a
                 href="/pricing"
-                className="flex items-center justify-center gap-2 w-full py-3 font-black text-[14px] rounded-xl border-2 border-ds-brand-primary hover:bg-green-50 transition text-ds-brand-primary"
+                className="flex items-center justify-center gap-2 w-full py-3 font-black text-sm rounded-xl border-2 border-ds-brand-primary hover:bg-green-50 transition text-ds-brand-primary"
                 style={{ borderColor: "var(--nimi-green)", color: "var(--nimi-green)" }}
               >
                 Resubscribe instead
               </a>
-              <button onClick={onClose} className="w-full text-[12px] text-ds-muted hover:text-ds-text transition text-center">
+              <button onClick={onClose} className="w-full text-xs text-ds-muted hover:text-ds-text transition text-center">
                 Cancel
               </button>
             </div>

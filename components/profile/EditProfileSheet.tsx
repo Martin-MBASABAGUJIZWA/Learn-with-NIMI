@@ -159,7 +159,7 @@ export default function EditProfileSheet({
 
           <motion.div
             className="fixed inset-x-0 bottom-0 z-50 flex flex-col bg-ds-card rounded-t-[28px] shadow-2xl overflow-hidden
-                       sm:inset-0 sm:m-auto sm:h-fit sm:w-[580px] sm:rounded-3xl sm:max-h-[90vh]"
+                       sm:inset-0 sm:m-auto sm:h-fit sm:w-[580px] sm:leaf-lg sm:max-h-[90vh]"
             style={{ maxHeight: "93vh" }}
             initial={{ y: "100%", opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
@@ -183,10 +183,10 @@ export default function EditProfileSheet({
                   <ChildAvatar avatarUrl={currentAvatarUrl} size={56} />
                 </motion.div>
                 <div>
-                  <p className="font-baloo font-black text-ds-text text-[18px] leading-tight">
+                  <p className="font-baloo font-black text-ds-text text-lg leading-tight">
                     {name || initialName}
                   </p>
-                  <p className="text-[11px] text-ds-muted font-semibold">Edit your profile ✨</p>
+                  <p className="text-2xs text-ds-muted font-semibold">Edit your profile ✨</p>
                 </div>
               </div>
               <button
@@ -206,7 +206,7 @@ export default function EditProfileSheet({
                 <button
                   key={t.id}
                   onClick={() => handleTabChange(t.id)}
-                  className={`flex-1 flex flex-col items-center gap-0.5 py-2.5 text-[10px] font-black uppercase tracking-wide border-b-2 transition-all ${
+                  className={`flex-1 flex flex-col items-center gap-0.5 py-2.5 text-3xs font-black uppercase tracking-wide border-b-2 transition-all ${
                     tab === t.id
                       ? "border-[var(--ds-brand-primary)] text-[var(--ds-brand-primary)]"
                       : "border-transparent text-ds-muted hover:text-ds-text"
@@ -278,13 +278,13 @@ export default function EditProfileSheet({
                         <motion.button
                           whileTap={{ scale: 0.97 }}
                           onClick={() => fileInputRef.current?.click()}
-                          className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl border-2 border-dashed border-[var(--ds-brand-primary)]/50 bg-[var(--ds-brand-subtle)] text-[var(--ds-brand-primary)] font-black text-[15px] transition hover:border-[var(--ds-brand-primary)] hover:shadow-sm"
+                          className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl border-2 border-dashed border-[var(--ds-brand-primary)]/50 bg-[var(--ds-brand-subtle)] text-[var(--ds-brand-primary)] font-black text-mbase transition hover:border-[var(--ds-brand-primary)] hover:shadow-sm"
                         >
                           <span className="text-2xl">📷</span>
                           {photoPreview ? "Change Photo" : "Choose a Photo"}
                         </motion.button>
 
-                        <p className="text-center text-[11px] text-ds-muted font-semibold leading-relaxed">
+                        <p className="text-center text-2xs text-ds-muted font-semibold leading-relaxed">
                           On mobile, tap to take a selfie or pick from your gallery.{"\n"}
                           Your photo is cropped to a circle automatically.
                         </p>
@@ -300,14 +300,14 @@ export default function EditProfileSheet({
                               transition={{ duration: 0.2 }}
                             />
                           </div>
-                          <p className="text-center text-[11px] text-ds-muted mt-1.5 font-semibold">
+                          <p className="text-center text-2xs text-ds-muted mt-1.5 font-semibold">
                             Uploading… {uploadProgress}%
                           </p>
                         </div>
                       )}
 
                       {uploadError && (
-                        <p className="text-red-500 text-[12px] font-semibold text-center">{uploadError}</p>
+                        <p className="text-red-500 text-xs font-semibold text-center">{uploadError}</p>
                       )}
                     </div>
                   )}
@@ -315,7 +315,7 @@ export default function EditProfileSheet({
                   {/* ── Emoji picker ── */}
                   {tab === "emoji" && (
                     <div className="p-5">
-                      <p className="text-[12px] font-black text-ds-muted uppercase tracking-widest mb-4">
+                      <p className="text-xs font-black text-ds-muted uppercase tracking-widest mb-4">
                         Pick your favorite!
                       </p>
                       <div className="grid grid-cols-6 sm:grid-cols-8 gap-2.5">
@@ -347,7 +347,7 @@ export default function EditProfileSheet({
                         <ChildAvatar avatarUrl={currentAvatarUrl} size={96} />
                       </div>
                       <div className="w-full">
-                        <label className="block text-[13px] font-black text-ds-muted uppercase tracking-widest mb-3 text-center">
+                        <label className="block text-sml font-black text-ds-muted uppercase tracking-widest mb-3 text-center">
                           What&apos;s your name?
                         </label>
                         <input
@@ -357,15 +357,15 @@ export default function EditProfileSheet({
                           placeholder={initialName}
                           maxLength={24}
                           autoFocus
-                          className="w-full text-center text-[28px] font-baloo font-black text-ds-text bg-ds-page border-2 border-ds-border rounded-2xl px-4 py-4 focus:outline-none focus:border-[var(--ds-brand-primary)] transition-colors placeholder:text-ds-muted/50"
+                          className="w-full text-center text-3.5xl font-baloo font-black text-ds-text bg-ds-page border-2 border-ds-border rounded-2xl px-4 py-4 focus:outline-none focus:border-[var(--ds-brand-primary)] transition-colors placeholder:text-ds-muted/50"
                           style={{ letterSpacing: "-0.01em" }}
                         />
-                        <p className="text-center text-[11px] text-ds-muted mt-2 font-semibold">
+                        <p className="text-center text-2xs text-ds-muted mt-2 font-semibold">
                           {name.length} / 24 characters
                         </p>
                       </div>
                       <div className="w-full">
-                        <p className="text-[11px] font-black text-ds-muted uppercase tracking-widest mb-3 text-center">
+                        <p className="text-2xs font-black text-ds-muted uppercase tracking-widest mb-3 text-center">
                           Quick ideas ✨
                         </p>
                         <div className="flex flex-wrap gap-2 justify-center">
@@ -373,7 +373,7 @@ export default function EditProfileSheet({
                             <button
                               key={n}
                               onClick={() => setName(n)}
-                              className="px-3 py-1.5 rounded-full bg-ds-page border border-ds-border text-[12px] font-bold text-ds-muted hover:border-[var(--ds-brand-primary)] hover:text-[var(--ds-brand-primary)] transition-all"
+                              className="px-3 py-1.5 rounded-full bg-ds-page border border-ds-border text-xs font-bold text-ds-muted hover:border-[var(--ds-brand-primary)] hover:text-[var(--ds-brand-primary)] transition-all"
                             >
                               {n}
                             </button>
@@ -392,7 +392,7 @@ export default function EditProfileSheet({
                 onClick={handleSave}
                 disabled={saving || done}
                 whileTap={!saving && !done ? { scale: 0.96 } : {}}
-                className="w-full py-4 rounded-2xl font-baloo font-black text-[17px] text-white transition-all relative overflow-hidden"
+                className="w-full py-4 rounded-2xl font-baloo font-black text-mlg text-white transition-all relative overflow-hidden"
                 style={{ background: done ? "#22c55e" : "var(--ds-brand-primary)" }}
               >
                 <AnimatePresence mode="wait">

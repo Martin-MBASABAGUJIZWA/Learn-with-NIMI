@@ -112,10 +112,10 @@ export default function StoryFlipBook({ pages, onClose, t }: StoryFlipBookProps)
       <div className={`fixed inset-0 z-50 flex flex-col items-center justify-center gap-3 bg-gradient-to-br ${theme.gradients.storyReader}`}>
         <div className="text-5xl">📚</div>
         <p className="text-white text-lg font-semibold">{t("noPagesTitle")}</p>
-        <p className="text-gray-400 text-sm">{t("noPagesHint")}</p>
+        <p className="text-[var(--ds-text-tertiary)] text-sm">{t("noPagesHint")}</p>
         <button
           onClick={onClose}
-          className="mt-4 bg-white/10 text-white px-6 py-2.5 rounded-full border border-white/10 hover:bg-white/20 transition-colors font-medium"
+          className="mt-4 bg-[var(--ds-surface-card)]/10 text-white px-6 py-2.5 rounded-full border border-white/10 hover:bg-[var(--ds-surface-card)]/20 transition-colors font-medium"
         >
           {t("closeReader")}
         </button>
@@ -156,7 +156,7 @@ export default function StoryFlipBook({ pages, onClose, t }: StoryFlipBookProps)
           whileHover={{ scale: 1.08 }}
           whileTap={m.buttonPress}
           onClick={onClose}
-          className="flex items-center justify-center text-white bg-white/10 hover:bg-white/20 border border-white/10 backdrop-blur-sm rounded-full p-2.5 transition-colors touch-target"
+          className="flex items-center justify-center text-white bg-[var(--ds-surface-card)]/10 hover:bg-[var(--ds-surface-card)]/20 border border-white/10 backdrop-blur-sm rounded-full p-2.5 transition-colors touch-target"
         >
           <X className="h-5 w-5" />
         </motion.button>
@@ -294,7 +294,7 @@ function MobileSinglePageViewer({ pages, currentPage, onPageChange, onClose, the
         <motion.button
           whileTap={m.buttonPress}
           onClick={onClose}
-          className="flex items-center justify-center text-white bg-white/10 hover:bg-white/20 border border-white/10 rounded-full p-2 transition-colors"
+          className="flex items-center justify-center text-white bg-[var(--ds-surface-card)]/10 hover:bg-[var(--ds-surface-card)]/20 border border-white/10 rounded-full p-2 transition-colors"
         >
           <X className="h-5 w-5" />
         </motion.button>
@@ -342,7 +342,7 @@ function MobileSinglePageViewer({ pages, currentPage, onPageChange, onClose, the
           whileTap={m.buttonPress}
           onClick={() => goTo(currentPage - 1)}
           disabled={currentPage === 0}
-          className="flex items-center gap-1.5 text-white/80 disabled:opacity-30 font-semibold text-sm px-4 py-2.5 rounded-full bg-white/10 hover:bg-white/20 transition-colors disabled:pointer-events-none"
+          className="flex items-center gap-1.5 text-white/80 disabled:opacity-30 font-semibold text-sm px-4 py-2.5 rounded-full bg-[var(--ds-surface-card)]/10 hover:bg-[var(--ds-surface-card)]/20 transition-colors disabled:pointer-events-none"
         >
           <ChevronLeft className="h-4 w-4" /> Prev
         </motion.button>
@@ -355,8 +355,8 @@ function MobileSinglePageViewer({ pages, currentPage, onPageChange, onClose, the
               onClick={() => goTo(i)}
               className={`rounded-full transition-all ${
                 i === currentPage
-                  ? "w-4 h-2 bg-white"
-                  : "w-2 h-2 bg-white/30 hover:bg-white/50"
+                  ? "w-4 h-2 bg-[var(--ds-surface-card)]"
+                  : "w-2 h-2 bg-[var(--ds-surface-card)]/30 hover:bg-[var(--ds-surface-card)]/50"
               }`}
             />
           ))}
@@ -369,7 +369,7 @@ function MobileSinglePageViewer({ pages, currentPage, onPageChange, onClose, the
           whileTap={m.buttonPress}
           onClick={() => goTo(currentPage + 1)}
           disabled={currentPage === pages.length - 1}
-          className="flex items-center gap-1.5 text-white/80 disabled:opacity-30 font-semibold text-sm px-4 py-2.5 rounded-full bg-white/10 hover:bg-white/20 transition-colors disabled:pointer-events-none"
+          className="flex items-center gap-1.5 text-white/80 disabled:opacity-30 font-semibold text-sm px-4 py-2.5 rounded-full bg-[var(--ds-surface-card)]/10 hover:bg-[var(--ds-surface-card)]/20 transition-colors disabled:pointer-events-none"
         >
           Next <ChevronRight className="h-4 w-4" />
         </motion.button>

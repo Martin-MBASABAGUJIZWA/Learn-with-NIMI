@@ -87,7 +87,7 @@ export default function CelebrationModal({ isOpen, onClose, reward = "Kind Heart
           >
             {/* Close */}
             <button onClick={onClose}
-              className="absolute top-3 right-3 w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center text-gray-500 transition z-20">
+              className="absolute top-3 right-3 w-8 h-8 bg-[var(--ds-surface-card-hover)] hover:bg-[var(--ds-surface-card-active)] rounded-full flex items-center justify-center text-[var(--ds-text-secondary)] transition z-20">
               <X className="w-4 h-4" />
             </button>
 
@@ -118,7 +118,7 @@ export default function CelebrationModal({ isOpen, onClose, reward = "Kind Heart
               <motion.p
                 {...m.fadeUp}
                 transition={{ ...m.fadeUp.transition, delay: 0.6 }}
-                className="text-gray-500 text-sm font-medium"
+                className="text-[var(--ds-text-secondary)] text-sm font-medium"
               >
                 Amazing job, {childName}!
               </motion.p>
@@ -151,7 +151,7 @@ export default function CelebrationModal({ isOpen, onClose, reward = "Kind Heart
                     >
                       <Star className="w-6 h-6 text-yellow-400 fill-yellow-400" />
                       <span className="font-black text-yellow-600 text-2xl">+{stars}</span>
-                      <span className="text-gray-500 text-sm font-bold">Stars</span>
+                      <span className="text-[var(--ds-text-secondary)] text-sm font-bold">Stars</span>
                     </motion.div>
 
                     {/* Badge */}

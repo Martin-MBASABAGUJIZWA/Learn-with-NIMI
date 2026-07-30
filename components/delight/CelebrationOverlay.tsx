@@ -95,7 +95,7 @@ export default function CelebrationOverlay({
               <motion.p
                 initial={{ opacity: 0 }} animate={{ opacity: 1 }}
                 transition={{ delay: 0.5, duration: DURATION.base }}
-                className="text-gray-500 text-sm"
+                className="text-[var(--ds-text-secondary)] text-sm"
               >
                 {subtitle}
               </motion.p>

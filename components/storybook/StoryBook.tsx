@@ -136,7 +136,7 @@ function BookInner({ story, onComplete, completed, onExit }: {
       ) : (
         <div className="flex items-center justify-center px-2 sm:px-4">
           <div
-            className="w-full max-w-4xl leaf-lg border border-emerald-100 bg-gradient-to-br from-white/70 via-emerald-50/50 to-amber-50/50 p-2 shadow-[0_16px_34px_rgba(15,23,42,0.08)]"
+            className="w-full max-w-4xl leaf-lg border border-emerald-100 bg-gradient-to-br from-white/70 via-emerald-50/50 to-amber-50/50 p-2 shadow-card-2xl"
             style={{ aspectRatio: "16/10" }}
           >
             {/* @ts-ignore react-pageflip types */}
@@ -190,12 +190,12 @@ function BookInner({ story, onComplete, completed, onExit }: {
                       className="w-20 h-20 sm:w-24 sm:h-24 rounded-full border-4 border-blue-400 shadow-2xl shadow-blue-500/30 -ml-3" />
                   </div>
                   <div className="relative z-10 text-center">
-                    <p className="font-baloo font-black text-yellow-300 text-[28px] sm:text-[34px] drop-shadow-lg">{t("storyBookTheEnd")}</p>
-                    <p className="font-nunito font-bold theme-text-faint text-[14px] sm:text-[15px] mt-1">{t("storyBookSeeYou")}</p>
+                    <p className="font-baloo font-black text-yellow-300 text-3.5xl sm:text-4xl drop-shadow-lg">{t("storyBookTheEnd")}</p>
+                    <p className="font-nunito font-bold theme-text-faint text-sm sm:text-mbase mt-1">{t("storyBookSeeYou")}</p>
                   </div>
                   <div className="relative z-10 flex gap-1 mt-5">
                     {["⭐", "✨", "🌟", "✨", "⭐"].map((s, i) => (
-                      <span key={i} className="text-[14px] opacity-40">{s}</span>
+                      <span key={i} className="text-sm opacity-40">{s}</span>
                     ))}
                   </div>
                 </div>
@@ -215,7 +215,7 @@ function BookInner({ story, onComplete, completed, onExit }: {
         <div className="px-0 pb-2">
           <button
             onClick={() => { playSuccess(); onComplete(); }}
-            className="w-full font-baloo font-black bg-[var(--ds-brand-primary)] hover:bg-[var(--ds-brand-hover)] text-white text-[18px] rounded-full py-4 shadow-lg shadow-ds-cta flex items-center justify-center gap-2 transition"
+            className="w-full font-baloo font-black bg-[var(--ds-brand-primary)] hover:bg-[var(--ds-brand-hover)] text-white text-lg rounded-full py-4 shadow-lg shadow-ds-cta flex items-center justify-center gap-2 transition"
           >
             {t("storyBookFinished")}
           </button>

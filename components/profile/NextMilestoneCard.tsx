@@ -26,10 +26,10 @@ export default function NextMilestoneCard({ earnedSlugs, storiesCompleted, total
     return (
       <div className="bg-ds-card border border-ds-border shadow-ds-card p-5 text-center" style={{ borderRadius: "var(--leaf-r)" }}>
         <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 260, damping: 18 }}>
-          <p className="text-[40px] leading-none mb-2">🏆</p>
+          <p className="text-5xl leading-none mb-2">🏆</p>
         </motion.div>
-        <p className="font-baloo font-black text-ds-text text-[15px]">All Milestones Unlocked!</p>
-        <p className="text-ds-muted text-[11px] font-semibold mt-1">You are a NIMIPIKO Legend 👑</p>
+        <p className="font-baloo font-black text-ds-text text-mbase">All Milestones Unlocked!</p>
+        <p className="text-ds-muted text-2xs font-semibold mt-1">You are a NIMIPIKO Legend 👑</p>
       </div>
     );
   }
@@ -57,18 +57,18 @@ export default function NextMilestoneCard({ earnedSlugs, storiesCompleted, total
         <motion.span
           animate={{ rotate: [0, -8, 8, 0] }}
           transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
-          className="text-[14px] font-black text-[var(--ds-brand-primary)]"
+          className="text-sm font-black text-[var(--ds-brand-primary)]"
         >
           🎯
         </motion.span>
-        <p className="font-baloo font-black text-[var(--ds-brand-primary)] text-[12px] uppercase tracking-widest">
+        <p className="font-baloo font-black text-[var(--ds-brand-primary)] text-xs uppercase tracking-widest">
           Next Milestone
         </p>
         {isClose && (
           <motion.span
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="ml-auto text-[9px] font-black px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 border border-amber-200"
+            className="ml-auto text-4xs font-black px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 border border-amber-200"
           >
             🔥 So close!
           </motion.span>
@@ -92,16 +92,16 @@ export default function NextMilestoneCard({ earnedSlugs, storiesCompleted, total
 
           {/* Info */}
           <div className="flex-1 min-w-0">
-            <p className="font-baloo font-black text-ds-text text-[16px] leading-tight">{next.label}</p>
-            <p className="text-ds-muted text-[11px] font-semibold mt-0.5 leading-snug">{next.desc}</p>
+            <p className="font-baloo font-black text-ds-text text-base leading-tight">{next.label}</p>
+            <p className="text-ds-muted text-2xs font-semibold mt-0.5 leading-snug">{next.desc}</p>
 
             {/* Progress bar */}
             <div className="mt-3">
               <div className="flex items-center justify-between mb-1.5">
-                <span className="text-[10px] font-black text-ds-muted uppercase tracking-wide">
+                <span className="text-3xs font-black text-ds-muted uppercase tracking-wide">
                   Progress
                 </span>
-                <span className="text-[11px] font-black text-[var(--ds-brand-primary)]">
+                <span className="text-2xs font-black text-[var(--ds-brand-primary)]">
                   {current} / {target.target}
                 </span>
               </div>
@@ -114,7 +114,7 @@ export default function NextMilestoneCard({ earnedSlugs, storiesCompleted, total
                   transition={{ duration: 1.1, ease: "easeOut", delay: 0.4 }}
                 />
               </div>
-              <p className="text-[10px] text-ds-muted font-semibold mt-1.5">
+              <p className="text-3xs text-ds-muted font-semibold mt-1.5">
                 {remaining === 0 ? "Ready to unlock!" : `${remaining} more ${unit} to go`}
               </p>
             </div>
@@ -124,7 +124,7 @@ export default function NextMilestoneCard({ earnedSlugs, storiesCompleted, total
         {/* CTA */}
         <Link
           href="/stories"
-          className="mt-4 flex items-center justify-center gap-2 py-2.5 font-baloo font-black text-[13px] text-white rounded-xl transition hover:-translate-y-0.5 active:scale-95 shadow-sm hover:shadow-md"
+          className="mt-4 flex items-center justify-center gap-2 py-2.5 font-baloo font-black text-sml text-white rounded-xl transition hover:-translate-y-0.5 active:scale-95 shadow-sm hover:shadow-md"
           style={{ background: "var(--ds-brand-primary)" }}
         >
           {target.type === "stories" ? "📖 Read a Story" : "⭐ Earn Stars"} →

@@ -46,8 +46,8 @@ type Step = "pick" | "coaching" | "describing" | "done";
 // Colour swatch chip
 function Swatch({ hex, label }: { hex: string; label: string }) {
   return (
-    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold border"
-      style={{ background: hex + "22", borderColor: hex, color: "#111827" }}>
+    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-2xs font-bold border"
+      style={{ background: hex + "22", borderColor: hex, color: "var(--ds-text-primary)" }}>
       <span className="w-3 h-3 rounded-full shrink-0 border border-white/50"
         style={{ background: hex }} />
       {label}
@@ -191,10 +191,10 @@ export default function ColoringCoachView({
 
       {/* Header */}
       <div>
-        <p className="font-black text-[20px]" style={{ color: "var(--ds-text-primary,#111827)" }}>
+        <p className="font-black text-xl" style={{ color: "var(--ds-text-primary)" }}>
           🎨 Coloring Coach
         </p>
-        <p className="text-[12px] font-nunito" style={{ color: "#6B7280" }}>
+        <p className="text-xs font-nunito" style={{ color: "var(--ds-text-secondary)" }}>
           Pick a page, get colour ideas, then share what you used!
         </p>
       </div>
@@ -206,7 +206,7 @@ export default function ColoringCoachView({
           <motion.div key="pick" initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0 }}>
             {pages.length === 0 ? (
               <div className="py-12 text-center">
-                <p className="text-[14px] font-nunito" style={{ color: "#9CA3AF" }}>
+                <p className="text-sm font-nunito" style={{ color: "var(--ds-text-tertiary)" }}>
                   No coloring pages found for this story yet.
                 </p>
               </div>
@@ -216,9 +216,9 @@ export default function ColoringCoachView({
                   <motion.button key={page.id}
                     whileTap={{ scale: 0.97 }}
                     onClick={() => void handleSelect(page)}
-                    className="rounded-2xl overflow-hidden bg-white border-2 hover:border-green-400 transition-colors text-left shadow-sm"
-                    style={{ borderColor: "#E5E7EB" }}>
-                    <div className="relative aspect-[3/4] w-full bg-gray-50">
+                    className="rounded-2xl overflow-hidden bg-[var(--ds-surface-card)] border-2 hover:border-green-400 transition-colors text-left shadow-sm"
+                    style={{ borderColor: "var(--ds-border-primary)" }}>
+                    <div className="relative aspect-[3/4] w-full bg-[var(--ds-surface-card)]">
                       {page.template_image_url ? (
                         <Image
                           src={getStorageUrl(page.template_image_url)}
@@ -231,10 +231,10 @@ export default function ColoringCoachView({
                       )}
                     </div>
                     <div className="px-2.5 py-2">
-                      <p className="font-baloo font-black text-[11px]" style={{ color: "#111827" }}>
+                      <p className="font-baloo font-black text-2xs" style={{ color: "var(--ds-text-primary)" }}>
                         Page {page.page_number}
                       </p>
-                      <p className="font-nunito text-[10px] truncate" style={{ color: "#6B7280" }}>
+                      <p className="font-nunito text-3xs truncate" style={{ color: "var(--ds-text-secondary)" }}>
                         {page.story_title}
                       </p>
                     </div>
@@ -253,11 +253,11 @@ export default function ColoringCoachView({
             {/* Page preview + back */}
             <div className="flex items-center gap-3">
               <button onClick={handleReset}
-                className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 transition text-[16px]"
-                style={{ color: "#6B7280" }}>
+                className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[var(--ds-surface-card-hover)] transition text-base"
+                style={{ color: "var(--ds-text-secondary)" }}>
                 ←
               </button>
-              <p className="font-bold text-[14px]" style={{ color: "#374151" }}>
+              <p className="font-bold text-sm" style={{ color: "var(--ds-text-primary)" }}>
                 {selected.story_emoji} {selected.story_title} — Page {selected.page_number}
               </p>
             </div>
@@ -266,24 +266,24 @@ export default function ColoringCoachView({
               <div className="flex flex-col items-center gap-3 py-10">
                 <div className="w-10 h-10 rounded-full border-4 border-t-transparent animate-spin"
                   style={{ borderColor: `${G} transparent transparent transparent` }} />
-                <p className="font-bold text-[14px]" style={{ color: G }}>Nimi is choosing colours…</p>
+                <p className="font-bold text-sm" style={{ color: G }}>Nimi is choosing colours…</p>
               </div>
             ) : error ? (
               <div className="p-4 rounded-2xl text-center" style={{ background: "#FFF1F2", border: "1px solid #FECDD3" }}>
-                <p className="text-[13px] font-bold text-red-600">{error}</p>
-                <button onClick={() => void handleSelect(selected)} className="mt-3 px-4 py-1.5 rounded-full text-[12px] font-black text-white" style={{ background: G }}>
+                <p className="text-sml font-bold text-red-600">{error}</p>
+                <button onClick={() => void handleSelect(selected)} className="mt-3 px-4 py-1.5 rounded-full text-xs font-black text-white" style={{ background: G }}>
                   Try again
                 </button>
               </div>
             ) : coaching ? (
               <>
                 {/* Encouragement */}
-                <div className="p-4 rounded-2xl" style={{ background: "#F0FDF4", border: "1px solid #BBF7D0" }}>
-                  <p className="text-[14px] font-nunito leading-relaxed" style={{ color: "#166534" }}>
+                <div className="p-4 rounded-2xl" style={{ background: "var(--ds-brand-soft)", border: "1px solid #BBF7D0" }}>
+                  <p className="text-sm font-nunito leading-relaxed" style={{ color: "#166534" }}>
                     ✨ {coaching.encouragement}
                   </p>
                   {coaching.palette_story && (
-                    <p className="text-[11px] font-bold mt-2 italic" style={{ color: "#15803D" }}>
+                    <p className="text-2xs font-bold mt-2 italic" style={{ color: "var(--nimi-green)" }}>
                       {coaching.palette_story}
                     </p>
                   )}
@@ -297,11 +297,11 @@ export default function ColoringCoachView({
                       <div className="flex items-center gap-2 mb-1.5">
                         <span className="w-5 h-5 rounded-full border-2 border-white shadow shrink-0"
                           style={{ background: s.hex }} />
-                        <p className="font-black text-[12px]" style={{ color: "#111827" }}>
+                        <p className="font-black text-xs" style={{ color: "var(--ds-text-primary)" }}>
                           {s.area}
                         </p>
                       </div>
-                      <p className="font-nunito text-[11px]" style={{ color: "#374151" }}>
+                      <p className="font-nunito text-2xs" style={{ color: "var(--ds-text-primary)" }}>
                         Use <strong>{s.color}</strong> — {s.reason}
                       </p>
                     </div>
@@ -318,7 +318,7 @@ export default function ColoringCoachView({
                 {/* CTA */}
                 <button
                   onClick={() => setStep("describing")}
-                  className="w-full py-3 rounded-2xl font-black text-[14px] text-white hover:opacity-90 transition"
+                  className="w-full py-3 rounded-2xl font-black text-sm text-white hover:opacity-90 transition"
                   style={{ background: G }}>
                   🖍️ I finished coloring! Tell Nimi what I used
                 </button>
@@ -332,10 +332,10 @@ export default function ColoringCoachView({
           <motion.div key="describing" initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0 }}
             className="flex flex-col gap-4">
             <div className="p-4 rounded-2xl" style={{ background: "#FFF7ED", border: "1px solid #FED7AA" }}>
-              <p className="font-black text-[14px]" style={{ color: "#92400E" }}>
+              <p className="font-black text-sm" style={{ color: "#92400E" }}>
                 🖍️ Tell Nimi about your colours!
               </p>
-              <p className="text-[12px] font-nunito mt-1" style={{ color: "#B45309" }}>
+              <p className="text-xs font-nunito mt-1" style={{ color: "#B45309" }}>
                 Which colours did you use? What did you colour first?
               </p>
             </div>
@@ -344,15 +344,15 @@ export default function ColoringCoachView({
               onChange={e => setChildColors(e.target.value)}
               placeholder="I used blue for the sky and green for the trees…"
               rows={3}
-              className="w-full text-[14px] font-nunito p-3 rounded-2xl border focus:outline-none resize-none"
-              style={{ borderColor: "#D1D5DB", color: "#111827", background: "#FAFAFA" }} />
+              className="w-full text-sm font-nunito p-3 rounded-2xl border focus:outline-none resize-none"
+              style={{ borderColor: "var(--ds-border-strong)", color: "var(--ds-text-primary)", background: "var(--ds-surface-card)" }} />
             {error && (
-              <p className="text-[12px] font-bold text-red-500">{error}</p>
+              <p className="text-xs font-bold text-red-500">{error}</p>
             )}
             <button
               onClick={() => void handleSubmitColors()}
               disabled={loading || !childColors.trim()}
-              className="w-full py-3 rounded-2xl font-black text-[14px] text-white hover:opacity-90 transition disabled:opacity-30"
+              className="w-full py-3 rounded-2xl font-black text-sm text-white hover:opacity-90 transition disabled:opacity-30"
               style={{ background: G }}>
               {loading ? "Checking…" : "✓ See Nimi's feedback"}
             </button>
@@ -365,12 +365,12 @@ export default function ColoringCoachView({
             className="flex flex-col gap-4">
 
             {/* Stars earned */}
-            <div className="p-5 rounded-3xl text-center" style={{ background: G }}>
-              <p className="text-green-200 text-[10px] font-black uppercase tracking-widest mb-2">Stars Earned</p>
-              <p className="font-baloo font-black text-[52px] text-white leading-none">+{STARS_AWARD}</p>
+            <div className="p-5 leaf-lg text-center" style={{ background: G }}>
+              <p className="text-green-200 text-3xs font-black uppercase tracking-widest mb-2">Stars Earned</p>
+              <p className="font-baloo font-black text-5.5xl text-white leading-none">+{STARS_AWARD}</p>
               <div className="flex justify-center gap-1 mt-2">
                 {Array.from({ length: STARS_AWARD }).map((_, i) => (
-                  <motion.span key={i} className="text-[22px]"
+                  <motion.span key={i} className="text-1.5xl"
                     initial={{ scale: 0 }} animate={{ scale: 1 }}
                     transition={{ delay: 0.3 + i * 0.1, type: "spring", stiffness: 300 }}>
                     ⭐
@@ -380,18 +380,18 @@ export default function ColoringCoachView({
             </div>
 
             {/* Nimi feedback */}
-            <div className="p-4 rounded-2xl" style={{ background: "#F0FDF4", border: "1px solid #BBF7D0" }}>
-              <p className="text-[14px] font-nunito leading-relaxed" style={{ color: "#166534" }}>
+            <div className="p-4 rounded-2xl" style={{ background: "var(--ds-brand-soft)", border: "1px solid #BBF7D0" }}>
+              <p className="text-sm font-nunito leading-relaxed" style={{ color: "#166534" }}>
                 💬 {feedback.praise}
               </p>
               {feedback.color_fact && (
                 <div className="mt-3 px-3 py-2 rounded-xl" style={{ background: "#FFFBEB", border: "1px solid #FDE68A" }}>
-                  <p className="text-[12px] font-nunito" style={{ color: "#78350F" }}>
+                  <p className="text-xs font-nunito" style={{ color: "#78350F" }}>
                     🎨 <strong>Colour fact:</strong> {feedback.color_fact}
                   </p>
                 </div>
               )}
-              <p className="text-[12px] font-bold mt-2" style={{ color: "#15803D" }}>
+              <p className="text-xs font-bold mt-2" style={{ color: "var(--nimi-green)" }}>
                 {feedback.invite_more}
               </p>
             </div>
@@ -399,7 +399,7 @@ export default function ColoringCoachView({
             {/* Actions */}
             <div className="flex gap-3">
               <button onClick={handleReset}
-                className="flex-1 py-3 rounded-2xl font-black text-[14px] text-white hover:opacity-90 transition"
+                className="flex-1 py-3 rounded-2xl font-black text-sm text-white hover:opacity-90 transition"
                 style={{ background: G }}>
                 🎨 Color Another Page
               </button>

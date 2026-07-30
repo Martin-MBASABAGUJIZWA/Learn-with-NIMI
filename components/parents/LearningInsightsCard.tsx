@@ -22,39 +22,39 @@ export default function LearningInsightsCard({ insights }: Props) {
     : null;
 
   return (
-    <div className="bg-white border border-ds-border shadow-ds-card p-4" style={{ borderRadius: 'var(--leaf-r)' }}>
+    <div className="bg-[var(--ds-surface-card)] border border-ds-border shadow-ds-card p-4" style={{ borderRadius: 'var(--leaf-r)' }}>
       <p className="font-black text-ds-text mb-3">{t("learningInsightsTitle")}</p>
 
       <div className="flex flex-col gap-3">
         <div className="flex items-center justify-between gap-2">
-          <span className="text-gray-500 text-sm font-bold">{t("strongestCategoryLabel")}</span>
+          <span className="text-[var(--ds-text-secondary)] text-sm font-bold">{t("strongestCategoryLabel")}</span>
           {strongest && insights.strongestCategory ? (
             <span className="font-black text-ds-text text-sm text-right">
               {strongest.emoji} {t(strongest.titleKey)} · {insights.strongestCategory.completionPct}%
             </span>
           ) : (
-            <span className="text-gray-500 text-sm font-bold">{t("noDataYetLabel")}</span>
+            <span className="text-[var(--ds-text-secondary)] text-sm font-bold">{t("noDataYetLabel")}</span>
           )}
         </div>
 
         <div className="flex items-center justify-between gap-2">
-          <span className="text-gray-500 text-sm font-bold">{t("mostActiveLanguageLabel")}</span>
+          <span className="text-[var(--ds-text-secondary)] text-sm font-bold">{t("mostActiveLanguageLabel")}</span>
           {insights.mostActiveLanguage ? (
             <span className="font-black text-ds-text text-sm">
               {LANGUAGE_META[insights.mostActiveLanguage].flag} {LANGUAGE_META[insights.mostActiveLanguage].label}
             </span>
           ) : (
-            <span className="text-gray-500 text-sm font-bold">{t("noDataYetLabel")}</span>
+            <span className="text-[var(--ds-text-secondary)] text-sm font-bold">{t("noDataYetLabel")}</span>
           )}
         </div>
 
         <div className="flex items-center justify-between gap-2">
-          <span className="text-gray-500 text-sm font-bold">{t("longestStreakLabel")}</span>
+          <span className="text-[var(--ds-text-secondary)] text-sm font-bold">{t("longestStreakLabel")}</span>
           <span className="font-black text-ds-text text-sm">🔥 {insights.longestStreak} {t("dayStreakLabel")}</span>
         </div>
 
         <div className="flex items-center justify-between gap-2">
-          <span className="text-gray-500 text-sm font-bold">{t("recentTrendLabel")}</span>
+          <span className="text-[var(--ds-text-secondary)] text-sm font-bold">{t("recentTrendLabel")}</span>
           <span className="font-black text-ds-text text-sm">{t(TREND_KEY[insights.recentTrend])}</span>
         </div>
       </div>

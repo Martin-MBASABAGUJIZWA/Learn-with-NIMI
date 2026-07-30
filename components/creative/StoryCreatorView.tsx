@@ -46,11 +46,11 @@ function OptionPill<T extends string>({
   return (
     <motion.button whileTap={{ scale: 0.95 }}
       onClick={() => onClick(value)}
-      className="flex items-center gap-2 px-3.5 py-2 rounded-full border-2 text-[12px] font-bold transition-all"
+      className="flex items-center gap-2 px-3.5 py-2 rounded-full border-2 text-xs font-bold transition-all"
       style={{
-        borderColor: selected ? G        : "#E5E7EB",
-        background:  selected ? "#F0FDF4": "white",
-        color:       selected ? G        : "#374151",
+        borderColor: selected ? G : "var(--ds-border-primary)",
+        background:  selected ? "var(--ds-brand-soft)" : "var(--ds-surface-card)",
+        color:       selected ? G : "var(--ds-text-primary)",
       }}>
       <span>{emoji}</span> {label}
     </motion.button>
@@ -74,17 +74,17 @@ function WritingPrompt({
       initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.08 }}
       className="flex flex-col gap-2 p-4 rounded-2xl border-2"
-      style={{ borderColor: value.trim().length >= 5 ? color : "#E5E7EB", background: bg }}>
+      style={{ borderColor: value.trim().length >= 5 ? color : "var(--ds-border-primary)", background: bg }}>
       <div className="flex items-baseline gap-2">
-        <span className="font-black text-[11px] uppercase tracking-widest"
+        <span className="font-black text-2xs uppercase tracking-widest"
           style={{ color }}>
           Your part {index + 1}
         </span>
-        <span className="font-nunito text-[11px]" style={{ color: "#9CA3AF" }}>
+        <span className="font-nunito text-2xs" style={{ color: "var(--ds-text-tertiary)" }}>
           {hint}
         </span>
       </div>
-      <p className="font-bold text-[13px]" style={{ color: "#374151" }}>
+      <p className="font-bold text-sml" style={{ color: "var(--ds-text-primary)" }}>
         {label}
       </p>
       <textarea
@@ -93,16 +93,16 @@ function WritingPrompt({
         placeholder={placeholder}
         maxLength={300}
         rows={3}
-        className="w-full text-[13px] font-nunito px-3 py-2.5 rounded-xl border resize-none focus:outline-none focus:ring-2"
+        className="w-full text-sml font-nunito px-3 py-2.5 rounded-xl border resize-none focus:outline-none focus:ring-2"
         style={{
-          borderColor: "#D1D5DB",
+          borderColor: "var(--ds-border-strong)",
           background: "white",
-          color: "#111827",
+          color: "var(--ds-text-primary)",
           lineHeight: "1.6",
         } as React.CSSProperties}
       />
       {value.trim().length >= 5 && (
-        <p className="text-[10px] font-bold" style={{ color }}>
+        <p className="text-3xs font-bold" style={{ color }}>
           ✓ Great! Nimi will use your words.
         </p>
       )}
@@ -270,10 +270,10 @@ export default function StoryCreatorView({
     <div className="flex flex-col gap-5 max-w-2xl mx-auto">
 
       <div>
-        <p className="font-black text-[20px]" style={{ color: "var(--ds-text-primary,#111827)" }}>
+        <p className="font-black text-xl" style={{ color: "var(--ds-text-primary)" }}>
           📖 Story Creator
         </p>
-        <p className="text-[12px] font-nunito" style={{ color: "#6B7280" }}>
+        <p className="text-xs font-nunito" style={{ color: "var(--ds-text-secondary)" }}>
           You write the key moments — Nimi connects them into your story!
         </p>
       </div>
@@ -292,10 +292,10 @@ export default function StoryCreatorView({
                   opacity: step === s ? 1 : (["configure","writing","generating"].indexOf(step) > i ? 0.4 : 1),
                 }}
               />
-              {i < 2 && <div className="w-4 h-px" style={{ background: "#E5E7EB" }} />}
+              {i < 2 && <div className="w-4 h-px" style={{ background: "var(--ds-border-primary)" }} />}
             </div>
           ))}
-          <span className="ml-2 text-[10px] font-bold uppercase tracking-widest" style={{ color: "#9CA3AF" }}>
+          <span className="ml-2 text-3xs font-bold uppercase tracking-widest" style={{ color: "var(--ds-text-tertiary)" }}>
             {step === "configure" ? "Set up" : step === "writing" ? "Your part" : "Generating…"}
           </span>
         </div>
@@ -310,7 +310,7 @@ export default function StoryCreatorView({
 
             {/* Hero name */}
             <div>
-              <label className="block font-black text-[12px] uppercase tracking-widest mb-2" style={{ color: "#374151" }}>
+              <label className="block font-black text-xs uppercase tracking-widest mb-2" style={{ color: "var(--ds-text-primary)" }}>
                 1. Your hero&apos;s name
               </label>
               <input
@@ -319,14 +319,14 @@ export default function StoryCreatorView({
                 onChange={e => setHeroName(e.target.value)}
                 placeholder="e.g. Amara, Kwame, Luna…"
                 maxLength={40}
-                className="w-full text-[15px] font-bold px-4 py-3 rounded-2xl border focus:outline-none focus:ring-2"
-                style={{ borderColor: "#D1D5DB", color: "#111827", background: "#FAFAFA" } as React.CSSProperties}
+                className="w-full text-mbase font-bold px-4 py-3 rounded-2xl border focus:outline-none focus:ring-2"
+                style={{ borderColor: "var(--ds-border-strong)", color: "var(--ds-text-primary)", background: "var(--ds-surface-card)" } as React.CSSProperties}
               />
             </div>
 
             {/* Hero type */}
             <div>
-              <label className="block font-black text-[12px] uppercase tracking-widest mb-2" style={{ color: "#374151" }}>
+              <label className="block font-black text-xs uppercase tracking-widest mb-2" style={{ color: "var(--ds-text-primary)" }}>
                 2. What kind of hero?
               </label>
               <div className="flex flex-wrap gap-2">
@@ -340,7 +340,7 @@ export default function StoryCreatorView({
 
             {/* Setting */}
             <div>
-              <label className="block font-black text-[12px] uppercase tracking-widest mb-2" style={{ color: "#374151" }}>
+              <label className="block font-black text-xs uppercase tracking-widest mb-2" style={{ color: "var(--ds-text-primary)" }}>
                 3. Where does the story happen?
               </label>
               <div className="flex flex-wrap gap-2">
@@ -354,7 +354,7 @@ export default function StoryCreatorView({
 
             {/* Problem */}
             <div>
-              <label className="block font-black text-[12px] uppercase tracking-widest mb-2" style={{ color: "#374151" }}>
+              <label className="block font-black text-xs uppercase tracking-widest mb-2" style={{ color: "var(--ds-text-primary)" }}>
                 4. What happens in the adventure?
               </label>
               <div className="flex flex-wrap gap-2">
@@ -369,7 +369,7 @@ export default function StoryCreatorView({
             <button
               onClick={() => setStep("writing")}
               disabled={!heroName.trim()}
-              className="w-full py-3.5 rounded-2xl font-black text-[15px] text-white hover:opacity-90 transition disabled:opacity-30"
+              className="w-full py-3.5 rounded-2xl font-black text-mbase text-white hover:opacity-90 transition disabled:opacity-30"
               style={{ background: G }}>
               Next: Write your story moments →
             </button>
@@ -383,13 +383,13 @@ export default function StoryCreatorView({
 
             {/* Intro callout */}
             <div className="flex items-start gap-3 p-4 rounded-2xl"
-              style={{ background: "#F0FDF4", border: "1px solid #BBF7D0" }}>
-              <span className="text-[24px] shrink-0">✍️</span>
+              style={{ background: "var(--ds-brand-soft)", border: "1px solid #BBF7D0" }}>
+              <span className="text-2xl shrink-0">✍️</span>
               <div>
-                <p className="font-black text-[13px]" style={{ color: "#166534" }}>
+                <p className="font-black text-sml" style={{ color: "#166534" }}>
                   Now it&apos;s your turn, {childName}!
                 </p>
-                <p className="text-[12px] font-nunito" style={{ color: "#15803D" }}>
+                <p className="text-xs font-nunito" style={{ color: "var(--nimi-green)" }}>
                   Write the 3 most important moments. Nimi will build the story around your words.
                 </p>
               </div>
@@ -407,26 +407,26 @@ export default function StoryCreatorView({
               />
             ))}
 
-            {error && <p className="text-[12px] font-bold text-red-500">{error}</p>}
+            {error && <p className="text-xs font-bold text-red-500">{error}</p>}
 
             <div className="flex gap-3">
               <button
                 onClick={() => setStep("configure")}
-                className="py-3 px-5 rounded-2xl font-black text-[13px] border-2 hover:bg-gray-50 transition"
-                style={{ borderColor: "#D1D5DB", color: "#6B7280" }}>
+                className="py-3 px-5 rounded-2xl font-black text-sml border-2 hover:bg-[var(--ds-surface-card)] transition"
+                style={{ borderColor: "var(--ds-border-strong)", color: "var(--ds-text-secondary)" }}>
                 ← Back
               </button>
               <button
                 onClick={() => void handleGenerate()}
                 disabled={!allMomentsReady}
-                className="flex-1 py-3.5 rounded-2xl font-black text-[15px] text-white hover:opacity-90 transition disabled:opacity-30"
+                className="flex-1 py-3.5 rounded-2xl font-black text-mbase text-white hover:opacity-90 transition disabled:opacity-30"
                 style={{ background: G }}>
                 ✨ Create Our Story!
               </button>
             </div>
 
             {!allMomentsReady && (
-              <p className="text-center text-[11px] font-nunito" style={{ color: "#9CA3AF" }}>
+              <p className="text-center text-2xs font-nunito" style={{ color: "var(--ds-text-tertiary)" }}>
                 Fill in all 3 moments to continue ({moments.filter(m => m.trim().length >= 5).length}/3 done)
               </p>
             )}
@@ -437,13 +437,13 @@ export default function StoryCreatorView({
         {step === "generating" && (
           <motion.div key="generating" initial={{ opacity:0 }} animate={{ opacity:1 }} exit={{ opacity:0 }}
             className="flex flex-col items-center gap-4 py-16">
-            <div className="text-[60px] animate-bounce">📖</div>
+            <div className="text-6xl animate-bounce">📖</div>
             <div className="w-12 h-12 rounded-full border-4 border-t-transparent animate-spin"
               style={{ borderColor: `${G} transparent transparent transparent` }} />
-            <p className="font-black text-[16px]" style={{ color: G }}>
+            <p className="font-black text-base" style={{ color: G }}>
               Nimi is weaving your story…
             </p>
-            <p className="text-[12px] font-nunito" style={{ color: "#9CA3AF" }}>
+            <p className="text-xs font-nunito" style={{ color: "var(--ds-text-tertiary)" }}>
               Connecting your words into a full adventure — about 15 seconds
             </p>
           </motion.div>
@@ -460,12 +460,12 @@ export default function StoryCreatorView({
               transition={{ type: "spring", delay: 0.2 }}
               className="flex items-center gap-3 p-3.5 rounded-2xl"
               style={{ background: "#FEF9C3", border: "1px solid #FDE047" }}>
-              <span className="text-[24px]">🌟</span>
+              <span className="text-2xl">🌟</span>
               <div>
-                <p className="font-black text-[13px]" style={{ color: "#713F12" }}>
+                <p className="font-black text-sml" style={{ color: "#713F12" }}>
                   +{STARS_AWARD} stars earned! You&apos;re a real author, {childName}!
                 </p>
-                <p className="text-[11px] font-nunito" style={{ color: "#92400E" }}>
+                <p className="text-2xs font-nunito" style={{ color: "#92400E" }}>
                   Story Creator badge unlocked! Your words are in the story.
                 </p>
               </div>
@@ -475,22 +475,22 @@ export default function StoryCreatorView({
             <div className="flex items-center gap-4 px-1">
               <div className="flex items-center gap-1.5">
                 <div className="w-3 h-3 rounded-full" style={{ background: "#15803D" }} />
-                <span className="text-[10px] font-bold" style={{ color: "#6B7280" }}>Nimi&apos;s paragraphs</span>
+                <span className="text-3xs font-bold" style={{ color: "var(--ds-text-secondary)" }}>Nimi&apos;s paragraphs</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <div className="w-3 h-3 rounded-full" style={{ background: "#7C3AED" }} />
-                <span className="text-[10px] font-bold" style={{ color: "#6B7280" }}>Your words ✍️</span>
+                <span className="text-3xs font-bold" style={{ color: "var(--ds-text-secondary)" }}>Your words ✍️</span>
               </div>
             </div>
 
             {/* Story card */}
-            <div className="p-5 sm:p-6 rounded-3xl" style={{ background: "#FAFAFA", border: "1px solid #E5E7EB" }}>
+            <div className="p-5 sm:p-6 leaf-lg" style={{ background: "var(--ds-surface-card)", border: "1px solid var(--ds-border-primary)" }}>
               {/* Title */}
-              <h2 className="font-baloo font-black text-[22px] sm:text-[26px] leading-tight mb-1"
-                style={{ color: "#111827" }}>
+              <h2 className="font-baloo font-black text-1.5xl sm:text-2.5xl leading-tight mb-1"
+                style={{ color: "var(--ds-text-primary)" }}>
                 {story.title}
               </h2>
-              <p className="text-[11px] font-nunito mb-5" style={{ color: "#9CA3AF" }}>
+              <p className="text-2xs font-nunito mb-5" style={{ color: "var(--ds-text-tertiary)" }}>
                 ✍️ {story.author_note} · Co-written with Nimi
               </p>
 
@@ -507,17 +507,17 @@ export default function StoryCreatorView({
                         background: "#F5F3FF",
                         border: "1px solid #DDD6FE",
                       } : {}}>
-                      <span className="text-[32px] sm:text-[36px] leading-none shrink-0 mt-1 select-none">
+                      <span className="text-3xl sm:text-4xl leading-none shrink-0 mt-1 select-none">
                         {para.emoji}
                       </span>
                       <div className="flex-1 min-w-0">
                         {isChild && (
-                          <span className="inline-flex items-center gap-1 mb-1.5 text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full"
+                          <span className="inline-flex items-center gap-1 mb-1.5 text-4xs font-black uppercase tracking-widest px-2 py-0.5 rounded-full"
                             style={{ background: "#EDE9FE", color: "#6D28D9" }}>
                             ✍️ {childName}&apos;s words
                           </span>
                         )}
-                        <p className="font-nunito text-[14px] sm:text-[15px] leading-relaxed"
+                        <p className="font-nunito text-sm sm:text-mbase leading-relaxed"
                           style={{ color: isChild ? "#4C1D95" : "#374151", fontStyle: isChild ? "italic" : "normal" }}>
                           {para.text}
                         </p>
@@ -529,8 +529,8 @@ export default function StoryCreatorView({
 
               {/* Moral */}
               {story.moral && (
-                <div className="mt-5 p-3.5 rounded-2xl" style={{ background: "#F0FDF4", border: "1px solid #BBF7D0" }}>
-                  <p className="text-[12px] font-bold" style={{ color: "#166534" }}>
+                <div className="mt-5 p-3.5 rounded-2xl" style={{ background: "var(--ds-brand-soft)", border: "1px solid #BBF7D0" }}>
+                  <p className="text-xs font-bold" style={{ color: "#166534" }}>
                     📌 <em>{story.moral}</em>
                   </p>
                 </div>
@@ -540,17 +540,17 @@ export default function StoryCreatorView({
             {/* Actions */}
             <div className="flex gap-3 flex-wrap">
               <button onClick={handleRead}
-                className="flex-1 py-2.5 rounded-2xl font-black text-[13px] border-2 hover:bg-gray-50 transition"
+                className="flex-1 py-2.5 rounded-2xl font-black text-sml border-2 hover:bg-[var(--ds-surface-card)] transition"
                 style={{ borderColor: reading ? "#EF4444" : G, color: reading ? "#EF4444" : G }}>
                 {reading ? "⏹ Stop" : "🔊 Read Aloud"}
               </button>
               <button onClick={() => printStory(story, childName)}
-                className="flex-1 py-2.5 rounded-2xl font-black text-[13px] border-2 hover:bg-gray-50 transition"
-                style={{ borderColor: "#6B7280", color: "#6B7280" }}>
+                className="flex-1 py-2.5 rounded-2xl font-black text-sml border-2 hover:bg-[var(--ds-surface-card)] transition"
+                style={{ borderColor: "#6B7280", color: "var(--ds-text-secondary)" }}>
                 🖨️ Print Story
               </button>
               <button onClick={handleReset}
-                className="w-full py-2.5 rounded-2xl font-black text-[13px] text-white hover:opacity-90 transition"
+                className="w-full py-2.5 rounded-2xl font-black text-sml text-white hover:opacity-90 transition"
                 style={{ background: G }}>
                 ✨ Write Another Story
               </button>

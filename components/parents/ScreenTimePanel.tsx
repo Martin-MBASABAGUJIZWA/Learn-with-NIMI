@@ -97,7 +97,7 @@ export default function ScreenTimePanel({ childId, childName, ageYears }: Props)
   // ── Loading ────────────────────────────────────────────────────────────────
   if (loading) {
     return (
-      <div className="bg-white border border-ds-border p-5 shadow-ds-card space-y-4" style={{ borderRadius: "var(--leaf-r-lg)" }}>
+      <div className="bg-[var(--ds-surface-card)] border border-ds-border p-5 shadow-ds-card space-y-4" style={{ borderRadius: "var(--leaf-r-lg)" }}>
         <div className="flex items-center gap-2">
           <Bone className="w-7 h-7 rounded-lg" />
           <Bone className="h-5 w-32" />
@@ -132,14 +132,14 @@ export default function ScreenTimePanel({ childId, childName, ageYears }: Props)
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white border border-ds-border p-5 shadow-ds-card"
+      className="bg-[var(--ds-surface-card)] border border-ds-border p-5 shadow-ds-card"
       style={{ borderRadius: "var(--leaf-r-lg)" }}
     >
       {/* Header */}
       <div className="flex items-center gap-2 mb-5">
         <span className="text-xl">⏱️</span>
-        <h2 className="font-black text-ds-text text-[18px]">Screen Time</h2>
-        <span className={`ml-auto text-[10px] font-black px-2.5 py-1 rounded-full border ${cfg.bg} ${cfg.text} ${cfg.border}`}>
+        <h2 className="font-black text-ds-text text-lg">Screen Time</h2>
+        <span className={`ml-auto text-3xs font-black px-2.5 py-1 rounded-full border ${cfg.bg} ${cfg.text} ${cfg.border}`}>
           {cfg.emoji} {cfg.label}
         </span>
       </div>
@@ -148,8 +148,8 @@ export default function ScreenTimePanel({ childId, childName, ageYears }: Props)
       {noDataToday ? (
         <div className="flex flex-col items-center gap-2 py-4 text-center mb-4">
           <span className="text-3xl">📱</span>
-          <p className="font-black text-ds-text text-[15px]">No sessions today</p>
-          <p className="text-gray-400 text-[12px] font-nunito">
+          <p className="font-black text-ds-text text-mbase">No sessions today</p>
+          <p className="text-[var(--ds-text-tertiary)] text-xs font-nunito">
             {childName}&apos;s app time will appear here once they open the app today.
           </p>
         </div>
@@ -158,23 +158,23 @@ export default function ScreenTimePanel({ childId, childName, ageYears }: Props)
           {/* Today stat row */}
           <div className="flex items-center gap-4 mb-4">
             <div className={`flex flex-col items-center justify-center w-20 h-20 shrink-0 border-2 rounded-2xl ${cfg.bg} ${cfg.border}`}>
-              <span className={`font-black text-[22px] leading-none ${cfg.text}`}>
+              <span className={`font-black text-1.5xl leading-none ${cfg.text}`}>
                 {todayMinutes}
               </span>
-              <span className={`text-[9px] font-bold ${cfg.text} opacity-70`}>min today</span>
+              <span className={`text-4xs font-bold ${cfg.text} opacity-70`}>min today</span>
             </div>
             <div className="flex-1 min-w-0 space-y-2">
               {/* Progress bar */}
               <div>
-                <div className="flex justify-between text-[10px] font-bold text-ds-muted mb-1">
+                <div className="flex justify-between text-3xs font-bold text-ds-muted mb-1">
                   <span>0</span>
                   <span>{thresholds.breakAfterMinutes} min break</span>
                   <span>{thresholds.limitMinutes} min limit</span>
                 </div>
-                <div className="h-3 rounded-full overflow-hidden bg-gray-100 relative">
+                <div className="h-3 rounded-full overflow-hidden bg-[var(--ds-surface-card-hover)] relative">
                   {/* Break threshold marker */}
                   <div
-                    className="absolute top-0 bottom-0 w-0.5 bg-white/80 z-10"
+                    className="absolute top-0 bottom-0 w-0.5 bg-[var(--ds-surface-card)]/80 z-10"
                     style={{ left: `${(thresholds.breakAfterMinutes / thresholds.limitMinutes) * 100}%` }}
                   />
                   <motion.div
@@ -187,11 +187,11 @@ export default function ScreenTimePanel({ childId, childName, ageYears }: Props)
               </div>
               {/* Secondary stats */}
               <div className="flex gap-3">
-                <span className="text-[11px] text-ds-muted font-semibold">
+                <span className="text-2xs text-ds-muted font-semibold">
                   {todayCount} session{todayCount !== 1 ? "s" : ""} today
                 </span>
                 {weekSeconds > 0 && (
-                  <span className="text-[11px] text-ds-muted font-semibold">
+                  <span className="text-2xs text-ds-muted font-semibold">
                     {formatDuration(weekSeconds)} this week
                   </span>
                 )}
@@ -204,7 +204,7 @@ export default function ScreenTimePanel({ childId, childName, ageYears }: Props)
       {/* 7-day bar chart */}
       {daily.length === 7 && (
         <div className="mb-5">
-          <p className="text-[10px] font-black text-ds-muted uppercase tracking-widest mb-3">Past 7 days</p>
+          <p className="text-3xs font-black text-ds-muted uppercase tracking-widest mb-3">Past 7 days</p>
           <div className="flex items-end gap-1.5 h-14">
             {daily.map((entry, i) => {
               const isToday = i === daily.length - 1;
@@ -222,13 +222,13 @@ export default function ScreenTimePanel({ childId, childName, ageYears }: Props)
                         isToday
                           ? cfg.barColor
                           : entry.seconds > 0
-                          ? "bg-gray-300"
-                          : "bg-gray-100"
+                          ? "bg-[var(--ds-surface-input)]"
+                          : "bg-[var(--ds-surface-card-hover)]"
                       }`}
                       style={{ minHeight: entry.seconds > 0 ? "4px" : "0" }}
                     />
                   </div>
-                  <span className={`text-[8px] font-bold ${isToday ? cfg.text : "text-gray-400"}`}>
+                  <span className={`text-5xs font-bold ${isToday ? cfg.text : "text-[var(--ds-text-tertiary)]"}`}>
                     {shortDayLabel(entry.date)}
                   </span>
                 </div>
@@ -240,14 +240,14 @@ export default function ScreenTimePanel({ childId, childName, ageYears }: Props)
 
       {/* Guidelines tip */}
       <div className="flex gap-2.5 p-3.5 bg-blue-50 border border-blue-100 rounded-xl">
-        <span className="text-[16px] shrink-0">📋</span>
-        <p className="text-[11px] text-blue-700 font-semibold leading-relaxed font-nunito">
+        <span className="text-base shrink-0">📋</span>
+        <p className="text-2xs text-blue-700 font-semibold leading-relaxed font-nunito">
           {getGuidanceTip(thresholds.ageLabel, thresholds.breakAfterMinutes, thresholds.limitMinutes)}
         </p>
       </div>
 
       {/* Gentle nudge note */}
-      <p className="text-[10px] text-gray-300 font-semibold text-center mt-4">
+      <p className="text-3xs text-[var(--ds-text-tertiary)] font-semibold text-center mt-4">
         Nimi gently suggests breaks to {childName} after {thresholds.breakAfterMinutes} minutes of learning.
       </p>
     </motion.div>

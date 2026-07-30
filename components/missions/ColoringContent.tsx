@@ -40,7 +40,7 @@ export default function ColoringContent({ mission, coloringPages, onComplete, co
   return (
     <div className="space-y-4">
       {/* Art Studio header */}
-      <div className="relative overflow-hidden leaf border border-orange-200/60 bg-gradient-to-br from-orange-50 via-pink-50/50 to-purple-50/60 p-5 text-center shadow-[0_16px_34px_rgba(15,23,42,0.08)]">
+      <div className="relative overflow-hidden leaf border border-orange-200/60 bg-gradient-to-br from-orange-50 via-pink-50/50 to-purple-50/60 p-5 text-center shadow-card-2xl">
         {/* Animated crayon tops */}
         {CRAYON_COLORS.map((color, i) => (
           <motion.div
@@ -72,15 +72,15 @@ export default function ColoringContent({ mission, coloringPages, onComplete, co
           ))}
         </div>
 
-        <p className="relative z-10 font-baloo font-black text-ds-text text-[20px]">{mission.title}</p>
+        <p className="relative z-10 font-baloo font-black text-ds-text text-xl">{mission.title}</p>
         {mission.subtitle && (
-          <p className="relative z-10 mt-1 font-nunito text-gray-500 text-[14px]">{mission.subtitle}</p>
+          <p className="relative z-10 mt-1 font-nunito text-[var(--ds-text-secondary)] text-sm">{mission.subtitle}</p>
         )}
       </div>
 
       {/* Pages grid or empty state */}
       {coloringPages.length === 0 ? (
-        <div className="leaf-lg border border-orange-100 p-8 text-center bg-white shadow-sm">
+        <div className="leaf-lg border border-orange-100 p-8 text-center bg-[var(--ds-surface-card)] shadow-sm">
           <div className="flex justify-center gap-2 mb-3">
             {["🖌️", "🎨", "✏️", "🖍️"].map((e, i) => (
               <motion.span key={i} className="select-none text-3xl"
@@ -90,9 +90,9 @@ export default function ColoringContent({ mission, coloringPages, onComplete, co
               </motion.span>
             ))}
           </div>
-          <p className="font-baloo font-black text-ds-text text-[18px]">{t("storyColorComingSoon")}</p>
-          <p className="font-nunito text-gray-500 text-[13px] mt-1">{t("storyColorComingSoonDesc")}</p>
-          <p className="font-nunito text-gray-500 text-[12px] mt-2">{t("storyColorCanComplete")}</p>
+          <p className="font-baloo font-black text-ds-text text-lg">{t("storyColorComingSoon")}</p>
+          <p className="font-nunito text-[var(--ds-text-secondary)] text-sml mt-1">{t("storyColorComingSoonDesc")}</p>
+          <p className="font-nunito text-[var(--ds-text-secondary)] text-xs mt-2">{t("storyColorCanComplete")}</p>
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -107,7 +107,7 @@ export default function ColoringContent({ mission, coloringPages, onComplete, co
                 whileHover={{ scale: 1.04, y: -2 }}
                 whileTap={{ scale: 0.97 }}
                 onClick={handleOpen}
-                className="overflow-hidden leaf cursor-pointer group relative bg-white"
+                className="overflow-hidden leaf cursor-pointer group relative bg-[var(--ds-surface-card)]"
                 style={{ borderColor: accent, borderWidth: 2, borderStyle: "solid" }}
               >
                 {cp.template_image_url ? (
@@ -129,11 +129,11 @@ export default function ColoringContent({ mission, coloringPages, onComplete, co
                   <motion.div
                     initial={{ opacity: 0, scale: 0.5 }}
                     whileHover={{ opacity: 1, scale: 1 }}
-                    className="w-11 h-11 rounded-full bg-white/90 flex items-center justify-center shadow-lg text-2xl select-none"
+                    className="w-11 h-11 rounded-full bg-[var(--ds-surface-card)]/90 flex items-center justify-center shadow-lg text-2xl select-none"
                   >🖌️</motion.div>
                 </div>
                 <div className="p-2 text-center">
-                  <p className="font-nunito font-bold text-[11px]" style={{ color: accent }}>
+                  <p className="font-nunito font-bold text-2xs" style={{ color: accent }}>
                     Page {idx + 1}
                   </p>
                 </div>
@@ -158,7 +158,7 @@ export default function ColoringContent({ mission, coloringPages, onComplete, co
               transition={{ duration: 0.5, delay: 0.1 }}
               className="select-none text-2xl"
             >🎨</motion.span>
-            <p className="font-baloo font-black text-orange-700 text-[15px]">{t("beautifulArtworkMsg")}</p>
+            <p className="font-baloo font-black text-orange-700 text-mbase">{t("beautifulArtworkMsg")}</p>
             <motion.span
               animate={{ rotate: [0, 20, -20, 20, 0] }}
               transition={{ duration: 0.5, delay: 0.3 }}
@@ -177,7 +177,7 @@ export default function ColoringContent({ mission, coloringPages, onComplete, co
             animate={{ scale: 1, opacity: 1 }}
             transition={{ type: "spring", stiffness: 300, damping: 22 }}
             whileTap={{ scale: 0.96 }}
-            className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-orange-500 to-pink-600 py-4 font-baloo font-black text-[18px] text-white shadow-[0_10px_24px_rgba(249,115,22,0.30)] transition disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-orange-500 to-pink-600 py-4 font-baloo font-black text-lg text-white shadow-[0_10px_24px_rgba(249,115,22,0.30)] transition disabled:opacity-50"
           >
             {saving ? t("saving") : <><Check className="h-5 w-5" /> {t("iColoredItBtn")}</>}
           </motion.button>
@@ -193,12 +193,12 @@ export default function ColoringContent({ mission, coloringPages, onComplete, co
             className="group flex w-full items-center justify-between rounded-2xl bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 px-5 py-4 text-white shadow-[0_10px_24px_rgba(249,115,22,0.28)] transition disabled:opacity-50"
           >
             <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-white/20 text-2xl select-none">
+              <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-[var(--ds-surface-card)]/20 text-2xl select-none">
                 🎨
               </div>
               <div className="text-left">
-                <p className="font-baloo font-black text-[17px] leading-tight">{t("letsCreateLabel")}</p>
-                <p className="font-nunito text-[11px] text-white/80">
+                <p className="font-baloo font-black text-mlg leading-tight">{t("letsCreateLabel")}</p>
+                <p className="font-nunito text-2xs text-white/80">
                   {coloringPages.length > 0 ? t("tapPageHint") : t("markAsDoneLabel")}
                 </p>
               </div>

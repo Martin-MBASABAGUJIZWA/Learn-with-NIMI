@@ -13,27 +13,27 @@ const COMMUNITY_POSTS = [
 
 export default function NimiCommunity() {
   return (
-    <div className="bg-white border border-ds-border shadow-ds-card overflow-hidden flex flex-col h-full" style={{ borderRadius: 'var(--leaf-r)' }}>
+    <div className="bg-[var(--ds-surface-card)] border border-ds-border shadow-ds-card overflow-hidden flex flex-col h-full" style={{ borderRadius: 'var(--leaf-r)' }}>
       <div className="px-4 pt-4 pb-2">
-        <h3 className="font-black text-ds-text text-[13px] uppercase flex items-center gap-1.5 tracking-wide mb-0.5">
+        <h3 className="font-black text-ds-text text-sml uppercase flex items-center gap-1.5 tracking-wide mb-0.5">
           <Users className="w-4 h-4" /> NIMI COMMUNITY
         </h3>
-        <p className="text-[9.5px] text-gray-500 leading-tight">Share your drawings, songs and achievements!</p>
+        <p className="text-[9.5px] text-[var(--ds-text-secondary)] leading-tight">Share your drawings, songs and achievements!</p>
       </div>
 
       <div className="px-3 pb-1 flex gap-2 flex-1">
         {COMMUNITY_POSTS.map(post => (
           <div key={post.name} className="flex-1 flex flex-col">
             <div className="flex items-center gap-1.5 mb-1.5">
-              <div className="w-7 h-7 bg-[var(--nimi-green)] rounded-full flex items-center justify-center text-white text-[9px] font-black flex-shrink-0 shadow">
+              <div className="w-7 h-7 bg-[var(--nimi-green)] rounded-full flex items-center justify-center text-white text-4xs font-black flex-shrink-0 shadow">
                 {post.name[0]}
               </div>
               <div className="min-w-0">
-                <p className="text-[9px] font-black text-ds-text leading-tight">{post.name}</p>
-                <p className="text-[8px] text-gray-500 leading-tight truncate">{post.text}</p>
+                <p className="text-4xs font-black text-ds-text leading-tight">{post.name}</p>
+                <p className="text-5xs text-[var(--ds-text-secondary)] leading-tight truncate">{post.text}</p>
               </div>
             </div>
-            <div className="w-full leaf overflow-hidden border border-ds-border shadow-sm bg-white">
+            <div className="w-full leaf overflow-hidden border border-ds-border shadow-sm bg-[var(--ds-surface-card)]">
               <div className={`w-full h-[55px] sm:h-[65px] xl:h-[70px] bg-gradient-to-br ${post.color} flex items-center justify-center`}>
                 <span className="text-4xl drop-shadow-sm">{post.emoji}</span>
               </div>
@@ -48,7 +48,7 @@ export default function NimiCommunity() {
 
       <div className="px-3 pb-3 pt-2 mt-auto">
         <Link href="/community">
-          <Button className="w-full bg-pink-500 hover:bg-pink-600 text-white text-[10px] font-black rounded-full h-7 tracking-wide">
+          <Button className="w-full bg-pink-500 hover:bg-pink-600 text-white text-3xs font-black rounded-full h-7 tracking-wide">
             View Community
           </Button>
         </Link>

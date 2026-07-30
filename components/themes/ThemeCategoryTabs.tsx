@@ -34,8 +34,8 @@ export default function ThemeCategoryTabs({ active, onChange, className = "" }: 
               flex-shrink-0 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-medium
               transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1
               ${isActive
-                ? "bg-white shadow-sm text-gray-900 border border-gray-200"
-                : "text-gray-600 hover:text-gray-900 hover:bg-white/60"
+                ? "bg-[var(--ds-surface-card)] shadow-sm text-[var(--ds-text-primary)] border border-[var(--ds-border-primary)]"
+                : "text-[var(--ds-text-secondary)] hover:text-[var(--ds-text-primary)] hover:bg-[var(--ds-surface-card)]/60"
               }
             `}
           >

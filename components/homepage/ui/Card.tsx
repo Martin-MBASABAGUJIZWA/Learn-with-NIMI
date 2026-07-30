@@ -8,7 +8,7 @@ interface CardProps {
 // Base rounded/bordered surface reused by story cards, info panels, etc.
 export default function Card({ children, className = "" }: CardProps) {
   return (
-    <div className={`bg-white rounded-2xl border border-gray-100 shadow-sm ${className}`}>
+    <div className={`bg-[var(--ds-surface-card)] rounded-2xl border border-[var(--ds-border-primary)] shadow-sm ${className}`}>
       {children}
     </div>
   );

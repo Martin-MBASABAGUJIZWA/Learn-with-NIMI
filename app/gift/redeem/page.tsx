@@ -108,13 +108,13 @@ function RedeemContent() {
         {step === "preview" && preview && (
           <motion.div initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }}
             transition={{ type: "spring", stiffness: 260, damping: 22 }}
-            className="bg-white rounded-3xl shadow-2xl overflow-hidden">
+            className="bg-[var(--ds-surface-card)] leaf-lg shadow-2xl overflow-hidden">
 
             {/* Gift card header */}
             <div className="relative overflow-hidden text-center px-6 py-8"
               style={{ background: "linear-gradient(135deg, #f43f5e 0%, #ec4899 45%, #fb923c 100%)" }}>
-              <div className="absolute -top-8 -right-8 w-40 h-40 rounded-full bg-white/10" />
-              <div className="absolute -bottom-6 -left-6 w-32 h-32 rounded-full bg-white/10" />
+              <div className="absolute -top-8 -right-8 w-40 h-40 rounded-full bg-[var(--ds-surface-card)]/10" />
+              <div className="absolute -bottom-6 -left-6 w-32 h-32 rounded-full bg-[var(--ds-surface-card)]/10" />
               <div className="relative z-10">
                 <motion.div
                   animate={{ rotate: [-8, 8, -8] }}
@@ -123,13 +123,13 @@ function RedeemContent() {
                 >🎁</motion.div>
                 {giftLabel ? (
                   <>
-                    <p className="text-white/80 text-[12px] font-bold uppercase tracking-widest mb-1">Nimipiko Gift</p>
-                    <p className="font-baloo font-black text-white text-[36px] sm:text-[42px] leading-none mb-1">{giftLabel}</p>
+                    <p className="text-white/80 text-xs font-bold uppercase tracking-widest mb-1">Nimipiko Gift</p>
+                    <p className="font-baloo font-black text-white text-4xl sm:text-4.5xl leading-none mb-1">{giftLabel}</p>
                   </>
                 ) : (
-                  <h1 className="font-baloo font-black text-white text-[26px] sm:text-[28px] leading-tight mb-1">You&apos;ve got a gift!</h1>
+                  <h1 className="font-baloo font-black text-white text-2.5xl sm:text-3.5xl leading-tight mb-1">You&apos;ve got a gift!</h1>
                 )}
-                <p className="text-white/90 text-[14px]">
+                <p className="text-white/90 text-sm">
                   A surprise from <strong>{preview.giverName}</strong> 💝
                 </p>
               </div>
@@ -140,9 +140,9 @@ function RedeemContent() {
               {preview.redeemed ? (
                 <div className="text-center">
                   <div className="text-5xl mb-4">🔓</div>
-                  <h2 className="font-baloo font-black text-ds-text text-[20px]">Already opened!</h2>
-                  <p className="text-gray-500 text-[14px] mt-2 leading-relaxed">This gift has already been claimed. Each gift link can only be used once — lucky recipient!</p>
-                  <a href="/" className="inline-block mt-6 px-8 py-3 rounded-2xl bg-[var(--nimi-green)] text-white font-black text-[15px] shadow-md">
+                  <h2 className="font-baloo font-black text-ds-text text-xl">Already opened!</h2>
+                  <p className="text-[var(--ds-text-secondary)] text-sm mt-2 leading-relaxed">This gift has already been claimed. Each gift link can only be used once — lucky recipient!</p>
+                  <a href="/" className="inline-block mt-6 px-8 py-3 rounded-2xl bg-[var(--nimi-green)] text-white font-black text-mbase shadow-md">
                     Visit Nimipiko
                   </a>
                 </div>
@@ -150,7 +150,7 @@ function RedeemContent() {
                 <>
                   {/* Recipient greeting */}
                   {preview.recipientName && (
-                    <p className="text-center font-baloo font-black text-ds-text text-[18px] mb-3">
+                    <p className="text-center font-baloo font-black text-ds-text text-lg mb-3">
                       Hi {preview.recipientName}! 👋
                     </p>
                   )}
@@ -158,36 +158,36 @@ function RedeemContent() {
                   {/* Personal message */}
                   {preview.message && (
                     <div className="bg-fuchsia-50 border-l-4 border-fuchsia-400 rounded-r-2xl px-4 py-3 mb-5">
-                      <p className="text-[13px] italic text-fuchsia-800 leading-relaxed">&ldquo;{preview.message}&rdquo;</p>
-                      <p className="text-[11px] text-fuchsia-500 mt-1 font-bold">— {preview.giverName}</p>
+                      <p className="text-sml italic text-fuchsia-800 leading-relaxed">&ldquo;{preview.message}&rdquo;</p>
+                      <p className="text-2xs text-fuchsia-500 mt-1 font-bold">— {preview.giverName}</p>
                     </div>
                   )}
 
                   {/* What they unlock */}
-                  <div className="bg-gradient-to-br from-rose-50 to-pink-50 border border-rose-100 rounded-2xl p-5 mb-6">
+                  <div className="bg-gradient-to-br from-rose-50 to-pink-50 border border-rose-100 leaf p-5 mb-6">
                     <div className="flex items-center gap-3 mb-3">
                       <span className="text-2xl">🌟</span>
-                      <p className="font-baloo font-black text-ds-text text-[17px]">What&apos;s waiting inside</p>
+                      <p className="font-baloo font-black text-ds-text text-mlg">What&apos;s waiting inside</p>
                     </div>
                     <div className="grid grid-cols-2 gap-2">
                       {[["📖", "Stories"], ["🎵", "Songs"], ["🎨", "Coloring books"], ["🤖", "Nimi AI"]].map(([icon, label]) => (
-                        <div key={label} className="flex items-center gap-2 text-[13px] text-gray-700">
+                        <div key={label} className="flex items-center gap-2 text-sml text-[var(--ds-text-primary)]">
                           <span>{icon}</span><span>{label}</span>
                         </div>
                       ))}
                     </div>
-                    <p className="text-[11px] text-gray-500 mt-3">In English, French &amp; Kinyarwanda</p>
+                    <p className="text-2xs text-[var(--ds-text-secondary)] mt-3">In English, French &amp; Kinyarwanda</p>
                   </div>
 
                   <motion.button
                     whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
                     onClick={handleRedeem}
-                    className="w-full py-4 rounded-2xl text-white font-black text-[16px] shadow-xl"
+                    className="w-full py-4 rounded-2xl text-white font-black text-base shadow-xl"
                     style={{ background: "linear-gradient(135deg, #f43f5e 0%, #ec4899 45%, #fb923c 100%)", boxShadow: "0 8px 24px rgba(244,63,94,0.3)" }}
                   >
                     🎁 Open My Gift
                   </motion.button>
-                  <p className="text-center text-gray-400 text-[11px] mt-3">You&apos;ll be asked to sign in or create a free account</p>
+                  <p className="text-center text-[var(--ds-text-tertiary)] text-2xs mt-3">You&apos;ll be asked to sign in or create a free account</p>
                 </>
               )}
             </div>
@@ -202,8 +202,8 @@ function RedeemContent() {
               transition={{ duration: 1.4, repeat: Infinity }}
               className="text-7xl mb-6"
             >🎁</motion.div>
-            <p className="font-baloo font-black text-ds-text text-[22px]">Opening your gift...</p>
-            <p className="text-gray-500 text-[14px] mt-2">Just a moment ✨</p>
+            <p className="font-baloo font-black text-ds-text text-1.5xl">Opening your gift...</p>
+            <p className="text-[var(--ds-text-secondary)] text-sm mt-2">Just a moment ✨</p>
           </div>
         )}
 
@@ -211,7 +211,7 @@ function RedeemContent() {
         {step === "success" && (
           <motion.div initial={{ opacity: 0, scale: 0.88 }} animate={{ opacity: 1, scale: 1 }}
             transition={{ type: "spring", stiffness: 260, damping: 20 }}
-            className="bg-white rounded-3xl shadow-2xl overflow-hidden text-center">
+            className="bg-[var(--ds-surface-card)] leaf-lg shadow-2xl overflow-hidden text-center">
             <div className="px-6 py-8 pb-6" style={{ background: "linear-gradient(135deg, #f43f5e 0%, #ec4899 45%, #fb923c 100%)" }}>
               <motion.div
                 initial={{ scale: 0, rotate: -20 }}
@@ -219,20 +219,20 @@ function RedeemContent() {
                 transition={{ type: "spring", stiffness: 280, damping: 18, delay: 0.1 }}
                 className="text-6xl sm:text-7xl mb-3"
               >🎉</motion.div>
-              <h2 className="font-baloo font-black text-white text-[26px] sm:text-[28px]">It&apos;s yours!</h2>
-              <p className="text-white/90 text-[14px] mt-1">Your Nimipiko adventure starts right now</p>
+              <h2 className="font-baloo font-black text-white text-2.5xl sm:text-3.5xl">It&apos;s yours!</h2>
+              <p className="text-white/90 text-sm mt-1">Your Nimipiko adventure starts right now</p>
             </div>
             <div className="p-5 sm:p-7">
               {preview?.giverName && (
-                <p className="text-gray-500 text-[14px] mb-5 leading-relaxed">
+                <p className="text-[var(--ds-text-secondary)] text-sm mb-5 leading-relaxed">
                   A gift from <strong className="text-ds-text">{preview.giverName}</strong> is now active on your account. Go explore! 🌍
                 </p>
               )}
               <a href="/stories"
-                className="inline-block w-full py-4 rounded-2xl bg-[var(--nimi-green)] text-white font-black text-[16px] shadow-lg hover:opacity-90 transition">
+                className="inline-block w-full py-4 rounded-2xl bg-[var(--nimi-green)] text-white font-black text-base shadow-lg hover:opacity-90 transition">
                 📖 Start Exploring
               </a>
-              <p className="text-gray-400 text-[11px] mt-4">This subscription won&apos;t auto-renew — enjoy every moment of it!</p>
+              <p className="text-[var(--ds-text-tertiary)] text-2xs mt-4">This subscription won&apos;t auto-renew — enjoy every moment of it!</p>
             </div>
           </motion.div>
         )}
@@ -240,22 +240,22 @@ function RedeemContent() {
         {/* ── Error ─────────────────────────────────────────────── */}
         {step === "error" && (
           <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-3xl shadow-2xl p-8 text-center">
+            className="bg-[var(--ds-surface-card)] leaf-lg shadow-2xl p-8 text-center">
             <div className="text-5xl mb-4">😕</div>
-            <h2 className="font-baloo font-black text-ds-text text-[22px]">Hmm, something&apos;s off</h2>
-            <p className="text-red-500 text-[14px] mt-3 leading-relaxed max-w-[280px] mx-auto">{redeemError || loadError}</p>
+            <h2 className="font-baloo font-black text-ds-text text-1.5xl">Hmm, something&apos;s off</h2>
+            <p className="text-red-500 text-sm mt-3 leading-relaxed max-w-[280px] mx-auto">{redeemError || loadError}</p>
             <div className="flex gap-3 mt-6 justify-center">
-              <a href="/" className="px-6 py-3 rounded-2xl bg-gray-100 text-ds-text font-bold text-[14px] hover:bg-gray-200 transition">
+              <a href="/" className="px-6 py-3 rounded-2xl bg-[var(--ds-surface-card-active)] text-ds-text font-bold text-sm hover:bg-[var(--ds-border-primary)] transition">
                 Go home
               </a>
               {redeemError && (
                 <button onClick={() => { setRedeemError(""); setStep("preview"); }}
-                  className="px-6 py-3 rounded-2xl bg-rose-50 text-rose-600 font-bold text-[14px] hover:bg-rose-100 transition">
+                  className="px-6 py-3 rounded-2xl bg-rose-50 text-rose-600 font-bold text-sm hover:bg-rose-100 transition">
                   Try again 💪
                 </button>
               )}
             </div>
-            <p className="text-gray-400 text-[12px] mt-5">Need help? <a href="mailto:support@nimipiko.com" className="text-rose-400 hover:underline">support@nimipiko.com</a></p>
+            <p className="text-[var(--ds-text-tertiary)] text-xs mt-5">Need help? <a href="mailto:support@nimipiko.com" className="text-rose-400 hover:underline">support@nimipiko.com</a></p>
           </motion.div>
         )}
 

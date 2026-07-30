@@ -75,7 +75,7 @@ function StepBar({ step }: { step: number }) {
               <motion.div
                 animate={current ? { scale:[1,1.12,1] } : {}}
                 transition={{ duration:1.4, repeat:Infinity }}
-                className={`w-8 h-8 rounded-full flex items-center justify-center text-[13px] font-black border-2 transition-all ${
+                className={`w-8 h-8 rounded-full flex items-center justify-center text-sml font-black border-2 transition-all ${
                   done    ? "bg-nimi-green border-nimi-green text-white" :
                   current ? "bg-amber-400 border-amber-400 text-white shadow-lg shadow-amber-200" :
                             "bg-ds-surface border-ds-border text-ds-muted"
@@ -83,7 +83,7 @@ function StepBar({ step }: { step: number }) {
               >
                 {done ? <CheckCircle2 className="w-4 h-4" /> : i + 1}
               </motion.div>
-              <p className={`text-[10px] font-bold hidden sm:block ${current ? "text-amber-600" : done ? "text-nimi-green" : "text-ds-muted"}`}>
+              <p className={`text-3xs font-bold hidden sm:block ${current ? "text-amber-600" : done ? "text-nimi-green" : "text-ds-muted"}`}>
                 {label}
               </p>
             </div>
@@ -246,10 +246,10 @@ export default function MasterpieceClient({ initialChildren }: Props = {}) {
             </motion.div>
 
             <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
-              <h1 className="font-baloo font-black text-ds-text text-[28px] sm:text-[34px] leading-tight">
+              <h1 className="font-baloo font-black text-ds-text text-3.5xl sm:text-4xl leading-tight">
                 Masterpiece is a Premium Feature
               </h1>
-              <p className="text-gray-500 text-[15px] mt-3 max-w-md mx-auto leading-relaxed">
+              <p className="text-[var(--ds-text-secondary)] text-mbase mt-3 max-w-md mx-auto leading-relaxed">
                 Purchase the Masterpiece add-on once and your child becomes the hero of their own personalized storybook — complete with their photo woven into every page and a Champion Certificate.
               </p>
             </motion.div>
@@ -263,11 +263,11 @@ export default function MasterpieceClient({ initialChildren }: Props = {}) {
                 { icon: "🏆", title: "Champion Certificate", desc: "With your child's name and photo" },
                 { icon: "🌍", title: "Any Language", desc: "EN · FR · RW — their choice" },
               ].map(({ icon, title, desc }) => (
-                <div key={title} className="flex items-start gap-3 bg-ds-card border border-ds-border rounded-2xl p-4 shadow-ds-card">
+                <div key={title} className="flex items-start gap-3 bg-ds-card border border-ds-border leaf p-4 shadow-ds-card">
                   <span className="text-2xl shrink-0">{icon}</span>
                   <div>
-                    <p className="font-black text-ds-text text-[13px]">{title}</p>
-                    <p className="text-gray-500 text-[11px] mt-0.5">{desc}</p>
+                    <p className="font-black text-ds-text text-sml">{title}</p>
+                    <p className="text-[var(--ds-text-secondary)] text-2xs mt-0.5">{desc}</p>
                   </div>
                 </div>
               ))}
@@ -276,16 +276,16 @@ export default function MasterpieceClient({ initialChildren }: Props = {}) {
             <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}
               className="flex flex-col sm:flex-row items-center gap-3">
               <a href="/pricing"
-                className="px-10 py-4 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 text-white font-black text-[16px] shadow-xl shadow-amber-200 flex items-center gap-2 hover:opacity-90 transition">
+                className="px-10 py-4 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 text-white font-black text-base shadow-xl shadow-amber-200 flex items-center gap-2 hover:opacity-90 transition">
                 <Crown className="w-5 h-5" /> Get Masterpiece — $29.99
               </a>
               <a href="/"
-                className="text-gray-400 text-[13px] font-bold hover:text-ds-text transition">
+                className="text-[var(--ds-text-tertiary)] text-sml font-bold hover:text-ds-text transition">
                 Back to home
               </a>
             </motion.div>
 
-            <p className="text-gray-400 text-[11px]">One-time purchase · No subscription needed · 40,000 RWF for Rwanda</p>
+            <p className="text-[var(--ds-text-tertiary)] text-2xs">One-time purchase · No subscription needed · 40,000 RWF for Rwanda</p>
           </main>
         </PageSurface>
       </AppShell>
@@ -302,17 +302,17 @@ export default function MasterpieceClient({ initialChildren }: Props = {}) {
           {/* ── HERO ── */}
           <HeroBanner zone="treasureRoom" className="mb-6">
             <button onClick={() => window.history.back()}
-              className="absolute top-4 left-5 z-20 flex items-center gap-1.5 text-white/80 hover:text-white text-[13px] font-bold transition-colors">
+              className="absolute top-4 left-5 z-20 flex items-center gap-1.5 text-white/80 hover:text-white text-sml font-bold transition-colors">
               <ArrowLeft className="w-4 h-4" /> Back
             </button>
 
             {/* Decorative circles */}
-            <div className="absolute -top-8 -right-8 w-44 h-44 rounded-full bg-white/10 pointer-events-none" />
-            <div className="absolute -bottom-10 -left-10 w-48 h-48 rounded-full bg-white/10 pointer-events-none" />
+            <div className="absolute -top-8 -right-8 w-44 h-44 rounded-full bg-[var(--ds-surface-card)]/10 pointer-events-none" />
+            <div className="absolute -bottom-10 -left-10 w-48 h-48 rounded-full bg-[var(--ds-surface-card)]/10 pointer-events-none" />
 
             {/* Floating sparkles */}
             {([ {t:"15%",l:"7%",d:0},{t:"70%",l:"11%",d:0.7},{t:"20%",r:"6%",d:0.35},{t:"65%",r:"9%",d:1.1} ] as Array<{t:string;d:number;l?:string;r?:string}>).map((s,i)=>(
-              <motion.span key={i} className="absolute pointer-events-none select-none text-[15px]"
+              <motion.span key={i} className="absolute pointer-events-none select-none text-mbase"
                 style={{ top:s.t, left:s.l, right:s.r }}
                 animate={{ opacity:[0.3,1,0.3], y:[0,-6,0] }}
                 transition={{ duration:2.5, repeat:Infinity, delay:s.d }} aria-hidden>
@@ -324,16 +324,16 @@ export default function MasterpieceClient({ initialChildren }: Props = {}) {
               <motion.div
                 animate={{ y:[0,-6,0], rotate:[0,4,-4,0] }}
                 transition={{ duration:3.2, repeat:Infinity }}
-                className="w-16 h-16 sm:w-20 sm:h-20 bg-white/25 backdrop-blur-sm rounded-full flex items-center justify-center text-3xl sm:text-4xl shadow-xl border-2 border-white/40 shrink-0"
+                className="w-16 h-16 sm:w-20 sm:h-20 bg-[var(--ds-surface-card)]/25 backdrop-blur-sm rounded-full flex items-center justify-center text-3xl sm:text-4xl shadow-xl border-2 border-white/40 shrink-0"
               >
                 👑
               </motion.div>
               <div>
-                <p className="text-white/60 text-[10px] font-bold uppercase tracking-[0.15em] mb-0.5">Premium Feature</p>
-                <h1 className="font-baloo font-black text-white text-[24px] sm:text-[32px] leading-tight drop-shadow-md">
+                <p className="text-white/60 text-3xs font-bold uppercase tracking-[0.15em] mb-0.5">Premium Feature</p>
+                <h1 className="font-baloo font-black text-white text-2xl sm:text-3xl leading-tight drop-shadow-md">
                   Masterpiece Studio
                 </h1>
-                <p className="text-white/80 text-[12px] sm:text-[13px] font-semibold mt-0.5">
+                <p className="text-white/80 text-xs sm:text-sml font-semibold mt-0.5">
                   {child?.name ? `${child.name} becomes the hero of their own story` : "Your child becomes the hero of their own story"}
                 </p>
               </div>
@@ -357,14 +357,14 @@ export default function MasterpieceClient({ initialChildren }: Props = {}) {
                     style={{ borderRadius:"var(--leaf-r-lg)" }}>
                     <motion.div animate={{ y:[0,-8,0] }} transition={{ duration:2.4, repeat:Infinity }}
                       className="text-6xl mb-4">👑</motion.div>
-                    <p className="text-ds-text font-black text-[18px]">No personalizable stories yet</p>
-                    <p className="text-ds-muted text-[13px] mt-2">Check back soon — new stories are coming!</p>
+                    <p className="text-ds-text font-black text-lg">No personalizable stories yet</p>
+                    <p className="text-ds-muted text-sml mt-2">Check back soon — new stories are coming!</p>
                   </div>
                 ) : (
                   <>
                     <div className="flex items-center gap-2 mb-1">
-                      <div className="w-7 h-7 rounded-full bg-amber-400 flex items-center justify-center text-white font-black text-[13px]">1</div>
-                      <h2 className="font-baloo font-black text-ds-text text-[20px]">Choose a Story</h2>
+                      <div className="w-7 h-7 rounded-full bg-amber-400 flex items-center justify-center text-white font-black text-sml">1</div>
+                      <h2 className="font-baloo font-black text-ds-text text-xl">Choose a Story</h2>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {stories.map((story, i) => (
@@ -390,8 +390,8 @@ export default function MasterpieceClient({ initialChildren }: Props = {}) {
                             <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-black/20 pointer-events-none" />
                           </div>
                           <div className="p-4">
-                            <p className="font-baloo font-black text-ds-text text-[16px] leading-tight">{story.title}</p>
-                            <p className="text-amber-500 text-[11px] mt-1.5 flex items-center gap-1 font-bold">
+                            <p className="font-baloo font-black text-ds-text text-base leading-tight">{story.title}</p>
+                            <p className="text-amber-500 text-2xs mt-1.5 flex items-center gap-1 font-bold">
                               <Crown className="w-3 h-3" /> Personalizable
                             </p>
                           </div>
@@ -404,7 +404,7 @@ export default function MasterpieceClient({ initialChildren }: Props = {}) {
                 {/* Previous orders */}
                 {orders.length > 0 && (
                   <div className="mt-8">
-                    <h2 className="font-baloo font-black text-ds-text text-[18px] mb-3">Your Masterpieces</h2>
+                    <h2 className="font-baloo font-black text-ds-text text-lg mb-3">Your Masterpieces</h2>
                     <div className="space-y-3">
                       {orders.map(order => (
                         <motion.div key={order.id}
@@ -414,13 +414,13 @@ export default function MasterpieceClient({ initialChildren }: Props = {}) {
                         >
                           <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shrink-0 ${
                             order.status === "completed" ? "bg-emerald-100" :
-                            order.status === "processing" ? "bg-amber-100" : "bg-gray-100"
+                            order.status === "processing" ? "bg-amber-100" : "bg-[var(--ds-surface-card-active)]"
                           }`}>
                             {order.status === "completed" ? "✅" : order.status === "processing" ? "⏳" : "📖"}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-ds-text font-black text-[14px]">{order.child_name}&apos;s Story</p>
-                            <p className="text-gray-400 text-[11px] font-semibold mt-0.5">
+                            <p className="text-ds-text font-black text-sm">{order.child_name}&apos;s Story</p>
+                            <p className="text-[var(--ds-text-tertiary)] text-2xs font-semibold mt-0.5">
                               {new Date(order.created_at).toLocaleDateString()} · {order.status}
                             </p>
                           </div>
@@ -431,13 +431,13 @@ export default function MasterpieceClient({ initialChildren }: Props = {}) {
                                 const data = await res.json();
                                 if (data.downloadUrl) window.open(data.downloadUrl, "_blank");
                               }}
-                              className="flex items-center gap-1.5 text-white font-bold text-[12px] px-3.5 py-2 rounded-full shadow-sm"
+                              className="flex items-center gap-1.5 text-white font-bold text-xs px-3.5 py-2 rounded-full shadow-sm"
                               style={{ backgroundColor:"var(--nimi-green)" }}>
                               <Download className="w-3.5 h-3.5" /> Download
                             </motion.button>
                           )}
                           {order.status === "processing" && (
-                            <span className="text-amber-500 text-[12px] font-bold animate-pulse">Generating…</span>
+                            <span className="text-amber-500 text-xs font-bold animate-pulse">Generating…</span>
                           )}
                         </motion.div>
                       ))}
@@ -460,10 +460,10 @@ export default function MasterpieceClient({ initialChildren }: Props = {}) {
                 <div className="flex items-center gap-3 p-3 bg-amber-50 border border-amber-100 rounded-2xl">
                   <span className="text-2xl">{selectedStory.theme_emoji || "📖"}</span>
                   <div className="min-w-0">
-                    <p className="text-[10px] text-amber-600 font-black uppercase tracking-wide">Selected Story</p>
-                    <p className="text-ds-text font-black text-[14px] truncate">{selectedStory.title}</p>
+                    <p className="text-3xs text-amber-600 font-black uppercase tracking-wide">Selected Story</p>
+                    <p className="text-ds-text font-black text-sm truncate">{selectedStory.title}</p>
                   </div>
-                  <button onClick={() => setStep("choose")} className="ml-auto text-[11px] font-bold text-amber-500 hover:text-amber-700 shrink-0">
+                  <button onClick={() => setStep("choose")} className="ml-auto text-2xs font-bold text-amber-500 hover:text-amber-700 shrink-0">
                     Change
                   </button>
                 </div>
@@ -471,10 +471,10 @@ export default function MasterpieceClient({ initialChildren }: Props = {}) {
                 {/* Upload header */}
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <div className="w-7 h-7 rounded-full bg-amber-400 flex items-center justify-center text-white font-black text-[13px]">2</div>
-                    <h2 className="font-baloo font-black text-ds-text text-[20px]">Upload a Photo</h2>
+                    <div className="w-7 h-7 rounded-full bg-amber-400 flex items-center justify-center text-white font-black text-sml">2</div>
+                    <h2 className="font-baloo font-black text-ds-text text-xl">Upload a Photo</h2>
                   </div>
-                  <p className="text-gray-500 text-[13px] ml-9">
+                  <p className="text-[var(--ds-text-secondary)] text-sml ml-9">
                     A clear headshot of {child?.name || "your child"} works best
                   </p>
                 </div>
@@ -492,32 +492,32 @@ export default function MasterpieceClient({ initialChildren }: Props = {}) {
                         <img src={photoPreview} alt="Preview" className="w-full h-full object-cover"  loading="lazy" />
                         <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 hover:opacity-100 transition rounded-full">
                           <Camera className="w-8 h-8 text-white" />
-                          <p className="text-white text-[12px] font-bold mt-1">Change</p>
+                          <p className="text-white text-xs font-bold mt-1">Change</p>
                         </div>
                       </>
                     ) : (
                       <div className="flex flex-col items-center gap-3 text-amber-400">
                         <Upload className="w-12 h-12" />
-                        <p className="font-black text-[13px]">Tap to upload</p>
-                        <p className="text-[11px] text-amber-300 font-semibold">JPG, PNG, WEBP</p>
+                        <p className="font-black text-sml">Tap to upload</p>
+                        <p className="text-2xs text-amber-300 font-semibold">JPG, PNG, WEBP</p>
                       </div>
                     )}
                   </motion.button>
                   {!photoPreview && (
-                    <p className="text-gray-400 text-[11px] mt-3 text-center max-w-[200px] leading-relaxed">
+                    <p className="text-[var(--ds-text-tertiary)] text-2xs mt-3 text-center max-w-[200px] leading-relaxed">
                       Use a well-lit, clear headshot for the best result
                     </p>
                   )}
                 </div>
 
                 {/* COPPA consent */}
-                <label className={`flex items-start gap-3 cursor-pointer p-4 rounded-2xl border-2 transition ${
+                <label className={`flex items-start gap-3 cursor-pointer p-4 leaf border-2 transition ${
                   consentChecked ? "border-emerald-200 bg-emerald-50" : "border-amber-200 bg-amber-50/60"
                 }`}>
                   <input type="checkbox" checked={consentChecked}
                     onChange={e => setConsentChecked(e.target.checked)}
                     className="mt-0.5 w-4 h-4 accent-green-600 shrink-0 cursor-pointer" />
-                  <span className="font-nunito text-[12px] text-gray-700 leading-relaxed">
+                  <span className="font-nunito text-xs text-[var(--ds-text-primary)] leading-relaxed">
                     I agree to the{" "}
                     <a href="/terms" target="_blank" rel="noopener noreferrer"
                       className="text-nimi-green underline font-bold">Terms of Use</a>
@@ -528,12 +528,12 @@ export default function MasterpieceClient({ initialChildren }: Props = {}) {
                 {/* Actions */}
                 <div className="flex gap-3 pt-2">
                   <button onClick={() => { setStep("choose"); setPhotoPreview(null); setPhotoFile(null); setConsentChecked(false); }}
-                    className="flex-1 py-3 rounded-2xl bg-ds-surface border border-ds-border text-ds-text hover:bg-ds-border/30 font-bold text-[14px] transition">
+                    className="flex-1 py-3 rounded-2xl bg-ds-surface border border-ds-border text-ds-text hover:bg-ds-border/30 font-bold text-sm transition">
                     Back
                   </button>
                   <motion.button whileTap={m.buttonPress} onClick={handleGenerate}
                     disabled={!photoFile || !consentChecked}
-                    className="flex-2 flex-1 py-3 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 text-white font-black text-[14px] shadow-lg shadow-amber-200 disabled:opacity-40 disabled:shadow-none flex items-center justify-center gap-2 transition"
+                    className="flex-2 flex-1 py-3 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 text-white font-black text-sm shadow-lg shadow-amber-200 disabled:opacity-40 disabled:shadow-none flex items-center justify-center gap-2 transition"
                   >
                     <Sparkles className="w-4 h-4" /> Create Masterpiece
                   </motion.button>
@@ -552,10 +552,10 @@ export default function MasterpieceClient({ initialChildren }: Props = {}) {
                   transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
                   className="text-6xl mb-4"
                 >🎨</motion.div>
-                <p className="font-baloo font-black text-ds-text text-[18px]">
+                <p className="font-baloo font-black text-ds-text text-lg">
                   {`Creating ${child?.name || "your child"}'s masterpiece…`}
                 </p>
-                <p className="text-gray-400 text-[12px] mt-8 font-semibold">
+                <p className="text-[var(--ds-text-tertiary)] text-xs mt-8 font-semibold">
                   This takes about 30–60 seconds
                 </p>
               </motion.div>
@@ -579,13 +579,13 @@ export default function MasterpieceClient({ initialChildren }: Props = {}) {
 
                 <motion.h2
                   initial={{ opacity:0, y:10 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.3 }}
-                  className="font-baloo font-black text-ds-text text-[28px] sm:text-[34px]"
+                  className="font-baloo font-black text-ds-text text-3.5xl sm:text-4xl"
                 >
                   Masterpiece Ready!
                 </motion.h2>
                 <motion.p
                   initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.45 }}
-                  className="text-gray-500 text-[15px] mt-2"
+                  className="text-[var(--ds-text-secondary)] text-mbase mt-2"
                 >
                   {child?.name}&apos;s personalized story is ready to download 🎉
                 </motion.p>
@@ -594,7 +594,7 @@ export default function MasterpieceClient({ initialChildren }: Props = {}) {
                   <motion.a href={downloadUrl} target="_blank"
                     initial={{ opacity:0, y:12 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.6 }}
                     whileHover={{ scale:1.04 }} whileTap={{ scale:0.97 }}
-                    className="inline-flex items-center gap-2.5 mt-8 px-10 py-4 rounded-2xl text-white font-black text-[16px] shadow-xl shadow-amber-200 bg-gradient-to-r from-amber-400 to-orange-500"
+                    className="inline-flex items-center gap-2.5 mt-8 px-10 py-4 rounded-2xl text-white font-black text-base shadow-xl shadow-amber-200 bg-gradient-to-r from-amber-400 to-orange-500"
                   >
                     <Download className="w-5 h-5" /> Download PDF
                   </motion.a>
@@ -603,7 +603,7 @@ export default function MasterpieceClient({ initialChildren }: Props = {}) {
                 <motion.button
                   initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:0.8 }}
                   onClick={resetToChoose}
-                  className="block mx-auto mt-5 text-gray-400 text-[13px] font-bold hover:text-ds-text transition"
+                  className="block mx-auto mt-5 text-[var(--ds-text-tertiary)] text-sml font-bold hover:text-ds-text transition"
                 >
                   Create Another →
                 </motion.button>

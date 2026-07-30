@@ -72,11 +72,11 @@ export default function StoryJourney({ completedSteps }: Props) {
       }}
     >
       <div className="mb-4 flex justify-center">
-        <div className="rounded-full border border-[var(--ds-border-brand)]/25 bg-white/70 px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-[var(--ds-brand-primary)] shadow-sm">
+        <div className="rounded-full border border-[var(--ds-border-brand)]/25 bg-[var(--ds-surface-card)]/70 px-3 py-1 text-3xs font-black uppercase tracking-[0.2em] text-[var(--ds-brand-primary)] shadow-sm">
           Your story adventure
         </div>
       </div>
-      <h2 className="text-center font-black text-[var(--ds-brand-primary)] text-[13px] sm:text-sm lg:text-[15px] uppercase tracking-wide mb-4">
+      <h2 className="text-center font-black text-[var(--ds-brand-primary)] text-sml sm:text-sm lg:text-mbase uppercase tracking-wide mb-4">
         COMPLETE ALL 6 STEPS TO EARN YOUR STORY CERTIFICATE!
       </h2>
 
@@ -96,12 +96,12 @@ export default function StoryJourney({ completedSteps }: Props) {
                 }}>
                 <div className="absolute inset-0 pointer-events-none opacity-25" style={{ backgroundImage: `url('${assets.storyCard.ornaments}')`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
                 <div className="flex items-start gap-1.5 px-2.5 pt-3 pb-1">
-                  <div className={`w-7 h-7 ${step.numBg} rounded-full flex items-center justify-center text-white font-black text-[13px] flex-shrink-0 shadow`}>
+                  <div className={`w-7 h-7 ${step.numBg} rounded-full flex items-center justify-center text-white font-black text-sml flex-shrink-0 shadow`}>
                     {step.number}
                   </div>
                   <div>
-                    <p className={`font-black text-[10px] uppercase leading-tight ${step.titleColor}`}>{step.title}</p>
-                    <p className={`font-black text-[10px] uppercase leading-tight ${step.titleColor}`}>{step.subtitle}</p>
+                    <p className={`font-black text-3xs uppercase leading-tight ${step.titleColor}`}>{step.title}</p>
+                    <p className={`font-black text-3xs uppercase leading-tight ${step.titleColor}`}>{step.subtitle}</p>
                   </div>
                 </div>
                 <div className="flex items-center justify-center flex-1 py-2 px-2">
@@ -109,16 +109,16 @@ export default function StoryJourney({ completedSteps }: Props) {
                     <Image src={step.isPiko ? assets.pikoCircle : assets.nimiCircle}
                       alt={step.isPiko ? "PIKO" : "NIMI"} width={60} height={60}
                       className="rounded-full object-cover border-4 border-white shadow-md" />
-                    <div className="absolute -bottom-1.5 -right-1.5 bg-white/90 rounded-full w-7 h-7 flex items-center justify-center text-base shadow border border-gray-200 leading-none">
+                    <div className="absolute -bottom-1.5 -right-1.5 bg-[var(--ds-surface-card)]/90 rounded-full w-7 h-7 flex items-center justify-center text-base shadow border border-[var(--ds-border-primary)] leading-none">
                       {step.emoji}
                     </div>
                   </div>
                 </div>
-                <p className="relative text-[var(--ds-text-secondary)] text-[9px] text-center px-2 mb-2 leading-snug min-h-[26px]">
+                <p className="relative text-[var(--ds-text-secondary)] text-4xs text-center px-2 mb-2 leading-snug min-h-[26px]">
                   {step.description}
                 </p>
                 <div className="px-2.5 pb-3">
-                  <div className={`w-full py-1.5 rounded-full text-white text-[10px] font-black flex items-center justify-center gap-1 ${step.btnColor}`}>
+                  <div className={`w-full py-1.5 rounded-full text-white text-3xs font-black flex items-center justify-center gap-1 ${step.btnColor}`}>
                     {done
                       ? <><Check className="w-3 h-3" strokeWidth={3} /> COMPLETED</>
                       : <><Play className="w-3 h-3 fill-white" /> START</>}
@@ -130,7 +130,7 @@ export default function StoryJourney({ completedSteps }: Props) {
           if (idx < STORY_STEPS.length - 1) {
             return [card, (
               <div key={`a${idx}`} className="flex items-center justify-center w-5 flex-shrink-0 self-center">
-                <ChevronRight className="w-4 h-4 text-gray-400" />
+                <ChevronRight className="w-4 h-4 text-[var(--ds-text-tertiary)]" />
               </div>
             )];
           }
@@ -154,12 +154,12 @@ export default function StoryJourney({ completedSteps }: Props) {
                 }}>
                 <div className="absolute inset-0 pointer-events-none opacity-25" style={{ backgroundImage: `url('${assets.storyCard.ornaments}')`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
                 <div className="flex items-start gap-1.5 px-2.5 pt-3 pb-1">
-                  <div className={`w-7 h-7 ${step.numBg} rounded-full flex items-center justify-center text-white font-black text-[13px] flex-shrink-0 shadow`}>
+                  <div className={`w-7 h-7 ${step.numBg} rounded-full flex items-center justify-center text-white font-black text-sml flex-shrink-0 shadow`}>
                     {step.number}
                   </div>
                   <div>
-                    <p className={`font-black text-[10px] uppercase leading-tight ${step.titleColor}`}>{step.title}</p>
-                    <p className={`font-black text-[10px] uppercase leading-tight ${step.titleColor}`}>{step.subtitle}</p>
+                    <p className={`font-black text-3xs uppercase leading-tight ${step.titleColor}`}>{step.title}</p>
+                    <p className={`font-black text-3xs uppercase leading-tight ${step.titleColor}`}>{step.subtitle}</p>
                   </div>
                 </div>
                 <div className="flex items-center justify-center flex-1 py-2 px-2">
@@ -167,16 +167,16 @@ export default function StoryJourney({ completedSteps }: Props) {
                     <Image src={step.isPiko ? assets.pikoCircle : assets.nimiCircle}
                       alt={step.isPiko ? "PIKO" : "NIMI"} width={56} height={56}
                       className="rounded-full object-cover border-4 border-white shadow-md" />
-                    <div className="absolute -bottom-1.5 -right-1.5 bg-white/90 rounded-full w-6 h-6 flex items-center justify-center text-sm shadow border border-gray-200 leading-none">
+                    <div className="absolute -bottom-1.5 -right-1.5 bg-[var(--ds-surface-card)]/90 rounded-full w-6 h-6 flex items-center justify-center text-sm shadow border border-[var(--ds-border-primary)] leading-none">
                       {step.emoji}
                     </div>
                   </div>
                 </div>
-                <p className="relative text-[var(--ds-text-secondary)] text-[9px] text-center px-2 mb-2 leading-snug min-h-[24px]">
+                <p className="relative text-[var(--ds-text-secondary)] text-4xs text-center px-2 mb-2 leading-snug min-h-[24px]">
                   {step.description}
                 </p>
                 <div className="px-2.5 pb-3">
-                  <div className={`w-full py-1.5 rounded-full text-white text-[10px] font-black flex items-center justify-center gap-1 ${step.btnColor}`}>
+                  <div className={`w-full py-1.5 rounded-full text-white text-3xs font-black flex items-center justify-center gap-1 ${step.btnColor}`}>
                     {done
                       ? <><Check className="w-3 h-3" strokeWidth={3} /> DONE</>
                       : <><Play className="w-3 h-3 fill-white" /> START</>}
@@ -205,12 +205,12 @@ export default function StoryJourney({ completedSteps }: Props) {
                   }}>
                   <div className="absolute inset-0 pointer-events-none opacity-25" style={{ backgroundImage: `url('${assets.storyCard.ornaments}')`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
                   <div className="flex items-start gap-1.5 px-2.5 pt-3 pb-1">
-                    <div className={`w-7 h-7 ${step.numBg} rounded-full flex items-center justify-center text-white font-black text-[13px] flex-shrink-0 shadow`}>
+                    <div className={`w-7 h-7 ${step.numBg} rounded-full flex items-center justify-center text-white font-black text-sml flex-shrink-0 shadow`}>
                       {step.number}
                     </div>
                     <div>
-                      <p className={`font-black text-[10px] uppercase leading-tight ${step.titleColor}`}>{step.title}</p>
-                      <p className={`font-black text-[10px] uppercase leading-tight ${step.titleColor}`}>{step.subtitle}</p>
+                      <p className={`font-black text-3xs uppercase leading-tight ${step.titleColor}`}>{step.title}</p>
+                      <p className={`font-black text-3xs uppercase leading-tight ${step.titleColor}`}>{step.subtitle}</p>
                     </div>
                   </div>
                   <div className="flex items-center justify-center py-2 px-2">
@@ -218,16 +218,16 @@ export default function StoryJourney({ completedSteps }: Props) {
                       <Image src={step.isPiko ? assets.pikoCircle : assets.nimiCircle}
                         alt={step.isPiko ? "PIKO" : "NIMI"} width={56} height={56}
                         className="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover border-4 border-white shadow-md" />
-                      <div className="absolute -bottom-1.5 -right-1.5 bg-white rounded-full w-6 h-6 flex items-center justify-center text-sm shadow border border-gray-200 leading-none">
+                      <div className="absolute -bottom-1.5 -right-1.5 bg-[var(--ds-surface-card)] rounded-full w-6 h-6 flex items-center justify-center text-sm shadow border border-[var(--ds-border-primary)] leading-none">
                         {step.emoji}
                       </div>
                     </div>
                   </div>
-                  <p className="relative text-[var(--ds-text-secondary)] text-[9px] text-center px-2 mb-2 leading-snug min-h-[24px]">
+                  <p className="relative text-[var(--ds-text-secondary)] text-4xs text-center px-2 mb-2 leading-snug min-h-[24px]">
                     {step.description}
                   </p>
                   <div className="px-2.5 pb-3">
-                    <div className={`w-full py-1.5 rounded-full text-white text-[10px] font-black flex items-center justify-center gap-1 ${step.btnColor}`}>
+                    <div className={`w-full py-1.5 rounded-full text-white text-3xs font-black flex items-center justify-center gap-1 ${step.btnColor}`}>
                       {done
                         ? <><Check className="w-3 h-3" strokeWidth={3} /> DONE</>
                         : <><Play className="w-3 h-3 fill-white" /> START</>}
@@ -237,7 +237,7 @@ export default function StoryJourney({ completedSteps }: Props) {
               </Link>
             );
             if (idx < STORY_STEPS.length - 1) {
-              return [card, <ChevronRight key={`ma${idx}`} className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />];
+              return [card, <ChevronRight key={`ma${idx}`} className="w-3.5 h-3.5 text-[var(--ds-text-tertiary)] flex-shrink-0" />];
             }
             return [card];
           })}

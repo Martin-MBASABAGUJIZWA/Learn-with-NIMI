@@ -63,15 +63,15 @@ export default function TrilingualChampionBanner({ status, childName }: Props) {
   }
 
   return (
-    <div className="bg-white border-4 border-dashed border-gray-200 shadow-ds-card p-5 text-center mb-5" style={{ borderRadius: 'var(--leaf-r-lg)' }}>
+    <div className="bg-[var(--ds-surface-card)] border-4 border-dashed border-[var(--ds-border-primary)] shadow-ds-card p-5 text-center mb-5" style={{ borderRadius: 'var(--leaf-r-lg)' }}>
       <span className="text-4xl">🌍</span>
       <p className="font-black text-ds-text text-sm uppercase tracking-wide mt-2">{t("trilingualChampionTitle")}</p>
-      <p className="text-gray-500 text-xs mt-1 px-2">{t("trilingualChampionDesc")}</p>
+      <p className="text-[var(--ds-text-secondary)] text-xs mt-1 px-2">{t("trilingualChampionDesc")}</p>
       <div className="flex justify-center gap-4 mt-3">
         {LANGUAGES.map(lang => (
           <div key={lang} className={`flex flex-col items-center gap-1 ${status.languages[lang] ? "" : "opacity-40 grayscale"}`}>
             <span className="text-2xl">{LANGUAGE_META[lang].flag}</span>
-            <span className={`text-xs ${status.languages[lang] ? "text-[var(--ds-brand-primary)]" : "text-gray-400"}`}>
+            <span className={`text-xs ${status.languages[lang] ? "text-[var(--ds-brand-primary)]" : "text-[var(--ds-text-tertiary)]"}`}>
               {status.languages[lang] ? "✓" : "—"}
             </span>
           </div>
@@ -80,7 +80,7 @@ export default function TrilingualChampionBanner({ status, childName }: Props) {
       <p className="text-ds-text font-bold text-xs mt-2">
         {t("trilingualChampionProgress").replace("{progress}", String(status.progress))}
       </p>
-      <p className="text-gray-500 font-bold text-sm mt-0.5">{childName}</p>
+      <p className="text-[var(--ds-text-secondary)] font-bold text-sm mt-0.5">{childName}</p>
     </div>
   );
 }

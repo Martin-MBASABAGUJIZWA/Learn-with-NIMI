@@ -12,7 +12,7 @@ export default function HomeLoading() {
           {/* Main column */}
           <div className="flex-1 space-y-8">
             {/* Activity board */}
-            <div className="leaf-lg border border-gray-100 p-5 space-y-4">
+            <div className="leaf-lg border border-[var(--ds-border-primary)] p-5 space-y-4">
               <Bone className="h-7 w-48" />
               <div className="grid grid-cols-3 lg:grid-cols-6 gap-3">
                 {Array.from({ length: 6 }).map((_, i) => (
@@ -22,7 +22,7 @@ export default function HomeLoading() {
             </div>
 
             {/* Stories row */}
-            <div className="leaf-lg border border-gray-100 p-5 space-y-4">
+            <div className="leaf-lg border border-[var(--ds-border-primary)] p-5 space-y-4">
               <Bone className="h-7 w-56" />
               <div className="flex gap-4 overflow-hidden">
                 {Array.from({ length: 4 }).map((_, i) => (

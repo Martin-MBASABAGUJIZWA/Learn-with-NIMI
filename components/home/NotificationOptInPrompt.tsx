@@ -62,7 +62,7 @@ export default function NotificationOptInPrompt({ childId, childName }: Props) {
           transition={{ type: "spring", damping: 22, stiffness: 260 }}
           className="fixed bottom-20 inset-x-4 sm:inset-x-auto sm:right-4 sm:left-auto sm:w-[340px] z-50"
         >
-          <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
+          <div className="bg-[var(--ds-surface-card)] rounded-2xl shadow-2xl border border-[var(--ds-border-primary)] overflow-hidden">
             {/* Accent strip */}
             <div className="h-1 w-full bg-gradient-to-r from-[var(--nimi-green)] to-emerald-400" />
 
@@ -71,14 +71,14 @@ export default function NotificationOptInPrompt({ childId, childName }: Props) {
                 <Bell className="w-5 h-5 text-emerald-600 fill-emerald-200" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-baloo font-black text-gray-900 text-[15px] leading-snug">
+                <p className="font-baloo font-black text-[var(--ds-text-primary)] text-mbase leading-snug">
                   Keep {childName}&apos;s streak going 🔥
                 </p>
-                <p className="font-nunito text-gray-500 text-[12px] mt-0.5 leading-relaxed">
+                <p className="font-nunito text-[var(--ds-text-secondary)] text-xs mt-0.5 leading-relaxed">
                   Get a daily nudge if {childName} hasn&apos;t practiced yet — so you never miss a day.
                 </p>
               </div>
-              <button onClick={dismiss} className="p-1 text-gray-300 hover:text-gray-500 shrink-0 -mr-1 -mt-1" aria-label="Dismiss">
+              <button onClick={dismiss} className="p-1 text-[var(--ds-text-tertiary)] hover:text-[var(--ds-text-secondary)] shrink-0 -mr-1 -mt-1" aria-label="Dismiss">
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -87,13 +87,13 @@ export default function NotificationOptInPrompt({ childId, childName }: Props) {
               <button
                 onClick={enable}
                 disabled={push.loading}
-                className="flex-1 bg-[var(--nimi-green)] text-white font-baloo font-black text-[13px] py-2.5 rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50"
+                className="flex-1 bg-[var(--nimi-green)] text-white font-baloo font-black text-sml py-2.5 rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50"
               >
                 {push.loading ? "Enabling…" : "Enable reminders"}
               </button>
               <button
                 onClick={dismiss}
-                className="px-4 font-nunito font-bold text-[13px] text-gray-400 hover:text-gray-600 transition-colors"
+                className="px-4 font-nunito font-bold text-sml text-[var(--ds-text-tertiary)] hover:text-[var(--ds-text-secondary)] transition-colors"
               >
                 Later
               </button>

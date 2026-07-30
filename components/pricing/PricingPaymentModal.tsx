@@ -251,7 +251,7 @@ export default function PricingPaymentModal({ product, currency, effectiveAmount
           transition={{ ...SPRING.dialog }}
           className="w-full sm:max-w-md bg-ds-card rounded-t-3xl sm:rounded-3xl border border-ds-border shadow-ds-card p-6 pb-8 sm:pb-6 sm:mx-4">
 
-          <div className="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-4 sm:hidden" />
+          <div className="w-10 h-1 bg-[var(--ds-border-primary)] rounded-full mx-auto mb-4 sm:hidden" />
 
           {/* ── Method picker (Rwanda only) ───────────────────────────── */}
           {step === "choose" && (
@@ -259,28 +259,28 @@ export default function PricingPaymentModal({ product, currency, effectiveAmount
               <div className="text-center mb-5">
                 <h3 className="font-baloo font-black text-ds-text text-[20px] mb-1">{product.name}</h3>
                 <div className="flex items-baseline justify-center gap-2">
-                  {hasDiscount && <span className="line-through text-gray-400 text-[16px] font-bold">{price.formatted}</span>}
+                  {hasDiscount && <span className="line-through text-[var(--ds-text-tertiary)] text-[16px] font-bold">{price.formatted}</span>}
                   <p className="font-baloo font-black text-yellow-600 text-[26px]">{priceDisplay}</p>
                   {hasDiscount && <span className="bg-ds-action text-white text-2xs font-black px-2 py-0.5 rounded-full">PROMO</span>}
                 </div>
               </div>
-              <p className="text-[11px] font-bold text-gray-500 text-center mb-3 uppercase tracking-wide">Choose payment method</p>
+              <p className="text-[11px] font-bold text-[var(--ds-text-secondary)] text-center mb-3 uppercase tracking-wide">Choose payment method</p>
               <div className="grid grid-cols-2 gap-3 mb-4">
                 <motion.button whileTap={m.buttonPress} onClick={handlePickMomo}
                   className="flex flex-col items-center gap-2 p-4 leaf border-2 border-yellow-400 bg-yellow-50 dark:bg-yellow-900/20 hover:bg-yellow-100 dark:hover:bg-yellow-900/30 transition text-center">
                   <span className="text-3xl">📱</span>
                   <span className="font-baloo font-black text-ds-text text-[14px]">MTN MoMo</span>
-                  <span className="text-gray-500 dark:text-gray-400 text-[11px]">Pay with mobile money</span>
+                  <span className="text-[var(--ds-text-secondary)] dark:text-[var(--ds-text-tertiary)] text-[11px]">Pay with mobile money</span>
                 </motion.button>
                 <motion.button whileTap={m.buttonPress} onClick={handlePickCard}
                   className="flex flex-col items-center gap-2 p-4 leaf border-2 border-blue-400 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 transition text-center">
                   <CreditCard className="w-8 h-8 text-blue-600 dark:text-blue-400" />
                   <span className="font-baloo font-black text-ds-text text-[14px]">Debit / Card</span>
-                  {isRwanda && <span className="text-gray-400 text-[10px]">USD equivalent</span>}
-                  <span className="text-gray-500 dark:text-gray-400 text-[11px]">Visa, Mastercard, Amex</span>
+                  {isRwanda && <span className="text-[var(--ds-text-tertiary)] text-[10px]">USD equivalent</span>}
+                  <span className="text-[var(--ds-text-secondary)] dark:text-[var(--ds-text-tertiary)] text-[11px]">Visa, Mastercard, Amex</span>
                 </motion.button>
               </div>
-              <button onClick={onClose} className="w-full py-2.5 leaf border border-ds-border text-gray-400 font-bold text-[13px] hover:bg-gray-50 transition">Cancel</button>
+              <button onClick={onClose} className="w-full py-2.5 leaf border border-ds-border text-[var(--ds-text-tertiary)] font-bold text-[13px] hover:bg-[var(--ds-surface-card-hover)] transition">Cancel</button>
             </>
           )}
 
@@ -292,7 +292,7 @@ export default function PricingPaymentModal({ product, currency, effectiveAmount
                 💳
               </motion.div>
               <p className="font-baloo font-black text-ds-text text-[16px]">Secure Card Checkout</p>
-              <p className="text-gray-400 text-[12px] mt-1">Loading payment form...</p>
+              <p className="text-[var(--ds-text-tertiary)] text-[12px] mt-1">Loading payment form...</p>
             </div>
           )}
 
@@ -302,15 +302,15 @@ export default function PricingPaymentModal({ product, currency, effectiveAmount
               <div className="flex items-center gap-2 mb-3">
                 {isRwanda && (
                   <button onClick={() => { setActiveProvider(null); setStep("choose"); }}
-                    className="text-gray-400 hover:text-ds-text transition text-[12px] font-bold">← Back</button>
+                    className="text-[var(--ds-text-tertiary)] hover:text-ds-text transition text-[12px] font-bold">← Back</button>
                 )}
                 <h3 className="font-baloo font-black text-ds-text text-[20px]">{product.name}</h3>
               </div>
               <div className="flex items-baseline gap-2 mb-4">
-                {hasDiscount && <span className="line-through text-gray-400 text-[18px] font-bold">{price.formatted}</span>}
+                {hasDiscount && <span className="line-through text-[var(--ds-text-tertiary)] text-[18px] font-bold">{price.formatted}</span>}
                 <p className="font-baloo font-black text-yellow-600 text-[28px]">
                   {priceDisplay}
-                  {product.product_type === "subscription" ? <span className="text-[14px] text-gray-400">/mo</span> : ""}
+                  {product.product_type === "subscription" ? <span className="text-[14px] text-[var(--ds-text-tertiary)]">/mo</span> : ""}
                 </p>
                 {hasDiscount && <span className="bg-green-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full">PROMO</span>}
               </div>
@@ -318,9 +318,9 @@ export default function PricingPaymentModal({ product, currency, effectiveAmount
               <div id="cs-payment-form" className="min-h-[200px] leaf overflow-hidden" />
               <div className="flex items-center gap-2 mt-3">
                 <Shield className="w-4 h-4 text-[var(--ds-brand-primary)]" />
-                <p className="text-gray-500 text-[10px]">256-bit SSL encrypted — Visa, Mastercard, Amex</p>
+                <p className="text-[var(--ds-text-secondary)] text-[10px]">256-bit SSL encrypted — Visa, Mastercard, Amex</p>
               </div>
-              <button onClick={onClose} className="w-full mt-3 py-2.5 leaf border border-ds-border text-gray-400 font-bold text-[12px] hover:bg-gray-50 transition">Cancel</button>
+              <button onClick={onClose} className="w-full mt-3 py-2.5 leaf border border-ds-border text-[var(--ds-text-tertiary)] font-bold text-[12px] hover:bg-[var(--ds-surface-card-hover)] transition">Cancel</button>
             </>
           )}
 
@@ -330,30 +330,30 @@ export default function PricingPaymentModal({ product, currency, effectiveAmount
               <div className="flex items-center gap-2 mb-3">
                 {isRwanda && (
                   <button onClick={() => { setActiveProvider(null); setStep("choose"); }}
-                    className="text-gray-400 hover:text-ds-text transition text-[12px] font-bold">← Back</button>
+                    className="text-[var(--ds-text-tertiary)] hover:text-ds-text transition text-[12px] font-bold">← Back</button>
                 )}
                 <h3 className="font-baloo font-black text-ds-text text-[20px]">{product.name}</h3>
               </div>
               <div className="flex items-baseline gap-2 mb-4">
-                {hasDiscount && <span className="line-through text-gray-400 text-[18px] font-bold">{price.formatted}</span>}
+                {hasDiscount && <span className="line-through text-[var(--ds-text-tertiary)] text-[18px] font-bold">{price.formatted}</span>}
                 <p className="font-baloo font-black text-yellow-600 text-[28px]">
                   {priceDisplay}
-                  {product.product_type === "subscription" ? <span className="text-[14px] text-gray-400">/mo</span> : ""}
+                  {product.product_type === "subscription" ? <span className="text-[14px] text-[var(--ds-text-tertiary)]">/mo</span> : ""}
                 </p>
                 {hasDiscount && <span className="bg-green-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full">PROMO</span>}
               </div>
               <div className="space-y-3">
                 <div>
-                  <label className="text-[11px] font-bold text-gray-500 mb-1 block">MTN Phone Number</label>
+                  <label className="text-[11px] font-bold text-[var(--ds-text-secondary)] mb-1 block">MTN Phone Number</label>
                   <input type="tel" value={phone} onChange={e => setPhone(e.target.value)}
                     placeholder="078 XXX XXXX"
-                    className="w-full border border-ds-border bg-ds-input leaf px-4 py-3 text-ds-text text-[14px] focus:outline-none focus:ring-2 focus:ring-[var(--ds-state-focus)] transition placeholder:text-gray-400" />
+                    className="w-full border border-ds-border bg-ds-input leaf px-4 py-3 text-ds-text text-[14px] focus:outline-none focus:ring-2 focus:ring-[var(--ds-state-focus)] transition placeholder:text-[var(--ds-text-tertiary)]" />
                 </div>
-                <p className="text-gray-400 text-[10px]">📱 A payment prompt will be sent to your MTN MoMo</p>
+                <p className="text-[var(--ds-text-tertiary)] text-[10px]">📱 A payment prompt will be sent to your MTN MoMo</p>
                 {errorMsg && <p className="text-red-500 text-[11px] mt-1 font-semibold">{errorMsg}</p>}
               </div>
               <div className="flex gap-3 mt-5">
-                <button onClick={onClose} className="flex-1 py-3 leaf border border-ds-border text-gray-400 font-bold text-[13px] hover:bg-gray-50 transition">Cancel</button>
+                <button onClick={onClose} className="flex-1 py-3 leaf border border-ds-border text-[var(--ds-text-tertiary)] font-bold text-[13px] hover:bg-[var(--ds-surface-card-hover)] transition">Cancel</button>
                 <motion.button whileTap={m.buttonPress} onClick={handleMomoSubmit}
                   className="flex-1 py-3 leaf bg-[var(--nimi-green)] hover:bg-[var(--ds-brand-hover)] text-white font-black text-[14px] shadow-md transition">
                   Pay Now
@@ -372,10 +372,10 @@ export default function PricingPaymentModal({ product, currency, effectiveAmount
               </p>
               {activeProvider === "mtn_momo" && (
                 <>
-                  <p className="text-gray-500 text-[13px] mt-2">Check your phone and enter your PIN</p>
+                  <p className="text-[var(--ds-text-secondary)] text-[13px] mt-2">Check your phone and enter your PIN</p>
                   <button
                     onClick={() => { momoAbort.current = true; setStep("momo"); setErrorMsg(""); }}
-                    className="mt-5 px-5 py-2 leaf border border-ds-border text-gray-400 font-bold text-[12px] hover:bg-gray-50 transition">
+                    className="mt-5 px-5 py-2 leaf border border-ds-border text-[var(--ds-text-tertiary)] font-bold text-[12px] hover:bg-[var(--ds-surface-card-hover)] transition">
                     Cancel
                   </button>
                 </>
@@ -438,7 +438,7 @@ export default function PricingPaymentModal({ product, currency, effectiveAmount
                   {heading}
                 </motion.h3>
                 <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
-                  className="text-gray-500 text-[13px] mt-1">
+                  className="text-[var(--ds-text-secondary)] text-[13px] mt-1">
                   {product.name} is now active on your account.
                 </motion.p>
 
@@ -457,7 +457,7 @@ export default function PricingPaymentModal({ product, currency, effectiveAmount
                 <motion.a href={ctaHref} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }}
                   className="inline-flex items-center gap-2 mt-5 px-8 py-3.5 leaf bg-gradient-to-r from-yellow-400 to-orange-500 text-white font-black text-[15px] shadow-xl">
                   {ctaLabel}
-                  <span className="bg-white/30 rounded-full text-[11px] font-black px-2 py-0.5">{countdown}s</span>
+                  <span className="bg-[var(--ds-surface-card)]/30 rounded-full text-[11px] font-black px-2 py-0.5">{countdown}s</span>
                 </motion.a>
               </div>
             );
@@ -471,16 +471,16 @@ export default function PricingPaymentModal({ product, currency, effectiveAmount
               <p className="text-red-500 text-[13px] mt-2">{errorMsg}</p>
               <div className="flex flex-col gap-3 mt-5 items-center">
                 <div className="flex gap-3">
-                  <button onClick={onClose} className="px-6 py-3 leaf border border-ds-border text-gray-500 font-bold text-[13px] hover:bg-gray-50 transition">Close</button>
+                  <button onClick={onClose} className="px-6 py-3 leaf border border-ds-border text-[var(--ds-text-secondary)] font-bold text-[13px] hover:bg-[var(--ds-surface-card-hover)] transition">Close</button>
                   {activeProvider === "mtn_momo"
-                    ? <button onClick={() => { setErrorMsg(""); setStep("momo"); }} className="px-6 py-3 leaf bg-gray-100 text-ds-text font-bold text-[13px] hover:bg-gray-200 transition">Try Again</button>
+                    ? <button onClick={() => { setErrorMsg(""); setStep("momo"); }} className="px-6 py-3 leaf bg-[var(--ds-surface-card-active)] text-ds-text font-bold text-[13px] hover:bg-[var(--ds-border-primary)] transition">Try Again</button>
                     : isRwanda
-                      ? <button onClick={() => { setActiveProvider(null); setStep("choose"); }} className="px-6 py-3 leaf bg-gray-100 text-ds-text font-bold text-[13px] hover:bg-gray-200 transition">Try Different Method</button>
-                      : <button onClick={onClose} className="px-6 py-3 leaf bg-gray-100 text-ds-text font-bold text-[13px] hover:bg-gray-200 transition">Close & Reopen to Retry</button>
+                      ? <button onClick={() => { setActiveProvider(null); setStep("choose"); }} className="px-6 py-3 leaf bg-[var(--ds-surface-card-active)] text-ds-text font-bold text-[13px] hover:bg-[var(--ds-border-primary)] transition">Try Different Method</button>
+                      : <button onClick={onClose} className="px-6 py-3 leaf bg-[var(--ds-surface-card-active)] text-ds-text font-bold text-[13px] hover:bg-[var(--ds-border-primary)] transition">Close & Reopen to Retry</button>
                   }
                 </div>
                 {activeProvider === "cybersource" && !isRwanda && (
-                  <p className="text-gray-400 text-[10px] text-center">Card sessions can't be resumed — close this dialog and click Subscribe again.</p>
+                  <p className="text-[var(--ds-text-tertiary)] text-[10px] text-center">Card sessions can't be resumed — close this dialog and click Subscribe again.</p>
                 )}
               </div>
             </div>

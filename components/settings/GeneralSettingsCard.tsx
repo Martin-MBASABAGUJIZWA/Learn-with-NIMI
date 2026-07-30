@@ -12,10 +12,10 @@ function ToggleSwitch({ on, onClick }: { on: boolean; onClick: () => void }) {
       type="button"
       onClick={onClick}
       aria-pressed={on}
-      className={`relative w-11 h-6 rounded-full transition-colors shrink-0 ${on ? "bg-[var(--nimi-green)]" : "bg-gray-300"}`}
+      className={`relative w-11 h-6 rounded-full transition-colors shrink-0 ${on ? "bg-[var(--nimi-green)]" : "bg-[var(--ds-surface-input)]"}`}
     >
       <span
-        className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${on ? "translate-x-5" : "translate-x-0"}`}
+        className={`absolute top-0.5 left-0.5 w-5 h-5 bg-[var(--ds-surface-card)] rounded-full shadow transition-transform ${on ? "translate-x-5" : "translate-x-0"}`}
       />
     </button>
   );
@@ -37,7 +37,7 @@ export default function GeneralSettingsCard() {
   };
 
   return (
-    <div className="relative overflow-hidden leaf border border-[var(--ds-border-primary)]/60 bg-gradient-to-br from-white via-[var(--ds-brand-soft)]/35 to-white p-4 shadow-[0_16px_34px_rgba(15,23,42,0.08)]">
+    <div className="relative overflow-hidden leaf border border-[var(--ds-border-primary)]/60 bg-gradient-to-br from-white via-[var(--ds-brand-soft)]/35 to-white p-4 shadow-card-2xl">
       <div className="absolute inset-x-3 top-3 h-1 rounded-full bg-gradient-to-r from-[var(--ds-brand-primary)]/80 via-[var(--ds-brand-hover)]/70 to-transparent" />
       <h3 className="font-black text-ds-text mb-3">{t("generalSettingsTitle")}</h3>
 

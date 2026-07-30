@@ -24,7 +24,7 @@ export default function StoryIllustrationViewer({ images, title }: Props) {
 
   if (images.length === 0) {
     return (
-      <div className="leaf bg-white/[0.04] border border-white/[0.08] aspect-[4/3] flex flex-col items-center justify-center gap-2">
+      <div className="leaf bg-[var(--ds-surface-card)]/[0.04] border border-white/[0.08] aspect-[4/3] flex flex-col items-center justify-center gap-2">
         <span className="text-4xl">🖼️</span>
         <p className="text-white/30 text-sm font-bold">Coming Soon</p>
       </div>
@@ -79,13 +79,13 @@ export default function StoryIllustrationViewer({ images, title }: Props) {
 
           {/* Caption + page indicator */}
           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent p-3 pt-6">
-            {img.caption && <p className="text-white text-[12px] font-bold text-center">{img.caption}</p>}
+            {img.caption && <p className="text-white text-xs font-bold text-center">{img.caption}</p>}
             {images.length > 1 && (
               <div className="flex items-center justify-center gap-1.5 mt-1.5">
                 {images.map((_, i) => (
                   <button key={i} onClick={() => setCurrent(i)}
                     aria-label={`Illustration ${i + 1}`}
-                    className={`w-2 h-2 rounded-full transition ${i === current ? "bg-white" : "bg-white/30"}`} />
+                    className={`w-2 h-2 rounded-full transition ${i === current ? "bg-[var(--ds-surface-card)]" : "bg-[var(--ds-surface-card)]/30"}`} />
                 ))}
               </div>
             )}
@@ -98,7 +98,7 @@ export default function StoryIllustrationViewer({ images, title }: Props) {
         {zoomed && (
           <motion.div {...m.overlayFade}
             className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4" onClick={() => setZoomed(false)}>
-            <button aria-label="Close zoom" className="absolute top-4 right-4 w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-white">
+            <button aria-label="Close zoom" className="absolute top-4 right-4 w-10 h-10 bg-[var(--ds-surface-card)]/10 rounded-full flex items-center justify-center text-white">
               <X className="w-5 h-5" />
             </button>
             <motion.img src={src} alt="" className="max-w-full max-h-full object-contain"

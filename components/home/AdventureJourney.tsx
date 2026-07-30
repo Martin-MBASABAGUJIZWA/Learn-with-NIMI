@@ -28,7 +28,7 @@ export default function AdventureJourney({ storySlug, slots }: Props) {
     <div className="space-y-4">
       {/* Header */}
       <div className="text-center">
-        <p className="font-black text-ds-text text-[14px] sm:text-[16px] uppercase tracking-wider">
+        <p className="font-black text-ds-text text-sm sm:text-base uppercase tracking-wider">
           ⭐ Complete all 6 steps to earn your Story Certificate! ⭐
         </p>
       </div>
@@ -49,10 +49,10 @@ export default function AdventureJourney({ storySlug, slots }: Props) {
               whileHover={!isLocked ? { y: -6, scale: 1.03 } : undefined}
               className={`relative leaf overflow-hidden border-2 flex flex-col min-w-[140px] sm:min-w-[150px] lg:min-w-0 shadow-xl transition-all ${
                 slot.completed
-                  ? "border-[var(--ds-border-brand)]/40 bg-white"
+                  ? "border-[var(--ds-border-brand)]/40 bg-[var(--ds-surface-card)]"
                   : isNext
-                    ? "border-yellow-400/40 bg-white ring-2 ring-yellow-400/15"
-                    : "border-ds-border bg-white opacity-50"
+                    ? "border-yellow-400/40 bg-[var(--ds-surface-card)] ring-2 ring-yellow-400/15"
+                    : "border-ds-border bg-[var(--ds-surface-card)] opacity-50"
               }`}
             >
               {/* Background accent for active/next */}
@@ -65,10 +65,10 @@ export default function AdventureJourney({ storySlug, slots }: Props) {
 
               {/* Number badge */}
               <div className="relative z-10 p-3 pb-0 flex items-center justify-between">
-                <div className={`w-7 h-7 rounded-lg flex items-center justify-center text-[12px] font-black shadow ${
+                <div className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-black shadow ${
                   slot.completed ? "bg-[var(--nimi-green)] text-white"
                     : isNext ? "bg-gradient-to-br from-yellow-400 to-orange-500 text-white"
-                    : "bg-gray-100 text-gray-300"
+                    : "bg-[var(--ds-surface-card-hover)] text-[var(--ds-text-tertiary)]"
                 }`}>
                   {i + 1}
                 </div>
@@ -84,25 +84,25 @@ export default function AdventureJourney({ storySlug, slots }: Props) {
               <div className="relative z-10 flex items-center justify-center py-3 px-2">
                 <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-3xl shadow-lg border border-ds-border ${
                   slot.completed ? "bg-[var(--ds-brand-subtle)]"
-                    : isLocked ? "bg-gray-100"
+                    : isLocked ? "bg-[var(--ds-surface-card-hover)]"
                     : `bg-gradient-to-br ${m.bg} bg-opacity-20`
                 }`}>
                   {slot.completed ? <CheckCircle2 className="w-8 h-8 text-[var(--ds-brand-primary)]" /> :
-                   isLocked ? <Lock className="w-6 h-6 text-gray-300" /> :
+                   isLocked ? <Lock className="w-6 h-6 text-[var(--ds-text-tertiary)]" /> :
                    <span className="drop-shadow-lg">{m.icon}</span>}
                 </div>
               </div>
 
               {/* Text */}
               <div className="relative z-10 px-3 pb-2 text-center flex-1">
-                <p className={`font-black text-[11px] leading-tight whitespace-pre-line ${
-                  slot.completed ? "text-[var(--ds-brand-primary)]" : isNext ? "text-ds-text" : "text-gray-300"
+                <p className={`font-black text-2xs leading-tight whitespace-pre-line ${
+                  slot.completed ? "text-[var(--ds-brand-primary)]" : isNext ? "text-ds-text" : "text-[var(--ds-text-tertiary)]"
                 }`}>
                   {m.name}
                 </p>
                 {!isLocked && (
-                  <p className={`text-[8px] mt-1 leading-snug ${
-                    slot.completed ? "text-gray-400" : "text-gray-500"
+                  <p className={`text-5xs mt-1 leading-snug ${
+                    slot.completed ? "text-[var(--ds-text-tertiary)]" : "text-[var(--ds-text-secondary)]"
                   }`}>
                     {m.desc}
                   </p>
@@ -112,16 +112,16 @@ export default function AdventureJourney({ storySlug, slots }: Props) {
               {/* Status button */}
               <div className="relative z-10 px-3 pb-3">
                 {slot.completed ? (
-                  <div className="bg-[var(--nimi-green)] text-white text-[9px] font-black py-1.5 rounded-lg text-center shadow-lg">
+                  <div className="bg-[var(--nimi-green)] text-white text-4xs font-black py-1.5 rounded-lg text-center shadow-lg">
                     ✓ COMPLETED
                   </div>
                 ) : isNext ? (
                   <motion.div animate={{ opacity: [0.8, 1, 0.8] }} transition={{ duration: 1.5, repeat: Infinity }}
-                    className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-[9px] font-black py-1.5 rounded-lg text-center shadow-lg shadow-orange-500/25">
+                    className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-4xs font-black py-1.5 rounded-lg text-center shadow-lg shadow-orange-500/25">
                     ▶ START
                   </motion.div>
                 ) : (
-                  <div className="bg-gray-100 text-gray-300 text-[9px] font-bold py-1.5 rounded-lg text-center border border-ds-border">
+                  <div className="bg-[var(--ds-surface-card-hover)] text-[var(--ds-text-tertiary)] text-4xs font-bold py-1.5 rounded-lg text-center border border-ds-border">
                     🔒 LOCKED
                   </div>
                 )}

@@ -111,7 +111,7 @@ export default function UploadMissionMedia({ missionId, onUploadComplete }: Uplo
           onChange={(e) => handleFileChange(e, setVideoFile)}
           disabled={uploading}
         />
-        {videoFile && <p className="text-sm text-gray-600 mt-1">Selected: {videoFile.name}</p>}
+        {videoFile && <p className="text-sm text-[var(--ds-text-secondary)] mt-1">Selected: {videoFile.name}</p>}
       </div>
 
       <div>
@@ -122,7 +122,7 @@ export default function UploadMissionMedia({ missionId, onUploadComplete }: Uplo
           onChange={(e) => handleFileChange(e, setAudioFile)}
           disabled={uploading}
         />
-        {audioFile && <p className="text-sm text-gray-600 mt-1">Selected: {audioFile.name}</p>}
+        {audioFile && <p className="text-sm text-[var(--ds-text-secondary)] mt-1">Selected: {audioFile.name}</p>}
       </div>
 
       <Button
@@ -133,7 +133,7 @@ export default function UploadMissionMedia({ missionId, onUploadComplete }: Uplo
         {uploading ? "Uploading..." : "Upload Files"}
       </Button>
 
-      {message && <p className="mt-2 text-sm text-gray-700">{message}</p>}
+      {message && <p className="mt-2 text-sm text-[var(--ds-text-primary)]">{message}</p>}
     </div>
   );
 }

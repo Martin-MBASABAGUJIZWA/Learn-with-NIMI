@@ -40,7 +40,7 @@ export default function ContentSettingsCard() {
   };
 
   return (
-    <div className="relative overflow-hidden leaf border border-[var(--ds-border-primary)]/60 bg-gradient-to-br from-white via-[var(--ds-brand-soft)]/35 to-white p-4 shadow-[0_16px_34px_rgba(15,23,42,0.08)]">
+    <div className="relative overflow-hidden leaf border border-[var(--ds-border-primary)]/60 bg-gradient-to-br from-white via-[var(--ds-brand-soft)]/35 to-white p-4 shadow-card-2xl">
       <div className="absolute inset-x-3 top-3 h-1 rounded-full bg-gradient-to-r from-[var(--ds-brand-primary)]/80 via-[var(--ds-brand-hover)]/70 to-transparent" />
       <h3 className="font-black text-ds-text mb-3">{t("contentSettingsTitle")}</h3>
 
@@ -48,13 +48,13 @@ export default function ContentSettingsCard() {
         <span className="font-bold text-sm text-ds-text">{t("languageLabel")}</span>
         <button
           onClick={() => setShowLangDropdown(v => !v)}
-          className="flex items-center gap-1.5 rounded-full border border-[var(--ds-border-brand)]/20 bg-white/80 px-2.5 py-1 text-sm font-bold text-gray-500 hover:text-[var(--ds-brand-primary)] transition shadow-sm"
+          className="flex items-center gap-1.5 rounded-full border border-[var(--ds-border-brand)]/20 bg-[var(--ds-surface-card)]/80 px-2.5 py-1 text-sm font-bold text-[var(--ds-text-secondary)] hover:text-[var(--ds-brand-primary)] transition shadow-sm"
         >
           <span>{currentLabel}</span>
           <ChevronDown className="w-4 h-4" />
         </button>
         {showLangDropdown && (
-          <div className="absolute right-0 top-full mt-1 border border-[var(--ds-border-brand)]/20 bg-white/95 shadow-[0_12px_28px_rgba(15,23,42,0.10)] rounded-xl overflow-hidden z-50 w-40">
+          <div className="absolute right-0 top-full mt-1 border border-[var(--ds-border-brand)]/20 bg-[var(--ds-surface-card)]/95 shadow-card-lg rounded-xl overflow-hidden z-50 w-40">
             {LANGS.map(lang => (
               <button
                 key={lang.code}
@@ -74,17 +74,17 @@ export default function ContentSettingsCard() {
 
       <div className="flex items-center justify-between py-3 border-b border-ds-border/70">
         <span className="font-bold text-sm text-ds-text">{t("readingLevelLabel")}</span>
-        <div className="flex items-center gap-1.5 text-sm font-bold text-gray-500">
+        <div className="flex items-center gap-1.5 text-sm font-bold text-[var(--ds-text-secondary)]">
           <span>{t("readingLevelValue")}</span>
-          <ChevronRight className="w-4 h-4 text-gray-300" />
+          <ChevronRight className="w-4 h-4 text-[var(--ds-text-tertiary)]" />
         </div>
       </div>
 
       <div className="flex items-center justify-between py-3 last:border-0">
         <span className="font-bold text-sm text-ds-text">{t("contentFilterLabel")}</span>
-        <div className="flex items-center gap-1.5 text-sm font-bold text-gray-500">
+        <div className="flex items-center gap-1.5 text-sm font-bold text-[var(--ds-text-secondary)]">
           <span>{t("contentFilterValue")}</span>
-          <ChevronRight className="w-4 h-4 text-gray-300" />
+          <ChevronRight className="w-4 h-4 text-[var(--ds-text-tertiary)]" />
         </div>
       </div>
 

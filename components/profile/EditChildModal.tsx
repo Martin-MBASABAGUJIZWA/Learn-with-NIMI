@@ -48,12 +48,12 @@ export default function EditChildModal({ childId, initialName, initialAvatar, on
           <div className="px-5 py-4 flex items-center justify-between" style={{ backgroundColor: 'var(--nimi-green)' }}>
             <div>
               <p className="text-white font-black text-lg tracking-wide">{t("editProfileModalTitle")}</p>
-              <p className="text-white/75 text-[12px]">Design your explorer!</p>
+              <p className="text-white/75 text-xs">Design your explorer!</p>
             </div>
             <button
               onClick={onClose}
               aria-label="Close"
-              className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-white transition"
+              className="w-8 h-8 rounded-full bg-[var(--ds-surface-card)]/20 hover:bg-[var(--ds-surface-card)]/30 flex items-center justify-center text-white transition"
             >
               <X className="w-4 h-4" />
             </button>
@@ -76,7 +76,7 @@ export default function EditChildModal({ childId, initialName, initialAvatar, on
                 onChange={e => setName(e.target.value)}
                 onKeyDown={e => e.key === "Enter" && handleSave()}
                 maxLength={30}
-                className="w-full border border-ds-border bg-ds-input rounded-xl px-3 py-2.5 text-sm font-semibold text-ds-text focus:outline-none focus:ring-2 focus:ring-[var(--ds-state-focus)] transition placeholder:text-gray-400"
+                className="w-full border border-ds-border bg-ds-input rounded-xl px-3 py-2.5 text-sm font-semibold text-ds-text focus:outline-none focus:ring-2 focus:ring-[var(--ds-state-focus)] transition placeholder:text-[var(--ds-text-tertiary)]"
               />
             </div>
 
@@ -92,7 +92,7 @@ export default function EditChildModal({ childId, initialName, initialAvatar, on
               <button
                 onClick={onClose}
                 disabled={saving}
-                className="flex-1 bg-white border border-ds-border text-ds-text font-black py-3 text-sm hover:bg-gray-50 transition disabled:opacity-60 rounded-xl"
+                className="flex-1 bg-[var(--ds-surface-card)] border border-ds-border text-ds-text font-black py-3 text-sm hover:bg-[var(--ds-surface-card)] transition disabled:opacity-60 rounded-xl"
               >
                 {t("cancel")}
               </button>

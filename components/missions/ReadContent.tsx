@@ -47,11 +47,11 @@ export default function ReadContent({ mission, onComplete, completed, saving, st
               transition={m.floatLg.transition}
               className="w-14 h-14 rounded-full object-cover border-[3px] border-yellow-300 shadow-md flex-shrink-0 mt-1"
             />
-            <div className="relative bg-white border border-amber-200/70 rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm flex-1">
+            <div className="relative bg-[var(--ds-surface-card)] border border-amber-200/70 rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm flex-1">
               {/* Triangle tail */}
-              <div className="absolute left-[-6px] top-[14px] w-3 h-3 rotate-45 bg-white border-l border-b border-amber-200/70" />
-              <p className="font-baloo font-black text-ds-text text-[15px] leading-snug">{t("readyToReadLabel")}</p>
-              <p className="font-nunito text-gray-400 text-[12px] mt-0.5">{t("storyBookWaiting")}</p>
+              <div className="absolute left-[-6px] top-[14px] w-3 h-3 rotate-45 bg-[var(--ds-surface-card)] border-l border-b border-amber-200/70" />
+              <p className="font-baloo font-black text-ds-text text-mbase leading-snug">{t("readyToReadLabel")}</p>
+              <p className="font-nunito text-[var(--ds-text-tertiary)] text-xs mt-0.5">{t("storyBookWaiting")}</p>
             </div>
           </div>
 
@@ -67,7 +67,7 @@ export default function ReadContent({ mission, onComplete, completed, saving, st
                   <div key={i} className="h-[2px] rounded-full bg-amber-300/40" style={{ width: `${w}%` }} />
                 ))}
               </div>
-              <p className="absolute bottom-2 left-0 right-0 text-center font-nunito text-[9px] font-semibold text-amber-400/50 tracking-widest">— 1 —</p>
+              <p className="absolute bottom-2 left-0 right-0 text-center font-nunito text-4xs font-semibold text-amber-400/50 tracking-widest">— 1 —</p>
               {/* Gutter shadow */}
               <div className="absolute right-0 top-0 bottom-0 w-4 bg-gradient-to-l from-black/8 to-transparent" />
             </div>
@@ -83,14 +83,14 @@ export default function ReadContent({ mission, onComplete, completed, saving, st
               <div className="absolute top-5 left-5 right-5 h-[72px] rounded-lg
                 bg-gradient-to-br from-amber-100/70 to-yellow-100/50
                 border border-amber-200/50 flex items-center justify-center">
-                <span className="text-[32px] leading-none select-none">🌟</span>
+                <span className="text-3xl leading-none select-none">🌟</span>
               </div>
               {/* Lines below */}
               <div className="absolute bottom-9 left-5 right-5 flex flex-col gap-[9px]">
                 <div className="h-[2px] rounded-full bg-amber-300/40 w-full" />
                 <div className="h-[2px] rounded-full bg-amber-300/40 w-[72%]" />
               </div>
-              <p className="absolute bottom-2 left-0 right-0 text-center font-nunito text-[9px] font-semibold text-amber-400/50 tracking-widest">— 2 —</p>
+              <p className="absolute bottom-2 left-0 right-0 text-center font-nunito text-4xs font-semibold text-amber-400/50 tracking-widest">— 2 —</p>
               {/* Gutter shadow */}
               <div className="absolute left-0 top-0 bottom-0 w-4 bg-gradient-to-r from-black/8 to-transparent" />
             </div>
@@ -109,12 +109,12 @@ export default function ReadContent({ mission, onComplete, completed, saving, st
               text-white rounded-2xl px-4 py-3.5
               shadow-[0_8px_22px_rgba(245,158,11,0.28)] transition">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 bg-[var(--ds-surface-card)]/20 rounded-xl flex items-center justify-center flex-shrink-0">
                 <BookOpen className="w-5 h-5 text-white" />
               </div>
               <div className="text-left">
-                <p className="font-baloo font-black text-[17px] leading-tight">{t("openStorybookBtn")}</p>
-                <p className="font-nunito text-[11px] text-white/75 leading-tight">{t("readInsideApp")}</p>
+                <p className="font-baloo font-black text-mlg leading-tight">{t("openStorybookBtn")}</p>
+                <p className="font-nunito text-2xs text-white/75 leading-tight">{t("readInsideApp")}</p>
               </div>
             </div>
             <ChevronRight className="w-5 h-5 text-white/70 group-hover:translate-x-1 transition-transform flex-shrink-0" />
@@ -123,20 +123,20 @@ export default function ReadContent({ mission, onComplete, completed, saving, st
           {/* Download — subtle */}
           <div className="mt-3 text-center">
             <a href={pdfUrl} download
-              className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-amber-700/40 hover:text-amber-700 transition">
+              className="inline-flex items-center gap-1.5 text-2xs font-semibold text-amber-700/40 hover:text-amber-700 transition">
               <Download className="w-3 h-3" /> {t("saveToDevice")}
             </a>
           </div>
         </div>
       ) : (
         /* No PDF yet */
-        <div className="bg-white border border-ds-border leaf p-8 text-center shadow-sm">
+        <div className="bg-[var(--ds-surface-card)] border border-ds-border leaf p-8 text-center shadow-sm">
           <div className="w-16 h-16 bg-[var(--ds-brand-subtle)] rounded-full flex items-center justify-center mx-auto mb-3">
-            <FileText className="w-8 h-8 text-gray-400" />
+            <FileText className="w-8 h-8 text-[var(--ds-text-tertiary)]" />
           </div>
-          <p className="font-baloo font-black text-ds-text text-[18px]">{t("pdfComingSoon")}</p>
-          <p className="font-nunito text-gray-500 text-[13px] mt-1">{t("comingSoonTeacher")}</p>
-          <p className="font-nunito text-gray-500 text-[12px] mt-2">{t("comingSoonComplete")}</p>
+          <p className="font-baloo font-black text-ds-text text-lg">{t("pdfComingSoon")}</p>
+          <p className="font-nunito text-[var(--ds-text-secondary)] text-sml mt-1">{t("comingSoonTeacher")}</p>
+          <p className="font-nunito text-[var(--ds-text-secondary)] text-xs mt-2">{t("comingSoonComplete")}</p>
         </div>
       )}
 
@@ -149,7 +149,7 @@ export default function ReadContent({ mission, onComplete, completed, saving, st
                 className="leaf border border-amber-200/60 bg-amber-50/60 px-4 py-3 flex items-center gap-3"
               >
                 <Lock className="w-4 h-4 text-amber-500 flex-shrink-0" />
-                <p className="font-nunito font-bold text-[12px] text-amber-700">{t("readToUnlock")}</p>
+                <p className="font-nunito font-bold text-xs text-amber-700">{t("readToUnlock")}</p>
               </motion.div>
             )}
           </AnimatePresence>
@@ -160,12 +160,12 @@ export default function ReadContent({ mission, onComplete, completed, saving, st
               initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
               transition={{ type: "spring", stiffness: 300, damping: 22, delay: 0.1 }}
               whileTap={{ scale: 0.96 }}
-              className="w-full font-baloo font-black bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[18px] rounded-full py-4 shadow-[0_10px_24px_rgba(245,158,11,0.28)] flex items-center justify-center gap-2 disabled:opacity-50 transition">
+              className="w-full font-baloo font-black bg-gradient-to-r from-amber-500 to-orange-500 text-white text-lg rounded-full py-4 shadow-[0_10px_24px_rgba(245,158,11,0.28)] flex items-center justify-center gap-2 disabled:opacity-50 transition">
               {saving ? t("saving") : <><Check className="w-5 h-5" /> {t("iReadItBtn")}</>}
             </motion.button>
           ) : (
             <button disabled
-              className="w-full font-baloo font-black bg-gray-100 text-gray-400 text-[18px] rounded-full py-4 flex items-center justify-center gap-2 cursor-not-allowed border border-gray-200">
+              className="w-full font-baloo font-black bg-[var(--ds-surface-card-hover)] text-[var(--ds-text-tertiary)] text-lg rounded-full py-4 flex items-center justify-center gap-2 cursor-not-allowed border border-[var(--ds-border-primary)]">
               <Lock className="w-5 h-5" /> {t("readToUnlock")}
             </button>
           )}

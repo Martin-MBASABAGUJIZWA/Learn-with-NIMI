@@ -38,7 +38,7 @@ export default function HomeFooter() {
             <p className="font-black text-2xl tracking-widest leading-none bg-gradient-to-r from-pink-300 via-purple-200 to-cyan-300 bg-clip-text text-transparent drop-shadow">
               NIMIPIKO
             </p>
-            <p className="text-gray-400 text-[11px] font-semibold tracking-widest mt-1 uppercase">
+            <p className="text-[var(--ds-text-tertiary)] text-2xs font-semibold tracking-widest mt-1 uppercase">
               Where Stories Come to Life
             </p>
           </div>
@@ -57,7 +57,7 @@ export default function HomeFooter() {
         <div className="flex flex-wrap justify-center gap-2">
           {TRUST_BADGES.map(b => (
             <div key={b.label}
-              className={`${b.bg} flex items-center gap-1.5 px-4 py-2 rounded-full text-[11px] font-black tracking-wide shadow-md`}>
+              className={`${b.bg} flex items-center gap-1.5 px-4 py-2 rounded-full text-2xs font-black tracking-wide shadow-md`}>
               <span>{b.emoji}</span>
               <span>{b.label}</span>
             </div>
@@ -83,7 +83,7 @@ export default function HomeFooter() {
 
       {/* Copyright strip */}
       <div className="border-t border-gray-700 bg-gray-800 py-3 px-4">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] text-gray-400 font-semibold">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-2xs text-[var(--ds-text-tertiary)] font-semibold">
           <span>© {new Date().getFullYear()} Nimipiko Studio LTD. All rights reserved.</span>
           <div className="flex gap-5">
             <Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link>

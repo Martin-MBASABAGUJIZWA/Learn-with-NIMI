@@ -27,7 +27,7 @@ export function StickerPreviewCard({
   }, [child, badge])
 
   return (
-    <Card className="bg-white border-2 border-violet-200">
+    <Card className="bg-[var(--ds-surface-card)] border-2 border-violet-200">
       <CardHeader>
         <CardTitle className="text-violet-700">{t("stickerPreviewTitle")}</CardTitle>
       </CardHeader>

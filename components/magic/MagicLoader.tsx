@@ -63,7 +63,7 @@ function NimiWalking({ reduced }: AnimProps) {
         <motion.div key={`s${i}`} className="absolute bottom-3" style={{ left: 20 + i * 12 }}
           animate={reduced ? { opacity: 0.4 } : { opacity: [0, 0.6, 0], scale: [0.3, 0.8, 0] }}
           transition={reduced ? {} : { duration: DURATION.loopShimmer, repeat: Infinity, delay: i * 0.2 }}>
-          <span className="text-[10px]">✨</span>
+          <span className="text-3xs">✨</span>
         </motion.div>
       ))}
     </div>
@@ -252,12 +252,12 @@ export default function MagicLoader({ variant = "default", fullPage = true, mess
         <AnimatePresence mode="wait">
           <motion.p key={msgIndex}
             {...fadeUp}
-            className="font-nunito font-bold text-gray-500 text-sm text-center max-w-[240px]">
+            className="font-nunito font-bold text-[var(--ds-text-secondary)] text-sm text-center max-w-[240px]">
             {message ?? messages[msgIndex]}
           </motion.p>
         </AnimatePresence>
       ) : (
-        <p className="font-nunito font-bold text-gray-500 text-sm text-center max-w-[240px]">
+        <p className="font-nunito font-bold text-[var(--ds-text-secondary)] text-sm text-center max-w-[240px]">
           {message ?? messages[0]}
         </p>
       )}

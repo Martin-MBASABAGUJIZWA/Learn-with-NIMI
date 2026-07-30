@@ -44,7 +44,7 @@ export default function MissionShell({ activity, mission, completedCount, comple
           {/* Header row */}
           <div className="flex items-center gap-3">
             <Link href="/stories"
-              className="flex items-center gap-1 text-gray-500 font-bold text-sm hover:text-gray-900 transition shrink-0">
+              className="flex items-center gap-1 text-[var(--ds-text-secondary)] font-bold text-sm hover:text-[var(--ds-text-primary)] transition shrink-0">
               <ChevronLeft className="w-4 h-4" />
               <span className="hidden sm:inline">{t("backToAdventure")}</span>
             </Link>
@@ -54,12 +54,12 @@ export default function MissionShell({ activity, mission, completedCount, comple
                 {activity.emoji} {title}
               </h1>
               {subtitle && (
-                <p className="text-gray-500 text-xs sm:text-sm font-semibold truncate">{subtitle}</p>
+                <p className="text-[var(--ds-text-secondary)] text-xs sm:text-sm font-semibold truncate">{subtitle}</p>
               )}
             </div>
 
             <button onClick={() => setSoundOn(s => !s)}
-              className="w-9 h-9 rounded-full bg-white border border-ds-border shadow-sm flex items-center justify-center text-gray-500 hover:bg-gray-50 transition shrink-0"
+              className="w-9 h-9 rounded-full bg-[var(--ds-surface-card)] border border-ds-border shadow-sm flex items-center justify-center text-[var(--ds-text-secondary)] hover:bg-[var(--ds-surface-card)] transition shrink-0"
               aria-label={soundOn ? t("pauseLabel") : t("playSongLabel")}>
               {soundOn ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
             </button>
@@ -80,11 +80,11 @@ export default function MissionShell({ activity, mission, completedCount, comple
           <div className="lg:grid lg:grid-cols-[1fr_280px] lg:gap-4 lg:items-start space-y-4 lg:space-y-0">
             <div>{children}</div>
 
-            <div className="bg-white border border-ds-border shadow-ds-card p-4 space-y-3" style={{ borderRadius: 'var(--leaf-r)' }}>
+            <div className="bg-[var(--ds-surface-card)] border border-ds-border shadow-ds-card p-4 space-y-3" style={{ borderRadius: 'var(--leaf-r)' }}>
               <p className="font-black text-ds-text text-sm">{t("missionProgressTitle")}</p>
 
               <div>
-                <div className="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
+                <div className="w-full bg-[var(--ds-surface-card-hover)] rounded-full h-3 overflow-hidden">
                   <div className="bg-ds-progress-fill h-full rounded-full transition-all"
                     style={{ width: `${progressPct}%` }} />
                 </div>
@@ -93,10 +93,10 @@ export default function MissionShell({ activity, mission, completedCount, comple
                 </p>
               </div>
 
-              <p className="text-gray-500 text-xs text-center">{t("missionProgressDesc")}</p>
+              <p className="text-[var(--ds-text-secondary)] text-xs text-center">{t("missionProgressDesc")}</p>
 
               <div className={`leaf p-2.5 text-center border ${completed ? "bg-[var(--ds-brand-subtle)] border-[var(--ds-border-brand)]/30" : "bg-yellow-50 border-yellow-200"}`}>
-                <p className="text-[10px] font-black uppercase tracking-wide text-gray-600">{t("rewardLabel")}</p>
+                <p className="text-3xs font-black uppercase tracking-wide text-[var(--ds-text-secondary)]">{t("rewardLabel")}</p>
                 <p className="text-lg font-black text-yellow-600">⭐ {stars}</p>
               </div>
             </div>
@@ -108,8 +108,8 @@ export default function MissionShell({ activity, mission, completedCount, comple
               <Image src={assets.nimiCircle} alt="NIMI" width={48} height={48}
                 className="w-12 h-12 rounded-full object-cover border-4 border-ds-border-brand shrink-0" />
               <div className="min-w-0">
-                <p className="font-black text-gray-900 text-sm">{t("nimiSaysLabel")}</p>
-                <p className="text-gray-600 text-sm mt-0.5">{tip}</p>
+                <p className="font-black text-[var(--ds-text-primary)] text-sm">{t("nimiSaysLabel")}</p>
+                <p className="text-[var(--ds-text-secondary)] text-sm mt-0.5">{tip}</p>
               </div>
             </div>
             <Link href={nextHref}

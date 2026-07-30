@@ -53,7 +53,7 @@ export default function HomeHeader({ activeChild }: HomeHeaderProps) {
   };
 
   return (
-    <header className="bg-white border-b border-ds-border shadow-ds-nav relative overflow-hidden">
+    <header className="bg-[var(--ds-surface-card)] border-b border-ds-border shadow-ds-nav relative overflow-hidden">
 
       {/* Animated background stars */}
       <div className="absolute inset-0 pointer-events-none select-none">
@@ -100,7 +100,7 @@ export default function HomeHeader({ activeChild }: HomeHeaderProps) {
               NIMIPIKO
             </motion.h1>
           </Link>
-          <p className="text-gray-500 font-semibold text-sm lg:text-base mt-1 tracking-widest">
+          <p className="text-[var(--ds-text-secondary)] font-semibold text-sm lg:text-base mt-1 tracking-widest">
             Learn • Play • Create • Grow
           </p>
         </div>
@@ -111,11 +111,11 @@ export default function HomeHeader({ activeChild }: HomeHeaderProps) {
           {/* Speech bubble (lg+) */}
           <div className="hidden lg:block relative bg-[var(--ds-brand-subtle)] border border-[var(--ds-border-brand)]/30 rounded-2xl px-4 py-3 shadow-sm max-w-[185px] xl:max-w-[210px]">
             <span className="absolute top-2 right-2 text-yellow-400 text-sm leading-none">★</span>
-            <span className="absolute bottom-2 left-2 text-gray-300 text-xs leading-none">✦</span>
+            <span className="absolute bottom-2 left-2 text-[var(--ds-text-tertiary)] text-xs leading-none">✦</span>
             <p className="text-sm font-bold text-ds-text leading-snug pr-3">
               Welcome to your learning adventure!
             </p>
-            <p className="text-xs font-semibold text-gray-500 mt-1.5">
+            <p className="text-xs font-semibold text-[var(--ds-text-secondary)] mt-1.5">
               Have fun and earn your certificate!
             </p>
             <span className="absolute -right-[12px] top-1/2 -translate-y-1/2 w-0 h-0"
@@ -127,15 +127,15 @@ export default function HomeHeader({ activeChild }: HomeHeaderProps) {
           {/* Language picker */}
           <div className="relative">
             <button onClick={() => setShowPicker(!showPicker)}
-              className="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center text-xl transition shadow-sm"
+              className="w-10 h-10 bg-[var(--ds-surface-card-hover)] hover:bg-[var(--ds-surface-card-active)] rounded-full flex items-center justify-center text-xl transition shadow-sm"
               aria-label="Change language">
               {LANGS.find(l => l.code === language)?.flag ?? "🌐"}
             </button>
             {showPicker && (
-              <div className="absolute right-0 mt-2 bg-white border border-ds-border rounded-xl shadow-lg overflow-hidden z-50 w-40">
+              <div className="absolute right-0 mt-2 bg-[var(--ds-surface-card)] border border-ds-border rounded-xl shadow-lg overflow-hidden z-50 w-40">
                 {LANGS.map(lang => (
                   <button key={lang.code} onClick={() => { setPendingLanguage(lang.code); setShowPicker(false); }}
-                    className="flex items-center px-4 py-3 w-full hover:bg-gray-50 transition text-sm">
+                    className="flex items-center px-4 py-3 w-full hover:bg-[var(--ds-surface-card)] transition text-sm">
                     <span className="text-xl mr-2">{lang.flag}</span>
                     <span className="font-semibold text-ds-text">{lang.label}</span>
                   </button>
@@ -177,7 +177,7 @@ export default function HomeHeader({ activeChild }: HomeHeaderProps) {
         <div className="flex items-center gap-2">
           <div className="relative">
             <Image src={assets.nimiCircle} alt="NIMI" width={44} height={44} className="rounded-full object-cover border-2 border-yellow-400 shadow-md" />
-            <span className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 bg-[var(--nimi-green)] text-white text-[8px] font-black px-2 py-0.5 rounded-full border border-white">NIMI</span>
+            <span className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 bg-[var(--nimi-green)] text-white text-5xs font-black px-2 py-0.5 rounded-full border border-white">NIMI</span>
           </div>
           <h1 className="font-black" style={{ fontSize: "1.75rem", lineHeight: 1,
             background: "linear-gradient(90deg,#FF0000,#FF7700,#FFDD00,#00BB44,#0066FF,#8800CC)",
@@ -188,14 +188,14 @@ export default function HomeHeader({ activeChild }: HomeHeaderProps) {
         <div className="flex items-center gap-2">
           <div className="relative">
             <button onClick={() => setShowPicker(!showPicker)}
-              className="w-9 h-9 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center text-lg transition" aria-label="Change language">
+              className="w-9 h-9 bg-[var(--ds-surface-card-hover)] hover:bg-[var(--ds-surface-card-active)] rounded-full flex items-center justify-center text-lg transition" aria-label="Change language">
               {LANGS.find(l => l.code === language)?.flag ?? "🌐"}
             </button>
             {showPicker && (
-              <div className="absolute right-0 mt-2 bg-white border border-ds-border rounded-xl shadow-lg overflow-hidden z-50 w-36">
+              <div className="absolute right-0 mt-2 bg-[var(--ds-surface-card)] border border-ds-border rounded-xl shadow-lg overflow-hidden z-50 w-36">
                 {LANGS.map(lang => (
                   <button key={lang.code} onClick={() => { setPendingLanguage(lang.code); setShowPicker(false); }}
-                    className="flex items-center px-3 py-2.5 w-full hover:bg-gray-50 text-sm">
+                    className="flex items-center px-3 py-2.5 w-full hover:bg-[var(--ds-surface-card)] text-sm">
                     <span className="text-lg mr-2">{lang.flag}</span>
                     <span className="font-medium text-ds-text">{lang.label}</span>
                   </button>
@@ -205,7 +205,7 @@ export default function HomeHeader({ activeChild }: HomeHeaderProps) {
           </div>
           <div className="relative">
             <Image src={assets.pikoCircle} alt="PIKO" width={36} height={36} className="rounded-full object-cover border-2 border-blue-300 shadow" />
-            <span className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full border border-white">PIKO</span>
+            <span className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-5xs font-black px-1.5 py-0.5 rounded-full border border-white">PIKO</span>
           </div>
         </div>
       </div>

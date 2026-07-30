@@ -25,7 +25,7 @@ const SIZES = {
 // Semantic variants not tied to app theme
 const STATIC_VARIANTS = {
   danger: "bg-gradient-to-r from-red-400 to-rose-500 text-white shadow-sm shadow-red-500/20",
-  ghost:  "bg-transparent text-gray-700 border border-gray-200 hover:bg-gray-50 hover:text-gray-900",
+  ghost:  "bg-transparent text-[var(--ds-text-primary)] border border-[var(--ds-border-primary)] hover:bg-[var(--ds-surface-card)] hover:text-[var(--ds-text-primary)]",
 };
 
 export default function MagicButton({
