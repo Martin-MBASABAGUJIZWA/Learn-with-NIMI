@@ -123,102 +123,6 @@ export interface Theme {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// HP Theme — the current default visual language (Sprint 11 HP design)
-// Every value here matches what components render today.
-// Changing this object must not change any pixel on screen.
-// ─────────────────────────────────────────────────────────────────────────────
-
-export const hpTheme: Theme = {
-  id:   "hp",
-  name: "NIMIPIKO Default",
-
-  surface: {
-    page:       "#F9FAFB",              // bg-gray-50
-    card:       "#FFFFFF",              // bg-white / bg-hp-card
-    cardHover:  "#F9FAFB",              // bg-gray-50 on hover
-    cardActive: "#F3F4F6",              // bg-gray-100
-    input:      "#F9FAFB",              // bg-hp-input
-    nav:        "#FFFFFF",              // bg-white nav bar
-    overlay:    "rgba(0,0,0,0.50)",     // bg-black/50 modal backdrop
-    tooltip:    "#111827",              // bg-gray-900 tooltip
-  },
-
-  text: {
-    primary:   "#111827",               // text-hp-text / text-gray-900
-    secondary: "#6B7280",               // text-hp-muted / text-gray-500
-    tertiary:  "rgba(107,114,128,0.45)",// faint / disabled
-    inverse:   "#FFFFFF",               // text-white on colored surfaces
-    brand:     "#16A34A",               // text-green-600
-  },
-
-  border: {
-    primary: "#E5E7EB",                 // border-hp-border / border-gray-200
-    strong:  "rgba(156,163,175,0.80)",  // border-gray-400 emphasis
-    brand:   "#16A34A",                 // border-green-600 selected state
-  },
-
-  brand: {
-    primary: "#16A34A",                 // bg-green-600
-    hover:   "#15803D",                 // bg-green-700
-    pressed: "#166534",                 // bg-green-800
-    soft:    "rgba(22,163,74,0.10)",    // green-50 wash
-    subtle:  "#F0FDF4",                 // bg-green-50
-  },
-
-  nav: {
-    bg:           "#FFFFFF",
-    activeBg:     "#F0FDF4",            // bg-green-50
-    activeText:   "#16A34A",            // text-green-600
-    inactiveText: "#374151",            // text-gray-700
-    inactiveIcon: "#6B7280",            // text-gray-500
-    border:       "#E5E7EB",            // border-gray-200
-  },
-
-  shadow: {
-    card:  "0 4px 16px rgba(0,0,0,0.08)",      // shadow-hp-shadow-card
-    nav:   "0 2px 8px rgba(0,0,0,0.06)",       // shadow-hp-shadow-nav
-    hover: "0 8px 28px rgba(0,0,0,0.14)",      // shadow-hp-shadow-hover
-    cta:   "0 4px 12px rgba(22,163,74,0.35)",  // green-tinted CTA glow
-  },
-
-  progress: {
-    track: "#E5E7EB",                   // bg-gray-200
-    fill:  "#16A34A",                   // bg-green-600
-  },
-
-  state: {
-    success: "#16A34A",                 // green-600
-    error:   "#DC2626",                 // red-600
-    warning: "#D97706",                 // amber-600
-    focus:   "#16A34A",                 // green-600 focus ring
-  },
-
-  gradients: {
-    hero:              "from-green-500 to-emerald-600",
-    progress:          "from-green-500 to-emerald-600",
-    badge:             "from-green-400 to-emerald-500",
-    card:              "from-green-50 to-emerald-50",
-    pageBg:            "from-green-50 via-white to-emerald-50",
-    chatBg:            "from-yellow-100 to-pink-100",
-    storyReader:       "from-purple-950 via-gray-900 to-gray-950",
-    storyReaderHeader: "from-purple-900/70 via-gray-900/60 to-pink-900/70",
-    storyHeader:       "from-[#1a0840] via-[#2d1570] to-[#0d0530]",
-  },
-
-  motion: {
-    transitionFast:   "transition-all duration-150 ease-out",
-    transitionNormal: "transition-all duration-200 ease-in-out",
-    transitionSlow:   "transition-all duration-300 ease-in-out",
-    hoverScale:       1.04,
-    hoverLift:        -4,
-    tapScale:         0.97,
-    springStiffness:  260,
-    springDamping:    18,
-    glowIntensity:    0.35,
-  },
-};
-
-// ─────────────────────────────────────────────────────────────────────────────
 // CSS Custom Property Names
 // Use these constants instead of bare strings when setting/reading --ds-* vars.
 // ─────────────────────────────────────────────────────────────────────────────
@@ -334,100 +238,6 @@ export function applyThemeVars(tokens: Theme, root = document.documentElement): 
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Ocean theme
-// ─────────────────────────────────────────────────────────────────────────────
-
-export const oceanTheme: Theme = {
-  id:   "ocean",
-  name: "Ocean",
-
-  surface: {
-    page:       "#F0F9FF",
-    card:       "#FFFFFF",
-    cardHover:  "#F0F9FF",
-    cardActive: "#E0F2FE",
-    input:      "#F0F9FF",
-    nav:        "#FFFFFF",
-    overlay:    "rgba(0,0,0,0.50)",
-    tooltip:    "#0F172A",
-  },
-
-  text: {
-    primary:   "#0F172A",
-    secondary: "#475569",
-    tertiary:  "rgba(71,85,105,0.45)",
-    inverse:   "#FFFFFF",
-    brand:     "#0284C7",
-  },
-
-  border: {
-    primary: "#BAE6FD",
-    strong:  "rgba(14,165,233,0.40)",
-    brand:   "#0284C7",
-  },
-
-  brand: {
-    primary: "#0284C7",
-    hover:   "#0369A1",
-    pressed: "#075985",
-    soft:    "#E0F2FE",
-    subtle:  "#F0F9FF",
-  },
-
-  nav: {
-    bg:           "#FFFFFF",
-    activeBg:     "#E0F2FE",
-    activeText:   "#0284C7",
-    inactiveText: "#334155",
-    inactiveIcon: "#64748B",
-    border:       "#BAE6FD",
-  },
-
-  shadow: {
-    card:  "0 4px 16px rgba(0,0,0,0.08)",
-    nav:   "0 2px 8px rgba(0,0,0,0.06)",
-    hover: "0 8px 28px rgba(0,0,0,0.14)",
-    cta:   "0 4px 12px rgba(2,132,199,0.35)",
-  },
-
-  progress: {
-    track: "#E0F2FE",
-    fill:  "#0284C7",
-  },
-
-  state: {
-    success: "#16A34A",
-    error:   "#DC2626",
-    warning: "#F59E0B",
-    focus:   "#0EA5E9",
-  },
-
-  gradients: {
-    hero:              "from-cyan-400 to-sky-600",
-    progress:          "from-cyan-500 to-blue-600",
-    badge:             "from-sky-400 to-cyan-500",
-    card:              "from-sky-50 to-cyan-50",
-    pageBg:            "from-sky-50 via-white to-cyan-50",
-    chatBg:            "from-sky-100 to-cyan-100",
-    storyReader:       "from-sky-950 via-slate-900 to-slate-950",
-    storyReaderHeader: "from-sky-900/70 via-slate-900/60 to-cyan-900/70",
-    storyHeader:       "from-[#021020] via-[#052040] to-[#010810]",
-  },
-
-  motion: {
-    transitionFast:   "transition-all duration-200 ease-out",
-    transitionNormal: "transition-all duration-300 ease-in-out",
-    transitionSlow:   "transition-all duration-500 ease-in-out",
-    hoverScale:       1.02,
-    hoverLift:        -2,
-    tapScale:         0.98,
-    springStiffness:  160,
-    springDamping:    22,
-    glowIntensity:    0.25,
-  },
-};
-
-// ─────────────────────────────────────────────────────────────────────────────
 // Default (Nimipiko World) theme — garden/nature aesthetic, green brand
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -526,12 +336,10 @@ export const defaultTheme: Theme = {
 // App-level theme registry
 // ─────────────────────────────────────────────────────────────────────────────
 
-export type AppThemeId = "default" | "hp" | "ocean";
+export type AppThemeId = "default";
 
 export const APP_THEMES: Record<AppThemeId, Theme> = {
   default: defaultTheme,
-  hp:      hpTheme,
-  ocean:   oceanTheme,
 };
 
 export function getAppTheme(id: AppThemeId): Theme {

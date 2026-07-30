@@ -144,68 +144,10 @@ const hpEffects: ThemeEffects = {
   },
 };
 
-// ─── Ocean theme effects ───────────────────────────────────────────────────
-// Cool, aquatic: rising bubbles, light rays, blue-cyan ambient drift
-
-const oceanEffects: ThemeEffects = {
-  backgroundDecorations: {
-    ambientGradient:
-      "radial-gradient(ellipse 80% 50% at 50% -20%, rgba(224,242,254,0.45), transparent)," +
-      "radial-gradient(ellipse 70% 50% at 10% 80%,  rgba(207,250,254,0.25), transparent)",
-    meshClass: "from-sky-100/40 via-cyan-50/20 to-transparent",
-  },
-  heroDecorations: {
-    type:    "rays",
-    colors:  ["rgba(2,132,199,0.08)", "rgba(6,182,212,0.06)", "rgba(255,255,255,0.15)"],
-    count:   6,
-    opacity: 0.55,
-  },
-  cardDecorations: {
-    shimmerEnabled: true,
-    shimmerColor:   "rgba(2,132,199,0.14)",
-    glowColor:      "rgba(2,132,199,0.06)",
-  },
-  buttonEffects: {
-    glowColor:   "rgba(2,132,199,0.35)",
-    rippleColor: "rgba(2,132,199,0.20)",
-  },
-  badgeEffects: {
-    glowColor:   "rgba(6,182,212,0.45)",
-    pulseColor:  "rgba(6,182,212,0.20)",
-  },
-  pageEffects: {
-    ambientColor: "rgba(224,242,254,0.30)",
-    topGlow:      "rgba(207,250,254,0.25)",
-    bottomGlow:   "rgba(224,242,254,0.20)",
-  },
-  particles: {
-    count:         10,
-    shapes:        ["○", "◦", "∘", "°", "·"],
-    colors:        [
-      "rgba(2,132,199,0.70)",
-      "rgba(6,182,212,0.60)",
-      "rgba(14,165,233,0.50)",
-      "rgba(255,255,255,0.80)",
-    ],
-    sizeRange:     [5, 14],
-    durationRange: [6, 11],
-    opacityRange:  [0.15, 0.55],
-  },
-  motion: {
-    floatDuration:   4.5,
-    floatDistance:   12,
-    particleDuration: 9,
-    easing:          "ease-in-out",
-    shimmerDuration: 2.2,
-  },
-};
-
 // ─── Registry & getter ─────────────────────────────────────────────────────
 
 const THEME_EFFECTS: Record<AppThemeId, ThemeEffects> = {
   default: hpEffects,
-  hp:      hpEffects,
-  ocean:   oceanEffects,
 };
 
 /**

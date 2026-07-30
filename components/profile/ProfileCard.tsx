@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useLanguage } from "@/contexts/LanguageContext";
+import ChildAvatar from "@/components/avatar/ChildAvatar";
 
 interface Props {
   avatar: string | null;
@@ -23,17 +24,9 @@ export default function ProfileCard({ avatar, childName, level, categoriesComple
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: "spring", stiffness: 260, damping: 18 }}
       >
-        {avatar && !avatar.startsWith("http") ? (
-          <div className="w-24 h-24 rounded-full border-4 shadow-lg bg-gray-100 flex items-center justify-center text-5xl select-none" style={{ borderColor: 'var(--nimi-green)' }}>
-            {avatar}
-          </div>
-        ) : (
-          <img
-            src={avatar ?? "/default-avatar.png"} alt={childName}
-            className="w-24 h-24 rounded-full object-cover border-4 shadow-lg"
-            style={{ borderColor: 'var(--nimi-green)' }}
-            loading="lazy" onError={e => { (e.target as HTMLImageElement).src = "/avatar.png"; }} />
-        )}
+        <div className="w-24 h-24 rounded-full border-4 shadow-lg overflow-hidden flex items-center justify-center bg-gray-100" style={{ borderColor: 'var(--nimi-green)' }}>
+          <ChildAvatar avatarUrl={avatar} name={childName} size={96} />
+        </div>
       </motion.div>
 
       <p className="font-black text-xl text-ds-text mt-3">{childName}</p>

@@ -5,7 +5,6 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import { NimiReaderProvider } from "@/contexts/NimiReaderContext";
 import SupabaseProviderWrapper from "@/components/SupabaseProviderWrapper";
 import { UserProvider } from "@/contexts/UserContext";
-import { ThemeProvider } from "@/contexts/ThemeContext";
 import { AppThemeProvider } from "@/contexts/AppThemeProvider";
 import CookieConsentBanner from "@/components/CookieConsentBanner";
 import ErrorBoundary from "@/components/layout/ErrorBoundary";
@@ -94,15 +93,13 @@ r.setProperty("--theme-sidebar","#FFFFFF");
           <NimiReaderProvider>
             <SupabaseProviderWrapper>
               <UserProvider>
-                <ThemeProvider>
-                  <AppThemeProvider>
-                    <NavigationProgress />
-                    <ErrorBoundary>
-                      {children}
-                    </ErrorBoundary>
-                    <CookieConsentBanner />
-                  </AppThemeProvider>
-                </ThemeProvider>
+                <AppThemeProvider>
+                  <NavigationProgress />
+                  <ErrorBoundary>
+                    {children}
+                  </ErrorBoundary>
+                  <CookieConsentBanner />
+                </AppThemeProvider>
               </UserProvider>
             </SupabaseProviderWrapper>
           </NimiReaderProvider>
