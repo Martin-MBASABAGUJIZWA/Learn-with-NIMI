@@ -31,7 +31,7 @@ export default function AchievementToast({ visible, config, onDismiss }: Props) 
       {visible && config && (
         <motion.div
           {...m.fadeDown}
-          className="fixed top-4 left-1/2 z-[70] w-auto max-w-xs sm:max-w-sm min-w-[220px] -translate-x-1/2"
+          className="fixed top-4 left-1/2 z-overlay w-auto max-w-xs sm:max-w-sm min-w-[220px] -translate-x-1/2"
           onClick={onDismiss}
           role="status"
           aria-live="polite"

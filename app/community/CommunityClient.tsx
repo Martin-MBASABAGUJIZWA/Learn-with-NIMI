@@ -608,13 +608,13 @@ function CaptionSheet({
         <>
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/70 z-[60] backdrop-blur-sm"
+            className="fixed inset-0 bg-black/70 z-nav backdrop-blur-sm"
             onClick={onBack}
           />
           <motion.div
             initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
             transition={{ type: "spring", stiffness: 340, damping: 36 }}
-            className="fixed bottom-0 left-0 right-0 z-[60] rounded-t-[28px] shadow-[0_-16px_56px_rgba(0,0,0,0.35)]"
+            className="fixed bottom-0 left-0 right-0 z-nav rounded-t-[28px] shadow-[0_-16px_56px_rgba(0,0,0,0.35)]"
             style={{ background: "var(--ds-surface-card)" }}
           >
             {/* Pull handle */}
@@ -1387,7 +1387,7 @@ export default function CommunityClient({ initialUserId, initialHasSubscription 
             animate={{ opacity: 1, y: 0,  scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
             transition={{ type: "spring", stiffness: 380, damping: 28 }}
-            className="fixed bottom-[140px] left-1/2 -translate-x-1/2 z-[80] flex items-center gap-2.5 px-5 py-3 rounded-2xl text-white text-sml font-black shadow-[0_8px_32px_rgba(5,150,105,0.4)] whitespace-nowrap"
+            className="fixed bottom-[140px] left-1/2 -translate-x-1/2 z-popover flex items-center gap-2.5 px-5 py-3 rounded-2xl text-white text-sml font-black shadow-[0_8px_32px_rgba(5,150,105,0.4)] whitespace-nowrap"
             style={{ background: "var(--nimi-green)" }}
           >
             {toast}

@@ -553,7 +553,7 @@ export default function ColoringStudio({ pages, childId, onClose, t }: ColoringS
             {/* Kid-friendly color palette — big chunky circles */}
             <div className={`grid gap-2 ${showAdvancedPalette ? 'grid-cols-5' : 'grid-cols-4'}`}>
               {(showAdvancedPalette ? ADVANCED_COLORS : KID_COLORS).map(c => (
-                <button key={c} onClick={() => { setColor(c); setTool('brush'); playColorPick(); }}
+                <button key={c} aria-label={`Color ${c}`} onClick={() => { setColor(c); setTool('brush'); playColorPick(); }}
                   className={`rounded-full transition-all hover:scale-110 border-3 ${
                     color === c && tool !== 'eraser' ? 'border-white scale-110 shadow-lg ring-2 ring-yellow-400' : 'border-transparent'
                   }`}
@@ -579,7 +579,7 @@ export default function ColoringStudio({ pages, childId, onClose, t }: ColoringS
                 { id: 'eraser' as const,  icon: <Eraser className="h-5 w-5" />, label: '🧹' },
                 { id: 'sticker' as const, icon: <span className="text-xl">⭐</span>, label: '⭐' },
               ]).map(({ id, icon }) => (
-                <button key={id} onClick={() => setTool(id)}
+                <button key={id} aria-label={id.charAt(0).toUpperCase() + id.slice(1)} onClick={() => setTool(id)}
                   className={`flex items-center justify-center py-3 rounded-2xl border-2 transition-all ${
                     tool === id
                       ? 'border-yellow-400 bg-yellow-400/15 text-[var(--ds-text-primary)] shadow-lg'
@@ -683,7 +683,7 @@ export default function ColoringStudio({ pages, childId, onClose, t }: ColoringS
               className="w-11 h-11 rounded-xl bg-[var(--ds-surface-card-active)] hover:bg-[var(--ds-border-primary)] flex items-center justify-center text-[var(--ds-text-primary)] disabled:opacity-20 transition flex-shrink-0">▶</motion.button>
           </div>
           {isMobile && (
-            <button onClick={() => { savePage(); playSuccess(); }} className="w-11 h-11 rounded-xl bg-[var(--ds-brand-subtle)] text-[var(--ds-brand-primary)] hover:opacity-80 flex items-center justify-center flex-shrink-0">
+            <button aria-label="Save" onClick={() => { savePage(); playSuccess(); }} className="w-11 h-11 rounded-xl bg-[var(--ds-brand-subtle)] text-[var(--ds-brand-primary)] hover:opacity-80 flex items-center justify-center flex-shrink-0">
               <Save className="h-4 w-4" />
             </button>
           )}
@@ -745,7 +745,7 @@ export default function ColoringStudio({ pages, childId, onClose, t }: ColoringS
                 </button>
               ))}
               <div className="w-px h-8 bg-[var(--ds-border-primary)] mx-1" />
-              <button onClick={undo} disabled={!canUndo} className="w-12 h-12 rounded-2xl bg-[var(--ds-surface-card-active)] flex items-center justify-center disabled:opacity-20"><Undo className="h-5 w-5 text-[var(--ds-text-tertiary)]" /></button>
+              <button aria-label="Undo" onClick={undo} disabled={!canUndo} className="w-12 h-12 rounded-2xl bg-[var(--ds-surface-card-active)] flex items-center justify-center disabled:opacity-20"><Undo className="h-5 w-5 text-[var(--ds-text-tertiary)]" /></button>
             </div>
           </div>
         )}

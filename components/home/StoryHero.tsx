@@ -97,7 +97,7 @@ interface OverlaysProps {
 }
 
 // Layer 5 + 6: frame border decoration + atmospheric particles.
-// Rendered as siblings of the bg container so they sit above content (z-[8] / z-30).
+// Rendered as siblings of the bg container so they sit above content (z-img-layer / z-30).
 // Both use pointer-events-none — never block clicks.
 function WorldOverlays({ assets, reduced }: OverlaysProps) {
   return (
@@ -106,7 +106,7 @@ function WorldOverlays({ assets, reduced }: OverlaysProps) {
       <motion.img
         src={assets.hero.frame}
         alt=""
-        className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none z-[8]"
+        className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none z-img-layer"
         animate={reduced ? {} : { opacity: [0.85, 1, 0.85] }}
         transition={reduced ? {} : { duration: 5, repeat: Infinity, ease: "easeInOut" }}
         draggable={false}

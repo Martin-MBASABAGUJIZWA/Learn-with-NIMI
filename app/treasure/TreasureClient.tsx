@@ -46,7 +46,7 @@ const CONFETTI_COLORS = ["#22c55e","#f59e0b","#3b82f6","#a855f7","#ec4899","#f97
 function Confetti({ onDone }: { onDone: () => void }) {
   useEffect(() => { const t = setTimeout(onDone, 2600); return () => clearTimeout(t); }, [onDone]);
   return (
-    <div className="pointer-events-none fixed inset-0 z-[9999] overflow-hidden">
+    <div className="pointer-events-none fixed inset-0 z-max overflow-hidden">
       {Array.from({ length: 32 }).map((_, i) => (
         <motion.div key={i}
           className="absolute rounded-[2px]"

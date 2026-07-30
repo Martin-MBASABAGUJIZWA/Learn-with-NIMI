@@ -107,7 +107,7 @@ export default function NimiChat({
   return (
     <div className={`fixed inset-0 z-50 bg-gradient-to-br ${theme.gradients.chatBg} p-4 flex flex-col items-center justify-center text-center`}>
       <div className="absolute top-4 right-4">
-        <button onClick={onClose} className="text-xl rounded-full bg-red-400 text-white p-2">
+        <button aria-label="Close" onClick={onClose} className="text-xl rounded-full bg-red-400 text-white p-2">
           <X />
         </button>
       </div>

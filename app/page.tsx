@@ -59,7 +59,7 @@ function StickyMobileCTA({ href, visible }: { href: string; visible: boolean }) 
           animate={{ y: 0 }}
           exit={{ y: 88 }}
           transition={{ type: "spring", damping: 30, stiffness: 320 }}
-          className="fixed bottom-0 inset-x-0 z-[55] lg:hidden"
+          className="fixed bottom-0 inset-x-0 z-nav lg:hidden"
           style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
         >
           <div className="bg-white/95 backdrop-blur-md border-t border-gray-100 shadow-2xl px-4 pt-2 pb-4">

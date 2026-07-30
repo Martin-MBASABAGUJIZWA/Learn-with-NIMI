@@ -52,7 +52,7 @@ export default function LogoutModal({ isOpen, onClose }: LogoutModalProps) {
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className={`fixed inset-0 z-[60] overflow-y-auto bg-gradient-to-br ${theme.gradients.pageBg}`}
+          className={`fixed inset-0 z-nav overflow-y-auto bg-gradient-to-br ${theme.gradients.pageBg}`}
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
         >
           {/* Decorative star field */}

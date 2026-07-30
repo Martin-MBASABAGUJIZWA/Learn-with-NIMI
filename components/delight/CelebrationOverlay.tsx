@@ -49,7 +49,7 @@ export default function CelebrationOverlay({
       {visible && (
         <motion.div
           {...m.overlayFade}
-          className="fixed inset-0 z-[70] flex items-center justify-center p-6"
+          className="fixed inset-0 z-overlay flex items-center justify-center p-6"
           onClick={onDismiss}
           role="dialog"
           aria-modal="true"

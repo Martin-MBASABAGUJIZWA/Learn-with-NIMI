@@ -21,7 +21,7 @@ export default function UpdateToast({ visible, onDismiss }: UpdateToastProps) {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -60 }}
           transition={{ type: "spring", stiffness: 300, damping: 28 }}
-          className="fixed top-3 left-1/2 z-[200] -translate-x-1/2 w-[calc(100%-2rem)] max-w-sm"
+          className="fixed top-3 left-1/2 z-fullscreen -translate-x-1/2 w-[calc(100%-2rem)] max-w-sm"
         >
           <div className="flex items-center gap-3 bg-[var(--nimi-green)] text-white rounded-2xl shadow-xl px-4 py-3">
             <div className="w-8 h-8 rounded-full bg-[var(--ds-surface-card)]/20 flex items-center justify-center flex-shrink-0">

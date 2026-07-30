@@ -27,7 +27,7 @@ export default function CookieConsentBanner() {
     <div
       role="dialog"
       aria-label="Cookie notice"
-      className="fixed bottom-0 left-0 right-0 z-[9999] p-3 sm:p-4"
+      className="fixed bottom-0 left-0 right-0 z-max p-3 sm:p-4"
       style={{ pointerEvents: "none" }}
     >
       <div

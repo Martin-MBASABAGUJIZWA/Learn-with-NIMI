@@ -73,7 +73,7 @@ interface Props {
 export default function LandingNav({ scrolled, menuOpen, setMenuOpen, authed }: Props) {
   return (
     <>
-      <nav className={`fixed top-0 left-0 right-0 z-[60] transition-all duration-300 ${
+      <nav className={`fixed top-0 left-0 right-0 z-nav transition-all duration-300 ${
         scrolled ? "bg-[var(--ds-surface-card)]/95 backdrop-blur-2xl border-b-2 border-[var(--ds-border-strong)] shadow-[0_8px_40px_rgba(0,0,0,0.14)]" : ""
       }`}>
         <div className="flex items-center justify-between px-4 sm:px-6 lg:px-10 py-3 w-full">

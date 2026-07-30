@@ -212,6 +212,21 @@ const config: Config = {
         "hp-pill": "9999px",
       },
 
+      // ─── Z-INDEX SCALE ─────────────────────────────────────────────
+      zIndex: {
+        "above-bg":   "1",    // absolute layers sitting just above a bg image
+        "img-layer":  "8",    // in-page image overlays
+        "nav":        "60",   // fixed navigation bars + drawers
+        "overlay":    "70",   // celebration overlays, sidebars
+        "popover":    "80",   // floating action buttons
+        "toast":      "100",  // toasts and inline notifications
+        "notification":"120", // transient in-page banners
+        "fullscreen": "200",  // media players, story fullscreen
+        "loading":    "300",  // global loading badges
+        "modal":      "999",  // modal dialogs (above everything except fx)
+        "max":        "9999", // cookie banners, particle effects
+      },
+
       // ─── MAX WIDTH ─────────────────────────────────────────────────
       maxWidth: {
         "hp-container": "1280px",

@@ -112,7 +112,7 @@ export default function UpdateCardModal({ onClose, onSuccess }: Props) {
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-ds-border">
           <h2 className="font-black text-ds-text text-base">Update Payment Card</h2>
-          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[var(--ds-surface-card-hover)] transition text-[var(--ds-text-tertiary)] hover:text-[var(--ds-text-secondary)]">
+          <button aria-label="Close" onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[var(--ds-surface-card-hover)] transition text-[var(--ds-text-tertiary)] hover:text-[var(--ds-text-secondary)]">
             <X className="w-4 h-4" />
           </button>
         </div>

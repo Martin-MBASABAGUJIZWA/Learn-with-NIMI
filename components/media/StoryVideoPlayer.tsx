@@ -90,17 +90,17 @@ export default function StoryVideoPlayer({ url, title, poster, onEnded }: Props)
 
       {/* Bottom bar */}
       <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3 pt-8 flex items-center gap-3">
-        <button onClick={toggle} className="w-10 h-10 rounded-full bg-[var(--ds-surface-card)]/15 border border-white/20 flex items-center justify-center text-white shrink-0">
+        <button aria-label={playing ? "Pause" : "Play"} onClick={toggle} className="w-10 h-10 rounded-full bg-[var(--ds-surface-card)]/15 border border-white/20 flex items-center justify-center text-white shrink-0">
           {playing ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 ml-0.5" />}
         </button>
         <div className="flex-1 bg-[var(--ds-surface-card)]/15 rounded-full h-[6px] overflow-hidden">
           <div className="bg-cta-gradient h-full rounded-full transition-all duration-200"
             style={{ width: `${progress}%` }} />
         </div>
-        <button onClick={toggleMute} className="w-8 h-8 rounded-full bg-[var(--ds-surface-card)]/10 border border-white/10 flex items-center justify-center text-white/60 shrink-0">
+        <button aria-label={muted ? "Unmute" : "Mute"} onClick={toggleMute} className="w-8 h-8 rounded-full bg-[var(--ds-surface-card)]/10 border border-white/10 flex items-center justify-center text-white/60 shrink-0">
           {muted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
         </button>
-        <button onClick={toggleFullscreen} className="w-8 h-8 rounded-full bg-[var(--ds-surface-card)]/10 border border-white/10 flex items-center justify-center text-white/60 shrink-0">
+        <button aria-label="Fullscreen" onClick={toggleFullscreen} className="w-8 h-8 rounded-full bg-[var(--ds-surface-card)]/10 border border-white/10 flex items-center justify-center text-white/60 shrink-0">
           <Maximize className="w-3.5 h-3.5" />
         </button>
       </div>

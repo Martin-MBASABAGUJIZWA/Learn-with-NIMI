@@ -22,7 +22,7 @@ export default function NextStoryCard({ story }: Props) {
       <Image src={assets.storyCard.background} alt="" aria-hidden="true"
         fill className="object-cover pointer-events-none opacity-[0.08]" />
       <Image src={assets.storyCard.frame} alt="" aria-hidden="true"
-        fill className="object-cover pointer-events-none opacity-40 z-[1]" />
+        fill className="object-cover pointer-events-none opacity-40 z-above-bg" />
       <div className="absolute inset-x-4 top-4 h-1 rounded-full bg-gradient-to-r from-[var(--ds-brand-primary)]/80 via-[var(--ds-brand-hover)]/70 to-transparent" />
 
       <div className="relative z-10 flex flex-col flex-1">

@@ -56,7 +56,7 @@ export default function StoryIllustrationViewer({ images, title }: Props) {
           </AnimatePresence>
 
           {/* Zoom button */}
-          <button onClick={() => setZoomed(true)}
+          <button aria-label="Zoom in" onClick={() => setZoomed(true)}
             className="absolute top-3 right-3 w-10 h-10 bg-black/30 backdrop-blur rounded-full flex items-center justify-center text-white/60 hover:text-white transition opacity-0 group-hover:opacity-100">
             <ZoomIn className="w-4 h-4" />
           </button>
