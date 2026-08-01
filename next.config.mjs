@@ -99,6 +99,9 @@ const nextConfig = {
 
   reactStrictMode: true,
 
+  // canvas is a native addon (.node file) — must not be bundled by webpack
+  serverExternalPackages: ["canvas"],
+
   experimental: {
     // Tree-shake icon and animation libraries — only bundle the symbols actually imported
     optimizePackageImports: ["lucide-react", "framer-motion", "@radix-ui/react-accordion"],

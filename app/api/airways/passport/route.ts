@@ -93,55 +93,55 @@ export async function GET(req: NextRequest) {
     if (uri) coverUriMap.set(s.id, uri);
   });
 
-  const doc = await PDFDocument.create();
+  try {
+    const doc = await PDFDocument.create();
 
-  // Page 1: Cover
-  await addPngPage(doc, await buildPassportCoverCanvas());
+    await addPngPage(doc, await buildPassportCoverCanvas());
 
-  // Page 2: Identity
-  await addPngPage(doc, await buildPassportIdentityCanvas({
-    childName: data.name,
-    championNumber: championNumber(data.name, data.current_story?.sort_order ?? 1, data.sibling_rank),
-    createdAt: data.created_at,
-    photoDataUri: photoUri ?? null,
-    qrDataUri: qr,
-  }));
-
-  // Pages 3..N: one per completed story + current story
-  const storiesToShow = data.stories.filter((s) => s.is_complete);
-  if (data.current_story && !data.current_story.is_complete) {
-    storiesToShow.push(data.current_story);
-  }
-
-  for (let i = 0; i < storiesToShow.length; i++) {
-    const story = storiesToShow[i];
-    const bookNum    = story.sort_order;
-    const nextStory  = data.stories.find((s) => s.sort_order === bookNum + 1) ?? null;
-    const coverIdx   = data.stories.findIndex((s) => s.id === story.id);
-    const nextCoverIdx = nextStory ? data.stories.findIndex((s) => s.id === nextStory.id) : -1;
-
-    await addPngPage(doc, await buildPassportDestinationCanvas({
-      story,
-      bookNum,
-      nextStory,
-      coverDataUri:     coverUriByIndex.get(coverIdx) ?? null,
-      nextCoverDataUri: nextCoverIdx >= 0 ? (coverUriByIndex.get(nextCoverIdx) ?? null) : null,
-      badgeDataUri: null,
+    await addPngPage(doc, await buildPassportIdentityCanvas({
+      childName: data.name,
+      championNumber: championNumber(data.name, data.current_story?.sort_order ?? 1, data.sibling_rank),
+      createdAt: data.created_at,
+      photoDataUri: photoUri ?? null,
+      qrDataUri: qr,
     }));
+
+    const storiesToShow = data.stories.filter((s) => s.is_complete);
+    if (data.current_story && !data.current_story.is_complete) {
+      storiesToShow.push(data.current_story);
+    }
+
+    for (let i = 0; i < storiesToShow.length; i++) {
+      const story = storiesToShow[i];
+      const bookNum      = story.sort_order;
+      const nextStory    = data.stories.find((s) => s.sort_order === bookNum + 1) ?? null;
+      const coverIdx     = data.stories.findIndex((s) => s.id === story.id);
+      const nextCoverIdx = nextStory ? data.stories.findIndex((s) => s.id === nextStory.id) : -1;
+
+      await addPngPage(doc, await buildPassportDestinationCanvas({
+        story, bookNum, nextStory,
+        coverDataUri:     coverUriByIndex.get(coverIdx) ?? null,
+        nextCoverDataUri: nextCoverIdx >= 0 ? (coverUriByIndex.get(nextCoverIdx) ?? null) : null,
+        badgeDataUri: null,
+      }));
+    }
+
+    await addPngPage(doc, await buildStampsCanvas({
+      childName: data.name,
+      stories: data.stories,
+      coverUris: coverUriMap,
+    }));
+
+    const pdfBytes = await doc.save();
+    return new NextResponse(new Uint8Array(pdfBytes), {
+      headers: {
+        "Content-Type": "application/pdf",
+        "Content-Disposition": `attachment; filename="${data.name}_passport_nimipiko.pdf"`,
+      },
+    });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error("[passport] build error:", msg);
+    return NextResponse.json({ error: `Passport build failed: ${msg}` }, { status: 500 });
   }
-
-  // Last page: Stamp collection
-  await addPngPage(doc, await buildStampsCanvas({
-    childName: data.name,
-    stories: data.stories,
-    coverUris: coverUriMap,
-  }));
-
-  const pdfBytes = await doc.save();
-  return new NextResponse(new Uint8Array(pdfBytes), {
-    headers: {
-      "Content-Type": "application/pdf",
-      "Content-Disposition": `attachment; filename="${data.name}_passport_nimipiko.pdf"`,
-    },
-  });
 }
