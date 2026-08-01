@@ -107,6 +107,46 @@ interface TemplateConfig {
   colors: Record<string, string>
 }
 
+// ── Passport Identity page ────────────────────────────────────────────────────
+const FIELDS_PASSPORT_ID: FieldDef[] = [
+  { key: 'photo',    label: 'Photo',            type: 'area', sample: '' },
+  { key: 'qr',       label: 'QR Code',          type: 'area', sample: '' },
+  { key: 'name',     label: 'Nom du champion',  type: 'text', sample: 'KETSIA' },
+  { key: 'champion', label: 'N° Champion',      type: 'text', sample: 'KET-A-001' },
+  { key: 'date',     label: 'Date de création', type: 'text', sample: '01 / 01 / 2025' },
+]
+
+const INIT_PASSPORT_ID: Record<string, Pos> = {
+  photo:    { x: 52,  y: 224, w: 170, h: 154, size: 0  },
+  qr:       { x: 614, y: 220, w: 140, h: 140, size: 0  },
+  name:     { x: 250, y: 185, w: 300, h: 30,  size: 26 },
+  champion: { x: 250, y: 258, w: 300, h: 26,  size: 22 },
+  date:     { x: 250, y: 328, w: 300, h: 22,  size: 18 },
+}
+
+const COLORS_PASSPORT_ID: Record<string, string> = {
+  name: '#0D1B30', champion: '#0D1B30', date: '#1A7A3E',
+}
+
+// ── Passport Destination page ─────────────────────────────────────────────────
+const FIELDS_PASSPORT_DEST: FieldDef[] = [
+  { key: 'book_cover', label: 'Couverture livre', type: 'area', sample: '' },
+  { key: 'title',      label: 'Titre histoire',   type: 'text', sample: 'THE TALKING FACES' },
+  { key: 'dest_num',   label: 'Destination N°',   type: 'text', sample: '★ DESTINATION 1 ★' },
+  { key: 'date_val',   label: 'Date validation',  type: 'text', sample: '01 / 01 / 2025' },
+]
+
+const INIT_PASSPORT_DEST: Record<string, Pos> = {
+  book_cover: { x: 60,  y: 155, w: 160, h: 190, size: 0  },
+  title:      { x: 397, y: 100, w: 600, h: 34,  size: 28 },
+  dest_num:   { x: 397, y: 44,  w: 300, h: 16,  size: 13 },
+  date_val:   { x: 284, y: 460, w: 300, h: 26,  size: 22 },
+}
+
+const COLORS_PASSPORT_DEST: Record<string, string> = {
+  title: '#0D1B30', dest_num: '#1A7A3E', date_val: '#1A7A3E',
+}
+
 const TEMPLATE_REGISTRY: TemplateConfig[] = [
   {
     slug: 'champion-kit', label: 'Champion Kit',
@@ -118,9 +158,16 @@ const TEMPLATE_REGISTRY: TemplateConfig[] = [
     W: 1080, H: 1080,
     fields: FIELDS_BP, init: INIT_BP, colors: COLORS_BP,
   },
-  // ── Add future templates below ────────────────────────────────────
-  // { slug: 'passport-cover', label: 'Passport Cover', W: 794, H: 1123, fields: [...], init: {...}, colors: {} },
-  // { slug: 'stamp-collection', label: 'Stamp Collection', W: 1200, H: 900, fields: [...], init: {...}, colors: {} },
+  {
+    slug: 'passport-identity', label: 'Passport — Identity',
+    W: 794, H: 1123,
+    fields: FIELDS_PASSPORT_ID, init: INIT_PASSPORT_ID, colors: COLORS_PASSPORT_ID,
+  },
+  {
+    slug: 'passport-destination', label: 'Passport — Destination',
+    W: 794, H: 1123,
+    fields: FIELDS_PASSPORT_DEST, init: INIT_PASSPORT_DEST, colors: COLORS_PASSPORT_DEST,
+  },
 ]
 
 type TemplateKey = string  // now just the slug string

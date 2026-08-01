@@ -14,6 +14,8 @@ import {
   buildStampsCanvas,
   PAGE_W,
   PAGE_H,
+  type PassportIdLayout,
+  type PassportDestLayout,
 } from "@/lib/airways/buildPassportCanvas";
 import { qrDataUri as genQr } from "@/lib/airways/qrCode";
 
@@ -61,6 +63,18 @@ export async function GET(req: NextRequest) {
   const data = await fetchAirwaysData(supabase, childId);
   if (!data) return NextResponse.json({ error: "Child not found" }, { status: 404 });
 
+  // Load layout from unified template_layout table
+  const { data: layoutRows } = await supabase
+    .from("template_layout").select("template,field,x,y,w,h,font_size,bold,color")
+    .in("template", ["passport-identity", "passport-destination"])
+  const idLayout: PassportIdLayout = {}
+  const destLayout: PassportDestLayout = {}
+  for (const row of layoutRows ?? []) {
+    const pos = { x: row.x, y: row.y, w: row.w, h: row.h, font_size: row.font_size }
+    if (row.template === "passport-identity")   (idLayout as Record<string, typeof pos>)[row.field] = pos
+    if (row.template === "passport-destination") (destLayout as Record<string, typeof pos>)[row.field] = pos
+  }
+
   const appUrl  = process.env.NEXT_PUBLIC_APP_URL ?? "https://nimipiko.com";
   const supaUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
 
@@ -104,6 +118,7 @@ export async function GET(req: NextRequest) {
       createdAt: data.created_at,
       photoDataUri: photoUri ?? null,
       qrDataUri: qr,
+      layout: idLayout,
     }));
 
     const storiesToShow = data.stories.filter((s) => s.is_complete);
@@ -123,6 +138,7 @@ export async function GET(req: NextRequest) {
         coverDataUri:     coverUriByIndex.get(coverIdx) ?? null,
         nextCoverDataUri: nextCoverIdx >= 0 ? (coverUriByIndex.get(nextCoverIdx) ?? null) : null,
         badgeDataUri: null,
+        layout: destLayout,
       }));
     }
 

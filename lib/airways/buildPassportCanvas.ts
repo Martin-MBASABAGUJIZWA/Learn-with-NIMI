@@ -135,14 +135,32 @@ export async function buildPassportCoverCanvas(): Promise<Buffer> {
 
 // ── Identity page ─────────────────────────────────────────────────────────────
 
+export interface PassportIdLayout {
+  photo?:    { x: number; y: number; w: number; h: number }
+  qr?:       { x: number; y: number; w: number; h: number }
+  name?:     { x: number; y: number; font_size: number }
+  champion?: { x: number; y: number; font_size: number }
+  date?:     { x: number; y: number; font_size: number }
+}
+
+const DEFAULTS_ID: Required<PassportIdLayout> = {
+  photo:    { x: 52,  y: 224, w: 170, h: 154 },
+  qr:       { x: 614, y: 220, w: 140, h: 140 },
+  name:     { x: 250, y: 185, font_size: 26 },
+  champion: { x: 250, y: 258, font_size: 22 },
+  date:     { x: 250, y: 328, font_size: 18 },
+}
+
 export async function buildPassportIdentityCanvas(opts: {
   childName: string
   championNumber: string
   createdAt: string
   photoDataUri: string | null
   qrDataUri: string
+  layout?: PassportIdLayout | null
 }): Promise<Buffer> {
-  const { childName, championNumber, createdAt, photoDataUri, qrDataUri } = opts
+  const { childName, championNumber, createdAt, photoDataUri, qrDataUri, layout } = opts
+  const L = { ...DEFAULTS_ID, ...layout }
   const canvas = createCanvas(PAGE_W, PAGE_H)
   const ctx    = canvas.getContext('2d')
 
@@ -171,35 +189,35 @@ export async function buildPassportIdentityCanvas(opts: {
 
   // Photo
   ctx.save(); ctx.strokeStyle = GOLD; ctx.lineWidth = 2.5
-  roundRect(ctx, 48, 220, 178, 162, 10); ctx.stroke()
+  roundRect(ctx, L.photo.x - 4, L.photo.y - 4, L.photo.w + 8, L.photo.h + 8, 10); ctx.stroke()
   ctx.restore()
   if (photoDataUri) {
     ctx.save()
-    roundRect(ctx, 52, 224, 170, 154, 8); ctx.clip()
-    await drawImage(ctx, photoDataUri, 52, 224, 170, 154)
+    roundRect(ctx, L.photo.x, L.photo.y, L.photo.w, L.photo.h, 8); ctx.clip()
+    await drawImage(ctx, photoDataUri, L.photo.x, L.photo.y, L.photo.w, L.photo.h)
     ctx.restore()
   }
 
   // Name + details
-  const fieldX = 250
-  label(ctx, 'NOM DU CHAMPION :', fieldX, 155)
-  text(ctx, childName.toUpperCase(), fieldX, 185, { size: 26, bold: true, color: NAVY })
+  label(ctx, 'NOM DU CHAMPION :', L.name.x, L.name.y - 30)
+  text(ctx, childName.toUpperCase(), L.name.x, L.name.y, { size: L.name.font_size, bold: true, color: NAVY })
 
-  line(ctx, 248, 195, PAGE_W - 48, 195, '#D1D5DB', 1)
+  line(ctx, L.name.x - 2, L.name.y + 10, PAGE_W - 48, L.name.y + 10, '#D1D5DB', 1)
 
-  label(ctx, 'NUMERO DU CHAMPION :', fieldX, 230)
-  text(ctx, championNumber, fieldX, 258, { size: 22, bold: true, color: NAVY })
+  label(ctx, 'NUMERO DU CHAMPION :', L.champion.x, L.champion.y - 28)
+  text(ctx, championNumber, L.champion.x, L.champion.y, { size: L.champion.font_size, bold: true, color: NAVY })
 
-  label(ctx, 'DATE DE CREATION :', fieldX, 300)
+  label(ctx, 'DATE DE CREATION :', L.date.x, L.date.y - 28)
   const createdFmt = new Date(createdAt).toLocaleDateString('fr-FR', {
     day: '2-digit', month: '2-digit', year: 'numeric',
   }).replace(/\//g, ' / ')
-  text(ctx, createdFmt, fieldX, 328, { size: 18, bold: true, color: GREEN })
+  text(ctx, createdFmt, L.date.x, L.date.y, { size: L.date.font_size, bold: true, color: GREEN })
 
   // QR code
-  await drawImage(ctx, qrDataUri, PAGE_W - 180, 220, 140, 140)
-  text(ctx, 'SCANNE POUR VOIR',        PAGE_W - 110, 372, { size: 10, bold: false, color: NAVY, align: 'center', alpha: 0.6 })
-  text(ctx, 'TON PROFIL NIMIPIKO',     PAGE_W - 110, 387, { size: 10, bold: false, color: NAVY, align: 'center', alpha: 0.6 })
+  await drawImage(ctx, qrDataUri, L.qr.x, L.qr.y, L.qr.w, L.qr.h)
+  const qrCx = L.qr.x + L.qr.w / 2
+  text(ctx, 'SCANNE POUR VOIR',    qrCx, L.qr.y + L.qr.h + 14, { size: 10, bold: false, color: NAVY, align: 'center', alpha: 0.6 })
+  text(ctx, 'TON PROFIL NIMIPIKO', qrCx, L.qr.y + L.qr.h + 29, { size: 10, bold: false, color: NAVY, align: 'center', alpha: 0.6 })
 
   // Seal
   seal(ctx, PAGE_W - 80, PAGE_H - 100)
@@ -211,6 +229,20 @@ export async function buildPassportIdentityCanvas(opts: {
 
 // ── Destination page ──────────────────────────────────────────────────────────
 
+export interface PassportDestLayout {
+  book_cover?: { x: number; y: number; w: number; h: number }
+  title?:      { x: number; y: number; font_size: number }
+  dest_num?:   { x: number; y: number; font_size: number }
+  date_val?:   { x: number; y: number; font_size: number }
+}
+
+const DEFAULTS_DEST: Required<PassportDestLayout> = {
+  book_cover: { x: 60,  y: 155, w: 160, h: 190 },
+  title:      { x: 397, y: 100, font_size: 28 },
+  dest_num:   { x: 397, y: 44,  font_size: 13 },
+  date_val:   { x: 284, y: 460, font_size: 22 },
+}
+
 export async function buildPassportDestinationCanvas(opts: {
   story: AirwaysStory
   bookNum: number
@@ -218,8 +250,10 @@ export async function buildPassportDestinationCanvas(opts: {
   coverDataUri: string | null
   nextCoverDataUri: string | null
   badgeDataUri: string | null
+  layout?: PassportDestLayout | null
 }): Promise<Buffer> {
-  const { story, bookNum, nextStory, coverDataUri, nextCoverDataUri } = opts
+  const { story, bookNum, nextStory, coverDataUri, nextCoverDataUri, layout } = opts
+  const L = { ...DEFAULTS_DEST, ...layout }
   const canvas = createCanvas(PAGE_W, PAGE_H)
   const ctx    = canvas.getContext('2d')
 
@@ -231,28 +265,28 @@ export async function buildPassportDestinationCanvas(opts: {
 
   // Destination pill
   ctx.save(); ctx.fillStyle = GREEN; ctx.globalAlpha = 0.15
-  roundRect(ctx, cx - 120, 20, 240, 36, 18); ctx.fill()
+  roundRect(ctx, cx - 120, L.dest_num.y - 24, 240, 36, 18); ctx.fill()
   ctx.restore()
-  text(ctx, `* DESTINATION ${bookNum} *`, cx, 44, { size: 13, bold: true, color: GREEN, align: 'center' })
+  text(ctx, `* DESTINATION ${bookNum} *`, cx, L.dest_num.y, { size: L.dest_num.font_size, bold: true, color: GREEN, align: 'center' })
 
   // Story title
   const title = story.title.toUpperCase()
-  text(ctx, title, cx, 100, { size: 28, bold: true, color: NAVY, align: 'center', maxWidth: PAGE_W - 80 })
+  text(ctx, title, cx, L.title.y, { size: L.title.font_size, bold: true, color: NAVY, align: 'center', maxWidth: PAGE_W - 80 })
 
-  line(ctx, 40, 116, PAGE_W - 40, 116, GOLD, 1.5, 0.5)
+  line(ctx, 40, L.title.y + 16, PAGE_W - 40, L.title.y + 16, GOLD, 1.5, 0.5)
 
   // Book cover section
-  label(ctx, `LIVRE ${bookNum}`, 140, 148, GOLD)
+  label(ctx, `LIVRE ${bookNum}`, L.book_cover.x + L.book_cover.w / 2, L.book_cover.y - 8, GOLD)
   ctx.save(); ctx.strokeStyle = GOLD; ctx.lineWidth = 2
-  roundRect(ctx, 56, 152, 168, 196, 10); ctx.stroke()
+  roundRect(ctx, L.book_cover.x - 4, L.book_cover.y - 3, L.book_cover.w + 8, L.book_cover.h + 6, 10); ctx.stroke()
   ctx.restore()
   if (coverDataUri) {
     ctx.save()
-    roundRect(ctx, 60, 155, 160, 190, 8); ctx.clip()
-    await drawImage(ctx, coverDataUri, 60, 155, 160, 190)
+    roundRect(ctx, L.book_cover.x, L.book_cover.y, L.book_cover.w, L.book_cover.h, 8); ctx.clip()
+    await drawImage(ctx, coverDataUri, L.book_cover.x, L.book_cover.y, L.book_cover.w, L.book_cover.h)
     ctx.restore()
   } else {
-    text(ctx, '[LIVRE]', 140, 260, { size: 20, bold: true, color: GOLD, align: 'center', alpha: 0.5 })
+    text(ctx, '[LIVRE]', L.book_cover.x + L.book_cover.w / 2, L.book_cover.y + L.book_cover.h / 2, { size: 20, bold: true, color: GOLD, align: 'center', alpha: 0.5 })
   }
 
   // Badge d'attitude
@@ -261,13 +295,13 @@ export async function buildPassportDestinationCanvas(opts: {
 
   // DATE DE VALIDATION
   ctx.save(); ctx.fillStyle = 'rgba(255,255,255,0.5)'
-  roundRect(ctx, 36, 380, PAGE_W - 72, 120, 10); ctx.fill()
+  roundRect(ctx, 36, L.date_val.y - 80, PAGE_W - 72, 120, 10); ctx.fill()
   ctx.restore()
-  label(ctx, 'DATE DE VALIDATION', cx - 110, 420, GOLD)
+  label(ctx, 'DATE DE VALIDATION', L.date_val.x - 110, L.date_val.y - 40, GOLD)
   const dateFmt = story.completed_at
     ? new Date(story.completed_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, ' / ')
     : '__  /  __  /  ____'
-  text(ctx, dateFmt, cx, 460, { size: 22, bold: true, color: GREEN })
+  text(ctx, dateFmt, L.date_val.x, L.date_val.y, { size: L.date_val.font_size, bold: true, color: GREEN })
 
   // Seals
   seal(ctx, PAGE_W - 80, 470)
