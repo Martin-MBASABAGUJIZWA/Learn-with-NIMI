@@ -8,13 +8,13 @@ import { PDFDocument } from "pdf-lib";
 import sharp from "sharp";
 import { fetchAirwaysData, championNumber } from "@/lib/airways/airwaysData";
 import {
-  buildPassportCoverSvg,
-  buildPassportIdentitySvg,
-  buildPassportDestinationSvg,
+  buildPassportCoverCanvas,
+  buildPassportIdentityCanvas,
+  buildPassportDestinationCanvas,
+  buildStampsCanvas,
   PAGE_W,
   PAGE_H,
-} from "@/lib/airways/buildPassportSvg";
-import { buildStampsSvg } from "@/lib/airways/buildStampsSvg";
+} from "@/lib/airways/buildPassportCanvas";
 import { qrDataUri as genQr } from "@/lib/airways/qrCode";
 
 async function fetchImageAsDataUri(url: string, w: number, h: number): Promise<string | null> {
@@ -29,11 +29,6 @@ async function fetchImageAsDataUri(url: string, w: number, h: number): Promise<s
   }
 }
 
-async function svgToPng(svg: string): Promise<Buffer> {
-  return sharp(Buffer.from(svg)).png({ quality: 95 }).toBuffer();
-}
-
-/** Add one PNG page to the PDF document, A4 portrait */
 async function addPngPage(doc: PDFDocument, png: Buffer) {
   const img = await doc.embedPng(png);
   const scale = Math.min(PAGE_W / img.width, PAGE_H / img.height);
@@ -66,12 +61,11 @@ export async function GET(req: NextRequest) {
   const data = await fetchAirwaysData(supabase, childId);
   if (!data) return NextResponse.json({ error: "Child not found" }, { status: 404 });
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://nimipiko.com";
+  const appUrl  = process.env.NEXT_PUBLIC_APP_URL ?? "https://nimipiko.com";
   const supaUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
 
-  // ── Load assets in parallel ──────────────────────────────────
+  // Load all assets in parallel
   const [photoUri, qr, ...coverResults] = await Promise.all([
-    // Child photo
     data.avatar_url
       ? fetchImageAsDataUri(
           data.avatar_url.startsWith("http")
@@ -80,9 +74,7 @@ export async function GET(req: NextRequest) {
           150, 175
         )
       : Promise.resolve(null),
-    // QR code
     genQr(`${appUrl}/user-profile`, 140),
-    // Story cover images
     ...data.stories.map(async (s) => {
       if (!s.cover_url) return null;
       const url = s.cover_url.startsWith("http")
@@ -92,7 +84,6 @@ export async function GET(req: NextRequest) {
     }),
   ]);
 
-  // Map cover URIs by story index
   const coverUriByIndex = new Map<number, string | null>();
   data.stories.forEach((_, i) => coverUriByIndex.set(i, coverResults[i] ?? null));
 
@@ -102,56 +93,49 @@ export async function GET(req: NextRequest) {
     if (uri) coverUriMap.set(s.id, uri);
   });
 
-  // ── Build multi-page PDF ─────────────────────────────────────
   const doc = await PDFDocument.create();
 
   // Page 1: Cover
-  const coverSvg = buildPassportCoverSvg();
-  await addPngPage(doc, await svgToPng(coverSvg));
+  await addPngPage(doc, await buildPassportCoverCanvas());
 
   // Page 2: Identity
-  const identitySvg = buildPassportIdentitySvg({
+  await addPngPage(doc, await buildPassportIdentityCanvas({
     childName: data.name,
     championNumber: championNumber(data.name, data.current_story?.sort_order ?? 1, data.sibling_rank),
     createdAt: data.created_at,
     photoDataUri: photoUri ?? null,
     qrDataUri: qr,
-  });
-  await addPngPage(doc, await svgToPng(identitySvg));
+  }));
 
-  // Pages 3..N: One page per completed story + current story
-  // Show all stories (completed ones with full data, incomplete ones as locked)
+  // Pages 3..N: one per completed story + current story
   const storiesToShow = data.stories.filter((s) => s.is_complete);
-  // Also include current (first incomplete) if any
   if (data.current_story && !data.current_story.is_complete) {
     storiesToShow.push(data.current_story);
   }
 
   for (let i = 0; i < storiesToShow.length; i++) {
     const story = storiesToShow[i];
-    const bookNum = story.sort_order;
-    const nextStory = data.stories.find((s) => s.sort_order === bookNum + 1) ?? null;
-    const coverIdx = data.stories.findIndex((s) => s.id === story.id);
+    const bookNum    = story.sort_order;
+    const nextStory  = data.stories.find((s) => s.sort_order === bookNum + 1) ?? null;
+    const coverIdx   = data.stories.findIndex((s) => s.id === story.id);
     const nextCoverIdx = nextStory ? data.stories.findIndex((s) => s.id === nextStory.id) : -1;
 
-    const destSvg = buildPassportDestinationSvg({
+    await addPngPage(doc, await buildPassportDestinationCanvas({
       story,
       bookNum,
       nextStory,
-      coverDataUri: coverUriByIndex.get(coverIdx) ?? null,
+      coverDataUri:     coverUriByIndex.get(coverIdx) ?? null,
       nextCoverDataUri: nextCoverIdx >= 0 ? (coverUriByIndex.get(nextCoverIdx) ?? null) : null,
-      badgeDataUri: null, // badge images would be fetched from storage if available
-    });
-    await addPngPage(doc, await svgToPng(destSvg));
+      badgeDataUri: null,
+    }));
   }
 
   // Last page: Stamp collection
-  const stampsSvg = buildStampsSvg({
+  await addPngPage(doc, await buildStampsCanvas({
     childName: data.name,
     stories: data.stories,
     coverUris: coverUriMap,
-  });
-  await addPngPage(doc, await svgToPng(stampsSvg));
+  }));
 
   const pdfBytes = await doc.save();
   return new NextResponse(new Uint8Array(pdfBytes), {
