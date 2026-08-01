@@ -7,12 +7,10 @@ import { getServiceClient } from "@/lib/supabase/serviceClient";
 import { PDFDocument } from "pdf-lib";
 import sharp from "sharp";
 import { fetchAirwaysData, championNumber } from "@/lib/airways/airwaysData";
-import { fetchTemplate } from "@/lib/airways/templateFetcher";
 import {
   buildPassportSpread,
   type PassportSpreadLayout,
 } from "@/lib/airways/buildPassportSpread";
-import { buildStampsCanvas } from "@/lib/airways/buildPassportCanvas";
 import { qrDataUri as genQr } from "@/lib/airways/qrCode";
 
 async function fetchImageAsDataUri(url: string, w: number, h: number): Promise<string | null> {
@@ -120,46 +118,28 @@ export async function GET(req: NextRequest) {
   try {
     const doc = await PDFDocument.create();
 
-    // Page 1: cover (static template image, portrait)
-    const coverBuf = await fetchTemplate("passport-cover");
-    if (coverBuf) {
-      const CW = 794, CH = 1123;
-      const coverPng = await sharp(coverBuf).resize(CW, CH, { fit: "fill" }).png().toBuffer();
-      await addPngPage(doc, coverPng, CW, CH);
-    }
+    // Single spread page — current/latest story
+    const story     = storiesToShow[storiesToShow.length - 1];
+    const bookNum   = story.sort_order;
+    const nextStory = data.stories.find((s) => s.sort_order === bookNum + 1) ?? null;
+    const coverIdx  = data.stories.findIndex((s) => s.id === story.id);
+    const nextIdx   = nextStory ? data.stories.findIndex((s) => s.id === nextStory.id) : -1;
 
-    // Pages 2..N: one spread per story (landscape)
-    for (let i = 0; i < storiesToShow.length; i++) {
-      const story       = storiesToShow[i];
-      const bookNum     = story.sort_order;
-      const nextStory   = data.stories.find((s) => s.sort_order === bookNum + 1) ?? null;
-      const coverIdx    = data.stories.findIndex((s) => s.id === story.id);
-      const nextIdx     = nextStory ? data.stories.findIndex((s) => s.id === nextStory.id) : -1;
-
-      const spreadPng = await buildPassportSpread({
-        childName:       data.name,
-        championNumber:  champNum,
-        createdAt:       data.created_at,
-        photoDataUri:    photoUri ?? null,
-        qrDataUri:       qr,
-        story,
-        bookNum,
-        coverDataUri:     coverUriByIndex.get(coverIdx) ?? null,
-        nextStory,
-        nextCoverDataUri: nextIdx >= 0 ? (coverUriByIndex.get(nextIdx) ?? null) : null,
-        layout,
-      });
-
-      await addPngPage(doc, spreadPng);
-    }
-
-    // Last page: stamps
-    const stampsPng = await buildStampsCanvas({
-      childName: data.name,
-      stories:   data.stories,
-      coverUris: coverUriMap,
+    const spreadPng = await buildPassportSpread({
+      childName:        data.name,
+      championNumber:   champNum,
+      createdAt:        data.created_at,
+      photoDataUri:     photoUri ?? null,
+      qrDataUri:        qr,
+      story,
+      bookNum,
+      coverDataUri:     coverUriByIndex.get(coverIdx) ?? null,
+      nextStory,
+      nextCoverDataUri: nextIdx >= 0 ? (coverUriByIndex.get(nextIdx) ?? null) : null,
+      layout,
     });
-    await addPngPage(doc, stampsPng, 794, 1123);
+
+    await addPngPage(doc, spreadPng);
 
     const pdfBytes = await doc.save();
     return new NextResponse(new Uint8Array(pdfBytes), {
