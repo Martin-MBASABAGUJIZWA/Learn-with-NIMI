@@ -18,18 +18,19 @@ const DOCS: { key: DocKey; label: string; emoji: string; desc: string }[] = [
 ];
 
 export default function AirwaysCard({ childId, childName }: Props) {
-  const [loading, setLoading] = useState<DocKey | null>(null);
-  const [error,   setError]   = useState<string | null>(null);
+  const [loading, setLoading] = useState<Record<DocKey, boolean>>({ kit: false, "boarding-pass": false, passport: false });
+  const [errors,  setErrors]  = useState<Record<DocKey, string | null>>({ kit: null, "boarding-pass": null, passport: null });
 
   async function download(key: DocKey) {
-    setLoading(key);
-    setError(null);
+    setLoading(prev => ({ ...prev, [key]: true }));
+    setErrors(prev => ({ ...prev, [key]: null }));
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.access_token) throw new Error("Not signed in");
 
       const res = await fetch(`/api/airways/${key}?childId=${childId}&format=pdf`, {
         headers: { Authorization: `Bearer ${session.access_token}` },
+        signal: AbortSignal.timeout(60_000),
       });
       if (!res.ok) {
         const j = await res.json().catch(() => ({}));
@@ -43,9 +44,9 @@ export default function AirwaysCard({ childId, childName }: Props) {
       a.click();
       URL.revokeObjectURL(url);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Download failed");
+      setErrors(prev => ({ ...prev, [key]: e instanceof Error ? e.message : "Download failed" }));
     } finally {
-      setLoading(null);
+      setLoading(prev => ({ ...prev, [key]: false }));
     }
   }
 
@@ -72,33 +73,33 @@ export default function AirwaysCard({ childId, childName }: Props) {
       {/* Document buttons */}
       <div className="grid grid-cols-1 gap-2">
         {DOCS.map(doc => (
-          <button
-            key={doc.key}
-            onClick={() => void download(doc.key)}
-            disabled={loading !== null}
-            className="flex items-center justify-between gap-3 px-4 py-3 rounded-2xl bg-blue-50 hover:bg-blue-100 disabled:opacity-50 transition text-left"
-          >
-            <div className="flex items-center gap-3 min-w-0">
-              <span className="text-xl leading-none">{doc.emoji}</span>
-              <div className="min-w-0">
-                <p className="font-baloo font-bold text-blue-900 text-sm leading-tight truncate">
-                  {doc.label}
-                </p>
-                <p className="text-blue-500 text-2xs font-nunito truncate">{doc.desc}</p>
+          <div key={doc.key} className="space-y-1">
+            <button
+              onClick={() => void download(doc.key)}
+              disabled={loading[doc.key]}
+              className="w-full flex items-center justify-between gap-3 px-4 py-3 rounded-2xl bg-blue-50 hover:bg-blue-100 disabled:opacity-50 transition text-left"
+            >
+              <div className="flex items-center gap-3 min-w-0">
+                <span className="text-xl leading-none">{doc.emoji}</span>
+                <div className="min-w-0">
+                  <p className="font-baloo font-bold text-blue-900 text-sm leading-tight truncate">
+                    {doc.label}
+                  </p>
+                  <p className="text-blue-500 text-2xs font-nunito truncate">{doc.desc}</p>
+                </div>
               </div>
-            </div>
-            <div className="flex-shrink-0 text-blue-600">
-              {loading === doc.key
-                ? <Loader2 className="w-4 h-4 animate-spin" />
-                : <Download className="w-4 h-4" />}
-            </div>
-          </button>
+              <div className="flex-shrink-0 text-blue-600">
+                {loading[doc.key]
+                  ? <Loader2 className="w-4 h-4 animate-spin" />
+                  : <Download className="w-4 h-4" />}
+              </div>
+            </button>
+            {errors[doc.key] && (
+              <p className="text-red-500 text-2xs font-semibold px-1">{errors[doc.key]}</p>
+            )}
+          </div>
         ))}
       </div>
-
-      {error && (
-        <p className="text-red-500 text-2xs font-semibold text-center">{error}</p>
-      )}
     </div>
   );
 }
