@@ -7,16 +7,14 @@ import { getServiceClient } from "@/lib/supabase/serviceClient";
 import { PDFDocument } from "pdf-lib";
 import sharp from "sharp";
 import { fetchAirwaysData, championNumber } from "@/lib/airways/airwaysData";
+import { fetchTemplate } from "@/lib/airways/templateFetcher";
 import {
-  buildPassportCoverCanvas,
-  buildPassportIdentityCanvas,
-  buildPassportDestinationCanvas,
-  buildStampsCanvas,
-  PAGE_W,
-  PAGE_H,
-  type PassportIdLayout,
-  type PassportDestLayout,
-} from "@/lib/airways/buildPassportCanvas";
+  buildPassportSpread,
+  SPREAD_W,
+  SPREAD_H,
+  type PassportSpreadLayout,
+} from "@/lib/airways/buildPassportSpread";
+import { buildStampsCanvas } from "@/lib/airways/buildPassportCanvas";
 import { qrDataUri as genQr } from "@/lib/airways/qrCode";
 
 async function fetchImageAsDataUri(url: string, w: number, h: number): Promise<string | null> {
@@ -31,14 +29,14 @@ async function fetchImageAsDataUri(url: string, w: number, h: number): Promise<s
   }
 }
 
-async function addPngPage(doc: PDFDocument, png: Buffer) {
-  const img = await doc.embedPng(png);
-  const scale = Math.min(PAGE_W / img.width, PAGE_H / img.height);
-  const page = doc.addPage([PAGE_W, PAGE_H]);
+async function addPngPage(doc: PDFDocument, png: Buffer, w: number, h: number) {
+  const img   = await doc.embedPng(png);
+  const scale = Math.min(w / img.width, h / img.height);
+  const page  = doc.addPage([w, h]);
   page.drawImage(img, {
-    x: (PAGE_W - img.width * scale) / 2,
-    y: (PAGE_H - img.height * scale) / 2,
-    width: img.width * scale,
+    x: (w - img.width  * scale) / 2,
+    y: (h - img.height * scale) / 2,
+    width:  img.width  * scale,
     height: img.height * scale,
   });
 }
@@ -63,38 +61,39 @@ export async function GET(req: NextRequest) {
   const data = await fetchAirwaysData(supabase, childId);
   if (!data) return NextResponse.json({ error: "Child not found" }, { status: 404 });
 
-  // Load layout from unified template_layout table
+  // Load layout from DB
   const { data: layoutRows } = await supabase
-    .from("template_layout").select("template,field,x,y,w,h,font_size,bold,color")
-    .in("template", ["passport-identity", "passport-destination"])
-  const idLayout: PassportIdLayout = {}
-  const destLayout: PassportDestLayout = {}
+    .from("template_layout")
+    .select("field,x,y,w,h,font_size")
+    .eq("template", "passport-interior");
+
+  const layout: PassportSpreadLayout = {};
   for (const row of layoutRows ?? []) {
-    const pos = { x: row.x, y: row.y, w: row.w, h: row.h, font_size: row.font_size }
-    if (row.template === "passport-identity")   (idLayout as Record<string, typeof pos>)[row.field] = pos
-    if (row.template === "passport-destination") (destLayout as Record<string, typeof pos>)[row.field] = pos
+    (layout as Record<string, unknown>)[row.field] = {
+      x: row.x, y: row.y, w: row.w, h: row.h, font_size: row.font_size,
+    };
   }
 
   const appUrl  = process.env.NEXT_PUBLIC_APP_URL ?? "https://nimipiko.com";
   const supaUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
 
-  // Load all assets in parallel
+  // Fetch all assets in parallel
   const [photoUri, qr, ...coverResults] = await Promise.all([
     data.avatar_url
       ? fetchImageAsDataUri(
           data.avatar_url.startsWith("http")
             ? data.avatar_url
             : `${supaUrl}/storage/v1/object/public/${data.avatar_url}`,
-          150, 175
+          210, 265
         )
       : Promise.resolve(null),
-    genQr(`${appUrl}/user-profile`, 140),
+    genQr(`${appUrl}/user-profile`, 148),
     ...data.stories.map(async (s) => {
       if (!s.cover_url) return null;
       const url = s.cover_url.startsWith("http")
         ? s.cover_url
         : `${supaUrl}/storage/v1/object/public/${s.cover_url}`;
-      return fetchImageAsDataUri(url, 168, 200);
+      return fetchImageAsDataUri(url, 200, 310);
     }),
   ]);
 
@@ -107,46 +106,60 @@ export async function GET(req: NextRequest) {
     if (uri) coverUriMap.set(s.id, uri);
   });
 
+  const champNum = championNumber(data.name, data.current_story?.sort_order ?? 1, data.sibling_rank);
+
+  // Stories to render (completed + current if not complete)
+  const storiesToShow = data.stories.filter((s) => s.is_complete);
+  if (data.current_story && !data.current_story.is_complete) {
+    storiesToShow.push(data.current_story);
+  }
+  if (storiesToShow.length === 0 && data.stories.length > 0) {
+    storiesToShow.push(data.stories[0]);
+  }
+
   try {
     const doc = await PDFDocument.create();
 
-    await addPngPage(doc, await buildPassportCoverCanvas());
-
-    await addPngPage(doc, await buildPassportIdentityCanvas({
-      childName: data.name,
-      championNumber: championNumber(data.name, data.current_story?.sort_order ?? 1, data.sibling_rank),
-      createdAt: data.created_at,
-      photoDataUri: photoUri ?? null,
-      qrDataUri: qr,
-      layout: idLayout,
-    }));
-
-    const storiesToShow = data.stories.filter((s) => s.is_complete);
-    if (data.current_story && !data.current_story.is_complete) {
-      storiesToShow.push(data.current_story);
+    // Page 1: cover (static template image, portrait)
+    const coverBuf = await fetchTemplate("passport-cover");
+    if (coverBuf) {
+      const CW = 794, CH = 1123;
+      const coverPng = await sharp(coverBuf).resize(CW, CH, { fit: "fill" }).png().toBuffer();
+      await addPngPage(doc, coverPng, CW, CH);
     }
 
+    // Pages 2..N: one spread per story (landscape)
     for (let i = 0; i < storiesToShow.length; i++) {
-      const story = storiesToShow[i];
-      const bookNum      = story.sort_order;
-      const nextStory    = data.stories.find((s) => s.sort_order === bookNum + 1) ?? null;
-      const coverIdx     = data.stories.findIndex((s) => s.id === story.id);
-      const nextCoverIdx = nextStory ? data.stories.findIndex((s) => s.id === nextStory.id) : -1;
+      const story       = storiesToShow[i];
+      const bookNum     = story.sort_order;
+      const nextStory   = data.stories.find((s) => s.sort_order === bookNum + 1) ?? null;
+      const coverIdx    = data.stories.findIndex((s) => s.id === story.id);
+      const nextIdx     = nextStory ? data.stories.findIndex((s) => s.id === nextStory.id) : -1;
 
-      await addPngPage(doc, await buildPassportDestinationCanvas({
-        story, bookNum, nextStory,
+      const spreadPng = await buildPassportSpread({
+        childName:       data.name,
+        championNumber:  champNum,
+        createdAt:       data.created_at,
+        photoDataUri:    photoUri ?? null,
+        qrDataUri:       qr,
+        story,
+        bookNum,
         coverDataUri:     coverUriByIndex.get(coverIdx) ?? null,
-        nextCoverDataUri: nextCoverIdx >= 0 ? (coverUriByIndex.get(nextCoverIdx) ?? null) : null,
-        badgeDataUri: null,
-        layout: destLayout,
-      }));
+        nextStory,
+        nextCoverDataUri: nextIdx >= 0 ? (coverUriByIndex.get(nextIdx) ?? null) : null,
+        layout,
+      });
+
+      await addPngPage(doc, spreadPng, SPREAD_W, SPREAD_H);
     }
 
-    await addPngPage(doc, await buildStampsCanvas({
+    // Last page: stamps
+    const stampsPng = await buildStampsCanvas({
       childName: data.name,
-      stories: data.stories,
+      stories:   data.stories,
       coverUris: coverUriMap,
-    }));
+    });
+    await addPngPage(doc, stampsPng, 794, 1123);
 
     const pdfBytes = await doc.save();
     return new NextResponse(new Uint8Array(pdfBytes), {
