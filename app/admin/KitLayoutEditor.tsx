@@ -404,7 +404,7 @@ export default function KitLayoutEditor({ onNavigate, onOpenSidebar }: Props) {
                 </div>
               ) : imgSrc ? (
                 <img src={imgSrc} alt="Template"
-                  style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'fill', display: 'block' }}
+                  style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
                   draggable={false} />
               ) : (
                 <div className="w-full h-full absolute inset-0 bg-gray-100 flex flex-col items-center justify-center gap-3 text-gray-400">
