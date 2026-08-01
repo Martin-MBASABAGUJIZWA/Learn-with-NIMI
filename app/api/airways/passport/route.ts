@@ -54,9 +54,11 @@ export async function GET(req: NextRequest) {
   const childId = searchParams.get("childId");
   if (!childId) return NextResponse.json({ error: "childId required" }, { status: 400 });
 
-  const { data: child } = await supabase
-    .from("children").select("parent_id").eq("id", childId).single();
-  if (child?.parent_id !== user.id) {
+  const [{ data: child }, { data: adminRow }] = await Promise.all([
+    supabase.from("children").select("parent_id").eq("id", childId).single(),
+    supabase.from("admins").select("id").eq("id", user.id).maybeSingle(),
+  ]);
+  if (!adminRow && child?.parent_id !== user.id) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 

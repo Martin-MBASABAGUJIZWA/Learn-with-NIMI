@@ -2,129 +2,119 @@ import sharp from 'sharp'
 import { fetchTemplate } from './templateFetcher'
 import { barcodeBuffer } from './barcode'
 
-// ── Boarding pass template layout constants ────────────────────
-// Adjust these after uploading the actual template and testing.
-// All values are in pixels relative to the template image size.
+const W = 1080
+const H = 1080
 
-const BP = {
-  // Full template dimensions (adjust to match uploaded file)
-  W: 1080,
-  H: 1080,
-
-  // Child photo rectangle (left side)
-  PHOTO: { x: 42, y: 268, w: 295, h: 372 },
-
-  // Text overlays: [x, y] = top-left of each value
-  // Labels are already on the template; we only overlay the values.
-  NAME:         { x: 400, y: 268, size: 52, bold: true,  color: '#1a1a2e' },
-  AGE:          { x: 400, y: 348, size: 28, bold: true,  color: '#1a1a2e' },
-  STATUT:       { x: 400, y: 402, size: 28, bold: true,  color: '#16a34a' },
-  VOL:          { x: 400, y: 456, size: 28, bold: true,  color: '#1a1a2e' },
-  DESTINATION:  { x: 400, y: 510, size: 28, bold: true,  color: '#1a1a2e' },
-  LIVRE:        { x: 400, y: 564, size: 28, bold: true,  color: '#1a1a2e' },
-  SIEGE:        { x: 400, y: 618, size: 28, bold: true,  color: '#1a1a2e' },
-  PORTE:        { x: 400, y: 672, size: 28, bold: true,  color: '#1a1a2e' },
-  EMBARQUEMENT: { x: 400, y: 726, size: 28, bold: true,  color: '#16a34a' },
-
-  // Barcode strip (bottom center)
-  BARCODE: { x: 80, y: 820, w: 920, h: 100 },
+export interface BPFieldLayout {
+  x: number
+  y: number
+  w?: number | null
+  h?: number | null
+  font_size?: number | null
+  bold?: boolean | null
+  color?: string | null
 }
+
+export type BPLayout = Record<string, BPFieldLayout>
+
+const DEFAULTS: BPLayout = {
+  photo:        { x: 42,  y: 268, w: 295, h: 372 },
+  name:         { x: 400, y: 268, font_size: 52, bold: true, color: '#1a1a2e' },
+  age:          { x: 400, y: 348, font_size: 28, bold: true, color: '#1a1a2e' },
+  statut:       { x: 400, y: 402, font_size: 28, bold: true, color: '#16a34a' },
+  vol:          { x: 400, y: 456, font_size: 28, bold: true, color: '#1a1a2e' },
+  destination:  { x: 400, y: 510, font_size: 28, bold: true, color: '#1a1a2e' },
+  livre:        { x: 400, y: 564, font_size: 28, bold: true, color: '#1a1a2e' },
+  siege:        { x: 400, y: 618, font_size: 28, bold: true, color: '#1a1a2e' },
+  porte:        { x: 400, y: 672, font_size: 28, bold: true, color: '#1a1a2e' },
+  embarquement: { x: 400, y: 726, font_size: 28, bold: true, color: '#16a34a' },
+  barcode:      { x: 80,  y: 820, w: 920, h: 100 },
+}
+
+function get(layout: BPLayout, key: string): BPFieldLayout {
+  const saved = layout[key]
+  const def   = DEFAULTS[key]
+  if (!saved) return def
+  return {
+    x:         saved.x         ?? def.x,
+    y:         saved.y         ?? def.y,
+    w:         saved.w         ?? def.w,
+    h:         saved.h         ?? def.h,
+    font_size: saved.font_size ?? def.font_size,
+    bold:      saved.bold      ?? def.bold,
+    color:     saved.color     ?? def.color,
+  }
+}
+
+function svgText(text: string, pos: BPFieldLayout): string {
+  const size   = pos.font_size ?? 28
+  const weight = pos.bold !== false ? 'font-weight="700"' : ''
+  const color  = pos.color ?? '#1a1a2e'
+  const safe   = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+  return `<text x="${pos.x}" y="${pos.y + size}" font-size="${size}" fill="${color}" ${weight}
+    font-family="Arial, Helvetica, sans-serif">${safe}</text>`
+}
+
+function flightNum(n: number)               { return `NMP1${String(n).padStart(2, '0')}` }
+function seatNum(age: number | null, n: number) { return `${age ?? n}A` }
+function gateNum(n: number)                 { return `G${n}` }
+function statusLabel(n: number)             { return n >= 7 ? 'GRAND CHAMPION' : 'PETIT CHAMPION' }
 
 export interface BoardingPassData {
-  childName: string
-  age: number | null
-  storyTitle: string
-  storyNumber: number    // sort_order (1, 2, 3…)
-  childId: string
+  childName:   string
+  age:         number | null
+  storyTitle:  string
+  storyNumber: number
+  childId:     string
   photoBuffer: Buffer | null
-}
-
-function svgText(
-  text: string,
-  x: number, y: number,
-  size: number,
-  color: string,
-  bold: boolean,
-  anchor: 'start' | 'middle' | 'end' = 'start'
-): string {
-  const weight = bold ? 'font-weight="700"' : ''
-  return `<text x="${x}" y="${y}" font-size="${size}" fill="${color}" ${weight}
-    font-family="Arial, Helvetica, sans-serif" text-anchor="${anchor}">${text}</text>`
-}
-
-function flightNum(storyNumber: number): string {
-  return `NMP1${String(storyNumber).padStart(2, '0')}`
-}
-
-function seatNum(age: number | null, storyNumber: number): string {
-  return `${age ?? storyNumber}A`
-}
-
-function gateNum(storyNumber: number): string {
-  return `G${storyNumber}`
-}
-
-function statusLabel(storyNumber: number): string {
-  return storyNumber >= 7 ? 'GRAND CHAMPION' : 'PETIT CHAMPION'
+  layout?:     BPLayout | null
 }
 
 export async function buildBoardingPassImage(data: BoardingPassData): Promise<Buffer> {
+  const layout: BPLayout = data.layout && Object.keys(data.layout).length ? data.layout : DEFAULTS
+
   const template = await fetchTemplate('boarding-pass')
+  const bcPos    = get(layout, 'barcode')
+  const phPos    = get(layout, 'photo')
 
   const barcode = await barcodeBuffer(data.childId, data.storyNumber)
   const barcodeResized = await sharp(barcode)
-    .resize(BP.BARCODE.w, BP.BARCODE.h, { fit: 'contain', background: { r: 255, g: 255, b: 255, alpha: 1 } })
-    .png()
-    .toBuffer()
+    .resize(bcPos.w ?? 920, bcPos.h ?? 100, { fit: 'contain', background: { r: 255, g: 255, b: 255, alpha: 1 } })
+    .png().toBuffer()
 
-  // Build photo composite
-  const photoComposites: sharp.OverlayOptions[] = []
+  const composites: sharp.OverlayOptions[] = []
+
   if (data.photoBuffer) {
     const photo = await sharp(data.photoBuffer)
-      .resize(BP.PHOTO.w, BP.PHOTO.h, { fit: 'cover' })
-      .png()
-      .toBuffer()
-    photoComposites.push({ input: photo, left: BP.PHOTO.x, top: BP.PHOTO.y })
+      .resize(phPos.w ?? 295, phPos.h ?? 372, { fit: 'cover', position: 'attention' })
+      .png().toBuffer()
+    composites.push({ input: photo, left: phPos.x, top: phPos.y })
   }
 
-  // Build SVG text overlay
-  const status = statusLabel(data.storyNumber)
-  const svg = `<svg width="${BP.W}" height="${BP.H}" xmlns="http://www.w3.org/2000/svg">
-    ${svgText(data.childName.toUpperCase(), BP.NAME.x, BP.NAME.y + BP.NAME.size, BP.NAME.size, BP.NAME.color, true)}
-    ${svgText(`${data.age ?? '?'} ANS`, BP.AGE.x, BP.AGE.y + BP.AGE.size, BP.AGE.size, BP.AGE.color, true)}
-    ${svgText(status, BP.STATUT.x, BP.STATUT.y + BP.STATUT.size, BP.STATUT.size, BP.STATUT.color, true)}
-    ${svgText(flightNum(data.storyNumber), BP.VOL.x, BP.VOL.y + BP.VOL.size, BP.VOL.size, BP.VOL.color, true)}
-    ${svgText(data.storyTitle.toUpperCase(), BP.DESTINATION.x, BP.DESTINATION.y + BP.DESTINATION.size, BP.DESTINATION.size, BP.DESTINATION.color, true)}
-    ${svgText(String(data.storyNumber), BP.LIVRE.x, BP.LIVRE.y + BP.LIVRE.size, BP.LIVRE.size, BP.LIVRE.color, true)}
-    ${svgText(seatNum(data.age, data.storyNumber), BP.SIEGE.x, BP.SIEGE.y + BP.SIEGE.size, BP.SIEGE.size, BP.SIEGE.color, true)}
-    ${svgText(gateNum(data.storyNumber), BP.PORTE.x, BP.PORTE.y + BP.PORTE.size, BP.PORTE.size, BP.PORTE.color, true)}
-    ${svgText('OUVERT', BP.EMBARQUEMENT.x, BP.EMBARQUEMENT.y + BP.EMBARQUEMENT.size, BP.EMBARQUEMENT.size, BP.EMBARQUEMENT.color, true)}
+  const svg = `<svg width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">
+    ${svgText(data.childName.toUpperCase(),        get(layout, 'name'))}
+    ${svgText(`${data.age ?? '?'} ANS`,             get(layout, 'age'))}
+    ${svgText(statusLabel(data.storyNumber),        get(layout, 'statut'))}
+    ${svgText(flightNum(data.storyNumber),          get(layout, 'vol'))}
+    ${svgText(data.storyTitle.toUpperCase(),        get(layout, 'destination'))}
+    ${svgText(String(data.storyNumber),             get(layout, 'livre'))}
+    ${svgText(seatNum(data.age, data.storyNumber),  get(layout, 'siege'))}
+    ${svgText(gateNum(data.storyNumber),            get(layout, 'porte'))}
+    ${svgText('OUVERT',                             get(layout, 'embarquement'))}
   </svg>`
 
   const textOverlay = await sharp(Buffer.from(svg)).png().toBuffer()
 
+  composites.push(
+    { input: textOverlay,    left: 0,       top: 0       },
+    { input: barcodeResized, left: bcPos.x, top: bcPos.y },
+  )
+
   if (template) {
-    // ── Template-based: composite photo + text + barcode onto real template ──
-    return sharp(template)
-      .resize(BP.W, BP.H, { fit: 'fill' })
-      .composite([
-        ...photoComposites,
-        { input: textOverlay, left: 0, top: 0 },
-        { input: barcodeResized, left: BP.BARCODE.x, top: BP.BARCODE.y },
-      ])
-      .png()
-      .toBuffer()
+    return sharp(template).resize(W, H, { fit: 'fill' }).composite(composites).png().toBuffer()
   }
 
-  // ── Fallback: white background + text + barcode (no template uploaded yet) ──
   return sharp({
-    create: { width: BP.W, height: BP.H, channels: 4, background: { r: 255, g: 255, b: 255, alpha: 1 } },
-  })
-    .composite([
-      ...photoComposites,
-      { input: textOverlay, left: 0, top: 0 },
-      { input: barcodeResized, left: BP.BARCODE.x, top: BP.BARCODE.y },
-    ])
-    .png()
-    .toBuffer()
+    create: { width: W, height: H, channels: 4, background: { r: 255, g: 255, b: 255, alpha: 1 } },
+  }).composite(composites).png().toBuffer()
 }

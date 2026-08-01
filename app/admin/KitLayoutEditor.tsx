@@ -1,6 +1,5 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
-import supabase from '@/lib/supabaseClient'
 import { getCachedAdmin } from './adminAuth'
 import { Layers, Menu, Save, RefreshCw, CheckCircle2, AlertCircle } from 'lucide-react'
 import { useToast } from './Toast'
@@ -10,66 +9,137 @@ interface Props {
   onOpenSidebar?: () => void
 }
 
-const CW = 1254
-const CH = 1254
 
-const FIELDS = [
-  { key: 'photo',        label: 'Photo (pass)',  type: 'area' as const, sample: '' },
-  { key: 'handle_photo', label: 'Photo (handle)',type: 'area' as const, sample: '' },
-  { key: 'champion',     label: 'Champion',      type: 'text' as const, sample: 'KETSIA' },
-  { key: 'age',          label: 'Âge',           type: 'text' as const, sample: '7 ANS' },
-  { key: 'statut',       label: 'Statut',        type: 'text' as const, sample: 'PETIT CHAMPION' },
-  { key: 'vol',          label: 'Vol',           type: 'text' as const, sample: 'NMP101' },
-  { key: 'destination',  label: 'Destination',   type: 'text' as const, sample: 'LE LION ET LA FORÊT' },
-  { key: 'livre',        label: 'Livre',         type: 'text' as const, sample: '1' },
-  { key: 'siege',        label: 'Siège',         type: 'text' as const, sample: '7A' },
-  { key: 'porte',        label: 'Porte',         type: 'text' as const, sample: 'G1' },
-  { key: 'embarquement', label: 'Embarquement',  type: 'text' as const, sample: 'OUVERT' },
-  { key: 'barcode',      label: 'Barcode',       type: 'area' as const, sample: '' },
-  { key: 'qr',           label: 'QR Code',       type: 'area' as const, sample: '' },
-]
-
-// Colors mirror buildKitImage.ts DEFAULTS
-const FIELD_COLORS: Record<string, string> = {
-  champion:     '#1a1a2e',
-  age:          '#1a1a2e',
-  statut:       '#16a34a',
-  vol:          '#1a1a2e',
-  destination:  '#1a1a2e',
-  livre:        '#1a1a2e',
-  siege:        '#1a1a2e',
-  porte:        '#1a1a2e',
-  embarquement: '#16a34a',
+interface FieldDef {
+  key: string
+  label: string
+  type: 'area' | 'text'
+  sample: string
 }
 
 interface Pos { x: number; y: number; w: number; h: number; size: number }
 
-const INIT: Record<string, Pos> = {
+// ── Champion Kit ─────────────────────────────────────────────────────────────
+const FIELDS_KIT: FieldDef[] = [
+  { key: 'photo',        label: 'Photo (pass)',   type: 'area', sample: '' },
+  { key: 'handle_photo', label: 'Photo (handle)', type: 'area', sample: '' },
+  { key: 'champion',     label: 'Champion',       type: 'text', sample: 'KETSIA' },
+  { key: 'age',          label: 'Âge',            type: 'text', sample: '7 ANS' },
+  { key: 'statut',       label: 'Statut',         type: 'text', sample: 'PETIT CHAMPION' },
+  { key: 'vol',          label: 'Vol',            type: 'text', sample: 'NMP101' },
+  { key: 'destination',  label: 'Destination',    type: 'text', sample: 'LE LION ET LA FORÊT' },
+  { key: 'livre',        label: 'Livre',          type: 'text', sample: '1' },
+  { key: 'siege',        label: 'Siège',          type: 'text', sample: '7A' },
+  { key: 'porte',        label: 'Porte',          type: 'text', sample: 'G1' },
+  { key: 'embarquement', label: 'Embarquement',   type: 'text', sample: 'OUVERT' },
+  { key: 'barcode',      label: 'Barcode',        type: 'area', sample: '' },
+  { key: 'qr',           label: 'QR Code',        type: 'area', sample: '' },
+]
+
+const INIT_KIT: Record<string, Pos> = {
   photo:        { x: 710,  y: 440, w: 133, h: 195, size: 0  },
   handle_photo: { x: 490,  y: 30,  w: 270, h: 170, size: 0  },
-  champion:     { x: 912,  y: 428, w: 150, h: 33,  size: 16 },
-  age:          { x: 912,  y: 463, w: 150, h: 33,  size: 16 },
-  statut:       { x: 912,  y: 498, w: 150, h: 33,  size: 16 },
-  vol:          { x: 912,  y: 533, w: 150, h: 33,  size: 16 },
-  destination:  { x: 912,  y: 568, w: 150, h: 33,  size: 14 },
-  livre:        { x: 912,  y: 603, w: 150, h: 33,  size: 16 },
-  siege:        { x: 912,  y: 638, w: 150, h: 33,  size: 16 },
-  porte:        { x: 912,  y: 673, w: 150, h: 33,  size: 16 },
-  embarquement: { x: 912,  y: 708, w: 150, h: 33,  size: 16 },
+  champion:     { x: 918,  y: 428, w: 150, h: 33,  size: 24 },
+  age:          { x: 918,  y: 461, w: 150, h: 33,  size: 20 },
+  statut:       { x: 918,  y: 494, w: 150, h: 33,  size: 20 },
+  vol:          { x: 918,  y: 527, w: 150, h: 33,  size: 20 },
+  destination:  { x: 918,  y: 560, w: 150, h: 33,  size: 18 },
+  livre:        { x: 918,  y: 593, w: 150, h: 33,  size: 20 },
+  siege:        { x: 918,  y: 626, w: 150, h: 33,  size: 20 },
+  porte:        { x: 918,  y: 659, w: 150, h: 33,  size: 20 },
+  embarquement: { x: 918,  y: 692, w: 150, h: 33,  size: 20 },
   barcode:      { x: 703,  y: 750, w: 382, h: 40,  size: 0  },
   qr:           { x: 1058, y: 898, w: 148, h: 148, size: 0  },
 }
 
+const COLORS_KIT: Record<string, string> = {
+  champion: '#1a1a2e', age: '#1a1a2e', statut: '#16a34a', vol: '#1a1a2e',
+  destination: '#1a1a2e', livre: '#1a1a2e', siege: '#1a1a2e', porte: '#1a1a2e',
+  embarquement: '#16a34a',
+}
+
+// ── Boarding Pass ─────────────────────────────────────────────────────────────
+const FIELDS_BP: FieldDef[] = [
+  { key: 'photo',        label: 'Photo',        type: 'area', sample: '' },
+  { key: 'name',         label: 'Nom',          type: 'text', sample: 'KETSIA' },
+  { key: 'age',          label: 'Âge',          type: 'text', sample: '7 ANS' },
+  { key: 'statut',       label: 'Statut',       type: 'text', sample: 'PETIT CHAMPION' },
+  { key: 'vol',          label: 'Vol',          type: 'text', sample: 'NMP101' },
+  { key: 'destination',  label: 'Destination',  type: 'text', sample: 'LE LION ET LA FORÊT' },
+  { key: 'livre',        label: 'Livre',        type: 'text', sample: '1' },
+  { key: 'siege',        label: 'Siège',        type: 'text', sample: '7A' },
+  { key: 'porte',        label: 'Porte',        type: 'text', sample: 'G1' },
+  { key: 'embarquement', label: 'Embarquement', type: 'text', sample: 'OUVERT' },
+  { key: 'barcode',      label: 'Barcode',      type: 'area', sample: '' },
+]
+
+const INIT_BP: Record<string, Pos> = {
+  photo:        { x: 42,  y: 268, w: 295, h: 372, size: 0  },
+  name:         { x: 400, y: 268, w: 600, h: 52,  size: 52 },
+  age:          { x: 400, y: 348, w: 600, h: 28,  size: 28 },
+  statut:       { x: 400, y: 402, w: 600, h: 28,  size: 28 },
+  vol:          { x: 400, y: 456, w: 600, h: 28,  size: 28 },
+  destination:  { x: 400, y: 510, w: 600, h: 28,  size: 28 },
+  livre:        { x: 400, y: 564, w: 600, h: 28,  size: 28 },
+  siege:        { x: 400, y: 618, w: 600, h: 28,  size: 28 },
+  porte:        { x: 400, y: 672, w: 600, h: 28,  size: 28 },
+  embarquement: { x: 400, y: 726, w: 600, h: 28,  size: 28 },
+  barcode:      { x: 80,  y: 820, w: 920, h: 100, size: 0  },
+}
+
+const COLORS_BP: Record<string, string> = {
+  name: '#1a1a2e', age: '#1a1a2e', statut: '#16a34a', vol: '#1a1a2e',
+  destination: '#1a1a2e', livre: '#1a1a2e', siege: '#1a1a2e', porte: '#1a1a2e',
+  embarquement: '#16a34a',
+}
+
+// ── Template registry — add new templates here ────────────────────────────────
+// slug  = storage filename (e.g. "passport-cover") + DB template key
+// To add a new template: upload <slug>.png via Airways Templates,
+// add its entry below, and implement the matching image builder.
+interface TemplateConfig {
+  slug: string        // airways-templates/<slug>.{png,jpg,...}
+  label: string       // shown in the tab bar
+  W: number           // canvas width  (matches image builder)
+  H: number           // canvas height (matches image builder)
+  fields: FieldDef[]
+  init: Record<string, Pos>
+  colors: Record<string, string>
+}
+
+const TEMPLATE_REGISTRY: TemplateConfig[] = [
+  {
+    slug: 'champion-kit', label: 'Champion Kit',
+    W: 1254, H: 1254,
+    fields: FIELDS_KIT, init: INIT_KIT, colors: COLORS_KIT,
+  },
+  {
+    slug: 'boarding-pass', label: 'Boarding Pass',
+    W: 1080, H: 1080,
+    fields: FIELDS_BP, init: INIT_BP, colors: COLORS_BP,
+  },
+  // ── Add future templates below ────────────────────────────────────
+  // { slug: 'passport-cover', label: 'Passport Cover', W: 794, H: 1123, fields: [...], init: {...}, colors: {} },
+  // { slug: 'stamp-collection', label: 'Stamp Collection', W: 1200, H: 900, fields: [...], init: {...}, colors: {} },
+]
+
+type TemplateKey = string  // now just the slug string
+
+// ─────────────────────────────────────────────────────────────────────────────
 export default function KitLayoutEditor({ onNavigate, onOpenSidebar }: Props) {
   const { error: toastErr } = useToast()
 
   const [admin,    setAdmin]    = useState<{ name: string; role: string } | null>(null)
-  const [pos,      setPos]      = useState<Record<string, Pos>>({ ...INIT })
-  const [sel,      setSel]      = useState('champion')
+  const [template, setTemplate] = useState<TemplateKey>(TEMPLATE_REGISTRY[0].slug)
+  const [pos,      setPos]      = useState<Record<string, Pos>>({ ...TEMPLATE_REGISTRY[0].init })
+  const [sel,      setSel]      = useState(TEMPLATE_REGISTRY[0].fields[0].key)
   const [saving,   setSaving]   = useState(false)
   const [toast,    setToast]    = useState<{ ok: boolean; msg: string } | null>(null)
   const [imgSrc,   setImgSrc]   = useState<string | null>(null)
   const [imgError, setImgError] = useState(false)
+  const [loading,  setLoading]  = useState(false)
+
+  const cfg = TEMPLATE_REGISTRY.find(t => t.slug === template) ?? TEMPLATE_REGISTRY[0]
 
   const containerRef = useRef<HTMLDivElement>(null)
   const svgRef       = useRef<SVGSVGElement>(null)
@@ -78,16 +148,15 @@ export default function KitLayoutEditor({ onNavigate, onOpenSidebar }: Props) {
   const selRef       = useRef(sel)
   useEffect(() => { selRef.current = sel }, [sel])
 
-  // ── Convert client coords → 1254-space ──────────────────────────
+  // ── Convert client coords → canvas-space ─────────────────────────
   function containerXY(clientX: number, clientY: number) {
     const r = containerRef.current!.getBoundingClientRect()
     return {
-      x: Math.round((clientX - r.left) / r.width  * CW),
-      y: Math.round((clientY - r.top)  / r.height * CH),
+      x: Math.round((clientX - r.left) / r.width  * cfg.W),
+      y: Math.round((clientY - r.top)  / r.height * cfg.H),
     }
   }
 
-  // ── Drag starts only from a field handle ─────────────────────────
   function startDrag(e: React.PointerEvent, fieldKey: string) {
     e.preventDefault()
     e.stopPropagation()
@@ -104,34 +173,24 @@ export default function KitLayoutEditor({ onNavigate, onOpenSidebar }: Props) {
     if (!dragging.current) return
     const { x, y } = containerXY(e.clientX, e.clientY)
     const k = selRef.current
-    setPos(prev => ({
-      ...prev,
-      [k]: { ...prev[k], x: x - grabOffset.current.x, y: y - grabOffset.current.y },
-    }))
+    setPos(prev => ({ ...prev, [k]: { ...prev[k], x: x - grabOffset.current.x, y: y - grabOffset.current.y } }))
   }
 
-  function handlePointerUp() {
-    dragging.current = false
-  }
+  function handlePointerUp() { dragging.current = false }
 
-  // ── Arrow key nudge (1px, 10px with Shift) ──────────────────────
+  // ── Arrow key nudge ──────────────────────────────────────────────
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       const step = e.shiftKey ? 10 : 1
       const map: Record<string, { x: number; y: number }> = {
-        ArrowLeft:  { x: -step, y: 0 },
-        ArrowRight: { x:  step, y: 0 },
-        ArrowUp:    { x: 0, y: -step },
-        ArrowDown:  { x: 0, y:  step },
+        ArrowLeft: { x: -step, y: 0 }, ArrowRight: { x: step, y: 0 },
+        ArrowUp:   { x: 0, y: -step }, ArrowDown:  { x: 0, y: step },
       }
       const d = map[e.key]
       if (!d) return
       e.preventDefault()
       setSel(k => {
-        setPos(prev => ({
-          ...prev,
-          [k]: { ...prev[k], x: prev[k].x + d.x, y: prev[k].y + d.y },
-        }))
+        setPos(prev => ({ ...prev, [k]: { ...prev[k], x: prev[k].x + d.x, y: prev[k].y + d.y } }))
         return k
       })
     }
@@ -139,65 +198,79 @@ export default function KitLayoutEditor({ onNavigate, onOpenSidebar }: Props) {
     return () => window.removeEventListener('keydown', onKey)
   }, [])
 
-  // ── Find template image ──────────────────────────────────────────
+  // ── Load template image + DB layout whenever template changes ────
   useEffect(() => {
-    const base = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/airways-templates/champion-kit`
+    setImgSrc(null)
+    setImgError(false)
+    setLoading(true)
+
+    const base = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/airways-templates/${cfg.slug}`
     let cancelled = false
+
     void (async () => {
+      // Load image
       for (const ext of ['png', 'jpg', 'jpeg', 'webp']) {
         try {
           const res = await fetch(`${base}.${ext}`, { method: 'HEAD' })
           if (cancelled) return
-          if (res.ok) { setImgSrc(`${base}.${ext}?t=${Date.now()}`); return }
+          if (res.ok) { setImgSrc(`${base}.${ext}?t=${Date.now()}`); break }
         } catch { /* try next */ }
       }
-      if (!cancelled) setImgError(true)
-    })()
-    return () => { cancelled = true }
-  }, [])
+      if (!cancelled && !imgSrc) setImgError(true)
 
-  // ── Load saved layout from DB ────────────────────────────────────
-  useEffect(() => {
-    void (async () => {
+      // Load DB layout via API
       try {
-        const [adminData, { data: rows }] = await Promise.all([
-          getCachedAdmin(),
-          supabase.from('kit_layout').select('field,x,y,w,h,font_size'),
-        ])
-        if (adminData) setAdmin(adminData)
-        if (rows?.length) {
-          const next: Record<string, Pos> = { ...INIT }
+        const res = await fetch(`/api/airways/kit-layout?template=${template}`)
+        if (!res.ok) throw new Error('failed')
+        const rows: { field: string; x: number; y: number; w: number | null; h: number | null; font_size: number | null }[] = await res.json()
+        if (cancelled) return
+        if (rows.length) {
+          const next: Record<string, Pos> = { ...cfg.init }
           for (const r of rows) {
             if (!next[r.field]) continue
             next[r.field] = {
-              x:    r.x         ?? next[r.field].x,
-              y:    r.y         ?? next[r.field].y,
-              w:    r.w         ?? next[r.field].w,
-              h:    r.h         ?? next[r.field].h,
+              x: r.x ?? next[r.field].x, y: r.y ?? next[r.field].y,
+              w: r.w ?? next[r.field].w, h: r.h ?? next[r.field].h,
               size: r.font_size ?? next[r.field].size,
             }
           }
           setPos(next)
+        } else {
+          setPos({ ...cfg.init })
         }
       } catch { toastErr('Failed to load layout') }
+
+      if (!cancelled) setLoading(false)
     })()
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+    return () => { cancelled = true }
+  }, [template]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── Admin profile (once) ──────────────────────────────────────────
+  useEffect(() => {
+    getCachedAdmin().then(a => { if (a) setAdmin(a) }).catch(() => {})
+  }, [])
+
+  // ── Ensure selected field exists in new template ──────────────────
+  useEffect(() => {
+    if (!cfg.fields.find(f => f.key === sel)) setSel(cfg.fields[0].key)
+  }, [template]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Save layout ──────────────────────────────────────────────────
   async function handleSave() {
     setSaving(true)
     try {
-      const rows = FIELDS.map(f => ({
-        field:     f.key,
-        x:         pos[f.key].x,
-        y:         pos[f.key].y,
-        w:         f.type === 'area' ? pos[f.key].w    : null,
-        h:         f.type === 'area' ? pos[f.key].h    : null,
-        font_size: f.type === 'text' ? pos[f.key].size : null,
-        color:     null,
+      const rows = cfg.fields.map(f => ({
+        field:      f.key,
+        x:          pos[f.key].x,
+        y:          pos[f.key].y,
+        w:          f.type === 'area' ? pos[f.key].w    : null,
+        h:          f.type === 'area' ? pos[f.key].h    : null,
+        font_size:  f.type === 'text' ? pos[f.key].size : null,
+        color:      null,
         updated_at: new Date().toISOString(),
       }))
-      const res = await fetch('/api/airways/kit-layout', {
+      const res = await fetch(`/api/airways/kit-layout?template=${template}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(rows),
@@ -205,7 +278,7 @@ export default function KitLayoutEditor({ onNavigate, onOpenSidebar }: Props) {
       })
       if (!res.ok) {
         const body = await res.json().catch(() => ({}))
-        throw new Error(body.error ?? `HTTP ${res.status}`)
+        throw new Error((body as { error?: string }).error ?? `HTTP ${res.status}`)
       }
       setToast({ ok: true, msg: 'Saved!' })
     } catch (err) {
@@ -216,8 +289,8 @@ export default function KitLayoutEditor({ onNavigate, onOpenSidebar }: Props) {
     }
   }
 
-  const cur  = pos[sel]
-  const curF = FIELDS.find(f => f.key === sel)!
+  const cur  = pos[sel] ?? cfg.init[sel] ?? { x: 0, y: 0, w: 0, h: 0, size: 0 }
+  const curF = cfg.fields.find(f => f.key === sel) ?? cfg.fields[0]
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
@@ -232,12 +305,12 @@ export default function KitLayoutEditor({ onNavigate, onOpenSidebar }: Props) {
               <Layers className="w-6 h-6" />
             </div>
             <div>
-              <h1 className="text-xl font-extrabold text-gray-800">Kit Layout Editor</h1>
-              <p className="text-sm text-gray-500 mt-0.5">Select a field → drag or use ← → ↑ ↓ keys → Save.</p>
+              <h1 className="text-xl font-extrabold text-gray-800">Template Layout Editor</h1>
+              <p className="text-sm text-gray-500 mt-0.5">Select a field → drag or ← → ↑ ↓ keys → Save.</p>
               <p className="text-xs text-gray-400 mt-1">
                 <button onClick={() => onNavigate('Dashboard')} className="font-bold hover:underline text-green-600">Dashboard</button>
                 <span className="mx-1 text-gray-300">/</span>
-                <span className="font-bold text-gray-500">Kit Layout</span>
+                <span className="font-bold text-gray-500">Template Layout</span>
               </p>
             </div>
           </div>
@@ -251,123 +324,120 @@ export default function KitLayoutEditor({ onNavigate, onOpenSidebar }: Props) {
             </div>
           )}
         </div>
+
+        {/* Template tabs */}
+        <div className="mt-4 flex flex-wrap gap-2">
+          {TEMPLATE_REGISTRY.map(t => (
+            <button
+              key={t.slug}
+              onClick={() => setTemplate(t.slug)}
+              className={`px-4 py-2 rounded-xl text-sm font-bold transition border ${
+                template === t.slug
+                  ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
+                  : 'bg-white text-gray-600 border-gray-200 hover:border-blue-300 hover:text-blue-600'
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
       </header>
 
       <div className="p-4 lg:p-6 max-w-screen-2xl mx-auto w-full space-y-4">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-6">
 
-          {/* Canvas preview */}
+          {/* Canvas */}
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
             <div className="flex items-center justify-between px-5 py-3 border-b border-gray-100">
               <p className="font-bold text-gray-700 text-sm">
                 Editing: <span className="text-red-500">{curF.label}</span>
+                <span className="ml-2 text-xs font-normal text-gray-400">{cfg.label} · {cfg.W}×{cfg.H}</span>
               </p>
               <span className="text-xs font-mono text-gray-400">x={cur.x} y={cur.y}</span>
             </div>
 
-            {/* Container forced square — matches buildKitImage's 1254×1254 fill exactly */}
             <div
               ref={containerRef}
-              style={{ position: 'relative', userSelect: 'none', aspectRatio: '1 / 1', width: '100%' }}
+              style={{ position: 'relative', userSelect: 'none', aspectRatio: `${cfg.W} / ${cfg.H}`, width: '100%' }}
             >
-              {/* Template image — object-fill matches sharp's fit:'fill' stretch */}
-              {imgSrc ? (
-                <img src={imgSrc} alt="Kit template"
+              {loading ? (
+                <div className="w-full h-full absolute inset-0 bg-gray-50 flex items-center justify-center">
+                  <RefreshCw className="w-8 h-8 animate-spin text-gray-300" />
+                </div>
+              ) : imgSrc ? (
+                <img src={imgSrc} alt="Template"
                   style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'fill', display: 'block' }}
                   draggable={false} />
-              ) : imgError ? (
-                <div className="w-full aspect-square bg-gray-100 flex flex-col items-center justify-center gap-3 text-gray-400">
-                  <Layers className="w-12 h-12 opacity-40" />
-                  <p className="font-bold text-sm text-gray-500">No template uploaded yet</p>
-                  <p className="text-xs">Upload <code>champion-kit.png</code> via Admin → Airways Templates</p>
-                </div>
               ) : (
-                <div className="w-full aspect-square bg-gray-100 flex items-center justify-center">
-                  <RefreshCw className="w-8 h-8 animate-spin text-gray-400" />
+                <div className="w-full h-full absolute inset-0 bg-gray-100 flex flex-col items-center justify-center gap-3 text-gray-400">
+                  <Layers className="w-12 h-12 opacity-40" />
+                  <p className="font-bold text-sm text-gray-500">No template uploaded</p>
+                  <p className="text-xs">Upload <code>{cfg.slug}.png</code> via Admin → Airways Templates</p>
                 </div>
               )}
 
-              {/* SVG overlay — viewBox matches buildKitImage coordinates exactly */}
               {imgSrc && (
                 <svg
                   ref={svgRef}
                   onPointerMove={handlePointerMove}
                   onPointerUp={handlePointerUp}
                   style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', touchAction: 'none' }}
-                  viewBox={`0 0 ${CW} ${CH}`}
+                  viewBox={`0 0 ${cfg.W} ${cfg.H}`}
                   preserveAspectRatio="xMidYMid meet"
                   xmlns="http://www.w3.org/2000/svg"
                 >
-                  {FIELDS.map(f => {
-                    const p   = pos[f.key]
+                  {cfg.fields.map(f => {
+                    const p   = pos[f.key] ?? cfg.init[f.key]
                     const hot = f.key === sel
                     if (!p) return null
 
-                    if (f.type === 'area') {
-                      return (
-                        <g key={f.key}>
-                          {/* border — thin when inactive, bold red when selected */}
-                          <rect x={p.x} y={p.y} width={p.w} height={p.h}
-                            fill="none"
-                            stroke={hot ? '#ef4444' : 'rgba(99,102,241,0.3)'}
-                            strokeWidth={hot ? 4 : 1.5}
-                            pointerEvents="none"
-                          />
-                          {hot ? (
-                            /* Selected: grip handle in top-left corner */
-                            <g onPointerDown={e => startDrag(e, f.key)} style={{ cursor: 'grab' }}>
-                              <rect x={p.x} y={p.y} width={34} height={20} rx={4}
-                                fill="#ef4444" stroke="white" strokeWidth={2} />
-                              {([[-6,-4],[6,-4],[-6,4],[6,4]] as [number,number][]).map(([dx,dy], i) => (
-                                <circle key={i} cx={p.x+17+dx} cy={p.y+10+dy} r={2} fill="white" />
-                              ))}
-                            </g>
-                          ) : (
-                            /* Inactive: tiny dot — click to select */
-                            <circle cx={p.x + 6} cy={p.y + 6} r={5}
-                              fill="rgba(99,102,241,0.5)"
-                              onPointerDown={e => startDrag(e, f.key)}
-                              style={{ cursor: 'grab' }}
-                            />
-                          )}
-                        </g>
-                      )
-                    }
+                    if (f.type === 'area') return (
+                      <g key={f.key}>
+                        <rect x={p.x} y={p.y} width={p.w} height={p.h}
+                          fill="none"
+                          stroke={hot ? '#ef4444' : 'rgba(99,102,241,0.3)'}
+                          strokeWidth={hot ? 4 : 1.5}
+                          pointerEvents="none" />
+                        {hot ? (
+                          <g onPointerDown={e => startDrag(e, f.key)} style={{ cursor: 'grab' }}>
+                            <rect x={p.x} y={p.y} width={34} height={20} rx={4}
+                              fill="#ef4444" stroke="white" strokeWidth={2} />
+                            {([[-6,-4],[6,-4],[-6,4],[6,4]] as [number,number][]).map(([dx,dy], i) => (
+                              <circle key={i} cx={p.x+17+dx} cy={p.y+10+dy} r={2} fill="white" />
+                            ))}
+                          </g>
+                        ) : (
+                          <circle cx={p.x+6} cy={p.y+6} r={5}
+                            fill="rgba(99,102,241,0.5)"
+                            onPointerDown={e => startDrag(e, f.key)}
+                            style={{ cursor: 'grab' }} />
+                        )}
+                      </g>
+                    )
 
-                    // Text field
                     const size  = p.size || 14
-                    const color = FIELD_COLORS[f.key] ?? '#1a1a2e'
-
+                    const color = cfg.colors[f.key] ?? '#1a1a2e'
                     return (
                       <g key={f.key}>
-                        {/* WYSIWYG sample text */}
-                        <text
-                          x={p.x} y={p.y + size}
-                          fontSize={size}
+                        <text x={p.x} y={p.y + size} fontSize={size}
                           fill={hot ? '#ef4444' : color}
-                          fontFamily="Arial,Helvetica,sans-serif"
-                          fontWeight={700}
-                          opacity={hot ? 0.9 : 0.45}
-                          pointerEvents="none"
-                        >
+                          fontFamily="Arial,Helvetica,sans-serif" fontWeight={700}
+                          opacity={hot ? 0.9 : 0.45} pointerEvents="none">
                           {f.sample}
                         </text>
                         {hot ? (
-                          /* Selected: grip handle at anchor */
                           <g onPointerDown={e => startDrag(e, f.key)} style={{ cursor: 'grab' }}>
-                            <rect x={p.x - 16} y={p.y - 11} width={32} height={22} rx={4}
+                            <rect x={p.x-16} y={p.y-11} width={32} height={22} rx={4}
                               fill="#ef4444" stroke="white" strokeWidth={2} />
                             {([[-5,-5],[5,-5],[-5,5],[5,5]] as [number,number][]).map(([dx,dy], i) => (
                               <circle key={i} cx={p.x+dx} cy={p.y+dy} r={2} fill="white" />
                             ))}
                           </g>
                         ) : (
-                          /* Inactive: tiny dot — click to select */
                           <circle cx={p.x} cy={p.y} r={4}
                             fill="rgba(99,102,241,0.45)"
                             onPointerDown={e => startDrag(e, f.key)}
-                            style={{ cursor: 'grab' }}
-                          />
+                            style={{ cursor: 'grab' }} />
                         )}
                       </g>
                     )
@@ -379,72 +449,67 @@ export default function KitLayoutEditor({ onNavigate, onOpenSidebar }: Props) {
 
           {/* Sidebar */}
           <div className="space-y-4">
-
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
               <p className="font-bold text-gray-700 text-sm mb-3">Fields</p>
               <div className="space-y-1">
-                {FIELDS.map(f => (
+                {cfg.fields.map(f => (
                   <button key={f.key} onClick={() => setSel(f.key)}
                     className={`w-full text-left px-3 py-2 rounded-xl text-sm font-semibold transition flex items-center justify-between ${
                       sel === f.key ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-50'
                     }`}>
                     <span>{f.label}</span>
                     <span className={`text-xs font-mono ${sel === f.key ? 'text-blue-200' : 'text-gray-400'}`}>
-                      {pos[f.key].x},{pos[f.key].y}
+                      {pos[f.key]?.x ?? 0},{pos[f.key]?.y ?? 0}
                     </span>
                   </button>
                 ))}
               </div>
             </div>
 
-            {cur && (
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 space-y-3">
-                <div className="flex items-center justify-between">
-                  <p className="font-bold text-gray-700 text-sm">{curF.label} — Fine-tune</p>
-                  <button
-                    onClick={() => setPos(p => ({ ...p, [sel]: { ...INIT[sel] } }))}
-                    className="text-[11px] font-bold text-orange-500 hover:text-orange-700 underline"
-                  >
-                    Reset
-                  </button>
-                </div>
-                <p className="text-xs text-gray-400">Arrow keys = 1px · Shift+Arrow = 10px</p>
-                <div className="grid grid-cols-2 gap-3">
-                  {(['x', 'y'] as const).map(f => (
-                    <div key={f}>
-                      <label className="text-xs font-bold text-gray-500 mb-1 block uppercase">{f}</label>
-                      <input type="number" value={cur[f]}
-                        onChange={e => setPos(p => ({ ...p, [sel]: { ...p[sel], [f]: +e.target.value } }))}
-                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400" />
-                    </div>
-                  ))}
-                  {curF.type === 'area' && (['w', 'h'] as const).map(f => (
-                    <div key={f}>
-                      <label className="text-xs font-bold text-gray-500 mb-1 block uppercase">{f}</label>
-                      <input type="number" value={cur[f]}
-                        onChange={e => setPos(p => ({ ...p, [sel]: { ...p[sel], [f]: +e.target.value } }))}
-                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400" />
-                    </div>
-                  ))}
-                  {curF.type === 'text' && (
-                    <div>
-                      <label className="text-xs font-bold text-gray-500 mb-1 block">Font size</label>
-                      <input type="number" value={cur.size}
-                        onChange={e => setPos(p => ({ ...p, [sel]: { ...p[sel], size: +e.target.value } }))}
-                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400" />
-                    </div>
-                  )}
-                </div>
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <p className="font-bold text-gray-700 text-sm">{curF.label} — Fine-tune</p>
+                <button
+                  onClick={() => setPos(p => ({ ...p, [sel]: { ...cfg.init[sel] } }))}
+                  className="text-[11px] font-bold text-orange-500 hover:text-orange-700 underline"
+                >Reset</button>
               </div>
-            )}
+              <p className="text-xs text-gray-400">Arrow keys = 1px · Shift+Arrow = 10px</p>
+              <div className="grid grid-cols-2 gap-3">
+                {(['x', 'y'] as const).map(f => (
+                  <div key={f}>
+                    <label className="text-xs font-bold text-gray-500 mb-1 block uppercase">{f}</label>
+                    <input type="number" value={cur[f]}
+                      onChange={e => setPos(p => ({ ...p, [sel]: { ...p[sel], [f]: +e.target.value } }))}
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400" />
+                  </div>
+                ))}
+                {curF.type === 'area' && (['w', 'h'] as const).map(f => (
+                  <div key={f}>
+                    <label className="text-xs font-bold text-gray-500 mb-1 block uppercase">{f}</label>
+                    <input type="number" value={cur[f]}
+                      onChange={e => setPos(p => ({ ...p, [sel]: { ...p[sel], [f]: +e.target.value } }))}
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400" />
+                  </div>
+                ))}
+                {curF.type === 'text' && (
+                  <div>
+                    <label className="text-xs font-bold text-gray-500 mb-1 block">Font size</label>
+                    <input type="number" value={cur.size}
+                      onChange={e => setPos(p => ({ ...p, [sel]: { ...p[sel], size: +e.target.value } }))}
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400" />
+                  </div>
+                )}
+              </div>
+            </div>
 
             <button onClick={handleSave} disabled={saving}
               className="w-full flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 disabled:opacity-40 text-white font-bold text-sm py-3 rounded-xl shadow transition">
               {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-              {saving ? 'Saving…' : 'Save All Positions'}
+              {saving ? 'Saving…' : `Save ${cfg.label} Layout`}
             </button>
             <p className="text-center text-xs text-gray-400">
-              What you see here = what the kit generates. Save → download a test kit.
+              Drag fields to match your template, then save.
             </p>
           </div>
         </div>

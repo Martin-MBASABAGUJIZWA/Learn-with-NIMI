@@ -6,7 +6,7 @@ import { getServiceClient } from '@/lib/supabase/serviceClient'
 import { PDFDocument } from 'pdf-lib'
 import sharp from 'sharp'
 import { fetchAirwaysData } from '@/lib/airways/airwaysData'
-import { buildBoardingPassImage } from '@/lib/airways/buildBoardingPassImage'
+import { buildBoardingPassImage, type BPLayout } from '@/lib/airways/buildBoardingPassImage'
 
 async function fetchPhotoBuffer(url: string): Promise<Buffer | null> {
   try {
@@ -44,9 +44,11 @@ export async function GET(req: NextRequest) {
   const user = await getAuthUser(req)
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { data: child } = await supabase
-    .from('children').select('parent_id').eq('id', childId).single()
-  if (child?.parent_id !== user.id) {
+  const [{ data: child }, { data: adminRow }] = await Promise.all([
+    supabase.from('children').select('parent_id').eq('id', childId).single(),
+    supabase.from('admins').select('id').eq('id', user.id).maybeSingle(),
+  ])
+  if (!adminRow && child?.parent_id !== user.id) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
@@ -55,6 +57,14 @@ export async function GET(req: NextRequest) {
 
   const currentStory = data.current_story ?? data.stories[0] ?? null
   if (!currentStory) return NextResponse.json({ error: 'No story available' }, { status: 404 })
+
+  // Load layout from unified template_layout table
+  const { data: layoutRows } = await supabase
+    .from('template_layout').select('field,x,y,w,h,font_size,bold,color').eq('template', 'boarding-pass')
+  const layout: BPLayout = {}
+  for (const row of layoutRows ?? []) {
+    layout[row.field] = { x: row.x, y: row.y, w: row.w, h: row.h, font_size: row.font_size, bold: row.bold, color: row.color }
+  }
 
   const supaUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''
   let photoBuffer: Buffer | null = null
@@ -73,6 +83,7 @@ export async function GET(req: NextRequest) {
     storyNumber: currentStory.sort_order,
     childId: data.id,
     photoBuffer,
+    layout,
   })
 
   const safeName = data.name.toLowerCase().replace(/\s+/g, '_')

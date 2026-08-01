@@ -492,7 +492,7 @@ export default function UserProfileClient({ initialChildren, initialHasSubscript
     <AppShell>
       <RefreshingBadge show={refreshing} />
       <PageSurface>
-        <main className={`max-w-lg mx-auto px-4 sm:px-5 py-4 pb-28 flex-1 w-full content-enter transition-opacity duration-300${refreshing ? " opacity-50 pointer-events-none" : ""}`}>
+        <main className="max-w-lg mx-auto px-4 sm:px-5 py-4 pb-28 flex-1 w-full content-enter">
           <ProgressHeader
             activeTab={activeTab}
             onTabChange={setActiveTab}

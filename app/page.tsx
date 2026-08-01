@@ -113,6 +113,17 @@ export default function LandingPage() {
   const [authed,       setAuthed]       = useState(false);
   const [scrolled,     setScrolled]     = useState(false);
   const [ctaVisible,   setCtaVisible]   = useState(false);
+
+  // Redirect Supabase auth error params (e.g. expired reset link) to the right page
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    const errorCode = params.get('error_code');
+    if (errorCode) {
+      const desc = params.get('error_description') ?? '';
+      window.location.replace(`/reset-password?expired=1&desc=${encodeURIComponent(desc)}`);
+    }
+  }, []);
   const [testimonials, setTestimonials] = useState<{
     id: string; name: string; role: string; location: string | null;
     quote: string; rating: number; avatar_url: string | null;

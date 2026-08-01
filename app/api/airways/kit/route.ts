@@ -49,8 +49,9 @@ export async function GET(req: NextRequest) {
   const data = await fetchAirwaysData(supabase, childId)
   if (!data) return NextResponse.json({ error: 'Child not found' }, { status: 404 })
 
-  // Load saved layout from DB (falls back to hardcoded defaults if empty)
-  const { data: layoutRows } = await supabase.from('kit_layout').select('field,x,y,w,h,font_size,bold,color')
+  // Load saved layout from unified template_layout table
+  const { data: layoutRows } = await supabase
+    .from('template_layout').select('field,x,y,w,h,font_size,bold,color').eq('template', 'kit')
   const layout: KitLayout = {}
   for (const row of layoutRows ?? []) {
     layout[row.field] = { x: row.x, y: row.y, w: row.w, h: row.h, font_size: row.font_size, bold: row.bold, color: row.color }
