@@ -1,7 +1,14 @@
 import sharp from 'sharp'
-import { createCanvas } from 'canvas'
+import { createCanvas, registerFont } from 'canvas'
+import path from 'path'
 import { fetchTemplate } from './templateFetcher'
 import { barcodeBuffer } from './barcode'
+
+try {
+  const fontsDir = path.join(process.cwd(), 'public', 'fonts')
+  registerFont(path.join(fontsDir, 'DejaVuSans-Bold.ttf'), { family: 'DejaVu', weight: 'bold' })
+  registerFont(path.join(fontsDir, 'DejaVuSans.ttf'),      { family: 'DejaVu', weight: 'normal' })
+} catch { /* fonts already registered or path missing */ }
 
 const W = 1080
 const H = 1080
@@ -56,7 +63,7 @@ function renderTextOverlay(W: number, H: number, fields: BPTextField[]): Buffer 
   for (const { text, pos } of fields) {
     const size   = pos.font_size ?? 28
     const weight = pos.bold !== false ? 'bold' : 'normal'
-    ctx.font      = `${weight} ${size}px sans-serif`
+    ctx.font      = `${weight} ${size}px DejaVu, sans-serif`
     ctx.fillStyle = pos.color ?? '#1a1a2e'
     ctx.fillText(text, pos.x, pos.y + size)
   }
