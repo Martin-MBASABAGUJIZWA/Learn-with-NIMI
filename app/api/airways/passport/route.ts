@@ -10,8 +10,6 @@ import { fetchAirwaysData, championNumber } from "@/lib/airways/airwaysData";
 import { fetchTemplate } from "@/lib/airways/templateFetcher";
 import {
   buildPassportSpread,
-  SPREAD_W,
-  SPREAD_H,
   type PassportSpreadLayout,
 } from "@/lib/airways/buildPassportSpread";
 import { buildStampsCanvas } from "@/lib/airways/buildPassportCanvas";
@@ -29,13 +27,15 @@ async function fetchImageAsDataUri(url: string, w: number, h: number): Promise<s
   }
 }
 
-async function addPngPage(doc: PDFDocument, png: Buffer, w: number, h: number) {
-  const img   = await doc.embedPng(png);
-  const scale = Math.min(w / img.width, h / img.height);
-  const page  = doc.addPage([w, h]);
+async function addPngPage(doc: PDFDocument, png: Buffer, pageW?: number, pageH?: number) {
+  const img = await doc.embedPng(png);
+  const pw  = pageW ?? img.width;
+  const ph  = pageH ?? img.height;
+  const scale = Math.min(pw / img.width, ph / img.height);
+  const page  = doc.addPage([pw, ph]);
   page.drawImage(img, {
-    x: (w - img.width  * scale) / 2,
-    y: (h - img.height * scale) / 2,
+    x: (pw - img.width  * scale) / 2,
+    y: (ph - img.height * scale) / 2,
     width:  img.width  * scale,
     height: img.height * scale,
   });
@@ -150,7 +150,7 @@ export async function GET(req: NextRequest) {
         layout,
       });
 
-      await addPngPage(doc, spreadPng, SPREAD_W, SPREAD_H);
+      await addPngPage(doc, spreadPng);
     }
 
     // Last page: stamps

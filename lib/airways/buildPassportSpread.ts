@@ -11,42 +11,42 @@ try {
   registerFont(path.join(dir, 'DejaVuSans.ttf'),      { family: 'DejaVu', weight: 'normal' })
 } catch {}
 
-// Spread canvas size — matches template image proportions (landscape 2:1)
-export const SPREAD_W = 2200
-export const SPREAD_H = 1100
+// Fallback canvas size if no template uploaded yet
+export const SPREAD_W = 2480
+export const SPREAD_H = 1240
 
-// ── Layout types ─────────────────────────────────────────────────────────────
+// ── Layout types ──────────────────────────────────────────────────────────────
 
 export interface PassportSpreadLayout {
-  // Left (identity) fields
-  photo?:    { x: number; y: number; w: number; h: number }
-  name?:     { x: number; y: number; font_size: number }
-  champion?: { x: number; y: number; font_size: number }
-  date?:     { x: number; y: number; font_size: number }
-  qr?:       { x: number; y: number; w: number; h: number }
-  // Right (destination) fields
-  dest_num?:  { x: number; y: number; font_size: number }
-  title?:     { x: number; y: number; font_size: number }
-  book_cover?:{ x: number; y: number; w: number; h: number }
-  date_val?:  { x: number; y: number; font_size: number }
-  next_cover?:{ x: number; y: number; w: number; h: number }
-  next_title?:{ x: number; y: number; font_size: number }
+  photo?:      { x: number; y: number; w: number; h: number }
+  qr?:         { x: number; y: number; w: number; h: number }
+  name?:       { x: number; y: number; font_size: number }
+  champion?:   { x: number; y: number; font_size: number }
+  date?:       { x: number; y: number; font_size: number }
+  dest_num?:   { x: number; y: number; font_size: number }
+  title?:      { x: number; y: number; font_size: number }
+  book_cover?: { x: number; y: number; w: number; h: number }
+  date_val?:   { x: number; y: number; font_size: number }
+  next_cover?: { x: number; y: number; w: number; h: number }
+  next_title?: { x: number; y: number; font_size: number }
 }
 
+// Defaults are proportional to SPREAD_W=2480, SPREAD_H=1240
+// Left half: x 0–1240 | Right half: x 1240–2480
 const DEFAULTS: Required<PassportSpreadLayout> = {
-  // Left identity side
-  photo:    { x: 76,  y: 330, w: 210, h: 265 },
-  name:     { x: 326, y: 370, font_size: 36 },
-  champion: { x: 326, y: 445, font_size: 26 },
-  date:     { x: 326, y: 515, font_size: 22 },
-  qr:       { x: 450, y: 395, w: 148, h: 148 },
-  // Right destination side (right half starts at x≈1100)
-  dest_num:   { x: 1560, y: 68,  font_size: 22 },
-  title:      { x: 1540, y: 148, font_size: 40 },
-  book_cover: { x: 1220, y: 240, w: 198, h: 310 },
-  date_val:   { x: 1280, y: 748, font_size: 28 },
-  next_cover: { x: 1145, y: 878, w: 100, h: 130 },
-  next_title: { x: 1640, y: 890, font_size: 22 },
+  // Left identity page
+  photo:    { x: 115, y: 350, w: 230, h: 295 },
+  qr:       { x: 560, y: 340, w: 155, h: 155 },
+  name:     { x: 350, y: 325, font_size: 38 },
+  champion: { x: 350, y: 405, font_size: 28 },
+  date:     { x: 350, y: 470, font_size: 24 },
+  // Right destination page (right half starts at x≈1240)
+  dest_num:   { x: 1860, y: 75,  font_size: 24 },
+  title:      { x: 1860, y: 145, font_size: 44 },
+  book_cover: { x: 1380, y: 245, w: 210, h: 320 },
+  date_val:   { x: 1455, y: 750, font_size: 30 },
+  next_cover: { x: 1290, y: 895, w: 110, h: 140 },
+  next_title: { x: 1860, y: 910, font_size: 24 },
 }
 
 function get<K extends keyof PassportSpreadLayout>(
@@ -62,9 +62,9 @@ function txt(
   opts: { size: number; bold?: boolean; color?: string; align?: CanvasTextAlign; maxWidth?: number }
 ) {
   ctx.save()
-  ctx.fillStyle = opts.color ?? '#0D1B30'
-  ctx.font      = `${opts.bold ? 'bold' : 'normal'} ${opts.size}px DejaVu, sans-serif`
-  ctx.textAlign = opts.align ?? 'left'
+  ctx.fillStyle    = opts.color ?? '#0D1B30'
+  ctx.font         = `${opts.bold ? 'bold' : 'normal'} ${opts.size}px DejaVu, sans-serif`
+  ctx.textAlign    = opts.align ?? 'left'
   ctx.textBaseline = 'top'
   if (opts.maxWidth) ctx.fillText(str, x, y, opts.maxWidth)
   else               ctx.fillText(str, x, y)
@@ -88,128 +88,130 @@ async function drawImg(
 // ── Main builder ──────────────────────────────────────────────────────────────
 
 export interface PassportSpreadData {
-  // Identity (left side — same every page)
-  childName:      string
-  championNumber: string
-  createdAt:      string
-  photoDataUri:   string | null
-  qrDataUri:      string | null
-  // Destination (right side — changes per story)
-  story:          AirwaysStory
-  bookNum:        number
-  coverDataUri:   string | null
-  nextStory:      AirwaysStory | null
+  childName:        string
+  championNumber:   string
+  createdAt:        string
+  photoDataUri:     string | null
+  qrDataUri:        string | null
+  story:            AirwaysStory
+  bookNum:          number
+  coverDataUri:     string | null
+  nextStory:        AirwaysStory | null
   nextCoverDataUri: string | null
-  layout?:        PassportSpreadLayout | null
+  layout?:          PassportSpreadLayout | null
 }
 
 export async function buildPassportSpread(data: PassportSpreadData): Promise<Buffer> {
   const L = { ...DEFAULTS, ...(data.layout ?? {}) }
 
-  const canvas = createCanvas(SPREAD_W, SPREAD_H)
+  // Fetch template and get its REAL dimensions
+  const templateBuf = await fetchTemplate('passport-interior')
+  let TW = SPREAD_W
+  let TH = SPREAD_H
+  if (templateBuf) {
+    const meta = await sharp(templateBuf).metadata()
+    TW = meta.width  ?? SPREAD_W
+    TH = meta.height ?? SPREAD_H
+  }
+
+  // Scale layout positions if DB positions were saved for a different canvas size
+  // (When no DB layout, DEFAULTS are already calibrated to SPREAD_W/SPREAD_H)
+  const scaleX = TW / SPREAD_W
+  const scaleY = TH / SPREAD_H
+  const hasDbLayout = data.layout && Object.keys(data.layout).length > 0
+
+  function sx(v: number) { return hasDbLayout ? v : Math.round(v * scaleX) }
+  function sy(v: number) { return hasDbLayout ? v : Math.round(v * scaleY) }
+  function sf(v: number) { return hasDbLayout ? v : Math.round(v * Math.min(scaleX, scaleY)) }
+
+  // Canvas is exactly the template size — overlays only (transparent background)
+  const canvas = createCanvas(TW, TH)
   const ctx    = canvas.getContext('2d')
 
-  // ── Load template background ──────────────────────────────────────────────
-  const templateBuf = await fetchTemplate('passport-interior')
-  if (templateBuf) {
-    const resized = await sharp(templateBuf)
-      .resize(SPREAD_W, SPREAD_H, { fit: 'fill' })
-      .png().toBuffer()
-    const bgImg = await loadImage(resized)
-    ctx.drawImage(bgImg, 0, 0, SPREAD_W, SPREAD_H)
-  } else {
-    // Fallback: cream background
-    ctx.fillStyle = '#F5EDDA'
-    ctx.fillRect(0, 0, SPREAD_W, SPREAD_H)
-  }
+  // ── Left page — Identity ──────────────────────────────────────────────────
 
-  // ══════════════════════════════════
-  // LEFT PAGE — Identity
-  // ══════════════════════════════════
-
-  // Photo
   const ph = get(L, 'photo')
   if (data.photoDataUri) {
-    await drawImg(ctx, data.photoDataUri, ph.x, ph.y, ph.w, ph.h, true)
+    const photoResized = await sharp(Buffer.from(data.photoDataUri.split(',')[1], 'base64'))
+      .resize(sx(ph.w), sy(ph.h), { fit: 'cover', position: 'attention' })
+      .png().toBuffer()
+    const photoUri = `data:image/png;base64,${photoResized.toString('base64')}`
+    await drawImg(ctx, photoUri, sx(ph.x), sy(ph.y), sx(ph.w), sy(ph.h), true)
   }
 
-  // QR code
   const qr = get(L, 'qr')
   if (data.qrDataUri) {
-    await drawImg(ctx, data.qrDataUri, qr.x, qr.y, qr.w, qr.h)
+    await drawImg(ctx, data.qrDataUri, sx(qr.x), sy(qr.y), sx(qr.w), sy(qr.h))
   }
 
-  // Name
   const nm = get(L, 'name')
-  txt(ctx, data.childName.toUpperCase(), nm.x, nm.y,
-    { size: nm.font_size, bold: true, color: '#0D1B30', maxWidth: 400 })
+  txt(ctx, data.childName.toUpperCase(), sx(nm.x), sy(nm.y),
+    { size: sf(nm.font_size), bold: true, color: '#0D1B30', maxWidth: sx(420) })
 
-  // Champion number
   const ch = get(L, 'champion')
-  txt(ctx, data.championNumber, ch.x, ch.y,
-    { size: ch.font_size, bold: true, color: '#0D1B30' })
+  txt(ctx, data.championNumber, sx(ch.x), sy(ch.y),
+    { size: sf(ch.font_size), bold: true, color: '#0D1B30' })
 
-  // Creation date
   const dt = get(L, 'date')
   const dateStr = data.createdAt
-    ? new Date(data.createdAt).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, ' / ')
+    ? new Date(data.createdAt).toLocaleDateString('fr-FR', {
+        day: '2-digit', month: '2-digit', year: 'numeric',
+      }).replace(/\//g, ' / ')
     : '__  /  __  /  ____'
-  txt(ctx, dateStr, dt.x, dt.y,
-    { size: dt.font_size, bold: false, color: '#0D1B30' })
+  txt(ctx, dateStr, sx(dt.x), sy(dt.y),
+    { size: sf(dt.font_size), bold: false, color: '#0D1B30' })
 
-  // ══════════════════════════════════
-  // RIGHT PAGE — Destination
-  // ══════════════════════════════════
+  // ── Right page — Destination ──────────────────────────────────────────────
 
-  // Destination number pill text
   const dn = get(L, 'dest_num')
-  txt(ctx, String(data.bookNum), dn.x, dn.y,
-    { size: dn.font_size, bold: true, color: '#1A7A3E', align: 'center' })
+  txt(ctx, String(data.bookNum), sx(dn.x), sy(dn.y),
+    { size: sf(dn.font_size), bold: true, color: '#1A7A3E', align: 'center' })
 
-  // Story title
   const ti = get(L, 'title')
-  const titleStr = data.story.title.toUpperCase()
-  txt(ctx, titleStr, ti.x, ti.y,
-    { size: ti.font_size, bold: true, color: '#0D1B30', align: 'center', maxWidth: 900 })
+  txt(ctx, data.story.title.toUpperCase(), sx(ti.x), sy(ti.y),
+    { size: sf(ti.font_size), bold: true, color: '#0D1B30', align: 'center', maxWidth: sx(950) })
 
-  // Book cover (in the oval placeholder)
   const bc = get(L, 'book_cover')
   if (data.coverDataUri) {
-    await drawImg(ctx, data.coverDataUri, bc.x, bc.y, bc.w, bc.h, true)
+    await drawImg(ctx, data.coverDataUri, sx(bc.x), sy(bc.y), sx(bc.w), sy(bc.h), true)
   }
 
-  // Validation date
   const dv = get(L, 'date_val')
   const valDate = data.story.completed_at
-    ? new Date(data.story.completed_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, ' / ')
+    ? new Date(data.story.completed_at).toLocaleDateString('fr-FR', {
+        day: '2-digit', month: '2-digit', year: 'numeric',
+      }).replace(/\//g, ' / ')
     : '__  /  __  /  ____'
-  txt(ctx, valDate, dv.x, dv.y,
-    { size: dv.font_size, bold: true, color: '#0D1B30', align: 'center' })
+  txt(ctx, valDate, sx(dv.x), sy(dv.y),
+    { size: sf(dv.font_size), bold: true, color: '#0D1B30', align: 'center' })
 
-  // Visa section — next story cover + title
   if (data.nextStory) {
     const nc = get(L, 'next_cover')
     if (data.nextCoverDataUri) {
-      await drawImg(ctx, data.nextCoverDataUri, nc.x, nc.y, nc.w, nc.h, true)
+      await drawImg(ctx, data.nextCoverDataUri, sx(nc.x), sy(nc.y), sx(nc.w), sy(nc.h), true)
     }
     const nt = get(L, 'next_title')
     const nextTitle = data.nextStory.title.length > 28
       ? data.nextStory.title.slice(0, 26) + '…'
       : data.nextStory.title
-    txt(ctx, nextTitle.toUpperCase(), nt.x, nt.y,
-      { size: nt.font_size, bold: true, color: '#0D1B30', align: 'center', maxWidth: 420 })
+    txt(ctx, nextTitle.toUpperCase(), sx(nt.x), sy(nt.y),
+      { size: sf(nt.font_size), bold: true, color: '#0D1B30', align: 'center', maxWidth: sx(430) })
   }
 
-  // ── Composite onto template via sharp ─────────────────────────────────────
+  // ── Composite overlay onto template ───────────────────────────────────────
+
   const overlay = canvas.toBuffer('image/png')
 
   if (templateBuf) {
     return sharp(templateBuf)
-      .resize(SPREAD_W, SPREAD_H, { fit: 'fill' })
       .composite([{ input: overlay, left: 0, top: 0 }])
       .png()
       .toBuffer()
   }
 
-  return overlay
+  // No template: cream fallback background
+  const bg = await sharp({
+    create: { width: TW, height: TH, channels: 4, background: { r: 245, g: 237, b: 218, alpha: 1 } },
+  }).png().toBuffer()
+  return sharp(bg).composite([{ input: overlay, left: 0, top: 0 }]).png().toBuffer()
 }
