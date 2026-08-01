@@ -28,8 +28,6 @@ import { getThemeAssets } from "@/lib/design-system/assetRegistry";
 import AppShell              from "@/components/layout/AppShell";
 import { Bone }             from "@/components/ui/Bone";
 import { RefreshingBadge }  from "@/components/layout/RefreshingBadge";
-import WhoIsPlaying          from "@/components/home/WhoIsPlaying";
-import CreateChildModal      from "@/components/home/CreateChildModal";
 import CreateExplorerProfile from "@/components/home/CreateExplorerProfile";
 import HomeAdventureSection  from "@/components/home/HomeAdventureSection";
 import HomeStoryLibrarySection from "@/components/home/HomeStoryLibrarySection";
@@ -170,9 +168,7 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
   const [refreshing,      setRefreshing]      = useState(false);
   const [children,        setChildren]        = useState<Child[]>([]);
   const [activeChild,     setActiveChild]     = useState<Child | null>(null);
-  const [showPicker,      setShowPicker]      = useState(false);
   const [noChildrenYet,   setNoChildrenYet]   = useState(false);
-  const [showCreateModal, setShowCreateModal] = useState(false);
   const [hasSubscription, setHasSubscription] = useState(false);
   const [isTrial,           setIsTrial]           = useState(false);
   const [trialDaysLeft,     setTrialDaysLeft]     = useState(0);
@@ -279,9 +275,8 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
         // subscriptionLoadedRef already true (initialised from prop)
         if (initialChildren.length === 0) { router.replace("/onboarding"); return; }
         const savedId = typeof window !== "undefined" ? localStorage.getItem(ACTIVE_CHILD_KEY) : null;
-        const saved = initialChildren.find(c => c.id === savedId);
-        if (saved) await select(saved, initialChildren);
-        else { setShowPicker(true); setLoading(false); }
+        const saved = initialChildren.find(c => c.id === savedId) ?? initialChildren[0];
+        await select(saved, initialChildren);
         return;
       }
 
@@ -319,9 +314,8 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
       }).catch(() => { subscriptionLoadedRef.current = true; }); // failure → treat as free plan
       if (list.length === 0) { router.replace("/onboarding"); return; }
       const savedId = typeof window !== "undefined" ? localStorage.getItem(ACTIVE_CHILD_KEY) : null;
-      const saved   = list.find(c => c.id === savedId);
-      if (saved) await select(saved, list);
-      else       { setShowPicker(true); setLoading(false); }
+      const saved   = list.find(c => c.id === savedId) ?? list[0];
+      await select(saved, list);
     } catch (err) {
       console.error("[home] init failed:", err);
       setInitError(true);
@@ -347,7 +341,6 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
   async function select(child: Child, list?: Child[]) {
     const gen = ++selectGenRef.current;
     setActiveChild(child);
-    setShowPicker(false);
     if (typeof window !== "undefined") {
       localStorage.setItem(ACTIVE_CHILD_KEY, child.id);
       try {
@@ -447,7 +440,6 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
       console.error("[home] select failed:", err);
       // Restore picker so the user can choose again rather than getting a stuck skeleton
       setActiveChild(null);
-      setShowPicker(true);
       setLoading(false);
       setRefreshing(false);
     }
@@ -503,7 +495,6 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
   }
 
   async function handleCreated(child: Child) {
-    setShowCreateModal(false);
     setNoChildrenYet(false);
     await select(child, [...children, child]);
   }
@@ -528,21 +519,6 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
   );
 
   if (noChildrenYet) return <AppShell><CreateExplorerProfile onCreated={handleCreated} /></AppShell>;
-  if (showPicker) return (
-    <>
-      <WhoIsPlaying children={children} onSelect={c => select(c)}
-        onAddChild={() => {
-          // Wait until subscription status is known so Club members aren't falsely redirected
-          if (children.length >= 1 && !subscriptionLoadedRef.current) return;
-          if (children.length >= 1 && !hasSubscription) { router.push("/pricing?reason=add-child"); return; }
-          setShowPicker(false);
-          setShowCreateModal(true);
-        }} />
-      {showCreateModal && (
-        <CreateChildModal onCreated={handleCreated} onClose={() => { setShowCreateModal(false); setShowPicker(true); }} />
-      )}
-    </>
-  );
 
   /* ─── Derived ──────────────────────────────────────────────────────────── */
   const WEEK_DAYS = [t("dayMon"), t("dayTue"), t("dayWed"), t("dayThu"), t("dayFri"), t("daySat"), t("daySun")];
@@ -1202,9 +1178,6 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
         </div>
       )}
 
-      {showCreateModal && (
-        <CreateChildModal onCreated={handleCreated} onClose={() => setShowCreateModal(false)} />
-      )}
 
       {welcomeBack.show && activeChild && (
         <WelcomeBackOverlay
