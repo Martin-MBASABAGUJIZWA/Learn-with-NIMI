@@ -9,6 +9,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 export interface AirwaysStory {
   id: string;
   title: string;
+  slug: string | null;
   cover_url: string | null;
   sort_order: number;
   /** true when every active slot for this story is complete */
@@ -57,7 +58,7 @@ export async function fetchAirwaysData(
   // ── All active stories ordered ───────────────────────────────
   const { data: storiesRaw } = await supabase
     .from("stories")
-    .select("id, title, cover_url, sort_order")
+    .select("id, title, slug, cover_url, sort_order")
     .eq("is_active", true)
     .order("sort_order");
   if (!storiesRaw?.length) {
@@ -114,11 +115,13 @@ export async function fetchAirwaysData(
   return { ...child, sibling_rank, stories, current_story };
 }
 
-/** Derives the champion number from child name + sibling rank.
- *  Format: {FIRST3}-A-{003} e.g. KET-A-001 */
-export function championNumber(name: string, rank: number): string {
+/** Derives the champion number from child name, current story sort_order, and sibling rank.
+ *  Format: {FIRST3}-{storyLetter}-{rank:003}
+ *  e.g. story 1 → KET-A-001, story 2 → KET-B-001, story 26 → KET-Z-001 */
+export function championNumber(name: string, storyOrder: number, rank: number): string {
   const prefix = name.replace(/[^A-Za-z]/g, "").toUpperCase().slice(0, 3).padEnd(3, "X");
-  return `${prefix}-A-${String(rank).padStart(3, "0")}`;
+  const letter = String.fromCharCode(64 + Math.min(storyOrder, 26)); // A=1, B=2 … Z=26
+  return `${prefix}-${letter}-${String(rank).padStart(3, "0")}`;
 }
 
 /** Flight number for a given book (1-based sort_order).

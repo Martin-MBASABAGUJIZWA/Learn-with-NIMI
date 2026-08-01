@@ -4,7 +4,7 @@ import supabase from '@/lib/supabaseClient'
 import { getCachedAdmin } from './adminAuth'
 import {
   Plane, Upload, Trash2, ExternalLink, CheckCircle2, AlertCircle,
-  RefreshCw, X, Menu, Copy, Check, ImageIcon,
+  RefreshCw, X, Menu, Copy, Check, ImageIcon, Download,
 } from 'lucide-react'
 import { ACCENT } from './missionMeta'
 
@@ -59,9 +59,9 @@ const SLOTS: TemplateSlot[] = [
   {
     key: 'champion-kit',
     label: 'Champion Kit',
-    description: 'Blue suitcase toy reference image (day version).',
-    note: 'Reference only — not used in PDF generation.',
-    required: false,
+    description: 'Blue suitcase kit template (1254×1254px). Contains the boarding pass panel on the right and the passport cover on the left — both already baked into the template.',
+    note: 'Overlay: child photo (handle area), boarding pass values (name, age, status, flight, destination, livre, siège, porte, embarquement), real barcode, QR code.',
+    required: true,
   },
   {
     key: 'carry-on-day',
@@ -95,6 +95,8 @@ interface AirwaysTemplatesManagerProps {
   onOpenSidebar?: () => void
 }
 
+interface Child { id: string; name: string; age: number | null }
+
 export default function AirwaysTemplatesManager({ onNavigate, onOpenSidebar }: AirwaysTemplatesManagerProps) {
   const [admin, setAdmin] = useState<{ name: string; role: string } | null>(null)
   const [slotStates, setSlotStates] = useState<Record<string, SlotState>>(() =>
@@ -103,9 +105,45 @@ export default function AirwaysTemplatesManager({ onNavigate, onOpenSidebar }: A
   const [globalError, setGlobalError] = useState<string | null>(null)
   const [refreshKey, setRefreshKey] = useState(0)
 
+  // ── Test download ─────────────────────────────────────────────
+  const [children, setChildren] = useState<Child[]>([])
+  const [selectedChild, setSelectedChild] = useState<string>('')
+  const [testDoc, setTestDoc] = useState<'kit' | 'boarding-pass'>('kit')
+  const [downloading, setDownloading] = useState(false)
+  const [dlError, setDlError] = useState<string | null>(null)
+
   useEffect(() => {
     getCachedAdmin().then(a => { if (a) setAdmin(a) }).catch(() => {})
   }, [])
+
+  useEffect(() => {
+    supabase.from('children').select('id, name, age').order('name').limit(100)
+      .then(({ data }) => { if (data) setChildren(data) })
+  }, [])
+
+  const handleTestDownload = async () => {
+    if (!selectedChild) return
+    setDownloading(true)
+    setDlError(null)
+    try {
+      const res = await fetch(`/api/airways/${testDoc}?childId=${selectedChild}&format=png`)
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}))
+        throw new Error(j.error ?? `HTTP ${res.status}`)
+      }
+      const blob = await res.blob()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `test_${testDoc}.png`
+      a.click()
+      URL.revokeObjectURL(url)
+    } catch (err) {
+      setDlError(err instanceof Error ? err.message : 'Download failed')
+    } finally {
+      setDownloading(false)
+    }
+  }
 
   const updateSlot = useCallback((key: string, patch: Partial<SlotState>) => {
     setSlotStates(prev => ({ ...prev, [key]: { ...prev[key], ...patch } }))
@@ -121,7 +159,7 @@ export default function AirwaysTemplatesManager({ onNavigate, onOpenSidebar }: A
         // HEAD the URL to confirm it exists
         const res = await fetch(data.publicUrl, { method: 'HEAD', signal: AbortSignal.timeout(4000) })
         if (res.ok) {
-          updateSlot(key, { url: data.publicUrl, loading: false })
+          updateSlot(key, { url: `${data.publicUrl}?t=${Date.now()}`, loading: false })
           return
         }
       }
@@ -144,7 +182,7 @@ export default function AirwaysTemplatesManager({ onNavigate, onOpenSidebar }: A
       if (error) throw error
       // After upload, get the public URL directly
       const { data } = supabase.storage.from(BUCKET).getPublicUrl(fileName)
-      updateSlot(key, { uploading: false, url: data.publicUrl })
+      updateSlot(key, { uploading: false, url: `${data.publicUrl}?t=${Date.now()}` })
     } catch (err) {
       updateSlot(key, { uploading: false, error: err instanceof Error ? err.message : 'Upload failed.' })
     }
@@ -255,6 +293,53 @@ export default function AirwaysTemplatesManager({ onNavigate, onOpenSidebar }: A
             the child's personalized data (name, photo, QR code, dates) on top — exactly like the certificate system.
             Required templates must be uploaded before boarding passes and passports can be generated.
           </p>
+        </div>
+
+        {/* ── Test download panel ───────────────────────────── */}
+        <div className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm space-y-3">
+          <p className="font-bold text-gray-800 text-sm flex items-center gap-2">
+            <Download className="w-4 h-4 text-green-600" /> Test a document
+          </p>
+          <p className="text-xs text-gray-400">Pick a child and document type — downloads a PNG so you can check the overlay positions.</p>
+          <div className="flex flex-wrap gap-3 items-end">
+            <div className="flex-1 min-w-[180px]">
+              <label className="text-xs font-semibold text-gray-500 mb-1 block">Child</label>
+              <select
+                value={selectedChild}
+                onChange={e => setSelectedChild(e.target.value)}
+                className="w-full text-sm border border-gray-200 rounded-xl px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-200"
+              >
+                <option value="">— Select a child —</option>
+                {children.map(c => (
+                  <option key={c.id} value={c.id}>{c.name}{c.age ? ` (${c.age} ans)` : ''}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="text-xs font-semibold text-gray-500 mb-1 block">Document</label>
+              <select
+                value={testDoc}
+                onChange={e => setTestDoc(e.target.value as 'kit' | 'boarding-pass')}
+                className="text-sm border border-gray-200 rounded-xl px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-200"
+              >
+                <option value="kit">Champion Kit</option>
+                <option value="boarding-pass">Boarding Pass</option>
+              </select>
+            </div>
+            <button
+              onClick={handleTestDownload}
+              disabled={!selectedChild || downloading}
+              className="flex items-center gap-2 bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white text-sm font-bold px-4 py-2 rounded-full transition"
+            >
+              {downloading
+                ? <RefreshCw className="w-4 h-4 animate-spin" />
+                : <Download className="w-4 h-4" />}
+              {downloading ? 'Generating…' : 'Download PNG'}
+            </button>
+          </div>
+          {dlError && (
+            <p className="text-xs text-red-600 bg-red-50 rounded-lg px-3 py-2">{dlError}</p>
+          )}
         </div>
 
         {/* Template slots */}

@@ -6,7 +6,7 @@ import { getServiceClient } from '@/lib/supabase/serviceClient'
 import { PDFDocument } from 'pdf-lib'
 import sharp from 'sharp'
 import { fetchAirwaysData } from '@/lib/airways/airwaysData'
-import { buildBoardingPassImage } from '@/lib/airways/buildBoardingPassImage'
+import { buildKitImage, type KitLayout } from '@/lib/airways/buildKitImage'
 
 async function fetchPhotoBuffer(url: string): Promise<Buffer | null> {
   try {
@@ -21,76 +21,90 @@ async function fetchPhotoBuffer(url: string): Promise<Buffer | null> {
 async function pngToPdf(png: Buffer): Promise<Uint8Array> {
   const doc = await PDFDocument.create()
   const img = await doc.embedPng(png)
-  const pw = 595, ph = 842
-  const scale = Math.min(pw / img.width, ph / img.height)
-  const page = doc.addPage([pw, ph])
-  page.drawImage(img, {
-    x: (pw - img.width * scale) / 2,
-    y: (ph - img.height * scale) / 2,
-    width: img.width * scale,
-    height: img.height * scale,
-  })
+  const page = doc.addPage([img.width, img.height])
+  page.drawImage(img, { x: 0, y: 0, width: img.width, height: img.height })
   return doc.save()
 }
 
 export async function GET(req: NextRequest) {
   const supabase = getServiceClient()
+  const user = await getAuthUser(req)
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
   const { searchParams } = new URL(req.url)
   const childId = searchParams.get('childId')
   const format = searchParams.get('format') === 'png' ? 'png' : 'pdf'
 
   if (!childId) return NextResponse.json({ error: 'childId required' }, { status: 400 })
 
-  const user = await getAuthUser(req)
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-
-  const { data: child } = await supabase
-    .from('children').select('parent_id').eq('id', childId).single()
-  if (child?.parent_id !== user.id) {
+  // Verify ownership — admins can download any child's kit
+  const [{ data: child }, { data: adminRow }] = await Promise.all([
+    supabase.from('children').select('parent_id').eq('id', childId).single(),
+    supabase.from('admins').select('id').eq('id', user.id).maybeSingle(),
+  ])
+  if (!adminRow && child?.parent_id !== user.id) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
   const data = await fetchAirwaysData(supabase, childId)
   if (!data) return NextResponse.json({ error: 'Child not found' }, { status: 404 })
 
+  // Load saved layout from DB (falls back to hardcoded defaults if empty)
+  const { data: layoutRows } = await supabase.from('kit_layout').select('field,x,y,w,h,font_size,bold,color')
+  const layout: KitLayout = {}
+  for (const row of layoutRows ?? []) {
+    layout[row.field] = { x: row.x, y: row.y, w: row.w, h: row.h, font_size: row.font_size, bold: row.bold, color: row.color }
+  }
+
+  // Current story = first incomplete story, or story 1 if none started
   const currentStory = data.current_story ?? data.stories[0] ?? null
-  if (!currentStory) return NextResponse.json({ error: 'No story available' }, { status: 404 })
+  if (!currentStory) {
+    return NextResponse.json({ error: 'No story available for this child' }, { status: 404 })
+  }
 
   const supaUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''
+
+  // Fetch child photo
   let photoBuffer: Buffer | null = null
   if (data.avatar_url) {
     const photoUrl = data.avatar_url.startsWith('http')
       ? data.avatar_url
       : `${supaUrl}/storage/v1/object/public/${data.avatar_url}`
-    const raw = await fetchPhotoBuffer(photoUrl)
-    if (raw) photoBuffer = await sharp(raw).png().toBuffer()
+    photoBuffer = await fetchPhotoBuffer(photoUrl)
+    if (photoBuffer) {
+      // Normalize to PNG
+      photoBuffer = await sharp(photoBuffer).png().toBuffer()
+    }
   }
 
-  const png = await buildBoardingPassImage({
+  // Build the full kit (overlays all values directly onto the kit template)
+  const kitBuffer = await buildKitImage({
     childName: data.name,
     age: data.age,
     storyTitle: currentStory.title,
     storyNumber: currentStory.sort_order,
+    storySlug: currentStory.slug ?? String(currentStory.sort_order),
     childId: data.id,
     photoBuffer,
+    layout,
   })
 
   const safeName = data.name.toLowerCase().replace(/\s+/g, '_')
 
   if (format === 'png') {
-    return new NextResponse(new Uint8Array(png), {
+    return new NextResponse(new Uint8Array(kitBuffer), {
       headers: {
         'Content-Type': 'image/png',
-        'Content-Disposition': `attachment; filename="${safeName}_boarding_pass.png"`,
+        'Content-Disposition': `attachment; filename="${safeName}_kit_nimipiko.png"`,
       },
     })
   }
 
-  const pdfBytes = await pngToPdf(png)
+  const pdfBytes = await pngToPdf(kitBuffer)
   return new NextResponse(new Uint8Array(pdfBytes), {
     headers: {
       'Content-Type': 'application/pdf',
-      'Content-Disposition': `attachment; filename="${safeName}_boarding_pass.pdf"`,
+      'Content-Disposition': `attachment; filename="${safeName}_kit_nimipiko.pdf"`,
     },
   })
 }

@@ -109,7 +109,7 @@ export async function GET(req: NextRequest) {
   // Page 2: Identity
   const identitySvg = buildPassportIdentitySvg({
     childName: data.name,
-    championNumber: championNumber(data.name, data.sibling_rank),
+    championNumber: championNumber(data.name, data.current_story?.sort_order ?? 1, data.sibling_rank),
     createdAt: data.created_at,
     photoDataUri: photoUri ?? null,
     qrDataUri: qr,

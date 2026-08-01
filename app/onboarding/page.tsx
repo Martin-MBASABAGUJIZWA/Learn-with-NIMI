@@ -101,7 +101,7 @@ export default function OnboardingPage() {
     }
 
     setDone(true);
-    setTimeout(() => router.replace("/home"), 1000);
+    setTimeout(() => router.replace("/home"), 3000);
   }, [childName, ageGroup, language, avatarCfg, router]);
 
   return (
@@ -316,7 +316,25 @@ export default function OnboardingPage() {
                 <motion.div className="mt-5 h-1.5 bg-emerald-100 rounded-full overflow-hidden w-48">
                   <motion.div className="h-full bg-emerald-500 rounded-full"
                     initial={{ width:"0%" }} animate={{ width:"100%" }}
-                    transition={{ duration:0.9, ease:"easeInOut" }} />
+                    transition={{ duration:2.8, ease:"easeInOut" }} />
+                </motion.div>
+
+                {/* Airways teaser */}
+                <motion.div
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.8, duration: 0.4 }}
+                  className="mt-6 w-full bg-blue-50 rounded-2xl px-4 py-3 flex items-center gap-3 text-left"
+                >
+                  <span className="text-2xl">🧳</span>
+                  <div>
+                    <p className="font-baloo font-black text-blue-900 text-sm leading-tight">
+                      Your Champion Kit is ready!
+                    </p>
+                    <p className="text-blue-500 text-xs font-nunito">
+                      Download it from your profile anytime ✈️
+                    </p>
+                  </div>
                 </motion.div>
               </div>
             </motion.div>

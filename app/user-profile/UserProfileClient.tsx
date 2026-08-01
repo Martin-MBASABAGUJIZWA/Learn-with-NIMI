@@ -28,6 +28,7 @@ import supabase from "@/lib/supabaseClient";
 import { getActiveSubscription } from "@/lib/payments/products";
 import { Crown, Download, Loader2 } from "lucide-react";
 import NextMilestoneCard from "@/components/profile/NextMilestoneCard";
+import AirwaysCard from "@/components/profile/AirwaysCard";
 
 const ACTIVE_CHILD_KEY = "nimipiko_active_child";
 
@@ -526,6 +527,9 @@ export default function UserProfileClient({ initialChildren, initialHasSubscript
                   totalStars={totalStars}
                   imageMap={badgeImageMap}
                 />
+                {activeChild && (
+                  <AirwaysCard childId={activeChild.id} childName={childName} />
+                )}
                 <EarnedAchievementsCard earnedSlugs={earnedBadgeSlugs} imageMap={badgeImageMap} certificates={certificates} hasSubscription={hasSubscription} childName={childName} />
               </motion.div>
             )}
