@@ -6,6 +6,7 @@
 // ══════════════════════════════════════════════════════════════
 
 import type { AirwaysStory } from "./airwaysData";
+import { svgFontStyle } from "./svgFont";
 
 const W = 1080;
 const H = 1400;
@@ -52,33 +53,33 @@ function stampCell(opts: {
     ? `<circle cx="${x + W_CELL - 26}" cy="${y + H_CELL - 26}" r="22"
         fill="${GREEN}" opacity="0.9"/>
       <text x="${x + W_CELL - 26}" y="${y + H_CELL - 21}" text-anchor="middle"
-        font-size="11" font-family="Arial Black,sans-serif" fill="white" font-weight="900">✓</text>`
+        font-size="11" font-family="DejaVu,sans-serif" fill="white" font-weight="900">✓</text>`
     : "";
 
   const dateBlock = isComplete
     ? `<text x="${x + W_CELL / 2}" y="${y + H_CELL - 22}" text-anchor="middle"
-        font-size="11" font-family="Arial,sans-serif" fill="${GOLD}">${esc(dateStr)}</text>`
+        font-size="11" font-family="DejaVu,sans-serif" fill="${GOLD}">${esc(dateStr)}</text>`
     : `<text x="${x + W_CELL / 2}" y="${y + H_CELL - 28}" text-anchor="middle"
-        font-size="11" font-family="Arial,sans-serif" fill="#AAAAAA">DATE :</text>
+        font-size="11" font-family="DejaVu,sans-serif" fill="#AAAAAA">DATE :</text>
       <text x="${x + W_CELL / 2}" y="${y + H_CELL - 14}" text-anchor="middle"
-        font-size="11" font-family="Arial,sans-serif" fill="#AAAAAA">__ /__ /____</text>`;
+        font-size="11" font-family="DejaVu,sans-serif" fill="#AAAAAA">__ /__ /____</text>`;
 
   const bookNumBadge = `
     <circle cx="${x + 24}" cy="${y + 24}" r="16" fill="${isComplete ? GOLD : "#CCCCCC"}"/>
     <text x="${x + 24}" y="${y + 29}" text-anchor="middle"
-      font-size="14" font-family="Arial Black,sans-serif" font-weight="900"
+      font-size="14" font-family="DejaVu,sans-serif" font-weight="900"
       fill="${isComplete ? NAVY : "white"}">${bookNum}</text>`;
 
   const titleText = isComplete
     ? `<text x="${x + W_CELL / 2}" y="${y + 188}" text-anchor="middle"
-        font-size="11" font-family="Arial Black,sans-serif" font-weight="900"
+        font-size="11" font-family="DejaVu,sans-serif" font-weight="900"
         fill="${NAVY}">${esc(title.length > 16 ? title.slice(0, 14) + "…" : title)}</text>`
     : `<text x="${x + W_CELL / 2}" y="${y + 188}" text-anchor="middle"
-        font-size="11" font-family="Arial,sans-serif" font-style="italic"
+        font-size="11" font-family="DejaVu,sans-serif" font-style="italic"
         fill="#AAAAAA">À découvrir !</text>`;
 
   const livreLine = `<text x="${x + 44}" y="${y + 22}" font-size="10"
-    font-family="Arial,sans-serif" fill="${isComplete ? GOLD : "#AAAAAA"}" letter-spacing="1">LIVRE ${bookNum}</text>`;
+    font-family="DejaVu,sans-serif" fill="${isComplete ? GOLD : "#AAAAAA"}" letter-spacing="1">LIVRE ${bookNum}</text>`;
 
   return `
   <defs>${clipPath}</defs>
@@ -122,10 +123,10 @@ export function buildStampsSvg(opts: StampsOptions): string {
     ? `<rect x="${W / 2 - 250}" y="${H - 170}" width="500" height="80" rx="12"
         fill="${GOLD}" opacity="0.95"/>
       <text x="${W / 2}" y="${H - 125}" text-anchor="middle"
-        font-size="20" font-family="Arial Black,sans-serif" font-weight="900"
+        font-size="20" font-family="DejaVu,sans-serif" font-weight="900"
         fill="${NAVY}">🎉 FÉLICITATIONS GRAND CHAMPION ! 🎉</text>`
     : `<text x="${W / 2}" y="${H - 125}" text-anchor="middle"
-        font-size="16" font-family="Arial,sans-serif" fill="${NAVY}" opacity="0.5">
+        font-size="16" font-family="DejaVu,sans-serif" fill="${NAVY}" opacity="0.5">
         ${completedCount} / ${TOTAL} histoires terminées
       </text>`;
 
@@ -150,9 +151,9 @@ export function buildStampsSvg(opts: StampsOptions): string {
         fill="#F0F0F0" stroke="#DDDDDD" stroke-width="1.5" opacity="0.5"/>
       <circle cx="${x + 24}" cy="${y + 24}" r="16" fill="#DDDDDD"/>
       <text x="${x + 24}" y="${y + 29}" text-anchor="middle"
-        font-size="14" font-family="Arial Black,sans-serif" fill="white">${i + 1}</text>
+        font-size="14" font-family="DejaVu,sans-serif" fill="white">${i + 1}</text>
       <text x="${x + CELL_W / 2}" y="${y + 145}" text-anchor="middle"
-        font-size="11" font-family="Arial,sans-serif" font-style="italic" fill="#AAAAAA">À découvrir !</text>`;
+        font-size="11" font-family="DejaVu,sans-serif" font-style="italic" fill="#AAAAAA">À découvrir !</text>`;
     }
 
     const cover = coverUris.get(story.id) ?? null;
@@ -172,6 +173,7 @@ export function buildStampsSvg(opts: StampsOptions): string {
 
   return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
   width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
+${svgFontStyle()}
 <defs>
   <filter id="stampShadow" x="-8%" y="-8%" width="116%" height="116%">
     <feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#00000020"/>
@@ -198,7 +200,7 @@ export function buildStampsSvg(opts: StampsOptions): string {
 
 <!-- RÉPUBLIQUE DES CHAMPIONS header -->
 <text x="${W / 2}" y="62" text-anchor="middle"
-  font-size="18" font-family="Arial Black,sans-serif" font-weight="900"
+  font-size="18" font-family="DejaVu,sans-serif" font-weight="900"
   fill="${NAVY}" letter-spacing="2">RÉPUBLIQUE DES CHAMPIONS</text>
 
 <text x="${W - 50}" y="58" font-size="22" fill="${GOLD}" text-anchor="middle">★</text>
@@ -207,21 +209,21 @@ export function buildStampsSvg(opts: StampsOptions): string {
 
 <!-- COLLECTION OFFICIELLE large title -->
 <text x="${W / 2}" y="108" text-anchor="middle"
-  font-size="44" font-family="Arial Black,sans-serif" font-weight="900"
+  font-size="44" font-family="DejaVu,sans-serif" font-weight="900"
   fill="${NAVY}">COLLECTION OFFICIELLE</text>
 
 <text x="${W / 2}" y="152" text-anchor="middle"
-  font-size="26" font-family="Arial Black,sans-serif" font-weight="900"
+  font-size="26" font-family="DejaVu,sans-serif" font-weight="900"
   fill="${GOLD}">DES TIMBRES DE VOYAGE NIMIPIKO</text>
 
 <!-- Subtitle: champion name + stats -->
 <text x="${W / 2}" y="188" text-anchor="middle"
-  font-size="16" font-family="Arial,sans-serif" fill="${NAVY}" opacity="0.7">
+  font-size="16" font-family="DejaVu,sans-serif" fill="${NAVY}" opacity="0.7">
   🌿 ${completedCount} HISTOIRE${completedCount !== 1 ? "S" : ""} · ${completedCount} DESTINATION${completedCount !== 1 ? "S" : ""} · ${completedCount} SOUVENIR${completedCount !== 1 ? "S" : ""} INOUBLIABLE${completedCount !== 1 ? "S" : ""} 🌿
 </text>
 
 <text x="${W / 2}" y="215" text-anchor="middle"
-  font-size="14" font-family="Arial,sans-serif" fill="${GOLD}">
+  font-size="14" font-family="DejaVu,sans-serif" fill="${GOLD}">
   Champion : ${esc(childName.toUpperCase())}
 </text>
 
@@ -230,17 +232,17 @@ ${stamps}
 
 <!-- Stars progress row -->
 <text x="${W / 2 - 5.5 * 36 - 18}" y="${H - 55}" font-size="16"
-  font-family="Arial,sans-serif" fill="${NAVY}">1</text>
+  font-family="DejaVu,sans-serif" fill="${NAVY}">1</text>
 ${starsRow}
 <text x="${W / 2 + 6.5 * 36}" y="${H - 55}" font-size="16"
-  font-family="Arial,sans-serif" fill="${NAVY}">12</text>
+  font-family="DejaVu,sans-serif" fill="${NAVY}">12</text>
 
 <!-- Completion badge or progress -->
 ${completionBadge}
 
 <!-- Bottom watermark -->
 <text x="${W / 2}" y="${H - 18}" text-anchor="middle"
-  font-size="10" font-family="Arial,sans-serif" fill="${GOLD}" opacity="0.5">
+  font-size="10" font-family="DejaVu,sans-serif" fill="${GOLD}" opacity="0.5">
   p. 13 / 13 ★ nimipiko.com
 </text>
 </svg>`;
