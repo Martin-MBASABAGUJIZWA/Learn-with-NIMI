@@ -1,4 +1,5 @@
 import sharp from 'sharp'
+import { createCanvas } from 'canvas'
 import { fetchTemplate } from './templateFetcher'
 import { barcodeBuffer } from './barcode'
 
@@ -47,13 +48,19 @@ function get(layout: BPLayout, key: string): BPFieldLayout {
   }
 }
 
-function svgText(text: string, pos: BPFieldLayout): string {
-  const size   = pos.font_size ?? 28
-  const weight = pos.bold !== false ? 'font-weight="700"' : ''
-  const color  = pos.color ?? '#1a1a2e'
-  const safe   = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
-  return `<text x="${pos.x}" y="${pos.y + size}" font-size="${size}" fill="${color}" ${weight}
-    font-family="Arial, Helvetica, sans-serif">${safe}</text>`
+interface BPTextField { text: string; pos: BPFieldLayout }
+
+function renderTextOverlay(W: number, H: number, fields: BPTextField[]): Buffer {
+  const canvas = createCanvas(W, H)
+  const ctx    = canvas.getContext('2d')
+  for (const { text, pos } of fields) {
+    const size   = pos.font_size ?? 28
+    const weight = pos.bold !== false ? 'bold' : 'normal'
+    ctx.font      = `${weight} ${size}px sans-serif`
+    ctx.fillStyle = pos.color ?? '#1a1a2e'
+    ctx.fillText(text, pos.x, pos.y + size)
+  }
+  return canvas.toBuffer('image/png')
 }
 
 function flightNum(n: number)               { return `NMP1${String(n).padStart(2, '0')}` }
@@ -92,19 +99,17 @@ export async function buildBoardingPassImage(data: BoardingPassData): Promise<Bu
     composites.push({ input: photo, left: phPos.x, top: phPos.y })
   }
 
-  const svg = `<svg width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">
-    ${svgText(data.childName.toUpperCase(),        get(layout, 'name'))}
-    ${svgText(`${data.age ?? '?'} ANS`,             get(layout, 'age'))}
-    ${svgText(statusLabel(data.storyNumber),        get(layout, 'statut'))}
-    ${svgText(flightNum(data.storyNumber),          get(layout, 'vol'))}
-    ${svgText(data.storyTitle.toUpperCase(),        get(layout, 'destination'))}
-    ${svgText(String(data.storyNumber),             get(layout, 'livre'))}
-    ${svgText(seatNum(data.age, data.storyNumber),  get(layout, 'siege'))}
-    ${svgText(gateNum(data.storyNumber),            get(layout, 'porte'))}
-    ${svgText('OUVERT',                             get(layout, 'embarquement'))}
-  </svg>`
-
-  const textOverlay = await sharp(Buffer.from(svg)).png().toBuffer()
+  const textOverlay = renderTextOverlay(W, H, [
+    { text: data.childName.toUpperCase(),          pos: get(layout, 'name') },
+    { text: `${data.age ?? '?'} ANS`,              pos: get(layout, 'age') },
+    { text: statusLabel(data.storyNumber),         pos: get(layout, 'statut') },
+    { text: flightNum(data.storyNumber),           pos: get(layout, 'vol') },
+    { text: data.storyTitle.toUpperCase(),         pos: get(layout, 'destination') },
+    { text: String(data.storyNumber),              pos: get(layout, 'livre') },
+    { text: seatNum(data.age, data.storyNumber),   pos: get(layout, 'siege') },
+    { text: gateNum(data.storyNumber),             pos: get(layout, 'porte') },
+    { text: 'OUVERT',                              pos: get(layout, 'embarquement') },
+  ])
 
   composites.push(
     { input: textOverlay,    left: 0,       top: 0       },

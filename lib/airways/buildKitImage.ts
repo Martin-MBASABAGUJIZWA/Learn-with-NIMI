@@ -1,4 +1,5 @@
 import sharp from 'sharp'
+import { createCanvas } from 'canvas'
 import { fetchTemplate } from './templateFetcher'
 import { barcodeBuffer } from './barcode'
 import { qrPngBuffer } from './qrCode'
@@ -52,27 +53,21 @@ function get(layout: KitLayout, key: string): KitFieldLayout {
   }
 }
 
-function svgText(text: string, pos: KitFieldLayout, maxWidth?: number): string {
-  // Auto-shrink font when text is wide; hard-clip with clipPath if still too wide
-  const baseSize = pos.font_size ?? 14
-  // Estimate: each char ≈ 0.65 × fontSize wide
-  const estWidth = text.length * baseSize * 0.65
-  const size = maxWidth && estWidth > maxWidth
-    ? Math.max(8, Math.round(baseSize * maxWidth / estWidth))
-    : baseSize
-  const fw    = pos.bold !== false ? 'font-weight="700"' : ''
-  const color = pos.color ?? '#1a1a2e'
-  const safe  = text
-    .replace(/&/g, '&amp;').replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;').replace(/"/g, '&quot;')
-  if (maxWidth) {
-    const id = `cl_${pos.x}_${pos.y}`
-    return `<defs><clipPath id="${id}"><rect x="${pos.x}" y="${pos.y}" width="${maxWidth}" height="${size + 4}"/></clipPath></defs>
-    <text x="${pos.x}" y="${pos.y + size}" font-size="${size}" fill="${color}" ${fw}
-      font-family="Arial,Helvetica,sans-serif" clip-path="url(#${id})">${safe}</text>`
+interface TextField { text: string; pos: KitFieldLayout; maxWidth?: number }
+
+function renderTextOverlay(W: number, H: number, fields: TextField[]): Buffer {
+  const canvas = createCanvas(W, H)
+  const ctx    = canvas.getContext('2d')
+  for (const { text, pos, maxWidth } of fields) {
+    const size  = pos.font_size ?? 14
+    const weight = pos.bold !== false ? 'bold' : 'normal'
+    ctx.font      = `${weight} ${size}px sans-serif`
+    ctx.fillStyle = pos.color ?? '#1a1a2e'
+    const y = pos.y + size // baseline
+    if (maxWidth) ctx.fillText(text, pos.x, y, maxWidth)
+    else          ctx.fillText(text, pos.x, y)
   }
-  return `<text x="${pos.x}" y="${pos.y + size}" font-size="${size}" fill="${color}" ${fw}
-    font-family="Arial,Helvetica,sans-serif">${safe}</text>`
+  return canvas.toBuffer('image/png')
 }
 
 function flightNum(n: number)                    { return `NMP1${String(n).padStart(2, '0')}` }
@@ -132,19 +127,17 @@ export async function buildKitImage(data: KitData): Promise<Buffer> {
     .resize(qrPos.w ?? 120, qrPos.h ?? 120, { fit: 'fill' })
     .png().toBuffer()
 
-  const svg = `<svg width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">
-    ${svgText(data.childName.toUpperCase(),              get(layout, 'champion'))}
-    ${svgText(`${data.age ?? '?'} ANS`,                  get(layout, 'age'))}
-    ${svgText(statusLabel(data.storyNumber),             get(layout, 'statut'))}
-    ${svgText(flightNum(data.storyNumber),               get(layout, 'vol'))}
-    ${svgText(data.storyTitle.toUpperCase(),             get(layout, 'destination'), 160)}
-    ${svgText(String(data.storyNumber),                  get(layout, 'livre'))}
-    ${svgText(seatNum(data.age, data.storyNumber),       get(layout, 'siege'))}
-    ${svgText(gateNum(data.storyNumber),                 get(layout, 'porte'))}
-    ${svgText('OUVERT',                                  get(layout, 'embarquement'))}
-  </svg>`
-
-  const textOverlay = await sharp(Buffer.from(svg)).png().toBuffer()
+  const textOverlay = renderTextOverlay(W, H, [
+    { text: data.childName.toUpperCase(),           pos: get(layout, 'champion') },
+    { text: `${data.age ?? '?'} ANS`,               pos: get(layout, 'age') },
+    { text: statusLabel(data.storyNumber),          pos: get(layout, 'statut') },
+    { text: flightNum(data.storyNumber),            pos: get(layout, 'vol') },
+    { text: data.storyTitle.toUpperCase(),          pos: get(layout, 'destination'), maxWidth: 160 },
+    { text: String(data.storyNumber),               pos: get(layout, 'livre') },
+    { text: seatNum(data.age, data.storyNumber),    pos: get(layout, 'siege') },
+    { text: gateNum(data.storyNumber),              pos: get(layout, 'porte') },
+    { text: 'OUVERT',                               pos: get(layout, 'embarquement') },
+  ])
 
   const composites: sharp.OverlayOptions[] = []
 
