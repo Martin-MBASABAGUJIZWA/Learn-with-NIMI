@@ -37,19 +37,19 @@ const FIELDS_KIT: FieldDef[] = [
 ]
 
 const INIT_KIT: Record<string, Pos> = {
-  photo:        { x: 710,  y: 440, w: 133, h: 195, size: 0  },
+  photo:        { x: 638,  y: 518, w: 133, h: 195, size: 0  },
   handle_photo: { x: 490,  y: 30,  w: 270, h: 170, size: 0  },
-  champion:     { x: 918,  y: 428, w: 150, h: 33,  size: 24 },
-  age:          { x: 918,  y: 461, w: 150, h: 33,  size: 20 },
-  statut:       { x: 918,  y: 494, w: 150, h: 33,  size: 20 },
-  vol:          { x: 918,  y: 527, w: 150, h: 33,  size: 20 },
-  destination:  { x: 918,  y: 560, w: 150, h: 33,  size: 18 },
-  livre:        { x: 918,  y: 593, w: 150, h: 33,  size: 20 },
-  siege:        { x: 918,  y: 626, w: 150, h: 33,  size: 20 },
-  porte:        { x: 918,  y: 659, w: 150, h: 33,  size: 20 },
-  embarquement: { x: 918,  y: 692, w: 150, h: 33,  size: 20 },
-  barcode:      { x: 703,  y: 750, w: 382, h: 40,  size: 0  },
-  qr:           { x: 1058, y: 898, w: 148, h: 148, size: 0  },
+  champion:     { x: 887,  y: 507, w: 150, h: 33,  size: 24 },
+  age:          { x: 836,  y: 537, w: 150, h: 33,  size: 20 },
+  statut:       { x: 858,  y: 564, w: 150, h: 33,  size: 20 },
+  vol:          { x: 846,  y: 599, w: 150, h: 33,  size: 20 },
+  destination:  { x: 895,  y: 625, w: 150, h: 33,  size: 18 },
+  livre:        { x: 856,  y: 646, w: 150, h: 33,  size: 20 },
+  siege:        { x: 856,  y: 667, w: 150, h: 33,  size: 20 },
+  porte:        { x: 863,  y: 690, w: 150, h: 33,  size: 20 },
+  embarquement: { x: 906,  y: 712, w: 150, h: 33,  size: 20 },
+  barcode:      { x: 613,  y: 751, w: 382, h: 40,  size: 0  },
+  qr:           { x: 1016, y: 958, w: 148, h: 148, size: 0  },
 }
 
 const COLORS_KIT: Record<string, string> = {
@@ -74,17 +74,17 @@ const FIELDS_BP: FieldDef[] = [
 ]
 
 const INIT_BP: Record<string, Pos> = {
-  photo:        { x: 42,  y: 268, w: 295, h: 372, size: 0  },
-  name:         { x: 400, y: 268, w: 600, h: 52,  size: 52 },
-  age:          { x: 400, y: 348, w: 600, h: 28,  size: 28 },
-  statut:       { x: 400, y: 402, w: 600, h: 28,  size: 28 },
-  vol:          { x: 400, y: 456, w: 600, h: 28,  size: 28 },
-  destination:  { x: 400, y: 510, w: 600, h: 28,  size: 28 },
-  livre:        { x: 400, y: 564, w: 600, h: 28,  size: 28 },
-  siege:        { x: 400, y: 618, w: 600, h: 28,  size: 28 },
-  porte:        { x: 400, y: 672, w: 600, h: 28,  size: 28 },
-  embarquement: { x: 400, y: 726, w: 600, h: 28,  size: 28 },
-  barcode:      { x: 80,  y: 820, w: 920, h: 100, size: 0  },
+  photo:        { x: 139, y: 362, w: 295, h: 372, size: 0  },
+  name:         { x: 698, y: 293, w: 350, h: 52,  size: 52 },
+  age:          { x: 610, y: 373, w: 350, h: 28,  size: 28 },
+  statut:       { x: 650, y: 434, w: 350, h: 28,  size: 28 },
+  vol:          { x: 652, y: 491, w: 350, h: 28,  size: 28 },
+  destination:  { x: 761, y: 549, w: 350, h: 28,  size: 28 },
+  livre:        { x: 679, y: 603, w: 350, h: 28,  size: 28 },
+  siege:        { x: 675, y: 661, w: 350, h: 28,  size: 28 },
+  porte:        { x: 688, y: 715, w: 350, h: 28,  size: 28 },
+  embarquement: { x: 751, y: 771, w: 350, h: 28,  size: 28 },
+  barcode:      { x: 87,  y: 845, w: 920, h: 100, size: 0  },
 }
 
 const COLORS_BP: Record<string, string> = {

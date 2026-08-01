@@ -117,8 +117,10 @@ export default function AirwaysTemplatesManager({ onNavigate, onOpenSidebar }: A
   }, [])
 
   useEffect(() => {
-    supabase.from('children').select('id, name, age').order('name').limit(100)
-      .then(({ data }) => { if (data) setChildren(data) })
+    fetch('/api/admin/children')
+      .then(r => r.json())
+      .then((data: Child[]) => { if (Array.isArray(data)) setChildren(data) })
+      .catch(() => {})
   }, [])
 
   const handleTestDownload = async () => {

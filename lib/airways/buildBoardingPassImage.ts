@@ -17,18 +17,19 @@ export interface BPFieldLayout {
 
 export type BPLayout = Record<string, BPFieldLayout>
 
+// ── Defaults calibrated from the boarding-pass template image ────
 const DEFAULTS: BPLayout = {
-  photo:        { x: 42,  y: 268, w: 295, h: 372 },
-  name:         { x: 400, y: 268, font_size: 52, bold: true, color: '#1a1a2e' },
-  age:          { x: 400, y: 348, font_size: 28, bold: true, color: '#1a1a2e' },
-  statut:       { x: 400, y: 402, font_size: 28, bold: true, color: '#16a34a' },
-  vol:          { x: 400, y: 456, font_size: 28, bold: true, color: '#1a1a2e' },
-  destination:  { x: 400, y: 510, font_size: 28, bold: true, color: '#1a1a2e' },
-  livre:        { x: 400, y: 564, font_size: 28, bold: true, color: '#1a1a2e' },
-  siege:        { x: 400, y: 618, font_size: 28, bold: true, color: '#1a1a2e' },
-  porte:        { x: 400, y: 672, font_size: 28, bold: true, color: '#1a1a2e' },
-  embarquement: { x: 400, y: 726, font_size: 28, bold: true, color: '#16a34a' },
-  barcode:      { x: 80,  y: 820, w: 920, h: 100 },
+  photo:        { x: 139, y: 362, w: 295, h: 372 },
+  name:         { x: 698, y: 293, font_size: 52, bold: true, color: '#1a1a2e' },
+  age:          { x: 610, y: 373, font_size: 28, bold: true, color: '#1a1a2e' },
+  statut:       { x: 650, y: 434, font_size: 28, bold: true, color: '#16a34a' },
+  vol:          { x: 652, y: 491, font_size: 28, bold: true, color: '#1a1a2e' },
+  destination:  { x: 761, y: 549, font_size: 28, bold: true, color: '#1a1a2e' },
+  livre:        { x: 679, y: 603, font_size: 28, bold: true, color: '#1a1a2e' },
+  siege:        { x: 675, y: 661, font_size: 28, bold: true, color: '#1a1a2e' },
+  porte:        { x: 688, y: 715, font_size: 28, bold: true, color: '#1a1a2e' },
+  embarquement: { x: 751, y: 771, font_size: 28, bold: true, color: '#16a34a' },
+  barcode:      { x: 87,  y: 845, w: 920, h: 100 },
 }
 
 function get(layout: BPLayout, key: string): BPFieldLayout {

@@ -20,26 +20,21 @@ export interface KitFieldLayout {
 
 export type KitLayout = Record<string, KitFieldLayout>
 
-// ── Defaults measured from the 1254×1254 template ────────────────
-// Boarding pass panel:  x 703–1079, y 339–790
-// Photo box:            x 703–840,  y 428–723   (137 × 295)
-// Field value column:   x 918,      y 428 + 33 × row
-// Barcode:              x 703,      y 735,  w 376, h 35
-// QR (bottom-right):    x 1068,     y 905,  w 120, h 120
+// ── Defaults calibrated from the champion-kit template image ─────
 const DEFAULTS: KitLayout = {
-  photo:        { x: 710,  y: 440, w: 133, h: 195 },
-  handle_photo: { x: 490,  y: 30,  w: 270, h: 170 },  // oval frame in suitcase handle
-  champion:     { x: 918,  y: 428, font_size: 24, bold: true,  color: '#1a1a2e' },
-  age:          { x: 918,  y: 461, font_size: 20, bold: true,  color: '#1a1a2e' },
-  statut:       { x: 918,  y: 494, font_size: 20, bold: true,  color: '#16a34a' },
-  vol:          { x: 918,  y: 527, font_size: 20, bold: true,  color: '#1a1a2e' },
-  destination:  { x: 918,  y: 560, font_size: 18, bold: true,  color: '#1a1a2e' },
-  livre:        { x: 918,  y: 593, font_size: 20, bold: true,  color: '#1a1a2e' },
-  siege:        { x: 918,  y: 626, font_size: 20, bold: true,  color: '#1a1a2e' },
-  porte:        { x: 918,  y: 659, font_size: 20, bold: true,  color: '#1a1a2e' },
-  embarquement: { x: 918,  y: 692, font_size: 20, bold: true,  color: '#16a34a' },
-  barcode:      { x: 703,  y: 735, w: 376, h: 35 },
-  qr:           { x: 1068, y: 905, w: 120, h: 120 },
+  photo:        { x: 638,  y: 518, w: 133, h: 195 },
+  handle_photo: { x: 490,  y: 30,  w: 270, h: 170 },
+  champion:     { x: 887,  y: 507, font_size: 24, bold: true,  color: '#1a1a2e' },
+  age:          { x: 836,  y: 537, font_size: 20, bold: true,  color: '#1a1a2e' },
+  statut:       { x: 858,  y: 564, font_size: 20, bold: true,  color: '#16a34a' },
+  vol:          { x: 846,  y: 599, font_size: 20, bold: true,  color: '#1a1a2e' },
+  destination:  { x: 895,  y: 625, font_size: 18, bold: true,  color: '#1a1a2e' },
+  livre:        { x: 856,  y: 646, font_size: 20, bold: true,  color: '#1a1a2e' },
+  siege:        { x: 856,  y: 667, font_size: 20, bold: true,  color: '#1a1a2e' },
+  porte:        { x: 863,  y: 690, font_size: 20, bold: true,  color: '#1a1a2e' },
+  embarquement: { x: 906,  y: 712, font_size: 20, bold: true,  color: '#16a34a' },
+  barcode:      { x: 613,  y: 751, w: 382, h: 40  },
+  qr:           { x: 1016, y: 958, w: 148, h: 148 },
 }
 
 function get(layout: KitLayout, key: string): KitFieldLayout {
