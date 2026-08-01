@@ -1,8 +1,8 @@
-import sharp from 'sharp'
+import sharp from 'sharp'  // still needed for fallback bg + composite
 import { createCanvas, registerFont, loadImage } from 'canvas'
 import type { CanvasRenderingContext2D, Image } from 'canvas'
 import path from 'path'
-import { fetchTemplate } from './templateFetcher'
+import { fetchTemplate, getTemplateDimensions } from './templateFetcher'
 import type { AirwaysStory } from './airwaysData'
 
 try {
@@ -104,15 +104,11 @@ export interface PassportSpreadData {
 export async function buildPassportSpread(data: PassportSpreadData): Promise<Buffer> {
   const L = { ...DEFAULTS, ...(data.layout ?? {}) }
 
-  // Fetch template and get its REAL dimensions
+  // Fetch template (cached — dimensions also cached, no extra sharp call needed)
   const templateBuf = await fetchTemplate('passport-interior')
-  let TW = SPREAD_W
-  let TH = SPREAD_H
-  if (templateBuf) {
-    const meta = await sharp(templateBuf).metadata()
-    TW = meta.width  ?? SPREAD_W
-    TH = meta.height ?? SPREAD_H
-  }
+  const dims = getTemplateDimensions('passport-interior')
+  let TW = dims?.width  ?? SPREAD_W
+  let TH = dims?.height ?? SPREAD_H
 
   // Scale layout positions if DB positions were saved for a different canvas size
   // (When no DB layout, DEFAULTS are already calibrated to SPREAD_W/SPREAD_H)
@@ -132,11 +128,7 @@ export async function buildPassportSpread(data: PassportSpreadData): Promise<Buf
 
   const ph = get(L, 'photo')
   if (data.photoDataUri) {
-    const photoResized = await sharp(Buffer.from(data.photoDataUri.split(',')[1], 'base64'))
-      .resize(sx(ph.w), sy(ph.h), { fit: 'cover', position: 'attention' })
-      .png().toBuffer()
-    const photoUri = `data:image/png;base64,${photoResized.toString('base64')}`
-    await drawImg(ctx, photoUri, sx(ph.x), sy(ph.y), sx(ph.w), sy(ph.h), true)
+    await drawImg(ctx, data.photoDataUri, sx(ph.x), sy(ph.y), sx(ph.w), sy(ph.h), true)
   }
 
   const qr = get(L, 'qr')
