@@ -25,12 +25,15 @@ export default function AirwaysCard({ childId, childName }: Props) {
     setLoading(prev => ({ ...prev, [key]: true }));
     setErrors(prev => ({ ...prev, [key]: null }));
     try {
+      // Prefer Bearer token when available; cookie auth handles the rest server-side
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.access_token) throw new Error("Not signed in");
+      const headers: HeadersInit = session?.access_token
+        ? { Authorization: `Bearer ${session.access_token}` }
+        : {};
 
       const res = await fetch(`/api/airways/${key}?childId=${childId}&format=pdf`, {
-        headers: { Authorization: `Bearer ${session.access_token}` },
-        signal: AbortSignal.timeout(60_000),
+        headers,
+        signal: AbortSignal.timeout(90_000),
       });
       if (!res.ok) {
         const j = await res.json().catch(() => ({}));
