@@ -108,7 +108,7 @@ export default function AirwaysTemplatesManager({ onNavigate, onOpenSidebar }: A
   // ── Test download ─────────────────────────────────────────────
   const [children, setChildren] = useState<Child[]>([])
   const [selectedChild, setSelectedChild] = useState<string>('')
-  const [testDoc, setTestDoc] = useState<'kit' | 'boarding-pass'>('kit')
+  const [testDoc, setTestDoc] = useState<'kit' | 'boarding-pass' | 'passport'>('kit')
   const [downloading, setDownloading] = useState(false)
   const [dlError, setDlError] = useState<string | null>(null)
 
@@ -128,18 +128,22 @@ export default function AirwaysTemplatesManager({ onNavigate, onOpenSidebar }: A
     setDownloading(true)
     setDlError(null)
     try {
-      const res = await fetch(`/api/airways/${testDoc}?childId=${selectedChild}&format=png`)
+      const isPdf = testDoc === 'passport'
+      const url = isPdf
+        ? `/api/airways/${testDoc}?childId=${selectedChild}`
+        : `/api/airways/${testDoc}?childId=${selectedChild}&format=png`
+      const res = await fetch(url)
       if (!res.ok) {
         const j = await res.json().catch(() => ({}))
         throw new Error(j.error ?? `HTTP ${res.status}`)
       }
       const blob = await res.blob()
-      const url = URL.createObjectURL(blob)
+      const objUrl = URL.createObjectURL(blob)
       const a = document.createElement('a')
-      a.href = url
-      a.download = `test_${testDoc}.png`
+      a.href = objUrl
+      a.download = `test_${testDoc}.${isPdf ? 'pdf' : 'png'}`
       a.click()
-      URL.revokeObjectURL(url)
+      URL.revokeObjectURL(objUrl)
     } catch (err) {
       setDlError(err instanceof Error ? err.message : 'Download failed')
     } finally {
@@ -326,6 +330,7 @@ export default function AirwaysTemplatesManager({ onNavigate, onOpenSidebar }: A
               >
                 <option value="kit">Champion Kit</option>
                 <option value="boarding-pass">Boarding Pass</option>
+                <option value="passport">Passport</option>
               </select>
             </div>
             <button
@@ -336,7 +341,7 @@ export default function AirwaysTemplatesManager({ onNavigate, onOpenSidebar }: A
               {downloading
                 ? <RefreshCw className="w-4 h-4 animate-spin" />
                 : <Download className="w-4 h-4" />}
-              {downloading ? 'Generating…' : 'Download PNG'}
+              {downloading ? 'Generating…' : testDoc === 'passport' ? 'Download PDF' : 'Download PNG'}
             </button>
           </div>
           {dlError && (
