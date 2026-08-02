@@ -74,7 +74,8 @@ function txt(
 async function drawImg(
   ctx: CanvasRenderingContext2D, dataUri: string,
   x: number, y: number, w: number, h: number,
-  clip: boolean | 'oval' = false
+  clip: boolean | 'oval' = false,
+  fit: 'cover' | 'contain' = 'cover'
 ) {
   try {
     const img: Image = await loadImage(dataUri)
@@ -88,8 +89,10 @@ async function drawImg(
       }
       ctx.clip()
     }
-    // object-fit: cover — scale to fill, preserve aspect ratio, center
-    const scale = Math.max(w / img.width, h / img.height)
+    // scale preserving aspect ratio
+    const scale = fit === 'cover'
+      ? Math.max(w / img.width, h / img.height)   // fill box, crop edges
+      : Math.min(w / img.width, h / img.height)    // fit whole image, no crop
     const sw = img.width  * scale
     const sh = img.height * scale
     const dx = x + (w - sw) / 2
@@ -136,7 +139,7 @@ export async function buildPassportSpread(data: PassportSpreadData): Promise<Buf
 
   const ph = get(L, 'photo')
   if (data.photoDataUri) {
-    await drawImg(ctx, data.photoDataUri, sx(ph.x), sy(ph.y), sx(ph.w), sy(ph.h), true)
+    await drawImg(ctx, data.photoDataUri, sx(ph.x), sy(ph.y), sx(ph.w), sy(ph.h), true, 'contain')
   }
 
   const qr = get(L, 'qr')
