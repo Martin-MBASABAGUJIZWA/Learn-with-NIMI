@@ -519,10 +519,10 @@ export default function KitLayoutEditor({ onNavigate, onOpenSidebar }: Props) {
           </div>
 
           {/* Sidebar */}
-          <div className="flex flex-col gap-4 lg:max-h-[calc(100vh-180px)] lg:overflow-y-auto lg:pr-1">
+          <div className="flex flex-col gap-4">
 
-            {/* Selected field controls — sticky at top */}
-            <div className="bg-blue-50 border-2 border-blue-400 rounded-2xl p-4 space-y-3 sticky top-0 z-10">
+            {/* Selected field controls */}
+            <div className="bg-blue-50 border-2 border-blue-400 rounded-2xl p-4 space-y-3">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-[10px] font-bold text-blue-400 uppercase tracking-wider">Editing</p>
