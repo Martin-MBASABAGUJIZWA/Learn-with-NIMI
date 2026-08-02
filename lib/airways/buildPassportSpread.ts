@@ -2,7 +2,7 @@ import sharp from 'sharp'  // still needed for fallback bg + composite
 import { createCanvas, registerFont, loadImage } from 'canvas'
 import type { CanvasRenderingContext2D, Image } from 'canvas'
 import path from 'path'
-import { fetchTemplate, getTemplateDimensions } from './templateFetcher'
+import { fetchTemplate } from './templateFetcher'
 import type { AirwaysStory } from './airwaysData'
 
 try {
@@ -11,9 +11,9 @@ try {
   registerFont(path.join(dir, 'DejaVuSans.ttf'),      { family: 'DejaVu', weight: 'normal' })
 } catch {}
 
-// Fallback canvas size if no template uploaded yet
-export const SPREAD_W = 2480
-export const SPREAD_H = 1240
+// Must match KitLayoutEditor W/H for passport-interior — coordinates are saved at this scale
+export const SPREAD_W = 2200
+export const SPREAD_H = 1100
 
 // ── Layout types ──────────────────────────────────────────────────────────────
 
@@ -104,25 +104,16 @@ export interface PassportSpreadData {
 export async function buildPassportSpread(data: PassportSpreadData): Promise<Buffer> {
   const L = { ...DEFAULTS, ...(data.layout ?? {}) }
 
-  // Fetch template (cached — dimensions also cached, no extra sharp call needed)
+  // Fetch template (cached after first call)
   const templateBuf = await fetchTemplate('passport-interior')
-  const dims = getTemplateDimensions('passport-interior')
-  let TW = dims?.width  ?? SPREAD_W
-  let TH = dims?.height ?? SPREAD_H
 
-  // Scale layout positions if DB positions were saved for a different canvas size
-  // (When no DB layout, DEFAULTS are already calibrated to SPREAD_W/SPREAD_H)
-  const scaleX = TW / SPREAD_W
-  const scaleY = TH / SPREAD_H
-  const hasDbLayout = data.layout && Object.keys(data.layout).length > 0
-
-  function sx(v: number) { return hasDbLayout ? v : Math.round(v * scaleX) }
-  function sy(v: number) { return hasDbLayout ? v : Math.round(v * scaleY) }
-  function sf(v: number) { return hasDbLayout ? v : Math.round(v * Math.min(scaleX, scaleY)) }
-
-  // Canvas is exactly the template size — overlays only (transparent background)
-  const canvas = createCanvas(TW, TH)
+  // Canvas always matches the editor dimensions — coordinates are 1:1
+  const canvas = createCanvas(SPREAD_W, SPREAD_H)
   const ctx    = canvas.getContext('2d')
+
+  function sx(v: number) { return v }
+  function sy(v: number) { return v }
+  function sf(v: number) { return v }
 
   // ── Left page — Identity ──────────────────────────────────────────────────
 
@@ -196,6 +187,7 @@ export async function buildPassportSpread(data: PassportSpreadData): Promise<Buf
 
   if (templateBuf) {
     return sharp(templateBuf)
+      .resize(SPREAD_W, SPREAD_H, { fit: 'fill' })
       .composite([{ input: overlay, left: 0, top: 0 }])
       .png()
       .toBuffer()
@@ -203,7 +195,7 @@ export async function buildPassportSpread(data: PassportSpreadData): Promise<Buf
 
   // No template: cream fallback background
   const bg = await sharp({
-    create: { width: TW, height: TH, channels: 4, background: { r: 245, g: 237, b: 218, alpha: 1 } },
+    create: { width: SPREAD_W, height: SPREAD_H, channels: 4, background: { r: 245, g: 237, b: 218, alpha: 1 } },
   }).png().toBuffer()
   return sharp(bg).composite([{ input: overlay, left: 0, top: 0 }]).png().toBuffer()
 }
