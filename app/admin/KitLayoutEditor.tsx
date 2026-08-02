@@ -457,62 +457,88 @@ export default function KitLayoutEditor({ onNavigate, onOpenSidebar }: Props) {
                   preserveAspectRatio="xMidYMid meet"
                   xmlns="http://www.w3.org/2000/svg"
                 >
-                  {cfg.fields.map(f => {
-                    const p   = pos[f.key] ?? cfg.init[f.key]
-                    const hot = f.key === sel
-                    if (!p) return null
+                  {(() => {
+                    // Scale handles so they're always ~20px on screen regardless of template size
+                    const u = Math.round(viewW / 28)  // base unit in SVG coords
+                    return cfg.fields.map(f => {
+                      const p   = pos[f.key] ?? cfg.init[f.key]
+                      const hot = f.key === sel
+                      if (!p) return null
 
-                    if (f.type === 'area') return (
-                      <g key={f.key}>
-                        <rect x={p.x} y={p.y} width={p.w} height={p.h}
-                          fill="none"
-                          stroke={hot ? '#ef4444' : 'rgba(99,102,241,0.3)'}
-                          strokeWidth={hot ? 4 : 1.5}
-                          pointerEvents="none" />
-                        {hot ? (
-                          <g onPointerDown={e => startDrag(e, f.key)} style={{ cursor: 'grab' }}>
-                            <rect x={p.x} y={p.y} width={34} height={20} rx={4}
-                              fill="#ef4444" stroke="white" strokeWidth={2} />
-                            {([[-6,-4],[6,-4],[-6,4],[6,4]] as [number,number][]).map(([dx,dy], i) => (
-                              <circle key={i} cx={p.x+17+dx} cy={p.y+10+dy} r={2} fill="white" />
-                            ))}
+                      if (f.type === 'area') {
+                        const cx = p.x + p.w / 2
+                        const cy = p.y + p.h / 2
+                        return (
+                          <g key={f.key}>
+                            {/* area outline */}
+                            <rect x={p.x} y={p.y} width={p.w} height={p.h}
+                              fill={hot ? 'rgba(239,68,68,0.08)' : 'none'}
+                              stroke={hot ? '#ef4444' : 'rgba(99,102,241,0.4)'}
+                              strokeWidth={hot ? Math.max(3, u * 0.15) : Math.max(1, u * 0.08)}
+                              strokeDasharray={hot ? 'none' : `${u*0.4} ${u*0.3}`}
+                              pointerEvents="none" />
+                            {/* drag handle — large circle in center */}
+                            <circle cx={cx} cy={cy} r={u * 0.7}
+                              fill={hot ? '#ef4444' : 'rgba(99,102,241,0.55)'}
+                              stroke="white" strokeWidth={Math.max(2, u * 0.1)}
+                              onPointerDown={e => startDrag(e, f.key)}
+                              style={{ cursor: 'grab' }} />
+                            {/* crosshair lines */}
+                            <line x1={cx - u*0.4} y1={cy} x2={cx + u*0.4} y2={cy}
+                              stroke="white" strokeWidth={Math.max(1.5, u*0.07)} pointerEvents="none" />
+                            <line x1={cx} y1={cy - u*0.4} x2={cx} y2={cy + u*0.4}
+                              stroke="white" strokeWidth={Math.max(1.5, u*0.07)} pointerEvents="none" />
+                            {/* label tag */}
+                            {hot && (
+                              <g pointerEvents="none">
+                                <rect x={p.x} y={p.y - u*0.9} width={u*3.5} height={u*0.8} rx={u*0.15}
+                                  fill="#ef4444" />
+                                <text x={p.x + u*0.2} y={p.y - u*0.15}
+                                  fontSize={u*0.55} fill="white" fontFamily="Arial,sans-serif" fontWeight={700}>
+                                  {f.label}
+                                </text>
+                              </g>
+                            )}
                           </g>
-                        ) : (
-                          <circle cx={p.x+6} cy={p.y+6} r={5}
-                            fill="rgba(99,102,241,0.5)"
+                        )
+                      }
+
+                      // text field
+                      const size  = p.size || 14
+                      const color = cfg.colors[f.key] ?? '#1a1a2e'
+                      const dotR  = hot ? u * 0.7 : u * 0.4
+                      return (
+                        <g key={f.key}>
+                          <text x={p.x} y={p.y + size} fontSize={size}
+                            fill={hot ? '#ef4444' : color}
+                            fontFamily="Arial,Helvetica,sans-serif" fontWeight={700}
+                            opacity={hot ? 0.95 : 0.5} pointerEvents="none">
+                            {f.sample}
+                          </text>
+                          {/* drag handle dot at anchor point */}
+                          <circle cx={p.x} cy={p.y} r={dotR}
+                            fill={hot ? '#ef4444' : 'rgba(99,102,241,0.55)'}
+                            stroke="white" strokeWidth={Math.max(2, u * 0.1)}
                             onPointerDown={e => startDrag(e, f.key)}
                             style={{ cursor: 'grab' }} />
-                        )}
-                      </g>
-                    )
-
-                    const size  = p.size || 14
-                    const color = cfg.colors[f.key] ?? '#1a1a2e'
-                    return (
-                      <g key={f.key}>
-                        <text x={p.x} y={p.y + size} fontSize={size}
-                          fill={hot ? '#ef4444' : color}
-                          fontFamily="Arial,Helvetica,sans-serif" fontWeight={700}
-                          opacity={hot ? 0.9 : 0.45} pointerEvents="none">
-                          {f.sample}
-                        </text>
-                        {hot ? (
-                          <g onPointerDown={e => startDrag(e, f.key)} style={{ cursor: 'grab' }}>
-                            <rect x={p.x-16} y={p.y-11} width={32} height={22} rx={4}
-                              fill="#ef4444" stroke="white" strokeWidth={2} />
-                            {([[-5,-5],[5,-5],[-5,5],[5,5]] as [number,number][]).map(([dx,dy], i) => (
-                              <circle key={i} cx={p.x+dx} cy={p.y+dy} r={2} fill="white" />
-                            ))}
-                          </g>
-                        ) : (
-                          <circle cx={p.x} cy={p.y} r={4}
-                            fill="rgba(99,102,241,0.45)"
-                            onPointerDown={e => startDrag(e, f.key)}
-                            style={{ cursor: 'grab' }} />
-                        )}
-                      </g>
-                    )
-                  })}
+                          {hot && <>
+                            <line x1={p.x - dotR*0.55} y1={p.y} x2={p.x + dotR*0.55} y2={p.y}
+                              stroke="white" strokeWidth={Math.max(1.5, u*0.07)} pointerEvents="none" />
+                            <line x1={p.x} y1={p.y - dotR*0.55} x2={p.x} y2={p.y + dotR*0.55}
+                              stroke="white" strokeWidth={Math.max(1.5, u*0.07)} pointerEvents="none" />
+                            <g pointerEvents="none">
+                              <rect x={p.x + dotR + u*0.1} y={p.y - u*0.45} width={u*3.2} height={u*0.75} rx={u*0.15}
+                                fill="#ef4444" />
+                              <text x={p.x + dotR + u*0.25} y={p.y + u*0.2}
+                                fontSize={u*0.5} fill="white" fontFamily="Arial,sans-serif" fontWeight={700}>
+                                {f.label}
+                              </text>
+                            </g>
+                          </>}
+                        </g>
+                      )
+                    })
+                  })()}
                 </svg>
               )}
             </div>
