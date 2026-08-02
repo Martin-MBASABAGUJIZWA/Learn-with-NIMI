@@ -78,8 +78,8 @@ async function drawImg(
 ) {
   try {
     const img: Image = await loadImage(dataUri)
+    ctx.save()
     if (clip) {
-      ctx.save()
       ctx.beginPath()
       if (clip === 'oval') {
         ctx.ellipse(x + w / 2, y + h / 2, w / 2, h / 2, 0, 0, Math.PI * 2)
@@ -88,8 +88,14 @@ async function drawImg(
       }
       ctx.clip()
     }
-    ctx.drawImage(img as unknown as Parameters<typeof ctx.drawImage>[0], x, y, w, h)
-    if (clip) ctx.restore()
+    // object-fit: cover — scale to fill, preserve aspect ratio, center
+    const scale = Math.max(w / img.width, h / img.height)
+    const sw = img.width  * scale
+    const sh = img.height * scale
+    const dx = x + (w - sw) / 2
+    const dy = y + (h - sh) / 2
+    ctx.drawImage(img as unknown as Parameters<typeof ctx.drawImage>[0], dx, dy, sw, sh)
+    ctx.restore()
   } catch {}
 }
 
