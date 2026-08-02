@@ -176,7 +176,8 @@ export default function KitLayoutEditor({ onNavigate, onOpenSidebar }: Props) {
   const [imgSrc,   setImgSrc]   = useState<string | null>(null)
   const [imgError, setImgError] = useState(false)
   const [loading,  setLoading]  = useState(false)
-  const [pageView, setPageView] = useState<'full' | 'left' | 'right'>('full')
+  const [pageView, setPageView]   = useState<'full' | 'left' | 'right'>('full')
+  const pageViewRef               = useRef<'full' | 'left' | 'right'>('full')
   // Actual pixel dimensions of the loaded template image
   const [imgNatW, setImgNatW] = useState(0)
   const [imgNatH, setImgNatH] = useState(0)
@@ -187,8 +188,8 @@ export default function KitLayoutEditor({ onNavigate, onOpenSidebar }: Props) {
   const viewW = imgNatW || cfg.W
   const viewH = imgNatH || cfg.H
 
-  // For wide spreads (passport): allow zooming into left or right half
-  const isSpread = viewW / viewH > 1.5
+  // For spread templates (passport): allow zooming into left or right half
+  const isSpread = cfg.W / cfg.H > 1.5
   const halfW = Math.round(viewW / 2)
   const svgViewBox = isSpread && pageView !== 'full'
     ? pageView === 'left'
@@ -208,13 +209,22 @@ export default function KitLayoutEditor({ onNavigate, onOpenSidebar }: Props) {
   const viewHRef     = useRef(viewH)
   useEffect(() => { selRef.current = sel }, [sel])
   useEffect(() => { viewWRef.current = viewW; viewHRef.current = viewH }, [viewW, viewH])
+  useEffect(() => { pageViewRef.current = pageView }, [pageView])
 
-  // ── Convert client coords → image-space (uses actual image px) ───
+  // ── Convert client coords → image-space, accounting for split-view offset ───
   function containerXY(clientX: number, clientY: number) {
-    const r = containerRef.current!.getBoundingClientRect()
+    const r    = containerRef.current!.getBoundingClientRect()
+    const pv   = pageViewRef.current
+    const W    = viewWRef.current
+    const H    = viewHRef.current
+    const half = Math.round(W / 2)
+    const rx   = (clientX - r.left) / r.width
+    const ry   = (clientY - r.top)  / r.height
+    const xOffset = pv === 'right' ? half : 0
+    const xScale  = pv === 'full'  ? W    : half
     return {
-      x: Math.round((clientX - r.left) / r.width  * viewWRef.current),
-      y: Math.round((clientY - r.top)  / r.height * viewHRef.current),
+      x: Math.round(xOffset + rx * xScale),
+      y: Math.round(ry * H),
     }
   }
 
@@ -428,24 +438,12 @@ export default function KitLayoutEditor({ onNavigate, onOpenSidebar }: Props) {
 
           {/* Canvas */}
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-            <div className="flex items-center justify-between px-5 py-3 border-b border-gray-100 flex-wrap gap-2">
+            <div className="flex items-center justify-between px-5 py-3 border-b border-gray-100">
               <p className="font-bold text-gray-700 text-sm">
                 Editing: <span className="text-red-500">{curF.label}</span>
                 <span className="ml-2 text-xs font-normal text-gray-400">{cfg.label} · {cfg.W}×{cfg.H}</span>
               </p>
-              <div className="flex items-center gap-2">
-                {isSpread && (
-                  <div className="flex rounded-lg border border-gray-200 overflow-hidden text-xs font-bold">
-                    {(['full', 'left', 'right'] as const).map(v => (
-                      <button key={v} onClick={() => setPageView(v)}
-                        className={`px-3 py-1.5 transition ${pageView === v ? 'bg-blue-600 text-white' : 'bg-white text-gray-500 hover:bg-gray-50'}`}>
-                        {v === 'full' ? 'Full' : v === 'left' ? '◀ Left' : 'Right ▶'}
-                      </button>
-                    ))}
-                  </div>
-                )}
-                <span className="text-xs font-mono text-gray-400">x={cur.x} y={cur.y}</span>
-              </div>
+              <span className="text-xs font-mono text-gray-400">x={cur.x} y={cur.y}</span>
             </div>
 
             <div
@@ -546,6 +544,24 @@ export default function KitLayoutEditor({ onNavigate, onOpenSidebar }: Props) {
 
           {/* Sidebar */}
           <div className="space-y-4">
+            {isSpread && (
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
+                <p className="font-bold text-gray-700 text-sm mb-2">View page</p>
+                <div className="grid grid-cols-3 gap-1">
+                  {(['full', 'left', 'right'] as const).map(v => (
+                    <button key={v} onClick={() => setPageView(v)}
+                      className={`py-2 rounded-xl text-sm font-bold transition border ${
+                        pageView === v
+                          ? 'bg-blue-600 text-white border-blue-600'
+                          : 'bg-white text-gray-600 border-gray-200 hover:border-blue-300 hover:text-blue-600'
+                      }`}>
+                      {v === 'full' ? 'Full' : v === 'left' ? '◀ Left' : 'Right ▶'}
+                    </button>
+                  ))}
+                </div>
+                <p className="text-[11px] text-gray-400 mt-2">Zoom into a page to drag right-side fields precisely.</p>
+              </div>
+            )}
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
               <p className="font-bold text-gray-700 text-sm mb-3">Fields</p>
               <div className="space-y-1">
