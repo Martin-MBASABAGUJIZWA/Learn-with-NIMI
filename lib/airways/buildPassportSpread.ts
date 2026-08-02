@@ -73,12 +73,20 @@ function txt(
 
 async function drawImg(
   ctx: CanvasRenderingContext2D, dataUri: string,
-  x: number, y: number, w: number, h: number, clip = false
+  x: number, y: number, w: number, h: number,
+  clip: boolean | 'oval' = false
 ) {
   try {
     const img: Image = await loadImage(dataUri)
     if (clip) {
-      ctx.save(); ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip()
+      ctx.save()
+      ctx.beginPath()
+      if (clip === 'oval') {
+        ctx.ellipse(x + w / 2, y + h / 2, w / 2, h / 2, 0, 0, Math.PI * 2)
+      } else {
+        ctx.rect(x, y, w, h)
+      }
+      ctx.clip()
     }
     ctx.drawImage(img as unknown as Parameters<typeof ctx.drawImage>[0], x, y, w, h)
     if (clip) ctx.restore()
@@ -159,7 +167,7 @@ export async function buildPassportSpread(data: PassportSpreadData): Promise<Buf
 
   const bc = get(L, 'book_cover')
   if (data.coverDataUri) {
-    await drawImg(ctx, data.coverDataUri, sx(bc.x), sy(bc.y), sx(bc.w), sy(bc.h), true)
+    await drawImg(ctx, data.coverDataUri, sx(bc.x), sy(bc.y), sx(bc.w), sy(bc.h), 'oval')
   }
 
   const dv = get(L, 'date_val')
