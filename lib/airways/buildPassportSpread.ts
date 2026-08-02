@@ -142,8 +142,8 @@ export async function buildPassportSpread(data: PassportSpreadData): Promise<Buf
   const dateStr = data.createdAt
     ? new Date(data.createdAt).toLocaleDateString('fr-FR', {
         day: '2-digit', month: '2-digit', year: 'numeric',
-      }).replace(/\//g, ' / ')
-    : '__  /  __  /  ____'
+      }).replace(/\//g, '  ')   // template already prints "/", just space the numbers
+    : ''
   txt(ctx, dateStr, sx(dt.x), sy(dt.y),
     { size: sf(dt.font_size), bold: false, color: '#0D1B30' })
 
@@ -166,8 +166,8 @@ export async function buildPassportSpread(data: PassportSpreadData): Promise<Buf
   const valDate = data.story.completed_at
     ? new Date(data.story.completed_at).toLocaleDateString('fr-FR', {
         day: '2-digit', month: '2-digit', year: 'numeric',
-      }).replace(/\//g, ' / ')
-    : '__  /  __  /  ____'
+      }).replace(/\//g, '  ')   // template already prints "/", just space the numbers
+    : ''
   txt(ctx, valDate, sx(dv.x), sy(dv.y),
     { size: sf(dv.font_size), bold: true, color: '#0D1B30' })
 
