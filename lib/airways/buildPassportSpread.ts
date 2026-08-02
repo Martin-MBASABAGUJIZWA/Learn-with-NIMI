@@ -71,32 +71,57 @@ function txt(
   ctx.restore()
 }
 
+function roundedRectPath(
+  ctx: CanvasRenderingContext2D,
+  x: number, y: number, w: number, h: number, r: number
+) {
+  ctx.beginPath()
+  ctx.moveTo(x + r, y)
+  ctx.lineTo(x + w - r, y)
+  ctx.arcTo(x + w, y,     x + w, y + r,     r)
+  ctx.lineTo(x + w, y + h - r)
+  ctx.arcTo(x + w, y + h, x + w - r, y + h, r)
+  ctx.lineTo(x + r, y + h)
+  ctx.arcTo(x,     y + h, x,     y + h - r, r)
+  ctx.lineTo(x,     y + r)
+  ctx.arcTo(x,     y,     x + r, y,         r)
+  ctx.closePath()
+}
+
 async function drawImg(
   ctx: CanvasRenderingContext2D, dataUri: string,
   x: number, y: number, w: number, h: number,
-  clip: boolean | 'oval' = false,
-  fit: 'cover' | 'contain' = 'cover'
+  clip: boolean | 'oval' | 'rounded' = false,
+  fit: 'cover' | 'contain' = 'cover',
+  focalY = 0.5   // 0 = top, 0.5 = center, 1 = bottom
 ) {
   try {
     const img: Image = await loadImage(dataUri)
     ctx.save()
     if (clip) {
-      ctx.beginPath()
       if (clip === 'oval') {
+        ctx.beginPath()
         ctx.ellipse(x + w / 2, y + h / 2, w / 2, h / 2, 0, 0, Math.PI * 2)
+        ctx.clip()
+      } else if (clip === 'rounded') {
+        const r = Math.min(w, h) * 0.12
+        roundedRectPath(ctx, x, y, w, h, r)
+        ctx.clip()
       } else {
+        ctx.beginPath()
         ctx.rect(x, y, w, h)
+        ctx.clip()
       }
-      ctx.clip()
     }
     // scale preserving aspect ratio
     const scale = fit === 'cover'
-      ? Math.max(w / img.width, h / img.height)   // fill box, crop edges
-      : Math.min(w / img.width, h / img.height)    // fit whole image, no crop
+      ? Math.max(w / img.width, h / img.height)
+      : Math.min(w / img.width, h / img.height)
     const sw = img.width  * scale
     const sh = img.height * scale
     const dx = x + (w - sw) / 2
-    const dy = y + (h - sh) / 2
+    // focalY controls vertical crop — 0 = show top, 0.5 = center, 1 = bottom
+    const dy = y + (h - sh) * focalY
     ctx.drawImage(img as unknown as Parameters<typeof ctx.drawImage>[0], dx, dy, sw, sh)
     ctx.restore()
   } catch {}
@@ -139,7 +164,8 @@ export async function buildPassportSpread(data: PassportSpreadData): Promise<Buf
 
   const ph = get(L, 'photo')
   if (data.photoDataUri) {
-    await drawImg(ctx, data.photoDataUri, sx(ph.x), sy(ph.y), sx(ph.w), sy(ph.h), true, 'contain')
+    // rounded clip + cover + top-bias (face stays at top of frame)
+    await drawImg(ctx, data.photoDataUri, sx(ph.x), sy(ph.y), sx(ph.w), sy(ph.h), 'rounded', 'cover', 0.2)
   }
 
   const qr = get(L, 'qr')
