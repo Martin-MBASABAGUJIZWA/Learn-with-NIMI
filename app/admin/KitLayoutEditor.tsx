@@ -176,22 +176,32 @@ export default function KitLayoutEditor({ onNavigate, onOpenSidebar }: Props) {
   const [imgSrc,   setImgSrc]   = useState<string | null>(null)
   const [imgError, setImgError] = useState(false)
   const [loading,  setLoading]  = useState(false)
+  // Actual pixel dimensions of the loaded template image
+  const [imgNatW, setImgNatW] = useState(0)
+  const [imgNatH, setImgNatH] = useState(0)
 
   const cfg = TEMPLATE_REGISTRY.find(t => t.slug === template) ?? TEMPLATE_REGISTRY[0]
+
+  // Use actual image dimensions when available, fall back to config
+  const viewW = imgNatW || cfg.W
+  const viewH = imgNatH || cfg.H
 
   const containerRef = useRef<HTMLDivElement>(null)
   const svgRef       = useRef<SVGSVGElement>(null)
   const dragging     = useRef(false)
   const grabOffset   = useRef({ x: 0, y: 0 })
   const selRef       = useRef(sel)
+  const viewWRef     = useRef(viewW)
+  const viewHRef     = useRef(viewH)
   useEffect(() => { selRef.current = sel }, [sel])
+  useEffect(() => { viewWRef.current = viewW; viewHRef.current = viewH }, [viewW, viewH])
 
-  // ── Convert client coords → canvas-space ─────────────────────────
+  // ── Convert client coords → image-space (uses actual image px) ───
   function containerXY(clientX: number, clientY: number) {
     const r = containerRef.current!.getBoundingClientRect()
     return {
-      x: Math.round((clientX - r.left) / r.width  * cfg.W),
-      y: Math.round((clientY - r.top)  / r.height * cfg.H),
+      x: Math.round((clientX - r.left) / r.width  * viewWRef.current),
+      y: Math.round((clientY - r.top)  / r.height * viewHRef.current),
     }
   }
 
@@ -240,6 +250,8 @@ export default function KitLayoutEditor({ onNavigate, onOpenSidebar }: Props) {
   useEffect(() => {
     setImgSrc(null)
     setImgError(false)
+    setImgNatW(0)
+    setImgNatH(0)
     setLoading(true)
 
     const base = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/airways-templates/${cfg.slug}`
@@ -412,7 +424,7 @@ export default function KitLayoutEditor({ onNavigate, onOpenSidebar }: Props) {
 
             <div
               ref={containerRef}
-              style={{ position: 'relative', userSelect: 'none', aspectRatio: `${cfg.W} / ${cfg.H}`, width: '100%' }}
+              style={{ position: 'relative', userSelect: 'none', aspectRatio: `${viewW} / ${viewH}`, width: '100%' }}
             >
               {loading ? (
                 <div className="w-full h-full absolute inset-0 bg-gray-50 flex items-center justify-center">
@@ -420,6 +432,11 @@ export default function KitLayoutEditor({ onNavigate, onOpenSidebar }: Props) {
                 </div>
               ) : imgSrc ? (
                 <img src={imgSrc} alt="Template"
+                  onLoad={e => {
+                    const img = e.currentTarget
+                    setImgNatW(img.naturalWidth)
+                    setImgNatH(img.naturalHeight)
+                  }}
                   style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'fill', display: 'block' }}
                   draggable={false} />
               ) : (
@@ -436,7 +453,7 @@ export default function KitLayoutEditor({ onNavigate, onOpenSidebar }: Props) {
                   onPointerMove={handlePointerMove}
                   onPointerUp={handlePointerUp}
                   style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', touchAction: 'none' }}
-                  viewBox={`0 0 ${cfg.W} ${cfg.H}`}
+                  viewBox={`0 0 ${viewW} ${viewH}`}
                   preserveAspectRatio="xMidYMid meet"
                   xmlns="http://www.w3.org/2000/svg"
                 >

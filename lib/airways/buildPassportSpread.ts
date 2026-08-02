@@ -2,7 +2,7 @@ import sharp from 'sharp'  // still needed for fallback bg + composite
 import { createCanvas, registerFont, loadImage } from 'canvas'
 import type { CanvasRenderingContext2D, Image } from 'canvas'
 import path from 'path'
-import { fetchTemplate } from './templateFetcher'
+import { fetchTemplate, getTemplateDimensions } from './templateFetcher'
 import type { AirwaysStory } from './airwaysData'
 
 try {
@@ -104,11 +104,14 @@ export interface PassportSpreadData {
 export async function buildPassportSpread(data: PassportSpreadData): Promise<Buffer> {
   const L = { ...DEFAULTS, ...(data.layout ?? {}) }
 
-  // Fetch template (cached after first call)
+  // Fetch template (cached after first call) — use its ACTUAL pixel dimensions
   const templateBuf = await fetchTemplate('passport-interior')
+  const dims = getTemplateDimensions('passport-interior')
+  const TW = dims?.width  ?? SPREAD_W
+  const TH = dims?.height ?? SPREAD_H
 
-  // Canvas always matches the editor dimensions — coordinates are 1:1
-  const canvas = createCanvas(SPREAD_W, SPREAD_H)
+  // Canvas matches the real template dimensions exactly — no stretch
+  const canvas = createCanvas(TW, TH)
   const ctx    = canvas.getContext('2d')
 
   function sx(v: number) { return v }
@@ -186,16 +189,16 @@ export async function buildPassportSpread(data: PassportSpreadData): Promise<Buf
   const overlay = canvas.toBuffer('image/png')
 
   if (templateBuf) {
+    // Composite overlay directly — no resize, template used at native resolution
     return sharp(templateBuf)
-      .resize(SPREAD_W, SPREAD_H, { fit: 'fill' })
       .composite([{ input: overlay, left: 0, top: 0 }])
       .png()
       .toBuffer()
   }
 
-  // No template: cream fallback background
+  // No template: cream fallback background at template dimensions
   const bg = await sharp({
-    create: { width: SPREAD_W, height: SPREAD_H, channels: 4, background: { r: 245, g: 237, b: 218, alpha: 1 } },
+    create: { width: TW, height: TH, channels: 4, background: { r: 245, g: 237, b: 218, alpha: 1 } },
   }).png().toBuffer()
   return sharp(bg).composite([{ input: overlay, left: 0, top: 0 }]).png().toBuffer()
 }
