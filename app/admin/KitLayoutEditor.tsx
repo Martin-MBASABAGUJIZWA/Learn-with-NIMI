@@ -176,6 +176,7 @@ export default function KitLayoutEditor({ onNavigate, onOpenSidebar }: Props) {
   const [imgSrc,   setImgSrc]   = useState<string | null>(null)
   const [imgError, setImgError] = useState(false)
   const [loading,  setLoading]  = useState(false)
+  const [pageView, setPageView] = useState<'full' | 'left' | 'right'>('full')
   // Actual pixel dimensions of the loaded template image
   const [imgNatW, setImgNatW] = useState(0)
   const [imgNatH, setImgNatH] = useState(0)
@@ -185,6 +186,18 @@ export default function KitLayoutEditor({ onNavigate, onOpenSidebar }: Props) {
   // Use actual image dimensions when available, fall back to config
   const viewW = imgNatW || cfg.W
   const viewH = imgNatH || cfg.H
+
+  // For wide spreads (passport): allow zooming into left or right half
+  const isSpread = viewW / viewH > 1.5
+  const halfW = Math.round(viewW / 2)
+  const svgViewBox = isSpread && pageView !== 'full'
+    ? pageView === 'left'
+      ? `0 0 ${halfW} ${viewH}`
+      : `${halfW} 0 ${halfW} ${viewH}`
+    : `0 0 ${viewW} ${viewH}`
+  const canvasAspect = isSpread && pageView !== 'full'
+    ? `${halfW} / ${viewH}`
+    : `${viewW} / ${viewH}`
 
   const containerRef = useRef<HTMLDivElement>(null)
   const svgRef       = useRef<SVGSVGElement>(null)
@@ -253,6 +266,7 @@ export default function KitLayoutEditor({ onNavigate, onOpenSidebar }: Props) {
     setImgNatW(0)
     setImgNatH(0)
     setLoading(true)
+    setPageView('full')
 
     const base = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/airways-templates/${cfg.slug}`
     let cancelled = false
@@ -414,17 +428,29 @@ export default function KitLayoutEditor({ onNavigate, onOpenSidebar }: Props) {
 
           {/* Canvas */}
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-            <div className="flex items-center justify-between px-5 py-3 border-b border-gray-100">
+            <div className="flex items-center justify-between px-5 py-3 border-b border-gray-100 flex-wrap gap-2">
               <p className="font-bold text-gray-700 text-sm">
                 Editing: <span className="text-red-500">{curF.label}</span>
                 <span className="ml-2 text-xs font-normal text-gray-400">{cfg.label} · {cfg.W}×{cfg.H}</span>
               </p>
-              <span className="text-xs font-mono text-gray-400">x={cur.x} y={cur.y}</span>
+              <div className="flex items-center gap-2">
+                {isSpread && (
+                  <div className="flex rounded-lg border border-gray-200 overflow-hidden text-xs font-bold">
+                    {(['full', 'left', 'right'] as const).map(v => (
+                      <button key={v} onClick={() => setPageView(v)}
+                        className={`px-3 py-1.5 transition ${pageView === v ? 'bg-blue-600 text-white' : 'bg-white text-gray-500 hover:bg-gray-50'}`}>
+                        {v === 'full' ? 'Full' : v === 'left' ? '◀ Left' : 'Right ▶'}
+                      </button>
+                    ))}
+                  </div>
+                )}
+                <span className="text-xs font-mono text-gray-400">x={cur.x} y={cur.y}</span>
+              </div>
             </div>
 
             <div
               ref={containerRef}
-              style={{ position: 'relative', userSelect: 'none', aspectRatio: `${viewW} / ${viewH}`, width: '100%' }}
+              style={{ position: 'relative', userSelect: 'none', aspectRatio: canvasAspect, width: '100%' }}
             >
               {loading ? (
                 <div className="w-full h-full absolute inset-0 bg-gray-50 flex items-center justify-center">
@@ -453,7 +479,7 @@ export default function KitLayoutEditor({ onNavigate, onOpenSidebar }: Props) {
                   onPointerMove={handlePointerMove}
                   onPointerUp={handlePointerUp}
                   style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', touchAction: 'none' }}
-                  viewBox={`0 0 ${viewW} ${viewH}`}
+                  viewBox={svgViewBox}
                   preserveAspectRatio="xMidYMid meet"
                   xmlns="http://www.w3.org/2000/svg"
                 >
