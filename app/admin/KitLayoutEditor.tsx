@@ -330,7 +330,7 @@ export default function KitLayoutEditor({ onNavigate, onOpenSidebar }: Props) {
         field:      f.key,
         x:          pos[f.key].x,
         y:          pos[f.key].y,
-        w:          f.type === 'area' ? pos[f.key].w    : null,
+        w:          pos[f.key].w ?? null,
         h:          f.type === 'area' ? pos[f.key].h    : null,
         font_size:  f.type === 'text' ? pos[f.key].size : null,
         color:      null,
@@ -551,14 +551,20 @@ export default function KitLayoutEditor({ onNavigate, onOpenSidebar }: Props) {
                       className="w-full border border-blue-300 bg-white rounded-lg px-2 py-1.5 text-sm font-mono focus:outline-none focus:border-blue-500" />
                   </div>
                 ))}
-                {curF.type === 'text' && (
+                {curF.type === 'text' && (<>
                   <div>
                     <label className="text-[10px] font-bold text-blue-500 mb-1 block">Font size</label>
                     <input type="number" value={cur.size}
                       onChange={e => setPos(p => ({ ...p, [sel]: { ...p[sel], size: +e.target.value } }))}
                       className="w-full border border-blue-300 bg-white rounded-lg px-2 py-1.5 text-sm font-mono focus:outline-none focus:border-blue-500" />
                   </div>
-                )}
+                  <div>
+                    <label className="text-[10px] font-bold text-blue-500 mb-1 block">Max width</label>
+                    <input type="number" value={cur.w}
+                      onChange={e => setPos(p => ({ ...p, [sel]: { ...p[sel], w: +e.target.value } }))}
+                      className="w-full border border-blue-300 bg-white rounded-lg px-2 py-1.5 text-sm font-mono focus:outline-none focus:border-blue-500" />
+                  </div>
+                </>)}
               </div>
             </div>
 

@@ -20,33 +20,31 @@ export const SPREAD_H = 1100
 export interface PassportSpreadLayout {
   photo?:      { x: number; y: number; w: number; h: number }
   qr?:         { x: number; y: number; w: number; h: number }
-  name?:       { x: number; y: number; font_size: number }
-  champion?:   { x: number; y: number; font_size: number }
-  date?:       { x: number; y: number; font_size: number }
-  dest_num?:   { x: number; y: number; font_size: number }
-  title?:      { x: number; y: number; font_size: number }
+  name?:       { x: number; y: number; font_size: number; w: number }
+  champion?:   { x: number; y: number; font_size: number; w: number }
+  date?:       { x: number; y: number; font_size: number; w: number }
+  dest_num?:   { x: number; y: number; font_size: number; w: number }
+  title?:      { x: number; y: number; font_size: number; w: number }
   book_cover?: { x: number; y: number; w: number; h: number }
-  date_val?:   { x: number; y: number; font_size: number }
+  date_val?:   { x: number; y: number; font_size: number; w: number }
   next_cover?: { x: number; y: number; w: number; h: number }
-  next_title?: { x: number; y: number; font_size: number }
+  next_title?: { x: number; y: number; font_size: number; w: number }
 }
 
-// Defaults are proportional to SPREAD_W=2480, SPREAD_H=1240
-// Left half: x 0–1240 | Right half: x 1240–2480
 const DEFAULTS: Required<PassportSpreadLayout> = {
   // Left identity page
   photo:    { x: 115, y: 350, w: 230, h: 295 },
   qr:       { x: 560, y: 340, w: 155, h: 155 },
-  name:     { x: 350, y: 325, font_size: 38 },
-  champion: { x: 350, y: 405, font_size: 28 },
-  date:     { x: 350, y: 470, font_size: 24 },
-  // Right destination page (right half starts at x≈1240)
-  dest_num:   { x: 1860, y: 75,  font_size: 24 },
-  title:      { x: 1860, y: 145, font_size: 44 },
+  name:     { x: 350, y: 325, font_size: 38, w: 420 },
+  champion: { x: 350, y: 405, font_size: 28, w: 300 },
+  date:     { x: 350, y: 470, font_size: 24, w: 300 },
+  // Right destination page
+  dest_num:   { x: 1860, y: 75,  font_size: 24, w: 200 },
+  title:      { x: 1860, y: 145, font_size: 44, w: 800 },
   book_cover: { x: 1380, y: 245, w: 210, h: 320 },
-  date_val:   { x: 1455, y: 750, font_size: 30 },
+  date_val:   { x: 1455, y: 750, font_size: 30, w: 300 },
   next_cover: { x: 1290, y: 895, w: 110, h: 140 },
-  next_title: { x: 1860, y: 910, font_size: 24 },
+  next_title: { x: 1860, y: 910, font_size: 24, w: 430 },
 }
 
 function get<K extends keyof PassportSpreadLayout>(
@@ -175,30 +173,30 @@ export async function buildPassportSpread(data: PassportSpreadData): Promise<Buf
 
   const nm = get(L, 'name')
   txt(ctx, data.childName.toUpperCase(), sx(nm.x), sy(nm.y),
-    { size: sf(nm.font_size), bold: true, color: '#0D1B30', maxWidth: sx(420) })
+    { size: sf(nm.font_size), bold: true, color: '#0D1B30', maxWidth: sx(nm.w) })
 
   const ch = get(L, 'champion')
   txt(ctx, data.championNumber, sx(ch.x), sy(ch.y),
-    { size: sf(ch.font_size), bold: true, color: '#0D1B30' })
+    { size: sf(ch.font_size), bold: true, color: '#0D1B30', maxWidth: sx(ch.w) })
 
   const dt = get(L, 'date')
   const dateStr = data.createdAt
     ? new Date(data.createdAt).toLocaleDateString('fr-FR', {
         day: '2-digit', month: '2-digit', year: 'numeric',
-      }).replace(/\//g, '  ')   // template already prints "/", just space the numbers
+      }).replace(/\//g, '  ')
     : ''
   txt(ctx, dateStr, sx(dt.x), sy(dt.y),
-    { size: sf(dt.font_size), bold: false, color: '#0D1B30' })
+    { size: sf(dt.font_size), bold: false, color: '#0D1B30', maxWidth: sx(dt.w) })
 
   // ── Right page — Destination ──────────────────────────────────────────────
 
   const dn = get(L, 'dest_num')
   txt(ctx, String(data.bookNum), sx(dn.x), sy(dn.y),
-    { size: sf(dn.font_size), bold: true, color: '#1A7A3E' })
+    { size: sf(dn.font_size), bold: true, color: '#1A7A3E', maxWidth: sx(dn.w) })
 
   const ti = get(L, 'title')
   txt(ctx, data.story.title.toUpperCase(), sx(ti.x), sy(ti.y),
-    { size: sf(ti.font_size), bold: true, color: '#0D1B30', maxWidth: sx(800) })
+    { size: sf(ti.font_size), bold: true, color: '#0D1B30', maxWidth: sx(ti.w) })
 
   const bc = get(L, 'book_cover')
   if (data.coverDataUri) {
@@ -209,10 +207,10 @@ export async function buildPassportSpread(data: PassportSpreadData): Promise<Buf
   const valDate = data.story.completed_at
     ? new Date(data.story.completed_at).toLocaleDateString('fr-FR', {
         day: '2-digit', month: '2-digit', year: 'numeric',
-      }).replace(/\//g, '  ')   // template already prints "/", just space the numbers
+      }).replace(/\//g, '  ')
     : ''
   txt(ctx, valDate, sx(dv.x), sy(dv.y),
-    { size: sf(dv.font_size), bold: true, color: '#0D1B30' })
+    { size: sf(dv.font_size), bold: true, color: '#0D1B30', maxWidth: sx(dv.w) })
 
   if (data.nextStory) {
     const nc = get(L, 'next_cover')
@@ -224,7 +222,7 @@ export async function buildPassportSpread(data: PassportSpreadData): Promise<Buf
       ? data.nextStory.title.slice(0, 26) + '…'
       : data.nextStory.title
     txt(ctx, nextTitle.toUpperCase(), sx(nt.x), sy(nt.y),
-      { size: sf(nt.font_size), bold: true, color: '#0D1B30', maxWidth: sx(430) })
+      { size: sf(nt.font_size), bold: true, color: '#0D1B30', maxWidth: sx(nt.w) })
   }
 
   // ── Composite overlay onto template ───────────────────────────────────────
