@@ -543,7 +543,50 @@ export default function KitLayoutEditor({ onNavigate, onOpenSidebar }: Props) {
           </div>
 
           {/* Sidebar */}
-          <div className="space-y-4">
+          <div className="flex flex-col gap-4 lg:max-h-[calc(100vh-180px)] lg:overflow-y-auto lg:pr-1">
+
+            {/* ── Selected field controls — always at top ── */}
+            <div className="bg-blue-50 border-2 border-blue-400 rounded-2xl p-4 space-y-3 sticky top-0 z-10">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-[10px] font-bold text-blue-400 uppercase tracking-wider">Editing</p>
+                  <p className="font-extrabold text-blue-700 text-base leading-tight">{curF.label}</p>
+                </div>
+                <button
+                  onClick={() => setPos(p => ({ ...p, [sel]: { ...cfg.init[sel] } }))}
+                  className="text-[11px] font-bold text-orange-500 hover:text-orange-700 underline"
+                >Reset</button>
+              </div>
+              <p className="text-[11px] text-blue-400">Arrow keys = 1px · Shift+Arrow = 10px</p>
+              <div className="grid grid-cols-2 gap-2">
+                {(['x', 'y'] as const).map(f => (
+                  <div key={f}>
+                    <label className="text-[10px] font-bold text-blue-500 mb-1 block uppercase">{f}</label>
+                    <input type="number" value={cur[f]}
+                      onChange={e => setPos(p => ({ ...p, [sel]: { ...p[sel], [f]: +e.target.value } }))}
+                      className="w-full border border-blue-300 bg-white rounded-lg px-2 py-1.5 text-sm font-mono focus:outline-none focus:border-blue-500" />
+                  </div>
+                ))}
+                {curF.type === 'area' && (['w', 'h'] as const).map(f => (
+                  <div key={f}>
+                    <label className="text-[10px] font-bold text-blue-500 mb-1 block uppercase">{f}</label>
+                    <input type="number" value={cur[f]}
+                      onChange={e => setPos(p => ({ ...p, [sel]: { ...p[sel], [f]: +e.target.value } }))}
+                      className="w-full border border-blue-300 bg-white rounded-lg px-2 py-1.5 text-sm font-mono focus:outline-none focus:border-blue-500" />
+                  </div>
+                ))}
+                {curF.type === 'text' && (
+                  <div>
+                    <label className="text-[10px] font-bold text-blue-500 mb-1 block">Font size</label>
+                    <input type="number" value={cur.size}
+                      onChange={e => setPos(p => ({ ...p, [sel]: { ...p[sel], size: +e.target.value } }))}
+                      className="w-full border border-blue-300 bg-white rounded-lg px-2 py-1.5 text-sm font-mono focus:outline-none focus:border-blue-500" />
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* ── Page zoom toggle (spread only) ── */}
             {isSpread && (
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
                 <p className="font-bold text-gray-700 text-sm mb-2">View page</p>
@@ -559,60 +602,26 @@ export default function KitLayoutEditor({ onNavigate, onOpenSidebar }: Props) {
                     </button>
                   ))}
                 </div>
-                <p className="text-[11px] text-gray-400 mt-2">Zoom into a page to drag right-side fields precisely.</p>
               </div>
             )}
+
+            {/* ── Field list ── */}
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
-              <p className="font-bold text-gray-700 text-sm mb-3">Fields</p>
+              <p className="font-bold text-gray-700 text-sm mb-3">All fields</p>
               <div className="space-y-1">
                 {cfg.fields.map(f => (
                   <button key={f.key} onClick={() => setSel(f.key)}
                     className={`w-full text-left px-3 py-2 rounded-xl text-sm font-semibold transition flex items-center justify-between ${
-                      sel === f.key ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-50'
+                      sel === f.key
+                        ? 'bg-blue-600 text-white ring-2 ring-blue-400 ring-offset-1'
+                        : 'text-gray-600 hover:bg-gray-50'
                     }`}>
                     <span>{f.label}</span>
-                    <span className={`text-xs font-mono ${sel === f.key ? 'text-blue-200' : 'text-gray-400'}`}>
+                    <span className={`text-xs font-mono ${sel === f.key ? 'text-blue-100' : 'text-gray-400'}`}>
                       {pos[f.key]?.x ?? 0},{pos[f.key]?.y ?? 0}
                     </span>
                   </button>
                 ))}
-              </div>
-            </div>
-
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 space-y-3">
-              <div className="flex items-center justify-between">
-                <p className="font-bold text-gray-700 text-sm">{curF.label} — Fine-tune</p>
-                <button
-                  onClick={() => setPos(p => ({ ...p, [sel]: { ...cfg.init[sel] } }))}
-                  className="text-[11px] font-bold text-orange-500 hover:text-orange-700 underline"
-                >Reset</button>
-              </div>
-              <p className="text-xs text-gray-400">Arrow keys = 1px · Shift+Arrow = 10px</p>
-              <div className="grid grid-cols-2 gap-3">
-                {(['x', 'y'] as const).map(f => (
-                  <div key={f}>
-                    <label className="text-xs font-bold text-gray-500 mb-1 block uppercase">{f}</label>
-                    <input type="number" value={cur[f]}
-                      onChange={e => setPos(p => ({ ...p, [sel]: { ...p[sel], [f]: +e.target.value } }))}
-                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400" />
-                  </div>
-                ))}
-                {curF.type === 'area' && (['w', 'h'] as const).map(f => (
-                  <div key={f}>
-                    <label className="text-xs font-bold text-gray-500 mb-1 block uppercase">{f}</label>
-                    <input type="number" value={cur[f]}
-                      onChange={e => setPos(p => ({ ...p, [sel]: { ...p[sel], [f]: +e.target.value } }))}
-                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400" />
-                  </div>
-                ))}
-                {curF.type === 'text' && (
-                  <div>
-                    <label className="text-xs font-bold text-gray-500 mb-1 block">Font size</label>
-                    <input type="number" value={cur.size}
-                      onChange={e => setPos(p => ({ ...p, [sel]: { ...p[sel], size: +e.target.value } }))}
-                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400" />
-                  </div>
-                )}
               </div>
             </div>
 
