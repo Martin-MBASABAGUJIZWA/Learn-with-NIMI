@@ -125,17 +125,19 @@ const FIELDS_PASSPORT: FieldDef[] = [
 ]
 
 const INIT_PASSPORT: Record<string, Pos> = {
-  photo:      { x: 76,  y: 330, w: 210, h: 265, size: 0  },
-  qr:         { x: 450, y: 395, w: 148, h: 148, size: 0  },
-  name:       { x: 326, y: 370, w: 400, h: 40,  size: 36 },
-  champion:   { x: 326, y: 445, w: 400, h: 30,  size: 26 },
-  date:       { x: 326, y: 515, w: 400, h: 26,  size: 22 },
-  dest_num:   { x: 1560, y: 68,  w: 80,  h: 26,  size: 22 },
-  title:      { x: 1540, y: 148, w: 900, h: 48,  size: 40 },
-  book_cover: { x: 1220, y: 240, w: 198, h: 310, size: 0  },
-  date_val:   { x: 1280, y: 748, w: 300, h: 34,  size: 28 },
-  next_cover: { x: 1145, y: 878, w: 100, h: 130, size: 0  },
-  next_title: { x: 1640, y: 890, w: 420, h: 26,  size: 22 },
+  // ── Left identity page (x: 0–1100) ──
+  photo:      { x: 60,   y: 310, w: 210, h: 265, size: 0  },
+  qr:         { x: 455,  y: 370, w: 148, h: 148, size: 0  },
+  name:       { x: 300,  y: 335, w: 400, h: 40,  size: 36 },
+  champion:   { x: 300,  y: 410, w: 300, h: 30,  size: 26 },
+  date:       { x: 300,  y: 478, w: 300, h: 26,  size: 22 },
+  // ── Right destination page (x: 1100–2200) ──
+  dest_num:   { x: 1800, y: 68,  w: 150, h: 26,  size: 22 },  // inside DESTINATION badge
+  title:      { x: 1145, y: 132, w: 950, h: 48,  size: 40 },  // large title, left of right page
+  book_cover: { x: 1163, y: 195, w: 225, h: 315, size: 0  },  // oval, left col of right page
+  date_val:   { x: 1168, y: 625, w: 300, h: 34,  size: 28 },  // blank date underline
+  next_cover: { x: 1162, y: 700, w: 125, h: 112, size: 0  },  // left box of VISA section
+  next_title: { x: 1455, y: 725, w: 410, h: 26,  size: 22 },  // right of arrow in VISA
 }
 
 const COLORS_PASSPORT: Record<string, string> = {

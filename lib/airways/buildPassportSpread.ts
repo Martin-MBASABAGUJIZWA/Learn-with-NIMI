@@ -33,18 +33,18 @@ export interface PassportSpreadLayout {
 
 const DEFAULTS: Required<PassportSpreadLayout> = {
   // Left identity page
-  photo:    { x: 115, y: 350, w: 230, h: 295 },
-  qr:       { x: 560, y: 340, w: 155, h: 155 },
-  name:     { x: 350, y: 325, font_size: 38, w: 420 },
-  champion: { x: 350, y: 405, font_size: 28, w: 300 },
-  date:     { x: 350, y: 470, font_size: 24, w: 300 },
-  // Right destination page
-  dest_num:   { x: 1860, y: 75,  font_size: 24, w: 200 },
-  title:      { x: 1860, y: 145, font_size: 44, w: 800 },
-  book_cover: { x: 1380, y: 245, w: 210, h: 320 },
-  date_val:   { x: 1455, y: 750, font_size: 30, w: 300 },
-  next_cover: { x: 1290, y: 895, w: 110, h: 140 },
-  next_title: { x: 1860, y: 910, font_size: 24, w: 430 },
+  photo:    { x: 60,  y: 310, w: 210, h: 265 },
+  qr:       { x: 455, y: 370, w: 148, h: 148 },
+  name:     { x: 300, y: 335, font_size: 36, w: 400 },
+  champion: { x: 300, y: 410, font_size: 26, w: 300 },
+  date:     { x: 300, y: 478, font_size: 22, w: 300 },
+  // Right destination page (x > 1100)
+  dest_num:   { x: 1800, y: 68,  font_size: 22, w: 150 },
+  title:      { x: 1145, y: 132, font_size: 40, w: 950 },
+  book_cover: { x: 1163, y: 195, w: 225, h: 315 },
+  date_val:   { x: 1168, y: 625, font_size: 28, w: 300 },
+  next_cover: { x: 1162, y: 700, w: 125, h: 112 },
+  next_title: { x: 1455, y: 725, font_size: 22, w: 410 },
 }
 
 function get<K extends keyof PassportSpreadLayout>(
