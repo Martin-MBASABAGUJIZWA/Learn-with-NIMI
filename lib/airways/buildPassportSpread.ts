@@ -148,11 +148,11 @@ export async function buildPassportSpread(data: PassportSpreadData): Promise<Buf
 
   const dn = get(L, 'dest_num')
   txt(ctx, String(data.bookNum), sx(dn.x), sy(dn.y),
-    { size: sf(dn.font_size), bold: true, color: '#1A7A3E', align: 'center' })
+    { size: sf(dn.font_size), bold: true, color: '#1A7A3E' })
 
   const ti = get(L, 'title')
   txt(ctx, data.story.title.toUpperCase(), sx(ti.x), sy(ti.y),
-    { size: sf(ti.font_size), bold: true, color: '#0D1B30', align: 'center', maxWidth: sx(950) })
+    { size: sf(ti.font_size), bold: true, color: '#0D1B30', maxWidth: sx(800) })
 
   const bc = get(L, 'book_cover')
   if (data.coverDataUri) {
@@ -166,7 +166,7 @@ export async function buildPassportSpread(data: PassportSpreadData): Promise<Buf
       }).replace(/\//g, ' / ')
     : '__  /  __  /  ____'
   txt(ctx, valDate, sx(dv.x), sy(dv.y),
-    { size: sf(dv.font_size), bold: true, color: '#0D1B30', align: 'center' })
+    { size: sf(dv.font_size), bold: true, color: '#0D1B30' })
 
   if (data.nextStory) {
     const nc = get(L, 'next_cover')
@@ -178,7 +178,7 @@ export async function buildPassportSpread(data: PassportSpreadData): Promise<Buf
       ? data.nextStory.title.slice(0, 26) + '…'
       : data.nextStory.title
     txt(ctx, nextTitle.toUpperCase(), sx(nt.x), sy(nt.y),
-      { size: sf(nt.font_size), bold: true, color: '#0D1B30', align: 'center', maxWidth: sx(430) })
+      { size: sf(nt.font_size), bold: true, color: '#0D1B30', maxWidth: sx(430) })
   }
 
   // ── Composite overlay onto template ───────────────────────────────────────

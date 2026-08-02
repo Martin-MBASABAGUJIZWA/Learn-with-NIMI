@@ -294,6 +294,22 @@ export default function KitLayoutEditor({ onNavigate, onOpenSidebar }: Props) {
     if (!cfg.fields.find(f => f.key === sel)) setSel(cfg.fields[0].key)
   }, [template]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // ── Reset all fields to code defaults ───────────────────────────
+  async function handleReset() {
+    if (!confirm(`Reset all ${cfg.label} fields to defaults and clear saved positions?`)) return
+    setSaving(true)
+    try {
+      await fetch(`/api/airways/kit-layout?template=${template}`, {
+        method: 'DELETE',
+        signal: AbortSignal.timeout(10000),
+      })
+    } catch { /* ignore — just reset locally */ }
+    setPos({ ...cfg.init })
+    setSaving(false)
+    setToast({ ok: true, msg: 'Reset to defaults' })
+    setTimeout(() => setToast(null), 3000)
+  }
+
   // ── Save layout ──────────────────────────────────────────────────
   async function handleSave() {
     setSaving(true)
@@ -545,6 +561,11 @@ export default function KitLayoutEditor({ onNavigate, onOpenSidebar }: Props) {
               className="w-full flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 disabled:opacity-40 text-white font-bold text-sm py-3 rounded-xl shadow transition">
               {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
               {saving ? 'Saving…' : `Save ${cfg.label} Layout`}
+            </button>
+            <button onClick={handleReset} disabled={saving}
+              className="w-full flex items-center justify-center gap-2 bg-white hover:bg-red-50 disabled:opacity-40 text-red-500 border border-red-200 font-bold text-sm py-2 rounded-xl transition">
+              <RefreshCw className="w-4 h-4" />
+              Reset All to Defaults
             </button>
             <p className="text-center text-xs text-gray-400">
               Drag fields to match your template, then save.

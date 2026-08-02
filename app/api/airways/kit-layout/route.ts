@@ -45,3 +45,19 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ ok: true })
 }
+
+export async function DELETE(req: NextRequest) {
+  const supabase = getServiceClient()
+  const user = await getAuthUser(req)
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const { data: admin } = await supabase.from('admins').select('id').eq('id', user.id).maybeSingle()
+  if (!admin) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+
+  const template = new URL(req.url).searchParams.get('template') ?? 'kit'
+
+  const { error } = await supabase.from('template_layout').delete().eq('template', template)
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  return NextResponse.json({ ok: true })
+}
