@@ -176,8 +176,6 @@ export default function KitLayoutEditor({ onNavigate, onOpenSidebar }: Props) {
   const [imgSrc,   setImgSrc]   = useState<string | null>(null)
   const [imgError, setImgError] = useState(false)
   const [loading,  setLoading]  = useState(false)
-  const [pageView, setPageView]   = useState<'full' | 'left' | 'right'>('full')
-  const pageViewRef               = useRef<'full' | 'left' | 'right'>('full')
   // Actual pixel dimensions of the loaded template image
   const [imgNatW, setImgNatW] = useState(0)
   const [imgNatH, setImgNatH] = useState(0)
@@ -188,18 +186,6 @@ export default function KitLayoutEditor({ onNavigate, onOpenSidebar }: Props) {
   const viewW = imgNatW || cfg.W
   const viewH = imgNatH || cfg.H
 
-  // For spread templates (passport): allow zooming into left or right half
-  const isSpread = cfg.W / cfg.H > 1.5
-  const halfW = Math.round(viewW / 2)
-  const svgViewBox = isSpread && pageView !== 'full'
-    ? pageView === 'left'
-      ? `0 0 ${halfW} ${viewH}`
-      : `${halfW} 0 ${halfW} ${viewH}`
-    : `0 0 ${viewW} ${viewH}`
-  const canvasAspect = isSpread && pageView !== 'full'
-    ? `${halfW} / ${viewH}`
-    : `${viewW} / ${viewH}`
-
   const containerRef = useRef<HTMLDivElement>(null)
   const svgRef       = useRef<SVGSVGElement>(null)
   const dragging     = useRef(false)
@@ -209,22 +195,13 @@ export default function KitLayoutEditor({ onNavigate, onOpenSidebar }: Props) {
   const viewHRef     = useRef(viewH)
   useEffect(() => { selRef.current = sel }, [sel])
   useEffect(() => { viewWRef.current = viewW; viewHRef.current = viewH }, [viewW, viewH])
-  useEffect(() => { pageViewRef.current = pageView }, [pageView])
 
-  // ── Convert client coords → image-space, accounting for split-view offset ───
+  // ── Convert client coords → image-space (uses actual image px) ───
   function containerXY(clientX: number, clientY: number) {
-    const r    = containerRef.current!.getBoundingClientRect()
-    const pv   = pageViewRef.current
-    const W    = viewWRef.current
-    const H    = viewHRef.current
-    const half = Math.round(W / 2)
-    const rx   = (clientX - r.left) / r.width
-    const ry   = (clientY - r.top)  / r.height
-    const xOffset = pv === 'right' ? half : 0
-    const xScale  = pv === 'full'  ? W    : half
+    const r = containerRef.current!.getBoundingClientRect()
     return {
-      x: Math.round(xOffset + rx * xScale),
-      y: Math.round(ry * H),
+      x: Math.round((clientX - r.left) / r.width  * viewWRef.current),
+      y: Math.round((clientY - r.top)  / r.height * viewHRef.current),
     }
   }
 
@@ -276,7 +253,6 @@ export default function KitLayoutEditor({ onNavigate, onOpenSidebar }: Props) {
     setImgNatW(0)
     setImgNatH(0)
     setLoading(true)
-    setPageView('full')
 
     const base = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/airways-templates/${cfg.slug}`
     let cancelled = false
@@ -448,7 +424,7 @@ export default function KitLayoutEditor({ onNavigate, onOpenSidebar }: Props) {
 
             <div
               ref={containerRef}
-              style={{ position: 'relative', userSelect: 'none', aspectRatio: canvasAspect, width: '100%' }}
+              style={{ position: 'relative', userSelect: 'none', aspectRatio: `${viewW} / ${viewH}`, width: '100%' }}
             >
               {loading ? (
                 <div className="w-full h-full absolute inset-0 bg-gray-50 flex items-center justify-center">
@@ -477,7 +453,7 @@ export default function KitLayoutEditor({ onNavigate, onOpenSidebar }: Props) {
                   onPointerMove={handlePointerMove}
                   onPointerUp={handlePointerUp}
                   style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', touchAction: 'none' }}
-                  viewBox={svgViewBox}
+                  viewBox={`0 0 ${viewW} ${viewH}`}
                   preserveAspectRatio="xMidYMid meet"
                   xmlns="http://www.w3.org/2000/svg"
                 >
@@ -545,7 +521,7 @@ export default function KitLayoutEditor({ onNavigate, onOpenSidebar }: Props) {
           {/* Sidebar */}
           <div className="flex flex-col gap-4 lg:max-h-[calc(100vh-180px)] lg:overflow-y-auto lg:pr-1">
 
-            {/* ── Selected field controls — always at top ── */}
+            {/* Selected field controls — sticky at top */}
             <div className="bg-blue-50 border-2 border-blue-400 rounded-2xl p-4 space-y-3 sticky top-0 z-10">
               <div className="flex items-center justify-between">
                 <div>
@@ -586,26 +562,7 @@ export default function KitLayoutEditor({ onNavigate, onOpenSidebar }: Props) {
               </div>
             </div>
 
-            {/* ── Page zoom toggle (spread only) ── */}
-            {isSpread && (
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
-                <p className="font-bold text-gray-700 text-sm mb-2">View page</p>
-                <div className="grid grid-cols-3 gap-1">
-                  {(['full', 'left', 'right'] as const).map(v => (
-                    <button key={v} onClick={() => setPageView(v)}
-                      className={`py-2 rounded-xl text-sm font-bold transition border ${
-                        pageView === v
-                          ? 'bg-blue-600 text-white border-blue-600'
-                          : 'bg-white text-gray-600 border-gray-200 hover:border-blue-300 hover:text-blue-600'
-                      }`}>
-                      {v === 'full' ? 'Full' : v === 'left' ? '◀ Left' : 'Right ▶'}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* ── Field list ── */}
+            {/* Field list */}
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
               <p className="font-bold text-gray-700 text-sm mb-3">All fields</p>
               <div className="space-y-1">
