@@ -73,6 +73,7 @@ describe("safeFilename", () => {
 });
 
 // ── rateLimiter ─────────────────────────────────────────────────────────────
+// UPSTASH env vars are absent in CI, so checkRateLimit uses the in-memory path.
 
 describe("checkRateLimit", () => {
   let now: number;
@@ -87,33 +88,33 @@ describe("checkRateLimit", () => {
     vi.useRealTimers();
   });
 
-  it("allows up to the limit", () => {
+  it("allows up to the limit", async () => {
     const key = `test:${Math.random()}`;
-    expect(checkRateLimit(key, 3)).toBe(true);
-    expect(checkRateLimit(key, 3)).toBe(true);
-    expect(checkRateLimit(key, 3)).toBe(true);
+    expect(await checkRateLimit(key, 3)).toBe(true);
+    expect(await checkRateLimit(key, 3)).toBe(true);
+    expect(await checkRateLimit(key, 3)).toBe(true);
   });
 
-  it("blocks when over the limit", () => {
+  it("blocks when over the limit", async () => {
     const key = `test:${Math.random()}`;
-    checkRateLimit(key, 2);
-    checkRateLimit(key, 2);
-    expect(checkRateLimit(key, 2)).toBe(false);
+    await checkRateLimit(key, 2);
+    await checkRateLimit(key, 2);
+    expect(await checkRateLimit(key, 2)).toBe(false);
   });
 
-  it("resets after the window expires", () => {
+  it("resets after the window expires", async () => {
     const key = `test:${Math.random()}`;
-    checkRateLimit(key, 1);
-    expect(checkRateLimit(key, 1)).toBe(false);
+    await checkRateLimit(key, 1);
+    expect(await checkRateLimit(key, 1)).toBe(false);
     vi.advanceTimersByTime(60_001);
-    expect(checkRateLimit(key, 1)).toBe(true);
+    expect(await checkRateLimit(key, 1)).toBe(true);
   });
 
-  it("different keys are independent", () => {
+  it("different keys are independent", async () => {
     const k1 = `test:${Math.random()}`;
     const k2 = `test:${Math.random()}`;
-    checkRateLimit(k1, 1);
-    checkRateLimit(k1, 1); // k1 now blocked
-    expect(checkRateLimit(k2, 1)).toBe(true); // k2 unaffected
+    await checkRateLimit(k1, 1);
+    await checkRateLimit(k1, 1); // k1 now blocked
+    expect(await checkRateLimit(k2, 1)).toBe(true); // k2 unaffected
   });
 });
