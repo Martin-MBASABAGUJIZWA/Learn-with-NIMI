@@ -227,9 +227,12 @@ export async function buildAttitudeBadge(data: AttitudeBadgeData): Promise<Buffe
   }
 
   if (data.cleanPhotoDataUri ?? data.childPhotoDataUri) {
-    // Use pre-cleaned photo when available (caller ran removeBg once and reuses it)
-    const cleanUri = data.cleanPhotoDataUri
-      ?? await removeBg(data.childPhotoDataUri!)
+    // cleanPhotoDataUri = string  → caller already ran ML, use it
+    // cleanPhotoDataUri = null    → caller tried ML but it failed; use raw photo, don't retry
+    // cleanPhotoDataUri = undefined → standalone call; run ML now
+    const cleanUri = data.cleanPhotoDataUri !== undefined
+      ? (data.cleanPhotoDataUri ?? data.childPhotoDataUri!)
+      : await removeBg(data.childPhotoDataUri!)
     const img = await tryLoad(cleanUri)
     if (img) {
       const cp = L.child_photo
