@@ -205,10 +205,12 @@ export async function GET(req: NextRequest) {
 
             if (provisionErr) {
               console.error("[MTN MoMo] provision_subscription failed:", provisionErr.message);
-              // Revert so the next poll can re-claim and retry provisioning.
+              // Revert — clear all fields written during the claim so the next poll
+              // sees a clean 'processing' row and can retry provisioning.
               await supabase.from("orders")
-                .update({ payment_status: "processing" })
-                .eq("id", orderId);
+                .update({ payment_status: "processing", completed_at: null, provider_transaction_id: null })
+                .eq("id", orderId)
+                .eq("payment_status", "completed");
               return NextResponse.json({ status: "pending" });
             }
 
@@ -286,12 +288,21 @@ export async function GET(req: NextRequest) {
               }
             }
           } else {
-            await supabase.from("content_access").insert({
+            const { error: accessErr } = await supabase.from("content_access").insert({
               parent_id: order.parent_id,
               access_type: accessType,
               story_id: product.story_id,
               order_id: orderId,
             });
+            if (accessErr) {
+              console.error("[MTN MoMo] content_access insert failed:", accessErr.message);
+              // Revert so access can be retried on next poll.
+              await supabase.from("orders")
+                .update({ payment_status: "processing", completed_at: null, provider_transaction_id: null })
+                .eq("id", orderId)
+                .eq("payment_status", "completed");
+              return NextResponse.json({ status: "pending" });
+            }
           }
         }
       }

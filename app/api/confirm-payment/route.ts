@@ -256,12 +256,16 @@ export async function POST(req: NextRequest) {
             }
           }
         } else {
-          await supabase.from("content_access").insert({
+          const { error: accessErr } = await supabase.from("content_access").insert({
             parent_id: order.parent_id,
             access_type: accessType,
             story_id: product.story_id,
             order_id: orderId,
           });
+          if (accessErr) {
+            console.error("[ConfirmPayment] content_access insert failed:", accessErr.message);
+            return NextResponse.json({ success: false, message: "Failed to grant access." }, { status: 500 });
+          }
           await supabase.from("orders").update({
             payment_status: "completed",
             provider_transaction_id: transactionId,
