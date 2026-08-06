@@ -20,6 +20,7 @@ import { buildStampsSvg } from "@/lib/airways/buildStampsSvg";
 import { buildGrandChampionPages } from "@/lib/airways/buildGrandChampion";
 import { checkRateLimit } from "@/lib/airways/rateLimiter";
 import { safeFilename } from "@/lib/airways/safeFilename";
+import { getCachedPassport, setCachedPassport } from "@/lib/airways/passportCache";
 import { fetchTemplate } from "@/lib/airways/templateFetcher";
 import { qrDataUri as genQr } from "@/lib/airways/qrCode";
 import { avatarUrlToBuffer } from "@/lib/airways/avatarToBuffer";
@@ -93,6 +94,23 @@ export async function GET(req: NextRequest) {
     fetchTemplate("passport-cover"),
   ]);
   if (!data) return NextResponse.json({ error: "Child not found" }, { status: 404 });
+
+  // ── Cache check ────────────────────────────────────────────────────────────
+  // Skip for admins (they may be previewing layout changes that need fresh output)
+  if (!adminRow) {
+    const cached = await getCachedPassport(supabase, childId);
+    if (cached) {
+      const safeName = safeFilename(data.name);
+      console.log(`[passport] cache HIT | child=${childId}`);
+      return new NextResponse(new Uint8Array(cached), {
+        headers: {
+          "Content-Type": "application/pdf",
+          "Content-Disposition": `attachment; filename="${safeName}_passport_nimipiko.pdf"`,
+          "X-Cache": "HIT",
+        },
+      });
+    }
+  }
 
   const layout: PassportSpreadLayout = {};
   const badgeLayout: AttitudeBadgeLayout = {};
@@ -270,6 +288,12 @@ export async function GET(req: NextRequest) {
     const pdfBytes = await doc.save();
     const safeName = safeFilename(data.name)
     console.log(`[passport] total ${Date.now() - t0}ms | pages=${doc.getPageCount()} | size=${(pdfBytes.length / 1024).toFixed(0)}kb | child=${childId}`);
+
+    // Cache write is fire-and-forget — a slow upload must not delay the response
+    if (!adminRow) {
+      setCachedPassport(supabase, childId, pdfBytes)  // intentionally not awaited
+    }
+
     return new NextResponse(new Uint8Array(pdfBytes), {
       headers: {
         "Content-Type": "application/pdf",
