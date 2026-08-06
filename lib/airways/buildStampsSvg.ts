@@ -102,10 +102,12 @@ export interface StampsOptions {
   stories: AirwaysStory[];
   /** covers as base64 data URIs, keyed by story id */
   coverUris: Map<string, string>;
+  pageNum?: number;
+  totalPages?: number;
 }
 
 export function buildStampsSvg(opts: StampsOptions): string {
-  const { childName, stories, coverUris } = opts;
+  const { childName, stories, coverUris, pageNum, totalPages } = opts;
 
   // Always show 12 slots
   const TOTAL = 12;
@@ -243,7 +245,7 @@ ${completionBadge}
 <!-- Bottom watermark -->
 <text x="${W / 2}" y="${H - 18}" text-anchor="middle"
   font-size="10" font-family="DejaVu,sans-serif" fill="${GOLD}" opacity="0.5">
-  p. 13 / 13 ★ nimipiko.com
+  ${pageNum && totalPages ? `p. ${pageNum} / ${totalPages} ★ ` : ''}nimipiko.com
 </text>
 </svg>`;
 }

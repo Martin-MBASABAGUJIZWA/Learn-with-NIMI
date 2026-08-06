@@ -218,11 +218,18 @@ export async function GET(req: NextRequest) {
       })
     );
 
-    // ── Stamp collection page (always last) ────────────────────────────────
+    // ── Stamp collection page (always last before grand champion) ─────────
+    const allComplete = data.stories.length > 0 && data.stories.every(s => s.is_complete);
+    const coverPages    = passportCoverBuf ? 1 : 0;
+    const stampsPageNum = coverPages + spreadPngs.length + 1;
+    const totalPages    = stampsPageNum + (allComplete ? 2 : 0);
+
     const stampsSvg = buildStampsSvg({
-      childName: data.name,
-      stories:   data.stories,
-      coverUris: coverUriMap,
+      childName:  data.name,
+      stories:    data.stories,
+      coverUris:  coverUriMap,
+      pageNum:    stampsPageNum,
+      totalPages,
     });
     const stampsPng = await sharp(Buffer.from(stampsSvg))
       .png({ quality: 95 })
@@ -245,7 +252,6 @@ export async function GET(req: NextRequest) {
     await addImagePage(doc, stampsPng);
 
     // Grand Champion bonus pages — only when every story is complete
-    const allComplete = data.stories.length > 0 && data.stories.every(s => s.is_complete);
     if (allComplete) {
       const lastStory = data.stories.at(-1);
       const grandChampPages = await buildGrandChampionPages({
