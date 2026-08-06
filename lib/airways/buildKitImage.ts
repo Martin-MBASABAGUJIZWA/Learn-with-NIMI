@@ -6,6 +6,7 @@ import { barcodeBuffer } from './barcode'
 import { qrPngBuffer } from './qrCode'
 import { flightNumber } from './airwaysData'
 import { seatNum, gateNum, statusLabel } from './formatters'
+import { mergeField } from './layoutMerge'
 
 // Register bundled fonts so canvas doesn't need system fontconfig (Vercel Lambda)
 try {
@@ -49,18 +50,7 @@ const DEFAULTS: KitLayout = {
 }
 
 function get(layout: KitLayout, key: string): KitFieldLayout {
-  const saved = layout[key]
-  const def   = DEFAULTS[key]
-  if (!saved) return def
-  return {
-    x:         saved.x         ?? def.x,
-    y:         saved.y         ?? def.y,
-    w:         saved.w         ?? def.w,
-    h:         saved.h         ?? def.h,
-    font_size: saved.font_size ?? def.font_size,
-    bold:      saved.bold      ?? def.bold,
-    color:     saved.color     ?? def.color,
-  }
+  return mergeField(layout[key] as KitFieldLayout | undefined, DEFAULTS[key])
 }
 
 interface TextField { text: string; pos: KitFieldLayout; maxWidth?: number }

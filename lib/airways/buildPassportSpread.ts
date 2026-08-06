@@ -4,6 +4,7 @@ import type { CanvasRenderingContext2D, Image } from 'canvas'
 import path from 'path'
 import { fetchTemplate, getTemplateDimensions } from './templateFetcher'
 import type { AirwaysStory } from './airwaysData'
+import { mergeField } from './layoutMerge'
 
 try {
   const dir = path.join(process.cwd(), 'public', 'fonts')
@@ -58,14 +59,10 @@ const DEFAULTS: Required<PassportSpreadLayout> = {
 function get<K extends keyof PassportSpreadLayout>(
   layout: PassportSpreadLayout, key: K
 ): Required<PassportSpreadLayout>[K] {
-  const saved = layout[key] as Record<string, unknown> | undefined;
-  const def   = DEFAULTS[key] as Record<string, unknown>;
-  if (!saved) return DEFAULTS[key];
-  // Sub-field merge: null DB values (e.g. w/h not stored for text fields) fall
-  // back to defaults so canvas/sharp never receives null as a dimension.
-  return Object.fromEntries(
-    Object.keys(def).map(k => [k, saved[k] ?? def[k]])
-  ) as Required<PassportSpreadLayout>[K];
+  return mergeField(
+    layout[key] as Record<string, unknown> | undefined,
+    DEFAULTS[key] as Record<string, unknown>,
+  ) as Required<PassportSpreadLayout>[K]
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────

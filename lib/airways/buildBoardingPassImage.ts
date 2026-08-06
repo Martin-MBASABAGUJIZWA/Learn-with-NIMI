@@ -5,6 +5,7 @@ import { fetchTemplate } from './templateFetcher'
 import { barcodeBuffer } from './barcode'
 import { flightNumber } from './airwaysData'
 import { seatNum, gateNum, statusLabel } from './formatters'
+import { mergeField } from './layoutMerge'
 
 try {
   const fontsDir = path.join(process.cwd(), 'public', 'fonts')
@@ -43,18 +44,7 @@ const DEFAULTS: BPLayout = {
 }
 
 function get(layout: BPLayout, key: string): BPFieldLayout {
-  const saved = layout[key]
-  const def   = DEFAULTS[key]
-  if (!saved) return def
-  return {
-    x:         saved.x         ?? def.x,
-    y:         saved.y         ?? def.y,
-    w:         saved.w         ?? def.w,
-    h:         saved.h         ?? def.h,
-    font_size: saved.font_size ?? def.font_size,
-    bold:      saved.bold      ?? def.bold,
-    color:     saved.color     ?? def.color,
-  }
+  return mergeField(layout[key] as BPFieldLayout | undefined, DEFAULTS[key])
 }
 
 interface BPTextField { text: string; pos: BPFieldLayout }

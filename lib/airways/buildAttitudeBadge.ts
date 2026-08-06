@@ -123,8 +123,15 @@ async function buildArcComposites(
   fontSize: number,
   fillColor: string, strokeColor: string, strokeWidth: number,
 ): Promise<Composite[]> {
-  const chars  = text.split('')
-  const widths = chars.map(c => fontSize * (c === ' ' ? 0.22 : 0.52))
+  const chars = text.split('')
+
+  // Measure each glyph with canvas — more accurate than a fixed 0.52× estimate,
+  // especially for narrow characters (i, l, 1) and wide ones (M, W, emoji).
+  const measCtx = createCanvas(10, 10).getContext('2d')
+  measCtx.font  = `bold ${fontSize}px sans-serif`
+  const widths = chars.map(c =>
+    c === ' ' ? fontSize * 0.22 : measCtx.measureText(c).width
+  )
   const totalW = widths.reduce((a, b) => a + b, 0)
 
   const pad   = Math.ceil(strokeWidth) + 6

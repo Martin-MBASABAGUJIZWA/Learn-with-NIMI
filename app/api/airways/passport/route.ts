@@ -60,7 +60,7 @@ export async function GET(req: NextRequest) {
   const user = await getAuthUser(req);
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  if (!checkRateLimit(`passport:${user.id}`, 3))
+  if (!(await checkRateLimit(`passport:${user.id}`, 3)))
     return NextResponse.json({ error: "Too many requests — please wait a minute before generating another passport." }, { status: 429 });
 
   const { searchParams } = new URL(req.url);
@@ -151,18 +151,17 @@ export async function GET(req: NextRequest) {
     storiesToShow.push(data.stories[0]);
   }
 
+  const t0 = Date.now()
   try {
     // ── Run background removal on child photo ONCE ─────────────────────────
-    // This avoids running the slow ML model N times for N story spreads.
     let cleanPhotoDataUri: string | null = null;
     if (photoUri) {
-      // On failure: keep null so each badge builder retries removeBg independently
-      // rather than forwarding the uncleaned photo as if it were already processed.
       cleanPhotoDataUri = await removeBg(photoUri).catch(() => null);
     }
+    console.log(`[passport] removeBg ${Date.now() - t0}ms | bgOk=${cleanPhotoDataUri !== null}`);
 
     // ── Generate attitude badge per story in parallel ──────────────────────
-    // Each story has its own attitude — badge evolves as the child progresses.
+    const t1 = Date.now()
     const badgeUris: (string | null)[] = await Promise.all(
       storiesToShow.map(async (story) => {
         const attitude = story.attitude ?? data.attitude ?? null;
@@ -180,15 +179,17 @@ export async function GET(req: NextRequest) {
             storyTitle:        story.title,
             bookNumber:        story.sort_order,
             childPhotoDataUri: photoUri ?? null,
-            cleanPhotoDataUri,          // skip ML — already done above
+            cleanPhotoDataUri,
             layout:            badgeLayout,
           });
           return `data:image/png;base64,${buf.toString("base64")}`;
         } catch { return null; }
       })
     );
+    console.log(`[passport] badges ×${storiesToShow.length} ${Date.now() - t1}ms`);
 
     // ── Generate one spread per story in parallel ──────────────────────────
+    const t2 = Date.now()
     const spreadPngs: Buffer[] = await Promise.all(
       storiesToShow.map(async (story, i) => {
         const bookNum   = story.sort_order;
@@ -217,6 +218,8 @@ export async function GET(req: NextRequest) {
         });
       })
     );
+
+    console.log(`[passport] spreads ×${storiesToShow.length} ${Date.now() - t2}ms`);
 
     // ── Stamp collection page (always last before grand champion) ─────────
     const allComplete = data.stories.length > 0 && data.stories.every(s => s.is_complete);
@@ -266,6 +269,7 @@ export async function GET(req: NextRequest) {
 
     const pdfBytes = await doc.save();
     const safeName = safeFilename(data.name)
+    console.log(`[passport] total ${Date.now() - t0}ms | pages=${doc.getPageCount()} | size=${(pdfBytes.length / 1024).toFixed(0)}kb | child=${childId}`);
     return new NextResponse(new Uint8Array(pdfBytes), {
       headers: {
         "Content-Type": "application/pdf",

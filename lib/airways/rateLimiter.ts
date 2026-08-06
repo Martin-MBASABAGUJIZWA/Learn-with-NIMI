@@ -1,38 +1,51 @@
-/**
- * Sliding-window in-memory rate limiter for expensive PDF routes.
- * Not distributed — one counter per server instance, which is fine for
- * serverless (each instance's budget is per-user, not global).
- */
+import { Ratelimit } from "@upstash/ratelimit"
+import { Redis } from "@upstash/redis"
 
-interface Window {
-  timestamps: number[]
+// Upstash distributed rate limiter — survives multi-instance serverless.
+// Falls back to in-memory when env vars are absent (local dev / CI).
+let upstash: Ratelimit | null = null
+if (
+  process.env.UPSTASH_REDIS_REST_URL &&
+  process.env.UPSTASH_REDIS_REST_TOKEN
+) {
+  upstash = new Ratelimit({
+    redis: new Redis({
+      url:   process.env.UPSTASH_REDIS_REST_URL,
+      token: process.env.UPSTASH_REDIS_REST_TOKEN,
+    }),
+    limiter: Ratelimit.slidingWindow(3, "60 s"),
+    prefix:  "nimipiko:airways",
+  })
 }
 
-const windows = new Map<string, Window>()
+// ── In-memory fallback ────────────────────────────────────────────────────────
+const windows = new Map<string, number[]>()
+
+function inMemoryCheck(key: string, limit: number, windowMs: number): boolean {
+  const now  = Date.now()
+  const prev = (windows.get(key) ?? []).filter(t => now - t < windowMs)
+  if (prev.length >= limit) { windows.set(key, prev); return false }
+  prev.push(now)
+  windows.set(key, prev)
+  return true
+}
 
 /**
  * Returns true if the caller is within the allowed budget.
- * @param key      Typically `${userId}:${routeName}`
- * @param limit    Maximum calls allowed in `windowMs`
- * @param windowMs Sliding window duration in milliseconds (default 60 000)
+ * Distributed when Upstash env vars are set; in-memory otherwise.
+ *
+ * @param key      Unique per user+route, e.g. `passport:${userId}`
+ * @param limit    Maximum calls per window (Upstash instance uses 3/60 s)
+ * @param windowMs Used only by the in-memory fallback
  */
-export function checkRateLimit(
+export async function checkRateLimit(
   key: string,
   limit: number,
   windowMs = 60_000,
-): boolean {
-  const now = Date.now()
-  const entry = windows.get(key) ?? { timestamps: [] }
-
-  // Evict timestamps outside the window
-  entry.timestamps = entry.timestamps.filter(t => now - t < windowMs)
-
-  if (entry.timestamps.length >= limit) {
-    windows.set(key, entry)
-    return false
+): Promise<boolean> {
+  if (upstash) {
+    const { success } = await upstash.limit(key)
+    return success
   }
-
-  entry.timestamps.push(now)
-  windows.set(key, entry)
-  return true
+  return inMemoryCheck(key, limit, windowMs)
 }

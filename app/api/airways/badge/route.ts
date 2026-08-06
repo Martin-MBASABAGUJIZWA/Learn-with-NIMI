@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
   const user     = await getAuthUser(req)
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  if (!checkRateLimit(`badge:${user.id}`, 3))
+  if (!(await checkRateLimit(`badge:${user.id}`, 3)))
     return NextResponse.json({ error: 'Too many requests — please wait a minute before generating another badge.' }, { status: 429 })
 
   const { searchParams } = new URL(req.url)
@@ -105,6 +105,7 @@ export async function GET(req: NextRequest) {
     }
   }
 
+  const t0 = Date.now()
   try {
     const badgeBuf = await buildAttitudeBadge({
       attitude,
@@ -115,6 +116,7 @@ export async function GET(req: NextRequest) {
     })
 
     const safeName = safeFilename(data.name)
+    console.log(`[badge] total ${Date.now() - t0}ms | size=${(badgeBuf.length / 1024).toFixed(0)}kb | child=${childId}`)
     return new NextResponse(new Uint8Array(badgeBuf), {
       headers: {
         'Content-Type':        'image/png',
