@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
   // Grant 1 free month to the referrer
   const periodEnd = addMonths(new Date(), 1);
 
-  const { data: newSub } = await supabase
+  const { data: newSub, error: subErr } = await supabase
     .from("nimipiko_subscriptions")
     .insert({
       parent_id: redemption.referrer_id,
@@ -103,11 +103,16 @@ export async function POST(req: NextRequest) {
     .select("id")
     .single();
 
+  if (subErr || !newSub?.id) {
+    console.error("[admin/referral/grant] subscription insert failed:", subErr?.message);
+    return NextResponse.json({ error: "Failed to create subscription — use force:true to retry after resolving" }, { status: 500 });
+  }
+
   const { error: accessErr } = await supabase.from("content_access").insert({
     parent_id: redemption.referrer_id,
     access_type: "club",
     order_id: null,
-    subscription_id: newSub?.id ?? null,
+    subscription_id: newSub.id,
     expires_at: periodEnd.toISOString(),
   });
   if (accessErr) {
