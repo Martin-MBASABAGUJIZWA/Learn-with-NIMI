@@ -66,6 +66,18 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // Validate sendAt before touching the DB — avoids orphaned orders on bad input
+  let sendAt: string | null = null;
+  if (body.sendAt) {
+    const d = new Date(body.sendAt);
+    const now = new Date();
+    const maxDate = new Date(); maxDate.setFullYear(maxDate.getFullYear() + 1);
+    if (isNaN(d.getTime()) || d <= now || d > maxDate) {
+      return NextResponse.json({ error: "Invalid send date" }, { status: 422 });
+    }
+    sendAt = d.toISOString();
+  }
+
   // Rwanda card: charge in USD equivalent so CyberSource can process it
   const isRwandaCard = currency === "RWF" && body.paymentProvider === "cybersource";
   const chargeCurrency = isRwandaCard ? "USD" : currency;
@@ -92,18 +104,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Failed to create order" }, { status: 500 });
   }
 
-  // Validate sendAt if provided — must be a future date within 1 year
-  let sendAt: string | null = null;
-  if (body.sendAt) {
-    const d = new Date(body.sendAt);
-    const now = new Date();
-    const maxDate = new Date(); maxDate.setFullYear(maxDate.getFullYear() + 1);
-    if (isNaN(d.getTime()) || d <= now || d > maxDate) {
-      return NextResponse.json({ error: "Invalid send date" }, { status: 422 });
-    }
-    sendAt = d.toISOString();
-  }
-
   // Create gift record (product_id is null — redeemer picks plan at redemption)
   const code = randomCode(12);
   const { data: gift, error: giftErr } = await supabase.from("gift_subscriptions").insert({
@@ -119,6 +119,8 @@ export async function POST(req: NextRequest) {
     send_at: sendAt,
   }).select().single();
   if (giftErr || !gift) {
+    // Roll back the order so the user doesn't have a dangling pending charge
+    await supabase.from("orders").delete().eq("id", order.id);
     return NextResponse.json({ error: "Failed to create gift record" }, { status: 500 });
   }
 
