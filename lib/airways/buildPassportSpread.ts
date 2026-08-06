@@ -58,7 +58,14 @@ const DEFAULTS: Required<PassportSpreadLayout> = {
 function get<K extends keyof PassportSpreadLayout>(
   layout: PassportSpreadLayout, key: K
 ): Required<PassportSpreadLayout>[K] {
-  return (layout[key] ?? DEFAULTS[key]) as Required<PassportSpreadLayout>[K]
+  const saved = layout[key] as Record<string, unknown> | undefined;
+  const def   = DEFAULTS[key] as Record<string, unknown>;
+  if (!saved) return DEFAULTS[key];
+  // Sub-field merge: null DB values (e.g. w/h not stored for text fields) fall
+  // back to defaults so canvas/sharp never receives null as a dimension.
+  return Object.fromEntries(
+    Object.keys(def).map(k => [k, saved[k] ?? def[k]])
+  ) as Required<PassportSpreadLayout>[K];
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
