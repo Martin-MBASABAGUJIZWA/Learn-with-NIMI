@@ -37,8 +37,11 @@ export async function POST(req: NextRequest) {
   if (key) {
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://nimipiko.com";
     const unsubUrl = `${siteUrl}/unsubscribe?token=${inserted.unsubscribe_token}`;
+    const esc = (s: string) => s.replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]!));
+    const safeName = typeof name === "string" ? esc(name.trim().slice(0, 80)) : null;
     void fetch("https://api.resend.com/emails", {
       method: "POST",
+      signal: AbortSignal.timeout(8_000),
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
       body: JSON.stringify({
         from: "NIMIPIKO <hello@nimipiko.com>",
@@ -52,7 +55,7 @@ export async function POST(req: NextRequest) {
             </div>
             <div style="padding:28px 24px">
               <p style="color:#374151;font-size:15px;line-height:1.6">
-                ${name ? `Hi ${name},` : "Hi there,"}<br><br>
+                ${safeName ? `Hi ${safeName},` : "Hi there,"}<br><br>
                 Thank you for joining the NIMIPIKO community. We'll send you updates about new stories, features, and tips to help your child thrive.
               </p>
               <p style="color:#374151;font-size:15px;line-height:1.6">
