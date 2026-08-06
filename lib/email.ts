@@ -27,6 +27,14 @@ async function send(to: string, subject: string, html: string): Promise<void> {
 }
 
 
+// Escapes user-supplied strings before embedding in email HTML.
+// Applied to every name/message field — prevents HTML injection where one
+// user's input appears in another user's email (e.g. gift giver → recipient).
+function esc(s: string | null | undefined): string {
+  if (!s) return "";
+  return s.replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]!));
+}
+
 // ── Shared branded wrapper for auth emails ───────────────────────────────────
 function authBase(title: string, body: string): string {
   return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${title}</title></head>
@@ -111,12 +119,13 @@ export async function sendAuthInvite(to: string, inviteUrl: string): Promise<voi
 
 // ── Welcome email sent after signup ─────────────────────────────────────────
 export async function sendWelcomeEmail(to: string, parentName: string): Promise<void> {
+  const safeName = esc(parentName);
   await send(
     to,
     "Welcome to NIMIPIKO — your 7-day free trial has started! 🌿",
     authBase(
       "Welcome to NIMIPIKO",
-      `<p style="margin:0 0 6px;font-size:26px;font-weight:900;color:#14532d;text-align:center;">Welcome, ${parentName}! 🎉</p>
+      `<p style="margin:0 0 6px;font-size:26px;font-weight:900;color:#14532d;text-align:center;">Welcome, ${safeName}! 🎉</p>
       <p style="margin:0 0 20px;font-size:15px;color:#4b5563;text-align:center;line-height:1.6;">Your child's learning adventure starts now</p>
       <div style="background:#ecfdf5;border:2px solid #6ee7b7;border-radius:14px;padding:18px 20px;margin-bottom:22px">
         <p style="margin:0 0 8px;font-size:15px;font-weight:800;color:#065f46;">🎁 Your 7-day free trial is active</p>
@@ -141,7 +150,8 @@ export async function sendTrialEndingSoon(opts: {
   daysLeft: number;
   expiresOn: string; // ISO date string
 }): Promise<void> {
-  const { to, parentName, daysLeft, expiresOn } = opts;
+  const { to, daysLeft, expiresOn } = opts;
+  const parentName = esc(opts.parentName);
   const expiryDate = new Date(expiresOn).toLocaleDateString("en-US", {
     weekday: "long", month: "long", day: "numeric",
   });
@@ -176,7 +186,8 @@ export async function sendTrialExpired(opts: {
   to: string;
   parentName: string;
 }): Promise<void> {
-  const { to, parentName } = opts;
+  const { to } = opts;
+  const parentName = esc(opts.parentName);
 
   await send(
     to,
@@ -212,7 +223,8 @@ export async function sendPaymentReceipt(opts: {
   periodEnd: string;
   billingInterval?: "month" | "year";
 }): Promise<void> {
-  const { to, parentName, amount, currency, provider, periodEnd, billingInterval = "month" } = opts;
+  const { to, amount, currency, provider, periodEnd, billingInterval = "month" } = opts;
+  const parentName = esc(opts.parentName);
   const renewDate = new Date(periodEnd).toLocaleDateString("en-US", {
     year: "numeric", month: "long", day: "numeric",
   });
@@ -254,7 +266,8 @@ export async function sendRenewalConfirmation(opts: {
   currency: string;
   periodEnd: string;
 }): Promise<void> {
-  const { to, parentName, amount, currency, periodEnd } = opts;
+  const { to, amount, currency, periodEnd } = opts;
+  const parentName = esc(opts.parentName);
   const renewDate = new Date(periodEnd).toLocaleDateString("en-US", {
     year: "numeric", month: "long", day: "numeric",
   });
@@ -296,7 +309,10 @@ export async function sendGiftNotification(opts: {
   message: string | null;
   redeemUrl: string;
 }): Promise<void> {
-  const { to, recipientName, giverName, productName, giftAmount, giftCurrency, message, redeemUrl } = opts;
+  const { to, productName, giftAmount, giftCurrency, redeemUrl } = opts;
+  const giverName    = esc(opts.giverName);
+  const recipientName = opts.recipientName ? esc(opts.recipientName) : null;
+  const message      = opts.message ? esc(opts.message) : null;
   const greeting = recipientName ? `Hi ${recipientName}!` : "Hello!";
 
   // Format what was gifted — amount-based gifts show the value; product-based show the plan name
@@ -344,7 +360,9 @@ export async function sendGiftRedeemed(opts: {
   giftAmount: number | null;
   giftCurrency: string | null;
 }): Promise<void> {
-  const { to, giverName, recipientName, recipientEmail, giftAmount, giftCurrency } = opts;
+  const { to, giftAmount, giftCurrency, recipientEmail } = opts;
+  const giverName    = esc(opts.giverName);
+  const recipientName = opts.recipientName ? esc(opts.recipientName) : null;
   const who = recipientName ?? recipientEmail;
 
   let amountLine = "";
@@ -387,7 +405,8 @@ export async function sendGiftConfirmation(opts: {
   giftAmount?: number | null;
   giftCurrency?: string | null;
 }): Promise<void> {
-  const { to, giverName, recipientEmail, productName, giftAmount, giftCurrency } = opts;
+  const { to, recipientEmail, productName, giftAmount, giftCurrency } = opts;
+  const giverName = esc(opts.giverName);
 
   let giftLabel: string;
   if (giftAmount && giftCurrency) {
@@ -439,9 +458,11 @@ export async function sendWeeklyDigest(opts: {
   children: WeeklyDigestChild[];
   trialDaysLeft?: number; // set when parent is on trial with ≤3 days remaining
 }): Promise<void> {
-  const { to, parentName, weekOf, children, trialDaysLeft } = opts;
+  const { to, weekOf, children, trialDaysLeft } = opts;
+  const parentName = esc(opts.parentName);
 
   const childBlocks = children.map(c => {
+    const childName = esc(c.name);
     const feelingsRow = c.feelings.length > 0
       ? `<div style="margin-top:12px;padding:10px 14px;background:#fdf2f8;border-radius:8px;border:1px solid #fbcfe8">
           <p style="margin:0 0 6px;font-size:12px;font-weight:700;color:#9d174d;text-transform:uppercase;letter-spacing:.06em">How they felt</p>
@@ -456,10 +477,10 @@ export async function sendWeeklyDigest(opts: {
 <div style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:20px;margin-bottom:16px">
   <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
     <div style="width:44px;height:44px;background:linear-gradient(135deg,#16a34a,#15803d);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;font-weight:900;text-align:center;line-height:44px">
-      ${c.name.charAt(0).toUpperCase()}
+      ${childName.charAt(0).toUpperCase()}
     </div>
     <div>
-      <p style="margin:0;font-size:17px;font-weight:900;color:#111827">${c.name}</p>
+      <p style="margin:0;font-size:17px;font-weight:900;color:#111827">${childName}</p>
       <p style="margin:0;font-size:12px;color:#9ca3af">${lang}</p>
     </div>
   </div>
@@ -478,13 +499,13 @@ export async function sendWeeklyDigest(opts: {
     </div>`).join("")}
   </div>
   ${feelingsRow}
-  ` : `<p style="text-align:center;color:#9ca3af;font-size:14px;padding:12px 0">No activity logged this week — nudge ${c.name} to open the app! 🚀</p>`}
+  ` : `<p style="text-align:center;color:#9ca3af;font-size:14px;padding:12px 0">No activity logged this week — nudge ${childName} to open the app! 🚀</p>`}
 </div>`;
   }).join("\n");
 
   await send(
     to,
-    `📊 ${parentName}, here's ${children.length === 1 ? children[0].name + "'s" : "your kids'"} learning report`,
+    `📊 ${parentName}, here's ${children.length === 1 ? esc(children[0].name) + "'s" : "your kids'"} learning report`,
     `
 <div style="font-family:Arial,sans-serif;max-width:580px;margin:0 auto;color:#111827;background:#f9fafb;padding:16px">
   <!-- Header -->
@@ -542,7 +563,8 @@ export async function sendWelcomeToClub(opts: {
   billingInterval: "monthly" | "annual" | string;
   renewsOn: string; // ISO date
 }): Promise<void> {
-  const { to, parentName, billingInterval, renewsOn } = opts;
+  const { to, billingInterval, renewsOn } = opts;
+  const parentName = esc(opts.parentName);
   const renewDate = new Date(renewsOn).toLocaleDateString("en-US", {
     year: "numeric", month: "long", day: "numeric",
   });
@@ -590,7 +612,8 @@ export async function sendReactivationConfirmation(opts: {
   parentName: string;
   renewsOn: string; // ISO date
 }): Promise<void> {
-  const { to, parentName, renewsOn } = opts;
+  const { to, renewsOn } = opts;
+  const parentName = esc(opts.parentName);
   const renewDate = new Date(renewsOn).toLocaleDateString("en-US", {
     year: "numeric", month: "long", day: "numeric",
   });
@@ -616,7 +639,8 @@ export async function sendCancellationConfirmation(opts: {
   parentName: string;
   accessUntil: string;
 }): Promise<void> {
-  const { to, parentName, accessUntil } = opts;
+  const { to, accessUntil } = opts;
+  const parentName = esc(opts.parentName);
   const untilDate = new Date(accessUntil).toLocaleDateString("en-US", {
     year: "numeric", month: "long", day: "numeric",
   });
@@ -652,7 +676,8 @@ export async function sendRenewalFailed(opts: {
   currency: string;
   provider?: string; // "cybersource" | "mtn_momo" — controls CTA copy and retry bullet
 }): Promise<void> {
-  const { to, parentName, amount, currency, provider } = opts;
+  const { to, amount, currency, provider } = opts;
+  const parentName = esc(opts.parentName);
   const isMoMo = provider === "mtn_momo";
   const formattedAmount = currency === "RWF"
     ? `${Math.round(Number(amount)).toLocaleString()} RWF`
@@ -702,7 +727,8 @@ export async function sendNoTokenRenewalFailed(opts: {
   to: string;
   parentName: string;
 }): Promise<void> {
-  const { to, parentName } = opts;
+  const { to } = opts;
+  const parentName = esc(opts.parentName);
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://nimipiko.com";
   await send(
     to,
@@ -733,7 +759,8 @@ export async function sendExpiredCheckoutSession(opts: {
   to: string;
   parentName: string;
 }): Promise<void> {
-  const { to, parentName } = opts;
+  const { to } = opts;
+  const parentName = esc(opts.parentName);
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://nimipiko.com";
   await send(
     to,
@@ -762,7 +789,9 @@ export async function sendReferralCodeUsed(opts: {
   referrerName: string;
   refereeName: string | null;
 }): Promise<void> {
-  const { to, referrerName, refereeName } = opts;
+  const { to } = opts;
+  const referrerName = esc(opts.referrerName);
+  const refereeName  = opts.refereeName ? esc(opts.refereeName) : null;
   const who = refereeName ?? "A friend";
   await send(
     to,
@@ -787,7 +816,9 @@ export async function sendReferralRewardGranted(opts: {
   refereeName: string | null;
   freeMonthEnd: string; // ISO date
 }): Promise<void> {
-  const { to, referrerName, refereeName, freeMonthEnd } = opts;
+  const { to, freeMonthEnd } = opts;
+  const referrerName = esc(opts.referrerName);
+  const refereeName  = opts.refereeName ? esc(opts.refereeName) : null;
   const who = refereeName ?? "Your friend";
   const untilDate = new Date(freeMonthEnd).toLocaleDateString("en-US", {
     year: "numeric", month: "long", day: "numeric",
@@ -815,7 +846,9 @@ export async function sendReferralAppliedToReferee(opts: {
   refereeName: string;
   referrerName: string | null;
 }): Promise<void> {
-  const { to, refereeName, referrerName } = opts;
+  const { to } = opts;
+  const refereeName  = esc(opts.refereeName);
+  const referrerName = opts.referrerName ? esc(opts.referrerName) : null;
   const inviter = referrerName ?? "A friend";
   await send(
     to,
@@ -847,7 +880,8 @@ export async function sendSubscriptionExpired(opts: {
   amount: string;
   currency: string;
 }): Promise<void> {
-  const { to, parentName, amount, currency } = opts;
+  const { to, amount, currency } = opts;
+  const parentName = esc(opts.parentName);
   const formattedAmount = currency === "RWF"
     ? `${Math.round(Number(amount)).toLocaleString()} RWF`
     : `${currency} ${Number(amount).toFixed(2)}`;
