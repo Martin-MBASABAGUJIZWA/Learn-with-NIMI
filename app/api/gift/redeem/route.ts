@@ -124,10 +124,14 @@ export async function POST(req: NextRequest) {
   });
   if (accessErr) {
     console.error("[gift/redeem] content_access insert failed:", accessErr.message);
-    // Roll back: un-redeem the gift so the user can try again
-    await serviceSupabase.from("gift_subscriptions")
-      .update({ redeemed_at: null, redeemed_by: null })
-      .eq("id", gift.id);
+    // Delete the subscription we just created, then un-redeem the gift so the
+    // user can retry without accumulating orphaned subscription rows.
+    await Promise.all([
+      serviceSupabase.from("nimipiko_subscriptions").delete().eq("id", sub.id),
+      serviceSupabase.from("gift_subscriptions")
+        .update({ redeemed_at: null, redeemed_by: null })
+        .eq("id", gift.id),
+    ]);
     return NextResponse.json({ error: "Failed to grant access. Please try again." }, { status: 500 });
   }
 

@@ -53,9 +53,12 @@ export async function GET(req: Request) {
 
     const periodEnd = addMonths(new Date(), 1);
 
-    // Insert subscription + content_access in parallel; capture both results.
-    const [{ data: newSub, error: subErr }, { data: newAccess, error: accessErr }, [referrerRow, refereeRow]] = await Promise.all([
-      supabase.from("nimipiko_subscriptions").insert({
+    // Insert subscription first so we have its id to link onto content_access.
+    // Sequential — not parallel — so a failure at either step can be cleanly
+    // rolled back before the other side is written.
+    const { data: newSub, error: subErr } = await supabase
+      .from("nimipiko_subscriptions")
+      .insert({
         parent_id: row.referrer_id,
         product_id: product!.id,
         status: "active",
@@ -66,31 +69,41 @@ export async function GET(req: Request) {
         current_period_end: periodEnd.toISOString(),
         payment_provider: "admin_grant",
         cancel_at_period_end: true,
-      }).select("id").single(),
-      supabase.from("content_access").insert({
-        parent_id: row.referrer_id,
-        access_type: "club",
-        order_id: null,
-        subscription_id: null,
-        expires_at: periodEnd.toISOString(),
-      }).select("id").single(),
-      Promise.all([
-        supabase.from("parents").select("email, name").eq("id", row.referrer_id).maybeSingle(),
-        supabase.from("parents").select("name").eq("id", row.referred_id).maybeSingle(),
-      ]),
-    ]);
+      })
+      .select("id")
+      .single();
 
-    if (subErr)    console.error("[referral-rewards] subscription insert failed:", subErr.message);
-    if (accessErr) console.error("[referral-rewards] content_access insert failed:", accessErr.message);
-
-    // Link the subscription id onto the specific content_access row we just created.
-    // Use the row's own id (not a parent wildcard) to avoid touching unrelated rows.
-    if (newSub?.id && newAccess?.id) {
-      void supabase.from("content_access")
-        .update({ subscription_id: newSub.id })
-        .eq("id", newAccess.id)
-        .then(() => {}, () => {});
+    if (subErr || !newSub?.id) {
+      console.error("[referral-rewards] subscription insert failed:", subErr?.message);
+      // Roll back CAS claim so the daily cron retries tomorrow.
+      await supabase.from("referral_redemptions")
+        .update({ reward_granted_at: null }).eq("id", row.id);
+      return false;
     }
+
+    const { error: accessErr } = await supabase.from("content_access").insert({
+      parent_id: row.referrer_id,
+      access_type: "club",
+      order_id: null,
+      subscription_id: newSub.id,
+      expires_at: periodEnd.toISOString(),
+    });
+
+    if (accessErr) {
+      console.error("[referral-rewards] content_access insert failed:", accessErr.message);
+      // Roll back both the subscription and the CAS claim.
+      await Promise.all([
+        supabase.from("nimipiko_subscriptions").delete().eq("id", newSub.id),
+        supabase.from("referral_redemptions")
+          .update({ reward_granted_at: null }).eq("id", row.id),
+      ]);
+      return false;
+    }
+
+    const [referrerRow, refereeRow] = await Promise.all([
+      supabase.from("parents").select("email, name").eq("id", row.referrer_id).maybeSingle(),
+      supabase.from("parents").select("name").eq("id", row.referred_id).maybeSingle(),
+    ]);
 
     const referrerEmail = referrerRow.data?.email;
     const referrerName  = referrerRow.data?.name ?? null;
