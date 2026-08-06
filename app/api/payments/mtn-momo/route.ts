@@ -217,6 +217,7 @@ export async function GET(req: NextRequest) {
             // Fire referral reward (best-effort)
             void fetch(`${process.env.NEXT_PUBLIC_SITE_URL ?? "https://nimipiko.com"}/api/referral/reward`, {
               method: "POST",
+              signal: AbortSignal.timeout(8_000),
               headers: { "Content-Type": "application/json", "x-cron-secret": process.env.CRON_SECRET ?? "" },
               body: JSON.stringify({ referred_id: order.parent_id }),
             }).catch(() => {});
