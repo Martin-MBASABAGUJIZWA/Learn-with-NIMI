@@ -49,6 +49,7 @@ async function chargeCybersource(token: string, amount: number, currency: string
 
   const res = await fetch(`https://${host}${resource}`, {
     method: "POST",
+    signal: AbortSignal.timeout(15_000),
     headers: {
       "Content-Type": "application/json",
       Host: host, Date: date, Digest: digest,
@@ -76,6 +77,7 @@ async function chargeMoMo(phone: string, amount: number, subId: string) {
   const creds = Buffer.from(`${apiUser}:${apiKey}`).toString("base64");
   const tokenRes = await fetch(tokenUrl, {
     method: "POST",
+    signal: AbortSignal.timeout(15_000),
     headers: { Authorization: `Basic ${creds}`, "Ocp-Apim-Subscription-Key": subKey },
   });
   if (!tokenRes.ok) return { ok: false, referenceId: null, error: "MoMo token failed" };
@@ -89,6 +91,7 @@ async function chargeMoMo(phone: string, amount: number, subId: string) {
   const refId = uuidv4();
   const res = await fetch(payUrl, {
     method: "POST",
+    signal: AbortSignal.timeout(15_000),
     headers: {
       Authorization: `Bearer ${access_token}`,
       "X-Reference-Id": refId,

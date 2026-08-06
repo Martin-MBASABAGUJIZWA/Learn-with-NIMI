@@ -26,6 +26,7 @@ export async function GET(req: NextRequest) {
     const creds = Buffer.from(`${apiUser}:${apiKey}`).toString("base64");
     const tokenRes = await fetch(tokenUrl, {
       method: "POST",
+      signal: AbortSignal.timeout(15_000),
       headers: { Authorization: `Basic ${creds}`, "Ocp-Apim-Subscription-Key": subKey },
     });
     if (!tokenRes.ok) return NextResponse.json({ error: "MoMo token failed" }, { status: 500 });
@@ -44,6 +45,7 @@ export async function GET(req: NextRequest) {
   for (const renewal of pending ?? []) {
     const url = statusUrl.replace("{referenceId}", renewal.provider_transaction_id);
     const res = await fetch(url, {
+      signal: AbortSignal.timeout(15_000),
       headers: {
         Authorization: `Bearer ${access_token}`,
         "X-Target-Environment": targetEnv,
