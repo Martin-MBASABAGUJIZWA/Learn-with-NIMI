@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { seatNum, gateNum, statusLabel } from "@/lib/airways/formatters";
 import { championNumber, flightNumber, fmtDate } from "@/lib/airways/airwaysData";
 import { checkRateLimit } from "@/lib/airways/rateLimiter";
+import { safeFilename } from "@/lib/airways/safeFilename";
 
 // ── formatters ──────────────────────────────────────────────────────────────
 
@@ -56,6 +57,19 @@ describe("fmtDate", () => {
     // Use a UTC noon timestamp to avoid timezone edge cases
     expect(fmtDate("2026-03-05T12:00:00Z")).toMatch(/05 \/ 03 \/ 2026/);
   });
+});
+
+// ── safeFilename ─────────────────────────────────────────────────────────────
+
+describe("safeFilename", () => {
+  it("lowercases and replaces spaces", () => expect(safeFilename("Alice Bob")).toBe("alice_bob"));
+  it("strips double quotes", () => expect(safeFilename('ali"ce')).toBe("alice"));
+  it("strips carriage returns", () => expect(safeFilename("ali\rce")).toBe("alice"));
+  it("strips newlines", () => expect(safeFilename("ali\nce")).toBe("alice"));
+  it("strips backslashes", () => expect(safeFilename("ali\\ce")).toBe("alice"));
+  it("preserves accented chars", () => expect(safeFilename("Élodie")).toBe("élodie"));
+  it("falls back to 'child' for empty result", () => expect(safeFilename('""')).toBe("child"));
+  it("collapses multiple spaces to single underscore", () => expect(safeFilename("a  b")).toBe("a_b"));
 });
 
 // ── rateLimiter ─────────────────────────────────────────────────────────────

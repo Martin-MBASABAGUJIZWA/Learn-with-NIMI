@@ -8,6 +8,7 @@ import { PDFDocument } from "pdf-lib";
 import sharp from "sharp";
 import { fetchAirwaysData } from "@/lib/airways/airwaysData";
 import { buildStampsSvg } from "@/lib/airways/buildStampsSvg";
+import { safeFilename } from "@/lib/airways/safeFilename";
 
 async function fetchCoverUri(url: string): Promise<string | null> {
   try {
@@ -88,7 +89,7 @@ export async function GET(req: NextRequest) {
   const svg = buildStampsSvg({ childName: data.name, stories: data.stories, coverUris });
   const png = await svgToPng(svg);
 
-  const safeName = data.name.toLowerCase().replace(/\s+/g, '_')
+  const safeName = safeFilename(data.name)
 
   if (format === "png") {
     return new NextResponse(new Uint8Array(png), {

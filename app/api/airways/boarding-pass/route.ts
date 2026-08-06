@@ -9,6 +9,7 @@ import sharp from 'sharp'
 import { fetchAirwaysData } from '@/lib/airways/airwaysData'
 import { buildBoardingPassImage, type BPLayout } from '@/lib/airways/buildBoardingPassImage'
 import { avatarUrlToBuffer } from '@/lib/airways/avatarToBuffer'
+import { safeFilename } from '@/lib/airways/safeFilename'
 
 async function fetchPhotoBuffer(url: string): Promise<Buffer | null> {
   try {
@@ -102,7 +103,7 @@ export async function GET(req: NextRequest) {
     layout,
   })
 
-  const safeName = data.name.toLowerCase().replace(/\s+/g, '_')
+  const safeName = safeFilename(data.name)
 
   if (format === 'png') {
     return new NextResponse(new Uint8Array(png), {

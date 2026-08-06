@@ -7,6 +7,7 @@ import sharp from "sharp";
 import * as fs from "fs";
 import * as path from "path";
 import { getServiceClient } from "@/lib/supabase/serviceClient";
+import { safeFilename } from "@/lib/airways/safeFilename";
 
 // ── Main handler ────────────────────────────────────────────
 export async function GET(req: NextRequest) {
@@ -32,7 +33,7 @@ export async function GET(req: NextRequest) {
 
   const { searchParams } = new URL(req.url);
   const childName  = searchParams.get("child") || "Explorer";
-  const safeName   = childName.toLowerCase().replace(/\s+/g, '_');
+  const safeName   = safeFilename(childName);
   const storyId    = searchParams.get("storyId");
   const storyTitle = searchParams.get("story") || "Story Adventure";
   const lang       = searchParams.get("lang") || "en";

@@ -10,6 +10,7 @@ import { buildAttitudeBadge, type AttitudeBadgeLayout } from '@/lib/airways/buil
 import { avatarUrlToBuffer } from '@/lib/airways/avatarToBuffer'
 import { isAvatarConfig } from '@/lib/avatarConfig'
 import { checkRateLimit } from '@/lib/airways/rateLimiter'
+import { safeFilename } from '@/lib/airways/safeFilename'
 
 const supaUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''
 
@@ -113,7 +114,7 @@ export async function GET(req: NextRequest) {
       layout,
     })
 
-    const safeName = data.name.toLowerCase().replace(/\s+/g, '_')
+    const safeName = safeFilename(data.name)
     return new NextResponse(new Uint8Array(badgeBuf), {
       headers: {
         'Content-Type':        'image/png',

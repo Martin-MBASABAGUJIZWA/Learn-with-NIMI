@@ -10,6 +10,7 @@ import { fetchAirwaysData } from '@/lib/airways/airwaysData'
 import { buildKitImage, type KitLayout } from '@/lib/airways/buildKitImage'
 import { avatarUrlToBuffer } from '@/lib/airways/avatarToBuffer'
 import { isAvatarConfig } from '@/lib/avatarConfig'
+import { safeFilename } from '@/lib/airways/safeFilename'
 
 async function fetchPhotoBuffer(url: string): Promise<Buffer | null> {
   try {
@@ -103,7 +104,7 @@ export async function GET(req: NextRequest) {
     layout,
   })
 
-  const safeName = data.name.toLowerCase().replace(/\s+/g, '_')
+  const safeName = safeFilename(data.name)
 
   if (format === 'png') {
     return new NextResponse(new Uint8Array(kitBuffer), {

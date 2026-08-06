@@ -19,6 +19,7 @@ import {
 import { buildStampsSvg } from "@/lib/airways/buildStampsSvg";
 import { buildGrandChampionPages } from "@/lib/airways/buildGrandChampion";
 import { checkRateLimit } from "@/lib/airways/rateLimiter";
+import { safeFilename } from "@/lib/airways/safeFilename";
 import { fetchTemplate } from "@/lib/airways/templateFetcher";
 import { qrDataUri as genQr } from "@/lib/airways/qrCode";
 import { avatarUrlToBuffer } from "@/lib/airways/avatarToBuffer";
@@ -258,7 +259,7 @@ export async function GET(req: NextRequest) {
     }
 
     const pdfBytes = await doc.save();
-    const safeName = data.name.toLowerCase().replace(/\s+/g, '_')
+    const safeName = safeFilename(data.name)
     return new NextResponse(new Uint8Array(pdfBytes), {
       headers: {
         "Content-Type": "application/pdf",
