@@ -259,7 +259,7 @@ export async function buildAttitudeBadge(data: AttitudeBadgeData): Promise<Buffe
 
   const botL      = L.bottom_text
   const botFontSz = botL?.font_size ?? 36
-  const botY      = botL?.y         ?? 1178
+  const botY      = botL?.y         ?? 960
   const botCx     = botL?.x         ?? 637
   const botWL     = Math.max(50, botL?.w || 1800)
   const botKL     = -1 / (2 * botWL)

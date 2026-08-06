@@ -9,6 +9,6 @@ VALUES
   ('badge-template', 'piko',        571,  499, 275, 340, null,  null),
   -- attitude arc: x = centre-x, y = apex-y, w = left-curve-radius, h = right-curve-radius, font_size = px
   ('badge-template', 'attitude',    630,  362, 1500, 1500, 85,  '#7A5100'),
-  -- bottom_text: same arc convention; y=1178 so it sits below the badge ring
-  ('badge-template', 'bottom_text', 637, 1178, 1800, 1800, 36,  '#C9A227')
+  -- bottom_text: same arc convention; y = apex (centre is lowest, edges curve upward)
+  ('badge-template', 'bottom_text', 637,  960, 1800, 1800, 36,  '#C9A227')
 ON CONFLICT (template, field) DO NOTHING;
