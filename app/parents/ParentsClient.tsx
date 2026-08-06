@@ -2319,8 +2319,12 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                                 const cd   = res.headers.get("Content-Disposition") ?? "";
                                 const m    = cd.match(/filename="([^"]+)"/);
                                 a.download = m?.[1] ?? `${doc.key}.pdf`;
+                                document.body.appendChild(a);
                                 a.click();
-                                URL.revokeObjectURL(url);
+                                document.body.removeChild(a);
+                                // Delay revoke — Firefox reads the blob URL asynchronously
+                                // after click(); revoking synchronously produces an empty file.
+                                setTimeout(() => URL.revokeObjectURL(url), 1000);
                               } catch (e) {
                                 const msg = e instanceof Error ? e.message : "Download failed";
                                 setAirwaysError(msg);
