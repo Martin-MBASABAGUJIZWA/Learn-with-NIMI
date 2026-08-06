@@ -70,6 +70,7 @@ export async function POST(req: NextRequest) {
 
   const res = await fetch(`https://${host}/up/v1/capture-contexts`, {
     method: "POST",
+    signal: AbortSignal.timeout(15_000),
     headers: {
       "Content-Type": "application/json",
       "v-c-merchant-id": merchantId,
@@ -108,6 +109,7 @@ export async function PATCH(req: NextRequest) {
 
   const tokenRes = await fetch(`https://${host}${resourcePath}`, {
     method: "POST",
+    signal: AbortSignal.timeout(15_000),
     headers: {
       "Content-Type": "application/json",
       "v-c-merchant-id": merchantId,

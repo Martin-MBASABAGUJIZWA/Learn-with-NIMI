@@ -66,7 +66,7 @@ export async function GET(req: NextRequest) {
         const nameSize = langConfig.nameSize ?? 40;
         const nameColor = langConfig.nameColor ?? "#1a2a6c";
 
-        const imgRes = await fetch(url);
+        const imgRes = await fetch(url, { signal: AbortSignal.timeout(8000) });
         if (imgRes.ok) {
           const imgBuffer = Buffer.from(await imgRes.arrayBuffer());
           const metadata  = await sharp(imgBuffer).metadata();
@@ -143,7 +143,7 @@ export async function GET(req: NextRequest) {
       .maybeSingle();
 
     if (tmpl?.image_url) {
-      const imgRes = await fetch(tmpl.image_url);
+      const imgRes = await fetch(tmpl.image_url, { signal: AbortSignal.timeout(8000) });
       if (imgRes.ok) {
         const imgBuffer = Buffer.from(await imgRes.arrayBuffer());
         const { width: imgW = 864, height: imgH = 1152 } = await sharp(imgBuffer).metadata();

@@ -107,6 +107,7 @@ export async function POST(request: NextRequest) {
 
     const response = await fetch(`https://${host}${resourcePath}`, {
       method: "POST",
+      signal: AbortSignal.timeout(15_000),
       headers: {
         "Content-Type": "application/json",
         "v-c-merchant-id": merchantId,

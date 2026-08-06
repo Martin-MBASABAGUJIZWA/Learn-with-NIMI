@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
     return new NextResponse("Forbidden", { status: 403 });
   }
 
-  const upstream = await fetch(raw, { cache: "force-cache" });
+  const upstream = await fetch(raw, { cache: "force-cache", signal: AbortSignal.timeout(8000) });
   if (!upstream.ok) {
     return new NextResponse("Upstream error", { status: upstream.status });
   }

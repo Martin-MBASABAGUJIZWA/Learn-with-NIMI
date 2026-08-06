@@ -22,6 +22,7 @@ async function getAccessToken(): Promise<string> {
   const credentials = Buffer.from(`${MOMO_API_USER}:${MOMO_API_KEY}`).toString("base64");
   const res = await fetch(MOMO_TOKEN_URL, {
     method: "POST",
+    signal: AbortSignal.timeout(15_000),
     headers: {
       Authorization: `Basic ${credentials}`,
       "Ocp-Apim-Subscription-Key": MOMO_SUBSCRIPTION_KEY,
@@ -68,6 +69,7 @@ export async function POST(req: NextRequest) {
 
     const res = await fetch(MOMO_REQUEST_TO_PAY_URL, {
       method: "POST",
+      signal: AbortSignal.timeout(15_000),
       headers: {
         Authorization: `Bearer ${token}`,
         "X-Reference-Id": referenceId,
@@ -133,6 +135,7 @@ export async function GET(req: NextRequest) {
     const token = await getAccessToken();
     const statusUrl = MOMO_STATUS_URL.replace("{referenceId}", referenceId);
     const res = await fetch(statusUrl, {
+      signal: AbortSignal.timeout(15_000),
       headers: {
         Authorization: `Bearer ${token}`,
         "X-Target-Environment": MOMO_TARGET_ENV,

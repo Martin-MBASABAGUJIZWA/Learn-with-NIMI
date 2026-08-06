@@ -15,7 +15,7 @@ interface PageCfg { x: number; y: number; size: number }
 
 
 async function fetchImage(url: string): Promise<Buffer> {
-  const res = await fetch(url);
+  const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
   if (!res.ok) throw new Error(`Failed to fetch image: ${url}`);
   return Buffer.from(await res.arrayBuffer());
 }
