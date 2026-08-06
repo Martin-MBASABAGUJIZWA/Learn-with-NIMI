@@ -131,7 +131,7 @@ export function buildStampsSvg(opts: StampsOptions): string {
       </text>`;
 
   // Stars at bottom
-  const starsRow = Array.from({ length: 12 }).map((_, i) => {
+  const starsRow = Array.from({ length: TOTAL }).map((_, i) => {
     const filled = i < completedCount;
     return `<text x="${W / 2 - 5.5 * 36 + i * 36 + 18}" y="${H - 55}"
       text-anchor="middle" font-size="22">${filled ? "⭐" : "☆"}</text>`;
@@ -235,7 +235,7 @@ ${stamps}
   font-family="DejaVu,sans-serif" fill="${NAVY}">1</text>
 ${starsRow}
 <text x="${W / 2 + 6.5 * 36}" y="${H - 55}" font-size="16"
-  font-family="DejaVu,sans-serif" fill="${NAVY}">12</text>
+  font-family="DejaVu,sans-serif" fill="${NAVY}">${TOTAL}</text>
 
 <!-- Completion badge or progress -->
 ${completionBadge}

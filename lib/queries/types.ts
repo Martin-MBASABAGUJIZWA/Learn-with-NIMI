@@ -19,6 +19,8 @@ export interface Child {
   age: number | null;
   favorite_category: FavoriteCategory | null;
   created_at: string;
+  attitude: string | null;
+  attitude_badge_url: string | null;
 }
 
 export interface Story {

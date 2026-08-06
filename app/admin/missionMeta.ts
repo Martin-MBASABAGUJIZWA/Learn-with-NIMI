@@ -182,6 +182,7 @@ export interface StoryRow {
   published_at: string | null
   theme_title: string | null
   theme_emoji: string | null
+  attitude: string | null
   is_personalizable?: boolean
   personalization_config?: PersonalizationConfig
   story_pages: StoryPageRow[]

@@ -43,6 +43,13 @@ const SLOTS: TemplateSlot[] = [
     required: true,
   },
   {
+    key: 'piko-character',
+    label: 'Piko Character PNG',
+    description: 'Piko robot character on a transparent background — placed in the right half of the badge inner circle.',
+    note: 'Must be PNG with transparency. Sized to fit inside the badge circle.',
+    required: true,
+  },
+  {
     key: 'boarding-pass',
     label: 'Boarding Pass',
     description: 'White/gold boarding pass layout with photo box and field placeholders.',
@@ -108,7 +115,7 @@ export default function AirwaysTemplatesManager({ onNavigate, onOpenSidebar }: A
   // ── Test download ─────────────────────────────────────────────
   const [children, setChildren] = useState<Child[]>([])
   const [selectedChild, setSelectedChild] = useState<string>('')
-  const [testDoc, setTestDoc] = useState<'kit' | 'boarding-pass' | 'passport'>('kit')
+  const [testDoc, setTestDoc] = useState<'kit' | 'boarding-pass' | 'passport' | 'badge'>('kit')
   const [downloading, setDownloading] = useState(false)
   const [dlError, setDlError] = useState<string | null>(null)
 
@@ -128,10 +135,13 @@ export default function AirwaysTemplatesManager({ onNavigate, onOpenSidebar }: A
     setDownloading(true)
     setDlError(null)
     try {
-      const isPdf = testDoc === 'passport'
-      const url = isPdf
-        ? `/api/airways/${testDoc}?childId=${selectedChild}`
-        : `/api/airways/${testDoc}?childId=${selectedChild}&format=png`
+      // passport → PDF (no format param); badge → PNG (no format param);
+      // boarding-pass / kit / stamps → PNG (need &format=png)
+      const needsFormatParam = testDoc !== 'passport' && testDoc !== 'badge'
+      const url = needsFormatParam
+        ? `/api/airways/${testDoc}?childId=${selectedChild}&format=png`
+        : `/api/airways/${testDoc}?childId=${selectedChild}`
+      const ext = testDoc === 'passport' ? 'pdf' : 'png'
       const res = await fetch(url)
       if (!res.ok) {
         const j = await res.json().catch(() => ({}))
@@ -141,7 +151,7 @@ export default function AirwaysTemplatesManager({ onNavigate, onOpenSidebar }: A
       const objUrl = URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = objUrl
-      a.download = `test_${testDoc}.${isPdf ? 'pdf' : 'png'}`
+      a.download = `test_${testDoc}.${ext}`
       a.click()
       URL.revokeObjectURL(objUrl)
     } catch (err) {
@@ -197,9 +207,10 @@ export default function AirwaysTemplatesManager({ onNavigate, onOpenSidebar }: A
   const handleDelete = async (key: string) => {
     const url = slotStates[key]?.url
     if (!url) return
-    // Derive filename from URL
-    const fileName = url.split('/').pop()
-    if (!fileName) return
+    // Derive filename from URL — strip the cache-busting ?t=... before passing to storage.remove()
+    const rawName = url.split('/').pop()
+    if (!rawName) return
+    const fileName = rawName.split('?')[0]
     if (!window.confirm(`Delete the "${key}" template? This cannot be undone.`)) return
     updateSlot(key, { deleting: true, error: null })
     try {
@@ -325,12 +336,13 @@ export default function AirwaysTemplatesManager({ onNavigate, onOpenSidebar }: A
               <label className="text-xs font-semibold text-gray-500 mb-1 block">Document</label>
               <select
                 value={testDoc}
-                onChange={e => setTestDoc(e.target.value as 'kit' | 'boarding-pass')}
+                onChange={e => setTestDoc(e.target.value as 'kit' | 'boarding-pass' | 'passport' | 'badge')}
                 className="text-sm border border-gray-200 rounded-xl px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-200"
               >
                 <option value="kit">Champion Kit</option>
                 <option value="boarding-pass">Boarding Pass</option>
                 <option value="passport">Passport</option>
+                <option value="badge">Attitude Badge</option>
               </select>
             </div>
             <button

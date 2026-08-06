@@ -679,6 +679,27 @@ export default function StoryEditor({ story, onSaved, defaultLang }: StoryEditor
               <AutoSaveInput label="Story Title" value={story.title} onSave={v => saveField('title', v)} />
               <SlugInput storyId={story.id} initialSlug={story.slug} titleHint={story.title} onSaved={onSaved} />
               <AutoSaveInput label="Tagline" value={story.theme_title ?? ''} onSave={v => saveField('theme_title', v)} />
+              {/* Airways attitude — badge text awarded when this story is completed */}
+              <div>
+                <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wide mb-1.5">
+                  ✈️ Airways Attitude
+                </label>
+                <div className="flex gap-2 flex-wrap mb-1.5">
+                  {['SUPER CURIEUX', 'COURAGEUX', 'CRÉATIF', 'BRILLANT', 'BIENVEILLANT', 'PERSÉVÉRANT', 'EXTRAORDINAIRE', 'DÉTERMINÉ'].map(a => (
+                    <button key={a} type="button"
+                      onClick={() => saveField('attitude', a)}
+                      className={`px-2 py-0.5 text-[10px] font-black rounded-full border transition ${
+                        story.attitude === a
+                          ? 'bg-amber-500 border-amber-500 text-white'
+                          : 'border-amber-200 text-amber-700 bg-amber-50 hover:bg-amber-100'
+                      }`}>
+                      {a}
+                    </button>
+                  ))}
+                </div>
+                <AutoSaveInput label="Custom attitude" value={story.attitude ?? ''} onSave={v => saveField('attitude', v)} />
+                <p className="text-[10px] text-gray-400 mt-1">Shown on the attitude badge in the child&apos;s passport. ALL CAPS recommended.</p>
+              </div>
               <div className="grid grid-cols-2 gap-3">
                 <AutoSaveInput label="Age Min" value={String(story.age_min ?? '')} onSave={v => saveField('age_min', v)} />
                 <AutoSaveInput label="Age Max" value={String(story.age_max ?? '')} onSave={v => saveField('age_max', v)} />

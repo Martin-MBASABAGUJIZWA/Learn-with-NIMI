@@ -1,4 +1,5 @@
 export const runtime = "nodejs";
+export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthUser } from "@/lib/supabaseRouteAuth";
@@ -50,10 +51,21 @@ export async function GET(req: NextRequest) {
 
   if (!childId) return NextResponse.json({ error: "childId required" }, { status: 400 });
 
-  const { data: child } = await supabase
-    .from("children").select("parent_id").eq("id", childId).single();
-  if (child?.parent_id !== user.id) {
+  const [{ data: child }, { data: adminRow }] = await Promise.all([
+    supabase.from("children").select("parent_id").eq("id", childId).single(),
+    supabase.from("admins").select("id").eq("id", user.id).maybeSingle(),
+  ]);
+  if (!adminRow && child?.parent_id !== user.id) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+  if (!adminRow) {
+    const { data: sub } = await supabase
+      .from("nimipiko_subscriptions")
+      .select("id")
+      .eq("parent_id", user.id)
+      .in("status", ["active", "trial"])
+      .maybeSingle();
+    if (!sub) return NextResponse.json({ error: "Subscription required" }, { status: 402 });
   }
 
   const data = await fetchAirwaysData(supabase, childId);
@@ -76,11 +88,13 @@ export async function GET(req: NextRequest) {
   const svg = buildStampsSvg({ childName: data.name, stories: data.stories, coverUris });
   const png = await svgToPng(svg);
 
+  const safeName = data.name.toLowerCase().replace(/\s+/g, '_')
+
   if (format === "png") {
     return new NextResponse(new Uint8Array(png), {
       headers: {
         "Content-Type": "image/png",
-        "Content-Disposition": `attachment; filename="${data.name}_stamps.png"`,
+        "Content-Disposition": `attachment; filename="${safeName}_stamps.png"`,
       },
     });
   }
@@ -89,7 +103,7 @@ export async function GET(req: NextRequest) {
   return new NextResponse(new Uint8Array(pdf), {
     headers: {
       "Content-Type": "application/pdf",
-      "Content-Disposition": `attachment; filename="${data.name}_stamp_collection.pdf"`,
+      "Content-Disposition": `attachment; filename="${safeName}_stamp_collection.pdf"`,
     },
   });
 }

@@ -107,7 +107,7 @@ export default function StoryManager({ initialStoryId, onNavigate, onOpenSidebar
     try {
       const { data, error } = await supabase
         .from('stories')
-        .select('id, slug, title, cover_url, sort_order, is_active, is_free, status, age_min, age_max, published_at, theme_title, theme_emoji, is_personalizable, personalization_config, story_pages(id, story_id, page_number, image_url, story_page_versions(id, language, text, audio_url, published)), coloring_pages(id), story_versions(id, story_id, language, title, cover_url, intro_video_url, theme_song_url, meet_characters_url, story_intro_url, status, published), story_slots(story_id, slot_key, mission_id, sort_order, missions(id, mission_versions(id, language, media_url)))')
+        .select('id, slug, title, cover_url, sort_order, is_active, is_free, status, age_min, age_max, published_at, theme_title, theme_emoji, attitude, is_personalizable, personalization_config, story_pages(id, story_id, page_number, image_url, story_page_versions(id, language, text, audio_url, published)), coloring_pages(id), story_versions(id, story_id, language, title, cover_url, intro_video_url, theme_song_url, meet_characters_url, story_intro_url, status, published), story_slots(story_id, slot_key, mission_id, sort_order, missions(id, mission_versions(id, language, media_url)))')
         .order('sort_order')
       if (error) throw error
       setStories((data ?? []) as unknown as StoryRow[])
@@ -861,6 +861,11 @@ function StoryCoverageMatrix({ stories, onSelect }: { stories: StoryRow[]; onSel
         <span className={`text-[11px] font-bold px-3 py-1.5 rounded-full ${avgScore >= 80 ? 'bg-emerald-50 text-emerald-700' : avgScore >= 50 ? 'bg-amber-50 text-amber-700' : 'bg-red-50 text-red-600'}`}>
           Avg {avgScore}% coverage
         </span>
+        {(() => { const missing = stories.filter(s => !s.attitude).length; return missing > 0 ? (
+          <span className="text-[11px] font-bold px-3 py-1.5 rounded-full bg-amber-50 text-amber-700">✈ {missing} attitude{missing !== 1 ? 's' : ''} missing</span>
+        ) : (
+          <span className="text-[11px] font-bold px-3 py-1.5 rounded-full bg-amber-50 text-amber-700">✈ All attitudes set</span>
+        )})()}
       </div>
 
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-x-auto">
@@ -876,6 +881,7 @@ function StoryCoverageMatrix({ stories, onSelect }: { stories: StoryRow[]; onSel
               <th className="px-2 py-3 text-[10px] font-semibold text-gray-400 uppercase tracking-wide text-center">Sing</th>
               <th className="px-2 py-3 text-[10px] font-semibold text-gray-400 uppercase tracking-wide text-center">Bonus</th>
               <th className="px-2 py-3 text-[10px] font-semibold text-gray-400 uppercase tracking-wide text-center">Score</th>
+              <th className="px-2 py-3 text-[10px] font-semibold text-amber-400 uppercase tracking-wide text-center">✈ Attitude</th>
               <th className="px-2 py-3" />
             </tr>
           </thead>
@@ -948,6 +954,11 @@ function StoryCoverageMatrix({ stories, onSelect }: { stories: StoryRow[]; onSel
                       : score >= 60  ? 'bg-amber-100 text-amber-700'
                       : 'bg-red-100 text-red-600'
                     }`}>{score}%</span>
+                  </td>
+                  <td className="px-2 py-3 text-center">
+                    {s.attitude
+                      ? <span className="text-[9px] font-black px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 whitespace-nowrap">{s.attitude}</span>
+                      : <span className="text-[9px] text-red-300 font-bold">— missing</span>}
                   </td>
                   <td className="px-2 py-3">
                     <button type="button" onClick={() => onSelect(s.id)}

@@ -46,6 +46,7 @@ export default function OnboardingPage() {
   const [saving, setSaving]         = useState(false);
   const [error, setError]           = useState("");
   const [done, setDone]             = useState(false);
+  const [createdChildId, setCreatedChildId] = useState<string | null>(null);
 
   useEffect(() => {
     void (async () => {
@@ -92,9 +93,11 @@ export default function OnboardingPage() {
       localStorage.setItem("nimipiko_active_child", child.id);
     }
 
-    // Pre-generate referral code so ReferralCard loads instantly on first visit
+    setCreatedChildId(child.id);
+
     const { data: { session } } = await supabase.auth.getSession();
     if (session?.access_token) {
+      // Pre-generate referral code so ReferralCard loads instantly on first visit
       void fetch("/api/referral", {
         headers: { Authorization: `Bearer ${session.access_token}` },
       }).catch(() => {});
@@ -281,61 +284,130 @@ export default function OnboardingPage() {
             </motion.div>
           )}
 
-          {/* ── DONE: Celebration ───────────────────────────────────────── */}
+          {/* ── DONE: Ready for Departure ──────────────────────────────── */}
           {done && (
             <motion.div key="done" variants={fadeSlide} initial="hidden" animate="visible"
-              className="w-full bg-[var(--ds-surface-card)]/90 backdrop-blur-sm border border-emerald-100 shadow-brand-glow-md overflow-hidden text-center"
+              className="w-full overflow-hidden shadow-2xl"
               style={{ borderRadius:"28px" }}>
-              <div className="p-10 flex flex-col items-center">
-                <motion.div
-                  animate={{ scale:[1,1.12,1], rotate:[0,5,-5,0] }}
-                  transition={{ duration:0.7, repeat:2 }}
-                  className="text-7xl mb-3 select-none" aria-hidden>🎉</motion.div>
-                <motion.div
-                  initial={{ scale:0.7, opacity:0 }}
-                  animate={{ scale:1, opacity:1 }}
-                  transition={{ delay:0.3, type:"spring", stiffness:260, damping:18 }}
-                  className="w-32 h-32 rounded-full overflow-hidden border-4 border-emerald-300 shadow-2xl mb-4"
-                  style={{ backgroundColor: `#${avatarCfg.bg}` }}>
-                  <AvatarSvg config={avatarCfg} size={128} />
-                </motion.div>
-                <h2 className="font-baloo font-black text-emerald-700 text-3.5xl leading-tight mb-2">
-                  {childName} is ready!
-                </h2>
-                <p className="font-nunito text-[var(--ds-text-secondary)] text-sm">
-                  Your 7-day free trial is active 🎉
-                </p>
-                <div className="flex items-center gap-1 mt-3">
-                  {[...Array(5)].map((_, i) => (
-                    <motion.div key={i} initial={{ scale:0 }} animate={{ scale:1 }}
-                      transition={{ delay:0.4 + i*0.08, ...SPRING.card }}>
-                      <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
-                    </motion.div>
-                  ))}
-                </div>
-                <motion.div className="mt-5 h-1.5 bg-emerald-100 rounded-full overflow-hidden w-48">
-                  <motion.div className="h-full bg-emerald-500 rounded-full"
-                    initial={{ width:"0%" }} animate={{ width:"100%" }}
-                    transition={{ duration:2.8, ease:"easeInOut" }} />
-                </motion.div>
 
-                {/* Airways teaser */}
-                <motion.div
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.8, duration: 0.4 }}
-                  className="mt-6 w-full bg-blue-50 rounded-2xl px-4 py-3 flex items-center gap-3 text-left"
-                >
-                  <span className="text-2xl">🧳</span>
+              {/* Airport header bar */}
+              <div className="px-6 py-4 flex items-center justify-between"
+                style={{ background:"linear-gradient(135deg,#06101F 0%,#1A3558 100%)" }}>
+                <div>
+                  <p className="text-[#C9A84C] font-black text-3xs tracking-widest uppercase">Nimipiko Airways</p>
+                  <p className="text-white font-baloo font-black text-base leading-none">Boarding Gate Open ✈️</p>
+                </div>
+                <motion.span
+                  animate={{ x:[0, 8, 0] }}
+                  transition={{ duration:1.8, repeat:Infinity, ease:"easeInOut" }}
+                  className="text-4xl select-none">✈️</motion.span>
+              </div>
+
+              {/* Boarding pass body */}
+              <div className="bg-white px-6 pt-5 pb-6">
+
+                {/* Flight info row */}
+                <div className="flex items-start justify-between mb-4 pb-4 border-b border-dashed border-gray-200">
                   <div>
-                    <p className="font-baloo font-black text-blue-900 text-sm leading-tight">
-                      Your Champion Kit is ready!
+                    <p className="text-3xs font-black text-gray-400 uppercase tracking-widest">Passenger</p>
+                    <p className="font-baloo font-black text-gray-900 text-xl leading-tight">{childName.toUpperCase()}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-3xs font-black text-gray-400 uppercase tracking-widest">Flight</p>
+                    <p className="font-baloo font-black text-[#1A3558] text-lg">NMP101</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="text-center">
+                    <p className="font-baloo font-black text-2xl text-gray-900">NMP</p>
+                    <p className="text-3xs text-gray-400 uppercase tracking-wider">Nimi Academy</p>
+                  </div>
+                  <div className="flex-1 flex flex-col items-center gap-1">
+                    <div className="w-full flex items-center gap-1">
+                      <div className="flex-1 h-px bg-gray-300" />
+                      <span className="text-gray-400 text-xs">✈</span>
+                      <div className="flex-1 h-px bg-gray-300" />
+                    </div>
+                    <p className="text-3xs text-[#1A7A3E] font-black uppercase tracking-widest">Direct</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="font-baloo font-black text-2xl text-gray-900">ADV</p>
+                    <p className="text-3xs text-gray-400 uppercase tracking-wider">Adventure</p>
+                  </div>
+                </div>
+
+                {/* Avatar + welcome */}
+                <div className="flex items-center gap-4 mb-5">
+                  <motion.div
+                    initial={{ scale:0.7, opacity:0 }}
+                    animate={{ scale:1, opacity:1 }}
+                    transition={{ delay:0.3, type:"spring", stiffness:260, damping:18 }}
+                    className="w-16 h-16 rounded-full overflow-hidden border-2 border-[#C9A84C] shadow-lg shrink-0"
+                    style={{ backgroundColor:`#${avatarCfg.bg}` }}>
+                    <AvatarSvg config={avatarCfg} size={64} />
+                  </motion.div>
+                  <div>
+                    <p className="font-baloo font-black text-gray-900 text-base leading-tight">
+                      {childName}&apos;s passport is ready!
                     </p>
-                    <p className="text-blue-500 text-xs font-nunito">
-                      Download it from your profile anytime ✈️
+                    <p className="text-gray-500 text-xs font-nunito mt-0.5">
+                      7-day free trial active · All Club doors open 🎉
+                    </p>
+                    <div className="flex items-center gap-0.5 mt-1.5">
+                      {[...Array(5)].map((_, i) => (
+                        <motion.div key={i} initial={{ scale:0 }} animate={{ scale:1 }}
+                          transition={{ delay:0.5 + i*0.07, ...SPRING.card }}>
+                          <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+                        </motion.div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Boarding progress bar */}
+                <div className="mb-4">
+                  <div className="flex justify-between text-3xs text-gray-400 font-black uppercase tracking-widest mb-1.5">
+                    <span>Boarding…</span><span>Gate closing</span>
+                  </div>
+                  <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                    <motion.div className="h-full rounded-full"
+                      style={{ background:"linear-gradient(90deg,#1A7A3E,#34D399)" }}
+                      initial={{ width:"0%" }} animate={{ width:"100%" }}
+                      transition={{ duration:2.8, ease:"easeInOut" }} />
+                  </div>
+                </div>
+
+                {/* Airways tip */}
+                <motion.div
+                  initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }}
+                  transition={{ delay:0.9, duration:0.4 }}
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-xl"
+                  style={{ background:"linear-gradient(135deg,#06101F,#1A3558)" }}>
+                  <span className="text-xl shrink-0">📘</span>
+                  <div>
+                    <p className="font-baloo font-black text-[#C9A84C] text-xs leading-tight">
+                      Passport &amp; boarding pass ready
+                    </p>
+                    <p className="text-white/60 text-3xs font-nunito">
+                      Download them anytime from your parent profile → Airways ✈️
                     </p>
                   </div>
                 </motion.div>
+              </div>
+
+              {/* Barcode strip */}
+              <div className="px-6 py-3 flex items-center justify-between"
+                style={{ background:"#F7F7F7", borderTop:"2px dashed #E5E7EB" }}>
+                <div className="flex gap-0.5">
+                  {Array.from({ length: 28 }).map((_, i) => (
+                    <div key={i} className="bg-gray-800 rounded-sm"
+                      style={{ width: i % 3 === 0 ? 3 : 1.5, height: 28 }} />
+                  ))}
+                </div>
+                <p className="font-baloo font-black text-3xs text-gray-400 tracking-widest">
+                  {createdChildId?.slice(0, 8).toUpperCase() ?? 'NMP-0001'}
+                </p>
               </div>
             </motion.div>
           )}

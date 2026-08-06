@@ -3,6 +3,8 @@ import { createCanvas, registerFont } from 'canvas'
 import path from 'path'
 import { fetchTemplate } from './templateFetcher'
 import { barcodeBuffer } from './barcode'
+import { flightNumber } from './airwaysData'
+import { seatNum, gateNum, statusLabel } from './formatters'
 
 try {
   const fontsDir = path.join(process.cwd(), 'public', 'fonts')
@@ -70,10 +72,6 @@ function renderTextOverlay(W: number, H: number, fields: BPTextField[]): Buffer 
   return canvas.toBuffer('image/png')
 }
 
-function flightNum(n: number)               { return `NMP1${String(n).padStart(2, '0')}` }
-function seatNum(age: number | null, n: number) { return `${age ?? n}A` }
-function gateNum(n: number)                 { return `G${n}` }
-function statusLabel(n: number)             { return n >= 7 ? 'GRAND CHAMPION' : 'PETIT CHAMPION' }
 
 export interface BoardingPassData {
   childName:   string
@@ -110,7 +108,7 @@ export async function buildBoardingPassImage(data: BoardingPassData): Promise<Bu
     { text: data.childName.toUpperCase(),          pos: get(layout, 'name') },
     { text: `${data.age ?? '?'} ANS`,              pos: get(layout, 'age') },
     { text: statusLabel(data.storyNumber),         pos: get(layout, 'statut') },
-    { text: flightNum(data.storyNumber),           pos: get(layout, 'vol') },
+    { text: flightNumber(data.storyNumber),         pos: get(layout, 'vol') },
     { text: data.storyTitle.toUpperCase(),         pos: get(layout, 'destination') },
     { text: String(data.storyNumber),              pos: get(layout, 'livre') },
     { text: seatNum(data.age, data.storyNumber),   pos: get(layout, 'siege') },

@@ -8,6 +8,7 @@ import { PDFDocument } from 'pdf-lib'
 import sharp from 'sharp'
 import { fetchAirwaysData } from '@/lib/airways/airwaysData'
 import { buildBoardingPassImage, type BPLayout } from '@/lib/airways/buildBoardingPassImage'
+import { avatarUrlToBuffer } from '@/lib/airways/avatarToBuffer'
 
 async function fetchPhotoBuffer(url: string): Promise<Buffer | null> {
   try {
@@ -52,6 +53,15 @@ export async function GET(req: NextRequest) {
   if (!adminRow && child?.parent_id !== user.id) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
+  if (!adminRow) {
+    const { data: sub } = await supabase
+      .from('nimipiko_subscriptions')
+      .select('id')
+      .eq('parent_id', user.id)
+      .in('status', ['active', 'trial'])
+      .maybeSingle()
+    if (!sub) return NextResponse.json({ error: 'Subscription required' }, { status: 402 })
+  }
 
   const data = await fetchAirwaysData(supabase, childId)
   if (!data) return NextResponse.json({ error: 'Child not found' }, { status: 404 })
@@ -69,7 +79,12 @@ export async function GET(req: NextRequest) {
 
   const supaUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''
   let photoBuffer: Buffer | null = null
-  if (data.avatar_url) {
+
+  // Avatar stored as "ava:{…json…}" → render to PNG; real URLs → fetch normally
+  const avatarBuf = await avatarUrlToBuffer(data.avatar_url, 295)
+  if (avatarBuf) {
+    photoBuffer = avatarBuf
+  } else if (data.avatar_url && !data.avatar_url.startsWith('ava:')) {
     const photoUrl = data.avatar_url.startsWith('http')
       ? data.avatar_url
       : `${supaUrl}/storage/v1/object/public/${data.avatar_url}`

@@ -12,6 +12,8 @@ export interface AirwaysStory {
   slug: string | null;
   cover_url: string | null;
   sort_order: number;
+  /** attitude awarded when this story is completed (e.g. "SUPER CURIEUX") */
+  attitude: string | null;
   /** true when every active slot for this story is complete */
   is_complete: boolean;
   /** ISO string of the last slot completion, null if not complete */
@@ -23,6 +25,10 @@ export interface AirwaysChildData {
   name: string;
   age: number | null;
   avatar_url: string | null;
+  /** Attitude label set at registration, e.g. "SUPER CURIEUX" */
+  attitude: string | null;
+  /** Optional pre-stored badge PNG URL; when null, badge is generated inline from attitude + story 1 */
+  attitude_badge_url: string | null;
   language: string;
   created_at: string;
   /** parent_id used for champion-number derivation */
@@ -42,7 +48,7 @@ export async function fetchAirwaysData(
   // ── Child profile ───────────────────────────────────────────
   const { data: child, error: childErr } = await supabase
     .from("children")
-    .select("id, name, age, avatar_url, language, created_at, parent_id")
+    .select("id, name, age, avatar_url, attitude, attitude_badge_url, language, created_at, parent_id")
     .eq("id", childId)
     .single();
   if (childErr || !child) return null;
@@ -58,7 +64,7 @@ export async function fetchAirwaysData(
   // ── All active stories ordered ───────────────────────────────
   const { data: storiesRaw } = await supabase
     .from("stories")
-    .select("id, title, slug, cover_url, sort_order")
+    .select("id, title, slug, cover_url, sort_order, attitude")
     .eq("is_active", true)
     .order("sort_order");
   if (!storiesRaw?.length) {
@@ -106,7 +112,7 @@ export async function fetchAirwaysData(
       const dates = slots.map((m) => doneSet.get(m)!);
       completed_at = dates.sort().at(-1) ?? null;
     }
-    return { ...s, is_complete, completed_at };
+    return { ...s, attitude: s.attitude ?? null, is_complete, completed_at };
   });
 
   const current_story =

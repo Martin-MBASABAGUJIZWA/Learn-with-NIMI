@@ -12,7 +12,8 @@ export async function GET(req: NextRequest) {
   const { data: admin } = await supabase.from('admins').select('id').eq('id', user.id).maybeSingle()
   if (!admin) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
-  const template = new URL(req.url).searchParams.get('template') ?? 'kit'
+  const template = new URL(req.url).searchParams.get('template')
+  if (!template) return NextResponse.json({ error: 'template param required' }, { status: 400 })
 
   const { data, error } = await supabase
     .from('template_layout')
@@ -31,7 +32,8 @@ export async function POST(req: NextRequest) {
   const { data: admin } = await supabase.from('admins').select('id').eq('id', user.id).maybeSingle()
   if (!admin) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
-  const template = new URL(req.url).searchParams.get('template') ?? 'kit'
+  const template = new URL(req.url).searchParams.get('template')
+  if (!template) return NextResponse.json({ error: 'template param required' }, { status: 400 })
 
   const rows = await req.json()
   if (!Array.isArray(rows)) return NextResponse.json({ error: 'Invalid body' }, { status: 400 })
@@ -54,7 +56,8 @@ export async function DELETE(req: NextRequest) {
   const { data: admin } = await supabase.from('admins').select('id').eq('id', user.id).maybeSingle()
   if (!admin) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
-  const template = new URL(req.url).searchParams.get('template') ?? 'kit'
+  const template = new URL(req.url).searchParams.get('template')
+  if (!template) return NextResponse.json({ error: 'template param required' }, { status: 400 })
 
   const { error } = await supabase.from('template_layout').delete().eq('template', template)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })

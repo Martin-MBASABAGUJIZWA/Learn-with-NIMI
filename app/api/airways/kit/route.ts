@@ -8,6 +8,8 @@ import { PDFDocument } from 'pdf-lib'
 import sharp from 'sharp'
 import { fetchAirwaysData } from '@/lib/airways/airwaysData'
 import { buildKitImage, type KitLayout } from '@/lib/airways/buildKitImage'
+import { avatarUrlToBuffer } from '@/lib/airways/avatarToBuffer'
+import { isAvatarConfig } from '@/lib/avatarConfig'
 
 async function fetchPhotoBuffer(url: string): Promise<Buffer | null> {
   try {
@@ -46,13 +48,22 @@ export async function GET(req: NextRequest) {
   if (!adminRow && child?.parent_id !== user.id) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
+  if (!adminRow) {
+    const { data: sub } = await supabase
+      .from('nimipiko_subscriptions')
+      .select('id')
+      .eq('parent_id', user.id)
+      .in('status', ['active', 'trial'])
+      .maybeSingle()
+    if (!sub) return NextResponse.json({ error: 'Subscription required' }, { status: 402 })
+  }
 
   const data = await fetchAirwaysData(supabase, childId)
   if (!data) return NextResponse.json({ error: 'Child not found' }, { status: 404 })
 
   // Load saved layout from unified template_layout table
   const { data: layoutRows } = await supabase
-    .from('template_layout').select('field,x,y,w,h,font_size,bold,color').eq('template', 'kit')
+    .from('template_layout').select('field,x,y,w,h,font_size,bold,color').eq('template', 'champion-kit')
   const layout: KitLayout = {}
   for (const row of layoutRows ?? []) {
     layout[row.field] = { x: row.x, y: row.y, w: row.w, h: row.h, font_size: row.font_size, bold: row.bold, color: row.color }
@@ -66,16 +77,17 @@ export async function GET(req: NextRequest) {
 
   const supaUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''
 
-  // Fetch child photo
+  // Avatar stored as "ava:{…json…}" → render to PNG; real URLs → fetch normally
   let photoBuffer: Buffer | null = null
   if (data.avatar_url) {
-    const photoUrl = data.avatar_url.startsWith('http')
-      ? data.avatar_url
-      : `${supaUrl}/storage/v1/object/public/${data.avatar_url}`
-    photoBuffer = await fetchPhotoBuffer(photoUrl)
-    if (photoBuffer) {
-      // Normalize to PNG
-      photoBuffer = await sharp(photoBuffer).png().toBuffer()
+    if (isAvatarConfig(data.avatar_url)) {
+      photoBuffer = await avatarUrlToBuffer(data.avatar_url, 295)
+    } else {
+      const photoUrl = data.avatar_url.startsWith('http')
+        ? data.avatar_url
+        : `${supaUrl}/storage/v1/object/public/${data.avatar_url}`
+      const raw = await fetchPhotoBuffer(photoUrl)
+      if (raw) photoBuffer = await sharp(raw).png().toBuffer()
     }
   }
 

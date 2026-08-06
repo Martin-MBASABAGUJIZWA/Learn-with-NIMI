@@ -145,7 +145,12 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
   const [referralRewards, setReferralRewards] = useState(0);
   const [referralCodeError, setReferralCodeError] = useState(false);
   const [parentUserId, setParentUserId] = useState<string | null>(null);
-  const [parentTab, setParentTab] = useState<"overview" | "stories" | "achievements" | "learning" | "settings">("overview");
+  const [parentTab, setParentTab] = useState<"overview" | "stories" | "achievements" | "learning" | "airways" | "settings">("overview");
+  const [airwaysDownloading, setAirwaysDownloading] = useState<string | null>(null);
+  const [airwaysError, setAirwaysError] = useState<string | null>(null);
+  const [boardingPassPreview, setBoardingPassPreview] = useState<string | null>(null);
+  const [boardingPassPreviewLoading, setBoardingPassPreviewLoading] = useState(false);
+  const boardingPassPreviewUrlRef = useRef<string | null>(null);
   const [editingName, setEditingName] = useState(false);
   const [nameInput, setNameInput] = useState("");
   const [savingName, setSavingName] = useState(false);
@@ -298,6 +303,45 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
     void getTodayMissions(selectedChild, data.child.language as "en" | "fr" | "rw")
       .then(setTodayActivity);
   }, [selectedChild, childrenData]);
+
+  // Fetch boarding pass preview PNG when Airways tab opens (subscribers only).
+  // AbortController cancels in-flight fetches when deps change — prevents a stale
+  // child's preview from overwriting the new child's slot if the user switches quickly.
+  useEffect(() => {
+    if (parentTab !== "airways" || !hasSubscription || !selectedChild || boardingPassPreview) return;
+    const ctrl = new AbortController();
+    setBoardingPassPreviewLoading(true);
+    (async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const res = await fetch(`/api/airways/boarding-pass?childId=${selectedChild}&format=png`, {
+          signal: ctrl.signal,
+          headers: session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {},
+        });
+        if (!res.ok) return;
+        const blob = await res.blob();
+        if (ctrl.signal.aborted) return;
+        const objUrl = URL.createObjectURL(blob);
+        boardingPassPreviewUrlRef.current = objUrl;
+        setBoardingPassPreview(objUrl);
+      } catch (e) {
+        if (e instanceof Error && e.name === "AbortError") return;
+        // other errors are non-critical for a preview
+      } finally {
+        if (!ctrl.signal.aborted) setBoardingPassPreviewLoading(false);
+      }
+    })();
+    return () => { ctrl.abort(); setBoardingPassPreviewLoading(false); };
+  }, [parentTab, hasSubscription, selectedChild, boardingPassPreview]);
+
+  // Reset preview when child switches, revoking the stale blob URL to free memory
+  useEffect(() => {
+    if (boardingPassPreviewUrlRef.current) {
+      URL.revokeObjectURL(boardingPassPreviewUrlRef.current);
+      boardingPassPreviewUrlRef.current = null;
+    }
+    setBoardingPassPreview(null);
+  }, [selectedChild]);
 
   const handleCancelSub = async (action: "cancel" | "reactivate") => {
     setCancellingSubscription(true);
@@ -527,6 +571,22 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
               className="fixed top-20 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-4 py-2.5 rounded-full bg-emerald-600 text-white text-sml font-black shadow-xl"
             >
               {`🎮 Switched to ${childrenData.find(d => d.child.id === playingChildId)?.child.name ?? "kid"} — whole app updated!`}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* ═══ Airways download error toast ═══ */}
+        <AnimatePresence>
+          {airwaysError && (
+            <motion.div
+              key="airways-error"
+              initial={{ opacity: 0, y: -12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              className="fixed top-20 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-4 py-2.5 rounded-full bg-red-600 text-white text-sml font-black shadow-xl max-w-sm text-center"
+            >
+              <AlertTriangle className="w-4 h-4 shrink-0" />
+              {airwaysError}
             </motion.div>
           )}
         </AnimatePresence>
@@ -1020,6 +1080,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                   { id: "stories",      emoji: "📚", label: t("tabStories"),  badge: totalStories > 0 ? `${storiesComplete}/${totalStories}` : null },
                   { id: "achievements", emoji: "🏆", label: t("tabWins"),     badge: (badges.length + certs.length) > 0 ? String(badges.length + certs.length) : null },
                   { id: "learning",     emoji: "🧠", label: "Learning",       badge: null },
+                  { id: "airways",      emoji: "✈️", label: "Airways",         badge: storiesComplete > 0 ? String(storiesComplete) : null },
                   { id: "settings",     emoji: "⚙️", label: t("tabSettings"), badge: null },
                 ] as { id: typeof parentTab; emoji: string; label: string; badge: string | null }[]).map(tab => (
                   <button
@@ -2091,6 +2152,215 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                     language={active.child.language}
                     childName={active.child.name}
                   />
+                )}
+
+                {/* ── AIRWAYS TAB ── */}
+                {parentTab === "airways" && (
+                  <motion.div key="airways"
+                    initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}
+                    transition={{ duration: 0.2 }}
+                    className="space-y-4"
+                  >
+                    {/* Header */}
+                    <div
+                      className="relative overflow-hidden rounded-2xl p-5"
+                      style={{ background: "linear-gradient(135deg, #0D1B30 0%, #1A3558 60%, #0D1B30 100%)" }}
+                    >
+                      {/* decorative runway lines */}
+                      <div className="absolute inset-0 opacity-10 pointer-events-none"
+                        style={{ backgroundImage: "repeating-linear-gradient(90deg, #C9A84C 0px, #C9A84C 2px, transparent 2px, transparent 40px)", backgroundSize: "40px 100%" }} />
+                      <div className="relative flex items-center gap-3">
+                        <div className="text-4xl">✈️</div>
+                        <div>
+                          <p className="text-[#C9A84C] text-4xs font-black tracking-widest uppercase">Nimipiko Airways</p>
+                          <p className="text-white font-black text-base leading-tight">{active.child.name}&apos;s Travel Documents</p>
+                          <p className="text-white/60 text-4xs mt-0.5">{storiesComplete} {storiesComplete === 1 ? "stamp" : "stamps"} collected · Champion Traveller</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Boarding pass inline preview */}
+                    {hasSubscription && (
+                      <div className="rounded-xl overflow-hidden border border-[var(--ds-border)] bg-[var(--ds-surface-card)]">
+                        <div className="px-4 py-2.5 flex items-center justify-between border-b border-[var(--ds-border)]">
+                          <p className="font-black text-ds-text text-4xs uppercase tracking-widest">Boarding Pass Preview</p>
+                          {boardingPassPreviewLoading && (
+                            <Loader2 className="w-3 h-3 animate-spin text-[var(--ds-text-secondary)]" />
+                          )}
+                        </div>
+                        {boardingPassPreview ? (
+                          <img
+                            src={boardingPassPreview}
+                            alt={`${active.child.name}'s boarding pass`}
+                            className="w-full block"
+                            style={{ maxHeight: 340, objectFit: "contain", background: "#f9f9f9" }}
+                          />
+                        ) : boardingPassPreviewLoading ? (
+                          <div className="h-40 flex items-center justify-center text-[var(--ds-text-secondary)] text-4xs">
+                            Generating preview…
+                          </div>
+                        ) : (
+                          <div className="h-40 flex flex-col items-center justify-center gap-2 text-[var(--ds-text-secondary)]">
+                            <span className="text-3xl">🎫</span>
+                            <p className="text-4xs">Boarding pass preview</p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Subscription gate notice */}
+                    {!hasSubscription && (
+                      <div className="flex items-start gap-3 px-4 py-3 rounded-xl border border-amber-200 bg-amber-50">
+                        <Lock className="w-4 h-4 text-amber-600 mt-0.5 shrink-0" />
+                        <div>
+                          <p className="text-amber-800 font-black text-xs">Premium feature</p>
+                          <p className="text-amber-700 text-4xs mt-0.5">Subscribe to download {active.child.name}&apos;s passport, boarding pass, and stamp collection.</p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Document cards */}
+                    {([
+                      {
+                        key:    "passport",
+                        emoji:  "📘",
+                        title:  "Passport",
+                        desc:   `${storiesComplete > 0 ? storiesComplete : "0"} spread${storiesComplete !== 1 ? "s" : ""} · stamp collection inside`,
+                        href:   `/api/airways/passport?childId=${active.child.id}`,
+                        accent: "#1A7A3E",
+                        bg:     "from-emerald-500/10 to-teal-500/5",
+                        border: "border-emerald-200/70",
+                        slow:   true,
+                      },
+                      {
+                        key:    "boarding-pass",
+                        emoji:  "🎫",
+                        title:  "Boarding Pass",
+                        desc:   "Personalised travel card",
+                        href:   `/api/airways/boarding-pass?childId=${active.child.id}`,
+                        accent: "#1A3558",
+                        bg:     "from-sky-500/10 to-blue-500/5",
+                        border: "border-sky-200/70",
+                        slow:   false,
+                      },
+                      {
+                        key:    "stamps",
+                        emoji:  "📮",
+                        title:  "Stamp Collection",
+                        desc:   `${storiesComplete} of ${totalStories} stamps earned`,
+                        href:   `/api/airways/stamps?childId=${active.child.id}`,
+                        accent: "#7C3AED",
+                        bg:     "from-violet-500/10 to-purple-500/5",
+                        border: "border-violet-200/70",
+                        slow:   false,
+                      },
+                      {
+                        key:    "badge",
+                        emoji:  "🏅",
+                        title:  "Attitude Badge",
+                        desc:   "Champion portrait badge",
+                        href:   `/api/airways/badge?childId=${active.child.id}`,
+                        accent: "#C9A84C",
+                        bg:     "from-amber-500/10 to-yellow-500/5",
+                        border: "border-amber-200/70",
+                        slow:   true,
+                        warn:   active.child.attitude ? undefined : "No custom attitude set — Story 1 default used. Customize in Admin → Curriculum → Stories.",
+                      },
+                      {
+                        key:    "kit",
+                        emoji:  "🧳",
+                        title:  "Champion Kit",
+                        desc:   "Full identity card — name, story, barcode",
+                        href:   `/api/airways/kit?childId=${active.child.id}`,
+                        accent: "#0D1B30",
+                        bg:     "from-slate-500/10 to-gray-500/5",
+                        border: "border-slate-200/70",
+                        slow:   false,
+                      },
+                    ] as { key: string; emoji: string; title: string; desc: string; href: string; accent: string; bg: string; border: string; slow: boolean; warn?: string }[]).map(doc => {
+                      const locked = !hasSubscription;
+                      const busy   = airwaysDownloading === doc.key;
+                      return (
+                        <div key={doc.key}
+                          className={`flex items-center gap-4 p-4 rounded-xl border bg-gradient-to-br ${doc.bg} ${doc.border}`}
+                        >
+                          <div className="text-3xl shrink-0">{doc.emoji}</div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-black text-ds-text text-sml leading-none">{doc.title}</p>
+                            <p className="text-[var(--ds-text-secondary)] text-4xs mt-0.5">{doc.desc}</p>
+                            {doc.slow && (
+                              <p className="text-[var(--ds-text-secondary)] text-4xs mt-0.5 opacity-60">May take ~30 s to generate</p>
+                            )}
+                            {doc.warn && (
+                              <p className="text-amber-600 dark:text-amber-400 text-4xs mt-1 leading-snug">{doc.warn}</p>
+                            )}
+                          </div>
+                          <button
+                            disabled={locked || busy}
+                            onClick={async () => {
+                              if (locked) return;
+                              setAirwaysDownloading(doc.key);
+                              try {
+                                const { data: { session } } = await supabase.auth.getSession();
+                                const res = await fetch(doc.href, {
+                                  headers: session?.access_token
+                                    ? { Authorization: `Bearer ${session.access_token}` }
+                                    : {},
+                                });
+                                if (!res.ok) {
+                                  let msg = "Download failed";
+                                  try { const j = await res.json(); msg = j.error ?? msg; } catch {}
+                                  throw new Error(msg);
+                                }
+                                const blob = await res.blob();
+                                const url  = URL.createObjectURL(blob);
+                                const a    = document.createElement("a");
+                                a.href     = url;
+                                const cd   = res.headers.get("Content-Disposition") ?? "";
+                                const m    = cd.match(/filename="([^"]+)"/);
+                                a.download = m?.[1] ?? `${doc.key}.pdf`;
+                                a.click();
+                                URL.revokeObjectURL(url);
+                              } catch (e) {
+                                const msg = e instanceof Error ? e.message : "Download failed";
+                                setAirwaysError(msg);
+                                setTimeout(() => setAirwaysError(null), 6000);
+                              } finally {
+                                setAirwaysDownloading(null);
+                              }
+                            }}
+                            className={`shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg text-white text-4xs font-black transition ${
+                              locked ? "bg-gray-300 cursor-not-allowed opacity-60"
+                              : busy  ? "opacity-70 cursor-wait"
+                              : "hover:opacity-90 active:scale-95"
+                            }`}
+                            style={locked ? {} : { background: doc.accent }}
+                          >
+                            {locked ? (
+                              <><Lock className="w-3 h-3" /> Locked</>
+                            ) : busy ? (
+                              <><Loader2 className="w-3 h-3 animate-spin" /> Generating…</>
+                            ) : (
+                              <>⬇ Download</>
+                            )}
+                          </button>
+                        </div>
+                      );
+                    })}
+
+                    {/* Progress strip */}
+                    <div className="flex items-center gap-3 px-4 py-3 rounded-xl border border-[var(--ds-border)] bg-[var(--ds-surface-card)]">
+                      <div className="text-2xl">🗺️</div>
+                      <div className="flex-1">
+                        <p className="font-black text-ds-text text-sml leading-none">Journey Progress</p>
+                        <p className="text-[var(--ds-text-secondary)] text-4xs mt-0.5">{storiesComplete} of {totalStories} stories complete</p>
+                        <div className="mt-2 h-1.5 bg-[var(--ds-surface-card-active)] rounded-full overflow-hidden">
+                          <div className="h-full rounded-full bg-[var(--nimi-green)] transition-all"
+                            style={{ width: `${totalStories > 0 ? (storiesComplete / totalStories) * 100 : 0}%` }} />
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
                 )}
 
                 {/* ── SETTINGS TAB ── */}

@@ -8,7 +8,7 @@ let _cache: string | null = null
  *  librsvg (used by sharp for SVG→PNG) resolves @font-face data URIs without
  *  needing system fontconfig — this makes text render correctly on Vercel Lambda. */
 export function svgFontStyle(): string {
-  if (_cache) return _cache
+  if (_cache !== null) return _cache
   try {
     const dir   = path.join(process.cwd(), 'public', 'fonts')
     const bold  = fs.readFileSync(path.join(dir, 'DejaVuSans-Bold.ttf')).toString('base64')
