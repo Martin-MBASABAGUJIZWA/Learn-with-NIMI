@@ -155,6 +155,7 @@ export async function POST(req: NextRequest) {
       });
       if (accessErr) {
         console.error("[/api/orders] free content_access insert failed:", accessErr.message);
+        return NextResponse.json({ error: "Failed to grant access. Please contact support." }, { status: 500 });
       }
     }
 
