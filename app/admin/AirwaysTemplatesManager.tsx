@@ -189,6 +189,17 @@ export default function AirwaysTemplatesManager({ onNavigate, onOpenSidebar }: A
     SLOTS.forEach(s => probeSlot(s.key))
   }, [probeSlot, refreshKey])
 
+  // Fire-and-forget: clears the server-side in-process template cache so the
+  // next PDF generation fetches the freshly uploaded image rather than a stale hit.
+  const invalidateServerCache = async (key: string) => {
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session?.access_token) return
+    await fetch(`/api/airways/invalidate-template?key=${encodeURIComponent(key)}`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${session.access_token}` },
+    }).catch(() => {})
+  }
+
   const handleUpload = async (key: string, file: File) => {
     const ext = file.name.split('.').pop()?.toLowerCase() ?? 'png'
     const fileName = `${key}.${ext}`
@@ -199,6 +210,7 @@ export default function AirwaysTemplatesManager({ onNavigate, onOpenSidebar }: A
       // After upload, get the public URL directly
       const { data } = supabase.storage.from(BUCKET).getPublicUrl(fileName)
       updateSlot(key, { uploading: false, url: `${data.publicUrl}?t=${Date.now()}` })
+      void invalidateServerCache(key)
     } catch (err) {
       updateSlot(key, { uploading: false, error: err instanceof Error ? err.message : 'Upload failed.' })
     }
@@ -217,6 +229,7 @@ export default function AirwaysTemplatesManager({ onNavigate, onOpenSidebar }: A
       const { error } = await supabase.storage.from(BUCKET).remove([fileName])
       if (error) throw error
       updateSlot(key, { deleting: false, url: null })
+      void invalidateServerCache(key)
     } catch (err) {
       updateSlot(key, { deleting: false, error: err instanceof Error ? err.message : 'Delete failed.' })
     }

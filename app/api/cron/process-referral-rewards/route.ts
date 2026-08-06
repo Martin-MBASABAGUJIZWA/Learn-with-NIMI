@@ -53,8 +53,8 @@ export async function GET(req: Request) {
 
     const periodEnd = addMonths(new Date(), 1);
 
-    // Insert subscription + content_access in parallel
-    const [{ data: newSub }, , [referrerRow, refereeRow]] = await Promise.all([
+    // Insert subscription + content_access in parallel; capture both results.
+    const [{ data: newSub, error: subErr }, { data: newAccess, error: accessErr }, [referrerRow, refereeRow]] = await Promise.all([
       supabase.from("nimipiko_subscriptions").insert({
         parent_id: row.referrer_id,
         product_id: product!.id,
@@ -73,19 +73,22 @@ export async function GET(req: Request) {
         order_id: null,
         subscription_id: null,
         expires_at: periodEnd.toISOString(),
-      }),
+      }).select("id").single(),
       Promise.all([
         supabase.from("parents").select("email, name").eq("id", row.referrer_id).maybeSingle(),
         supabase.from("parents").select("name").eq("id", row.referred_id).maybeSingle(),
       ]),
     ]);
 
-    // Update content_access with the new subscription id (best-effort)
-    if (newSub?.id) {
+    if (subErr)    console.error("[referral-rewards] subscription insert failed:", subErr.message);
+    if (accessErr) console.error("[referral-rewards] content_access insert failed:", accessErr.message);
+
+    // Link the subscription id onto the specific content_access row we just created.
+    // Use the row's own id (not a parent wildcard) to avoid touching unrelated rows.
+    if (newSub?.id && newAccess?.id) {
       void supabase.from("content_access")
         .update({ subscription_id: newSub.id })
-        .eq("parent_id", row.referrer_id)
-        .is("subscription_id", null)
+        .eq("id", newAccess.id)
         .then(() => {}, () => {});
     }
 
