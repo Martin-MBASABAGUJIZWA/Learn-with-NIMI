@@ -69,7 +69,7 @@ export async function POST(req: Request) {
 
   const periodEnd = addMonths(new Date(), 1);
 
-  const { data: newSub } = await supabase.from("nimipiko_subscriptions").insert({
+  const { data: newSub, error: subErr } = await supabase.from("nimipiko_subscriptions").insert({
     parent_id: redemption.referrer_id,
     product_id: product.id,
     status: "active",
@@ -82,13 +82,31 @@ export async function POST(req: Request) {
     cancel_at_period_end: true,
   }).select("id").single();
 
-  await supabase.from("content_access").insert({
+  if (subErr || !newSub?.id) {
+    console.error("[referral/reward] subscription insert failed:", subErr?.message);
+    // Undo the CAS claim so this will be retried on the next payment event.
+    await supabase.from("referral_redemptions")
+      .update({ reward_granted_at: null })
+      .eq("id", redemption.id);
+    return NextResponse.json({ error: "Failed to create subscription" }, { status: 500 });
+  }
+
+  const { error: accessErr } = await supabase.from("content_access").insert({
     parent_id: redemption.referrer_id,
     access_type: "club",
     order_id: null,
-    subscription_id: newSub?.id ?? null,
+    subscription_id: newSub.id,
     expires_at: periodEnd.toISOString(),
   });
+  if (accessErr) {
+    console.error("[referral/reward] content_access insert failed:", accessErr.message);
+    // Subscription already exists — clean it up so the undo-claim retry works cleanly.
+    await supabase.from("nimipiko_subscriptions").delete().eq("id", newSub.id);
+    await supabase.from("referral_redemptions")
+      .update({ reward_granted_at: null })
+      .eq("id", redemption.id);
+    return NextResponse.json({ error: "Failed to grant access" }, { status: 500 });
+  }
 
   // Look up referrer + referee names/emails for notifications
   const [referrerRow, refereeRow] = await Promise.all([
