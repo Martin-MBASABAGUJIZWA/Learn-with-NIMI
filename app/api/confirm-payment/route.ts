@@ -136,12 +136,6 @@ export async function POST(req: NextRequest) {
     }
 
     if (isAuthorized) {
-      await supabase.from("orders").update({
-        payment_status: "completed",
-        provider_transaction_id: transactionId,
-        completed_at: new Date().toISOString(),
-      }).eq("id", orderId);
-
       const product = order.products as OrderProduct | null;
       if (product) {
         const accessType = product.tier === "club" ? "club"
@@ -193,6 +187,14 @@ export async function POST(req: NextRequest) {
             console.error("[ConfirmPayment] provision_subscription failed:", provisionErr.message);
             return NextResponse.json({ success: false, message: "Failed to activate subscription." }, { status: 500 });
           }
+
+          // Provisioning succeeded — now mark the order completed so retries hit the
+          // idempotency check rather than re-running provision_subscription.
+          await supabase.from("orders").update({
+            payment_status: "completed",
+            provider_transaction_id: transactionId,
+            completed_at: new Date().toISOString(),
+          }).eq("id", orderId);
 
           // Fire referral reward (best-effort, non-blocking)
           void fetch(`${process.env.NEXT_PUBLIC_SITE_URL ?? "https://nimipiko.com"}/api/referral/reward`, {
@@ -260,6 +262,11 @@ export async function POST(req: NextRequest) {
             story_id: product.story_id,
             order_id: orderId,
           });
+          await supabase.from("orders").update({
+            payment_status: "completed",
+            provider_transaction_id: transactionId,
+            completed_at: new Date().toISOString(),
+          }).eq("id", orderId);
         }
       }
 
@@ -271,6 +278,11 @@ export async function POST(req: NextRequest) {
             .from("parents").select("email, name").eq("id", order.parent_id).maybeSingle();
           await dispatchGiftEmail(supabase, orderId, giver, null);
         }
+        await supabase.from("orders").update({
+          payment_status: "completed",
+          provider_transaction_id: transactionId,
+          completed_at: new Date().toISOString(),
+        }).eq("id", orderId);
       }
 
       return NextResponse.json({ success: true, status: "SUCCESS", transactionId });

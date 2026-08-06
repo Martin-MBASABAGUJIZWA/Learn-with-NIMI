@@ -35,6 +35,7 @@ export async function verifyCybersourceTransaction(
     `headers="host date (request-target) v-c-merchant-id", signature="${signatureHash}"`;
 
   const res = await fetch(`https://${host}${resourcePath}`, {
+    signal: AbortSignal.timeout(15_000),
     headers: {
       "v-c-merchant-id": merchantId,
       Date: date,

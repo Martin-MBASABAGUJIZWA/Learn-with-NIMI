@@ -202,7 +202,10 @@ export async function GET(req: NextRequest) {
 
             if (provisionErr) {
               console.error("[MTN MoMo] provision_subscription failed:", provisionErr.message);
-              // Don't expose internal error — status polling will keep retrying.
+              // Revert so the next poll can re-claim and retry provisioning.
+              await supabase.from("orders")
+                .update({ payment_status: "processing" })
+                .eq("id", orderId);
               return NextResponse.json({ status: "pending" });
             }
 

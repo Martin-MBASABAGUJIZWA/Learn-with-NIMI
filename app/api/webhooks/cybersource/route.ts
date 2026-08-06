@@ -192,6 +192,13 @@ export async function POST(req: NextRequest) {
 
                   if (provisionErr) {
                     console.error("[Webhook] provision_subscription failed:", provisionErr.message);
+                    // Revert to pending — clear completed_at/provider_transaction_id too so the
+                    // next CyberSource retry can re-claim cleanly without hitting a dirty state.
+                    await supabase.from("orders")
+                      .update({ payment_status: "pending", completed_at: null, provider_transaction_id: null })
+                      .eq("id", orderId)
+                      .eq("payment_status", "completed");
+                    return NextResponse.json({ error: "Provisioning failed — will retry" }, { status: 500 });
                   } else {
                     const { data: parent } = await supabase
                       .from("parents").select("email, name").eq("id", order.parent_id).maybeSingle();
