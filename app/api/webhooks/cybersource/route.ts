@@ -216,12 +216,21 @@ export async function POST(req: NextRequest) {
                     console.log("[Webhook] Browser-close recovery: provisioned order", orderId);
                   }
                 } else {
-                  await supabase.from("content_access").insert({
+                  const { error: accessErr } = await supabase.from("content_access").insert({
                     parent_id: order.parent_id,
                     access_type: accessType,
                     story_id: product.story_id,
                     order_id: orderId,
                   });
+                  if (accessErr) {
+                    console.error("[Webhook] content_access insert failed:", accessErr.message);
+                    // Revert so the next CyberSource retry can re-claim cleanly.
+                    await supabase.from("orders")
+                      .update({ payment_status: "pending", completed_at: null, provider_transaction_id: null })
+                      .eq("id", orderId)
+                      .eq("payment_status", "completed");
+                    return NextResponse.json({ error: "Access grant failed — will retry" }, { status: 500 });
+                  }
                 }
               }
             }
