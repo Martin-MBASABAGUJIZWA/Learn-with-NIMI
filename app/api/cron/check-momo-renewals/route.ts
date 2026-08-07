@@ -112,10 +112,24 @@ export async function GET(req: NextRequest) {
       confirmed++;
 
     } else if (data.status === "FAILED") {
-      await supabase.from("subscription_renewals").update({
-        status: "failed",
-        error_message: data.reason || "MoMo payment declined",
-      }).eq("id", renewal.id);
+      // CAS guard: same as the SUCCESSFUL path — only one concurrent run should
+      // claim the 'failed' state. Without this, two simultaneous runs would both
+      // mark the renewal failed AND both send the failure email to the parent.
+      const { data: claimedFail } = await supabase
+        .from("subscription_renewals")
+        .update({
+          status: "failed",
+          error_message: data.reason || "MoMo payment declined",
+        })
+        .eq("id", renewal.id)
+        .eq("status", "pending")  // only claim from pending state
+        .select("id")
+        .maybeSingle();
+
+      if (!claimedFail) {
+        failed++; // already handled by another concurrent run
+        continue;
+      }
 
       // Notify parent — MoMo decline is silent otherwise
       const sub = renewal.nimipiko_subscriptions;
