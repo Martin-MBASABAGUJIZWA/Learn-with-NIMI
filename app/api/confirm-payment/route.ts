@@ -257,16 +257,29 @@ export async function POST(req: NextRequest) {
             }
           }
         } else {
-          const { error: accessErr } = await supabase.from("content_access").insert({
-            parent_id: order.parent_id,
-            access_type: accessType,
-            story_id: product.story_id,
-            order_id: orderId,
-          });
-          if (accessErr) {
-            console.error("[ConfirmPayment] content_access insert failed:", accessErr.message);
-            return NextResponse.json({ success: false, message: "Failed to grant access." }, { status: 500 });
+          // Idempotency: if content_access was already inserted for this order
+          // (e.g. the insert succeeded but the order-status update failed and the
+          // client retried), skip the insert so we don't create a duplicate row or
+          // hit a unique-constraint error that would leave the user locked out.
+          const { data: existingAccess } = await supabase
+            .from("content_access")
+            .select("id")
+            .eq("order_id", orderId)
+            .maybeSingle();
+
+          if (!existingAccess) {
+            const { error: accessErr } = await supabase.from("content_access").insert({
+              parent_id: order.parent_id,
+              access_type: accessType,
+              story_id: product.story_id,
+              order_id: orderId,
+            });
+            if (accessErr) {
+              console.error("[ConfirmPayment] content_access insert failed:", accessErr.message);
+              return NextResponse.json({ success: false, message: "Failed to grant access." }, { status: 500 });
+            }
           }
+
           await supabase.from("orders").update({
             payment_status: "completed",
             provider_transaction_id: transactionId,
