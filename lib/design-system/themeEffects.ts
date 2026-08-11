@@ -148,6 +148,7 @@ const hpEffects: ThemeEffects = {
 
 const THEME_EFFECTS: Record<AppThemeId, ThemeEffects> = {
   default: hpEffects,
+  airways: hpEffects,
 };
 
 /**

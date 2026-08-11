@@ -45,11 +45,11 @@ const CAT_STYLE: Record<RecommendationCategory, CategoryStyle> = {
   reading_habit: {
     emoji:   "📅",
     label:   "Reading Habit",
-    bg:      "bg-emerald-50",
-    border:  "border-emerald-200",
-    text:    "text-emerald-800",
-    ctaBg:   "bg-emerald-100 hover:bg-emerald-200 border-emerald-300",
-    ctaText: "text-emerald-700",
+    bg:      "bg-[var(--ds-brand-subtle)]",
+    border:  "border-[var(--ds-border-brand)]",
+    text:    "text-[var(--ds-text-brand)]",
+    ctaBg:   "bg-[var(--ds-brand-soft)] hover:bg-[var(--ds-brand-soft)] border-[var(--ds-border-brand)]",
+    ctaText: "text-[var(--ds-text-brand)]",
   },
   supportive_action: {
     emoji:   "💬",

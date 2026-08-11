@@ -5,11 +5,11 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import type { Creation } from "./types";
 
 const AVATAR_COLORS = [
-  "from-green-500 to-emerald-600",
+  "from-[var(--ds-brand-primary)] to-[var(--ds-brand-hover)]",
   "from-blue-500 to-cyan-500",
   "from-orange-400 to-pink-400",
-  "from-green-500 to-teal-500",
-  "from-green-500 to-emerald-600",
+  "from-[var(--ds-brand-primary)] to-teal-500",
+  "from-[var(--ds-brand-primary)] to-[var(--ds-brand-hover)]",
 ];
 
 function avatarColorFor(name: string) {
@@ -44,7 +44,7 @@ export default function GalleryCard({ creation, onLike, isLoadingLike = false }:
           <span className="absolute top-2 right-2 bg-gradient-to-r from-yellow-500 to-amber-600 text-white text-4xs font-black rounded-full px-2 py-0.5 shadow">🏆 Challenge</span>
         )}
         {creation.type === "certificate" && (
-          <span className="absolute top-2 right-2 text-white text-4xs font-black px-2 py-0.5 shadow" style={{ backgroundColor: 'var(--nimi-green)', borderRadius: 'var(--leaf-r-sm)' }}>📜 Certificate</span>
+          <span className="absolute top-2 right-2 text-white text-4xs font-black px-2 py-0.5 shadow" style={{ backgroundColor: 'var(--ds-brand-primary)', borderRadius: 'var(--leaf-r-sm)' }}>📜 Certificate</span>
         )}
         {creation.type === "sticker" && (
           <span className="absolute top-2 right-2 bg-gradient-to-r from-pink-500 to-fuchsia-600 text-white text-4xs font-black rounded-full px-2 py-0.5 shadow">⭐ Sticker</span>

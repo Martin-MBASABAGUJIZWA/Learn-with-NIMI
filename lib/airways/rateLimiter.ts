@@ -3,19 +3,21 @@ import { Redis } from "@upstash/redis"
 
 // Upstash distributed rate limiter — survives multi-instance serverless.
 // Falls back to in-memory when env vars are absent (local dev / CI).
-let upstash: Ratelimit | null = null
+// Two instances so the `limit` parameter is honoured in production:
+//   upstashStrict → 3/min  (passport, badge — heavy ML/PDF build)
+//   upstashLight  → 5/min  (boarding-pass, stamps, kit — lighter builds)
+let upstashStrict: Ratelimit | null = null
+let upstashLight:  Ratelimit | null = null
 if (
   process.env.UPSTASH_REDIS_REST_URL &&
   process.env.UPSTASH_REDIS_REST_TOKEN
 ) {
-  upstash = new Ratelimit({
-    redis: new Redis({
-      url:   process.env.UPSTASH_REDIS_REST_URL,
-      token: process.env.UPSTASH_REDIS_REST_TOKEN,
-    }),
-    limiter: Ratelimit.slidingWindow(3, "60 s"),
-    prefix:  "nimipiko:airways",
+  const redis = new Redis({
+    url:   process.env.UPSTASH_REDIS_REST_URL,
+    token: process.env.UPSTASH_REDIS_REST_TOKEN,
   })
+  upstashStrict = new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(3, "60 s"), prefix: "nimipiko:airways" })
+  upstashLight  = new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(5, "60 s"), prefix: "nimipiko:airways" })
 }
 
 // ── In-memory fallback ────────────────────────────────────────────────────────
@@ -43,9 +45,15 @@ export async function checkRateLimit(
   limit: number,
   windowMs = 60_000,
 ): Promise<boolean> {
+  const upstash = limit <= 3 ? upstashStrict : upstashLight
   if (upstash) {
-    const { success } = await upstash.limit(key)
-    return success
+    try {
+      const { success } = await upstash.limit(key)
+      return success
+    } catch {
+      // Upstash unreachable — degrade to in-memory rather than blocking the request
+      console.warn('[rateLimiter] Upstash error, falling back to in-memory')
+    }
   }
   return inMemoryCheck(key, limit, windowMs)
 }

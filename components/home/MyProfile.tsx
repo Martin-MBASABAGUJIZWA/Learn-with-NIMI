@@ -36,7 +36,7 @@ export default function MyProfile({ childName, avatar, categoriesMastered }: Pro
         <p className="text-3xs text-[var(--ds-text-secondary)] font-semibold mb-1">Categories Mastered</p>
         <div className="w-full bg-[var(--ds-surface-card-active)] rounded-full h-2.5 mb-1 overflow-hidden">
           <motion.div
-            className="h-full rounded-full" style={{ backgroundColor: 'var(--nimi-green)' }}
+            className="h-full rounded-full" style={{ backgroundColor: 'var(--ds-brand-primary)' }}
             initial={{ width: 0 }}
             animate={{ width: `${(categoriesMastered / 8) * 100}%` }}
             transition={{ duration: 1, ease: "easeOut" }} />
@@ -45,7 +45,7 @@ export default function MyProfile({ childName, avatar, categoriesMastered }: Pro
       </div>
       <div className="mt-auto">
         <Link href="/user-profile">
-          <Button className="w-full text-white text-3xs font-black h-8 tracking-wide" style={{ backgroundColor: 'var(--nimi-green)', borderRadius: 'var(--leaf-r-sm)' }}>
+          <Button className="w-full text-white text-3xs font-black h-8 tracking-wide" style={{ backgroundColor: 'var(--ds-brand-primary)', borderRadius: 'var(--leaf-r-sm)' }}>
             VIEW MY ACHIEVEMENTS
           </Button>
         </Link>

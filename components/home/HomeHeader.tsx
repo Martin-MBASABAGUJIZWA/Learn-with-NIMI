@@ -81,7 +81,7 @@ export default function HomeHeader({ activeChild }: HomeHeaderProps) {
               animate={{ rotate: [0, 30, 0, 30, 0] }} transition={{ duration: 1.2, repeat: Infinity, repeatDelay: 3 }}>
               👋
             </motion.span>
-            <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 bg-[var(--nimi-green)] text-white text-xs lg:text-sm font-black px-4 py-1 rounded-full shadow-lg whitespace-nowrap border-2 border-white">
+            <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 bg-[var(--ds-brand-primary)] text-white text-xs lg:text-sm font-black px-4 py-1 rounded-full shadow-lg whitespace-nowrap border-2 border-white">
               NIMI
             </div>
           </div>
@@ -177,7 +177,7 @@ export default function HomeHeader({ activeChild }: HomeHeaderProps) {
         <div className="flex items-center gap-2">
           <div className="relative">
             <Image src={assets.nimiCircle} alt="NIMI" width={44} height={44} className="rounded-full object-cover border-2 border-yellow-400 shadow-md" />
-            <span className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 bg-[var(--nimi-green)] text-white text-5xs font-black px-2 py-0.5 rounded-full border border-white">NIMI</span>
+            <span className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 bg-[var(--ds-brand-primary)] text-white text-5xs font-black px-2 py-0.5 rounded-full border border-white">NIMI</span>
           </div>
           <h1 className="font-black" style={{ fontSize: "1.75rem", lineHeight: 1,
             background: "linear-gradient(90deg,#FF0000,#FF7700,#FFDD00,#00BB44,#0066FF,#8800CC)",

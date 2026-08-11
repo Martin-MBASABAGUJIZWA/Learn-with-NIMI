@@ -17,14 +17,14 @@ export default function MissionCard({ mission, completed, onComplete }: MissionC
   return (
     <Card
       className={`transition duration-300 bg-[var(--ds-surface-card)] border border-ds-border shadow-ds-card overflow-hidden hover:shadow-lg ${
-        completed ? "ring-1 ring-green-200" : "hover:scale-105"
+        completed ? "ring-1 ring-[var(--ds-border-brand)]" : "hover:scale-105"
       }`}
       style={{ borderRadius: 'var(--leaf-r)' }}
     >
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-6">
-            <div className="w-16 h-16 rounded-full flex items-center justify-center shadow-xl bg-green-500 animate-bounce">
+            <div className="w-16 h-16 rounded-full flex items-center justify-center shadow-xl bg-[var(--ds-brand-primary)] animate-bounce">
               {completed ? (
                 <CheckCircle className="w-8 h-8 text-white" />
               ) : (
@@ -79,7 +79,7 @@ export default function MissionCard({ mission, completed, onComplete }: MissionC
           <Button
             onClick={() => onComplete(mission.id)}
             className="text-white px-6 py-3 shadow-sm text-lg font-bold transition hover:scale-105"
-            style={{ backgroundColor: 'var(--nimi-green)', borderRadius: 'var(--leaf-r-sm)' }}
+            style={{ backgroundColor: 'var(--ds-brand-primary)', borderRadius: 'var(--leaf-r-sm)' }}
           >
             <Play className="w-5 h-5 mr-2" />
             Start Mission

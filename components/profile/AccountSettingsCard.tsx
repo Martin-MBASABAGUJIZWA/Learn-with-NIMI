@@ -21,7 +21,7 @@ const ROWS: {
   { id: "avatar",        icon: ImagePlus, gradient: "from-violet-400 to-purple-500",  labelKey: "changeAvatarLabel",          descKey: "changeAvatarDesc" },
   { id: "name",          icon: Pencil,    gradient: "from-blue-400 to-sky-500",       labelKey: "editNameLabel",              descKey: "editNameDesc" },
   { id: "notifications", icon: Bell,      gradient: "from-orange-400 to-amber-500",   labelKey: "notificationSettingsLabel",  descKey: "notificationSettingsDesc" },
-  { id: "privacy",       icon: Shield,    gradient: "from-emerald-400 to-teal-500",   labelKey: "privacySettingsLabel",       descKey: "privacySettingsDesc" },
+  { id: "privacy",       icon: Shield,    gradient: "from-[var(--ds-brand-primary)] to-teal-500",   labelKey: "privacySettingsLabel",       descKey: "privacySettingsDesc" },
 ];
 
 interface Props {

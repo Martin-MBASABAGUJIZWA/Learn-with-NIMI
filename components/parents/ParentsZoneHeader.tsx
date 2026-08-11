@@ -20,7 +20,7 @@ export default function ParentsZoneHeader({ onUploadClick }: Props) {
         {onUploadClick && (
           <button
             onClick={onUploadClick}
-            className="flex items-center gap-1.5 bg-[var(--nimi-green)] hover:bg-[var(--ds-brand-hover)] text-white font-black rounded-full px-4 py-2 shadow transition text-sm"
+            className="flex items-center gap-1.5 bg-[var(--ds-brand-primary)] hover:bg-[var(--ds-brand-hover)] text-white font-black rounded-full px-4 py-2 shadow transition text-sm"
           >
             <ImagePlus className="w-4 h-4" />
             {t("uploadArtworkBtn")}

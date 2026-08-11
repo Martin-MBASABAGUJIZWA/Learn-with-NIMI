@@ -19,11 +19,11 @@ export default function AI() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Left: copy */}
           <div>
-            <span className="inline-flex items-center gap-2 bg-nimi-green/10 text-nimi-green font-nunito font-bold text-xs tracking-wider uppercase px-4 py-1.5 rounded-full mb-4">
+            <span className="inline-flex items-center gap-2 bg-[var(--ds-brand-subtle)] text-[var(--ds-brand-primary)] font-nunito font-bold text-xs tracking-wider uppercase px-4 py-1.5 rounded-full mb-4">
               <Sparkles className="w-3.5 h-3.5" /> Powered by AI
             </span>
             <h2 className="font-baloo font-black text-[var(--ds-text-primary)] text-3xl sm:text-4xl leading-tight" style={{textWrap:"balance"}}>
-              Meet NIMI — your child's <span className="text-nimi-green">AI language tutor</span>
+              Meet NIMI — your child's <span className="text-[var(--ds-brand-primary)]">AI language tutor</span>
             </h2>
             <p className="font-nunito text-[var(--ds-text-secondary)] mt-4 leading-relaxed text-sm sm:text-base max-w-md">
               NIMI isn't a chatbot — it's a patient, encouraging tutor that adapts to every child's pace and speaks their language fluently.
@@ -31,8 +31,8 @@ export default function AI() {
             <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
               {FEATURES.map(({ icon: Icon, title, desc }) => (
                 <div key={title} className="bg-[var(--ds-surface-card)] rounded-2xl p-4 border border-[var(--ds-border-primary)] shadow-sm">
-                  <div className="w-9 h-9 bg-emerald-50 rounded-xl flex items-center justify-center mb-3">
-                    <Icon className="w-4.5 h-4.5 text-nimi-green" />
+                  <div className="w-9 h-9 bg-[var(--ds-brand-subtle)] rounded-xl flex items-center justify-center mb-3">
+                    <Icon className="w-4.5 h-4.5 text-[var(--ds-brand-primary)]" />
                   </div>
                   <p className="font-baloo font-black text-[var(--ds-text-primary)] text-sm">{title}</p>
                   <p className="font-nunito text-[var(--ds-text-secondary)] text-xs mt-1 leading-snug">{desc}</p>
@@ -47,10 +47,10 @@ export default function AI() {
           {/* Right: mock chat bubble UI */}
           <div className="bg-[var(--ds-surface-card)] rounded-3xl border border-[var(--ds-border-primary)] shadow-lg p-6 space-y-4 max-w-sm mx-auto lg:mx-0">
             <div className="flex items-center gap-3 pb-3 border-b border-[var(--ds-border-primary)]">
-              <div className="w-10 h-10 bg-nimi-green rounded-full flex items-center justify-center text-white font-baloo font-black text-lg">N</div>
+              <div className="w-10 h-10 bg-[var(--ds-brand-primary)] rounded-full flex items-center justify-center text-white font-baloo font-black text-lg">N</div>
               <div>
                 <p className="font-baloo font-black text-[var(--ds-text-primary)] text-sm">NIMI</p>
-                <p className="font-nunito text-xs text-emerald-500 font-bold">● Online</p>
+                <p className="font-nunito text-xs text-[var(--ds-brand-primary)] font-bold">● Online</p>
               </div>
             </div>
             {[
@@ -63,8 +63,8 @@ export default function AI() {
               <div key={i} className={`flex ${msg.from === "child" ? "justify-end" : "justify-start"}`}>
                 <div className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm font-nunito font-semibold leading-snug ${
                   msg.from === "nimi"
-                    ? "bg-emerald-50 text-[var(--ds-text-primary)] rounded-bl-sm"
-                    : "bg-nimi-green text-white rounded-br-sm"
+                    ? "bg-[var(--ds-brand-subtle)] text-[var(--ds-text-primary)] rounded-bl-sm"
+                    : "bg-[var(--ds-brand-primary)] text-white rounded-br-sm"
                 }`}>
                   {msg.text}
                 </div>

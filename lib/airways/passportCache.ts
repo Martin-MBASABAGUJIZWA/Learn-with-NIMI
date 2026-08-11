@@ -18,7 +18,7 @@ export async function getCachedPassport(
   try {
     const { data: files } = await supabase.storage
       .from(BUCKET)
-      .list("", { search: childId, limit: 1 })
+      .list("", { search: key(childId), limit: 1 })
     const file = files?.find(f => f.name === key(childId))
     if (!file) return null
 

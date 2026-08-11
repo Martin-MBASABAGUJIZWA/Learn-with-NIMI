@@ -11,6 +11,7 @@ import { buildKitImage, type KitLayout } from '@/lib/airways/buildKitImage'
 import { avatarUrlToBuffer } from '@/lib/airways/avatarToBuffer'
 import { isAvatarConfig } from '@/lib/avatarConfig'
 import { safeFilename } from '@/lib/airways/safeFilename'
+import { checkRateLimit } from '@/lib/airways/rateLimiter'
 
 async function fetchPhotoBuffer(url: string): Promise<Buffer | null> {
   try {
@@ -35,6 +36,9 @@ export async function GET(req: NextRequest) {
   const user = await getAuthUser(req)
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
+  if (!(await checkRateLimit(`kit:${user.id}`, 5)))
+    return NextResponse.json({ error: 'Too many requests — please wait a minute.' }, { status: 429 })
+
   const { searchParams } = new URL(req.url)
   const childId = searchParams.get('childId')
   const format = searchParams.get('format') === 'png' ? 'png' : 'pdf'
@@ -49,6 +53,7 @@ export async function GET(req: NextRequest) {
   if (!adminRow && child?.parent_id !== user.id) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
+  let isPersonalized = !!adminRow
   if (!adminRow) {
     const { data: sub } = await supabase
       .from('nimipiko_subscriptions')
@@ -56,15 +61,22 @@ export async function GET(req: NextRequest) {
       .eq('parent_id', user.id)
       .in('status', ['active', 'trial'])
       .maybeSingle()
-    if (!sub) return NextResponse.json({ error: 'Subscription required' }, { status: 402 })
+    isPersonalized = !!sub
   }
 
   const data = await fetchAirwaysData(supabase, childId)
   if (!data) return NextResponse.json({ error: 'Child not found' }, { status: 404 })
 
-  // Load saved layout from unified template_layout table
+  // Day vs night based on server time (6:00–18:59 = day)
+  const hour = new Date().getHours()
+  const variant: 'day' | 'night' = hour >= 6 && hour < 19 ? 'day' : 'night'
+
+  // Load saved layout for the correct tier's template
+  const kitLayoutKey = isPersonalized
+    ? (variant === 'night' ? 'carry-on-night'      : 'carry-on-day')
+    : (variant === 'night' ? 'carry-on-night-free' : 'carry-on-day-free')
   const { data: layoutRows } = await supabase
-    .from('template_layout').select('field,x,y,w,h,font_size,bold,color').eq('template', 'champion-kit')
+    .from('template_layout').select('field,x,y,w,h,font_size,bold,color').eq('template', kitLayoutKey)
   const layout: KitLayout = {}
   for (const row of layoutRows ?? []) {
     layout[row.field] = { x: row.x, y: row.y, w: row.w, h: row.h, font_size: row.font_size, bold: row.bold, color: row.color }
@@ -78,9 +90,9 @@ export async function GET(req: NextRequest) {
 
   const supaUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''
 
-  // Avatar stored as "ava:{…json…}" → render to PNG; real URLs → fetch normally
+  // Photo only fetched for personalized (subscribed) users
   let photoBuffer: Buffer | null = null
-  if (data.avatar_url) {
+  if (isPersonalized && data.avatar_url) {
     if (isAvatarConfig(data.avatar_url)) {
       photoBuffer = await avatarUrlToBuffer(data.avatar_url, 295)
     } else {
@@ -92,19 +104,23 @@ export async function GET(req: NextRequest) {
     }
   }
 
+  const displayName = isPersonalized ? data.name : 'PETIT CHAMPION'
+
   // Build the full kit (overlays all values directly onto the kit template)
   const kitBuffer = await buildKitImage({
-    childName: data.name,
-    age: data.age,
-    storyTitle: currentStory.title,
-    storyNumber: currentStory.sort_order,
-    storySlug: currentStory.slug ?? String(currentStory.sort_order),
-    childId: data.id,
+    childName:      displayName,
+    age:            data.age,
+    storyTitle:     currentStory.title,
+    storyNumber:    currentStory.sort_order,
+    storySlug:      currentStory.slug ?? String(currentStory.sort_order),
+    childId:        data.id,
     photoBuffer,
+    isPersonalized,
+    variant,
     layout,
   })
 
-  const safeName = safeFilename(data.name)
+  const safeName = safeFilename(displayName)
 
   if (format === 'png') {
     return new NextResponse(new Uint8Array(kitBuffer), {

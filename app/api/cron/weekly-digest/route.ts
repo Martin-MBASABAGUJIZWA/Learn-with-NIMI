@@ -24,6 +24,7 @@ export async function GET(req: NextRequest) {
   }
 
   const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
 
   const PAGE = 200;
   let offset = 0;
@@ -42,100 +43,114 @@ export async function GET(req: NextRequest) {
     if (pErr) return NextResponse.json({ error: pErr.message }, { status: 500 });
     if (!parents?.length) break;
 
-    for (const parent of parents) {
-    try {
-      // Children of this parent
-      const { data: children } = await sb
-        .from("children")
-        .select("id, name, language")
-        .eq("parent_id", parent.id);
+    const parentIds = parents.map(p => p.id);
 
-      if (!children?.length) continue;
+    // Round 1: all children for this page of parents — 1 query instead of 200.
+    const { data: allChildrenRows } = await sb
+      .from("children")
+      .select("id, name, language, parent_id")
+      .in("parent_id", parentIds);
 
-      // Fetch all data for all children in parallel — one Promise.all per parent
-      // instead of 4 sequential queries per child (which causes timeouts at scale).
-      const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
-      const childIds = children.map(c => c.id);
+    const allChildrenForPage = allChildrenRows ?? [];
+    const childrenByParent = new Map<string, typeof allChildrenForPage>();
+    for (const c of allChildrenForPage) {
+      if (!childrenByParent.has(c.parent_id)) childrenByParent.set(c.parent_id, []);
+      childrenByParent.get(c.parent_id)!.push(c);
+    }
 
-      const [missionsRes, actDatesRes, feelingsRes] = await Promise.all([
+    const allChildIds = allChildrenForPage.map(c => c.id);
+
+    if (allChildIds.length > 0) {
+      // Round 2: all activity data + trial subs for the full page — 4 queries
+      // instead of up to 4×200 = 800 per-parent queries.
+      const [missionsRes, actDatesRes, feelingsRes, trialSubsRes] = await Promise.all([
         sb.from("child_progress")
           .select("child_id, mission_id, stars_earned, language")
-          .in("child_id", childIds)
+          .in("child_id", allChildIds)
           .gte("completed_at", weekAgo),
         sb.from("child_progress")
           .select("child_id, completed_at, language")
-          .in("child_id", childIds)
+          .in("child_id", allChildIds)
           .gte("completed_at", thirtyDaysAgo),
         sb.from("story_feelings")
           .select("child_id, feeling")
-          .in("child_id", childIds)
+          .in("child_id", allChildIds)
           .gte("felt_at", weekAgo),
+        sb.from("nimipiko_subscriptions")
+          .select("parent_id, current_period_end")
+          .in("parent_id", parentIds)
+          .eq("payment_provider", "trial")
+          .eq("status", "active"),
       ]);
 
-      // Collect all mission_ids this week to batch-fetch story_slots
-      const weekMissions = missionsRes.data ?? [];
-      const allMissionIds = [...new Set(weekMissions.map(m => m.mission_id))];
+      // Story slots for all missions seen this week — 1 query instead of 200.
+      const allWeekMissions = missionsRes.data ?? [];
+      const allMissionIds = [...new Set(allWeekMissions.map(m => m.mission_id))];
       const { data: storySlotRows } = allMissionIds.length > 0
         ? await sb.from("story_slots").select("mission_id, story_id").in("mission_id", allMissionIds)
         : { data: [] };
       const missionToStory = new Map((storySlotRows ?? []).map(r => [r.mission_id, r.story_id]));
 
+      const trialSubMap = new Map(
+        (trialSubsRes.data ?? []).map(r => [r.parent_id, r.current_period_end])
+      );
+
       const today = new Date();
-      const childDigests: WeeklyDigestChild[] = [];
 
-      for (const child of children) {
-        const missions = weekMissions.filter(m => m.child_id === child.id && m.language === child.language);
-        const missionsThisWeek = missions.length;
-        const starsThisWeek = missions.reduce((s, m) => s + (m.stars_earned ?? 0), 0);
-        const storiesThisWeek = new Set(missions.map(m => missionToStory.get(m.mission_id)).filter(Boolean)).size;
+      for (const parent of parents) {
+        try {
+          const children = childrenByParent.get(parent.id) ?? [];
+          if (!children.length) continue;
 
-        const actDates = (actDatesRes.data ?? [])
-          .filter(r => r.child_id === child.id && r.language === child.language);
-        const daySet = new Set(actDates.map(r => new Date(r.completed_at).toISOString().slice(0, 10)));
-        let streak = 0;
-        for (let i = 0; i < 30; i++) {
-          const d = new Date(today);
-          d.setDate(today.getDate() - i);
-          if (daySet.has(d.toISOString().slice(0, 10))) streak++;
-          else if (i > 0) break;
+          const childDigests: WeeklyDigestChild[] = [];
+
+          for (const child of children) {
+            const missions = allWeekMissions.filter(m => m.child_id === child.id && m.language === child.language);
+            const missionsThisWeek = missions.length;
+            const starsThisWeek = missions.reduce((s, m) => s + (m.stars_earned ?? 0), 0);
+            const storiesThisWeek = new Set(missions.map(m => missionToStory.get(m.mission_id)).filter(Boolean)).size;
+
+            const actDates = (actDatesRes.data ?? [])
+              .filter(r => r.child_id === child.id && r.language === child.language);
+            const daySet = new Set(actDates.map(r => new Date(r.completed_at).toISOString().slice(0, 10)));
+            let streak = 0;
+            for (let i = 0; i < 30; i++) {
+              const d = new Date(today);
+              d.setDate(today.getDate() - i);
+              if (daySet.has(d.toISOString().slice(0, 10))) streak++;
+              else if (i > 0) break;
+            }
+
+            const feelings = (feelingsRes.data ?? [])
+              .filter(r => r.child_id === child.id)
+              .map(r => r.feeling);
+
+            childDigests.push({ name: child.name, language: child.language, missionsThisWeek, storiesThisWeek, streak, starsThisWeek, feelings });
+          }
+
+          if (!childDigests.length) continue;
+
+          let trialDaysLeft: number | undefined;
+          const trialEnd = trialSubMap.get(parent.id);
+          if (trialEnd) {
+            const msLeft = new Date(trialEnd as string).getTime() - Date.now();
+            const days = Math.max(0, Math.ceil(msLeft / 86_400_000));
+            if (days <= 3) trialDaysLeft = days;
+          }
+
+          await sendWeeklyDigest({
+            to: parent.email,
+            parentName: parent.name ?? "there",
+            weekOf: weekLabel(),
+            children: childDigests,
+            trialDaysLeft,
+          });
+
+          sent++;
+        } catch (err) {
+          errors.push(`${parent.email}: ${err instanceof Error ? err.message : String(err)}`);
         }
-
-        const feelings = (feelingsRes.data ?? [])
-          .filter(r => r.child_id === child.id)
-          .map(r => r.feeling);
-
-        childDigests.push({ name: child.name, language: child.language, missionsThisWeek, storiesThisWeek, streak, starsThisWeek, feelings });
       }
-
-      if (!childDigests.length) continue;
-
-      // Check for expiring trial (≤3 days left) to include a warning in the digest
-      let trialDaysLeft: number | undefined;
-      const { data: trialSub } = await sb
-        .from("nimipiko_subscriptions")
-        .select("current_period_end")
-        .eq("parent_id", parent.id)
-        .eq("payment_provider", "trial")
-        .eq("status", "active")
-        .maybeSingle();
-      if (trialSub?.current_period_end) {
-        const msLeft = new Date(trialSub.current_period_end as string).getTime() - Date.now();
-        const days = Math.max(0, Math.ceil(msLeft / 86_400_000));
-        if (days <= 3) trialDaysLeft = days;
-      }
-
-      await sendWeeklyDigest({
-        to: parent.email,
-        parentName: parent.name ?? "there",
-        weekOf: weekLabel(),
-        children: childDigests,
-        trialDaysLeft,
-      });
-
-      sent++;
-    } catch (err) {
-      errors.push(`${parent.email}: ${err instanceof Error ? err.message : String(err)}`);
-    }
     }
 
     offset += PAGE;

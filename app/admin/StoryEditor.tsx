@@ -37,7 +37,7 @@ interface ColoringPage {
 
 interface SlotData { story_id: string; slot_key: string; mission_id: string; sort_order: number }
 
-interface StoryEditorProps { story: StoryRow; onSaved: () => void; defaultLang?: Lang }
+interface StoryEditorProps { story: StoryRow; onSaved: () => void; defaultLang?: Lang; onNavigate?: (table: string) => void }
 
 const MISSION_ICONS: Record<string, React.ComponentType<{ size?: number }>> = {
   flipflop_audio: BookOpen, story_pdf: FileText, coloring: Palette,
@@ -183,6 +183,24 @@ function SlugInput({ storyId, initialSlug, titleHint, onSaved }: { storyId: stri
 }
 
 /* ── File uploader with real progress ── */
+// Max recommended size before showing a warning (500 MB for video, 50 MB for audio/image)
+const SIZE_WARN_VIDEO  = 500 * 1024 * 1024
+const SIZE_WARN_OTHER  =  50 * 1024 * 1024
+
+function formatFileSize(bytes: number): string {
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+}
+
+async function deleteStorageFile(storagePath: string): Promise<void> {
+  // storagePath format: "bucket/path/to/file.ext"
+  const slash = storagePath.indexOf('/')
+  if (slash === -1) return
+  const bucket = storagePath.substring(0, slash)
+  const path   = storagePath.substring(slash + 1)
+  await supabase.storage.from(bucket).remove([path])
+}
+
 function FileUploader({ label, url, accept, bucket, pathPrefix, dbSave, onDone, hint }: {
   label: string; url: string | null; accept: string
   bucket: string; pathPrefix: string
@@ -193,6 +211,7 @@ function FileUploader({ label, url, accept, bucket, pathPrefix, dbSave, onDone, 
   const ref = useRef<HTMLInputElement>(null)
   const [progress, setProgress] = useState<(UploadProgress & { status: string }) | null>(null)
   const [uploadError, setUploadError] = useState<string | null>(null)
+  const [sizeWarning, setSizeWarning] = useState<string | null>(null)
   const { error: toastErr } = useToast()
   const fileName = url?.split('/').pop() ?? ''
   const fileExt = fileName.split('.').pop()?.toLowerCase() ?? ''
@@ -201,6 +220,16 @@ function FileUploader({ label, url, accept, bucket, pathPrefix, dbSave, onDone, 
   const isImage = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif'].includes(fileExt)
 
   const handleFile = async (f: File) => {
+    setSizeWarning(null)
+    const isVid = f.type.startsWith('video/')
+    const limit = isVid ? SIZE_WARN_VIDEO : SIZE_WARN_OTHER
+    if (f.size > limit) {
+      setSizeWarning(`${formatFileSize(f.size)} — this is large${isVid ? ' (recommended: < 500 MB)' : ' (recommended: < 50 MB)'}. Upload may be slow.`)
+    }
+    if (f.name.toLowerCase().endsWith('.mov')) {
+      setSizeWarning(prev => `${prev ? prev + ' ' : ''}⚠ .mov files may not play in all browsers — convert to .mp4 for best compatibility.`)
+    }
+
     const ext = f.name.split('.').pop()
     const path = `${pathPrefix}-${Date.now()}.${ext}`
     setUploadError(null)
@@ -209,9 +238,11 @@ function FileUploader({ label, url, accept, bucket, pathPrefix, dbSave, onDone, 
     const { error, storagePath } = await smartUpload(bucket, path, f, setProgress)
     if (!error) {
       try {
+        // Delete old file from storage before saving new reference
+        if (url) await deleteStorageFile(url).catch(() => {})
         await dbSave(storagePath)
         onDone()
-        setTimeout(() => setProgress(null), 2000)
+        setTimeout(() => { setProgress(null); setSizeWarning(null) }, 2000)
       } catch (saveErr) {
         setProgress(null)
         const msg = saveErr instanceof Error ? saveErr.message : 'Failed to save after upload'
@@ -227,6 +258,8 @@ function FileUploader({ label, url, accept, bucket, pathPrefix, dbSave, onDone, 
 
   const handleRemove = async () => {
     try {
+      // Delete the file from storage then clear the DB reference
+      if (url) await deleteStorageFile(url).catch(() => {})
       await dbSave(null)
       onDone()
     } catch (err) {
@@ -304,6 +337,9 @@ function FileUploader({ label, url, accept, bucket, pathPrefix, dbSave, onDone, 
       )}
       <input ref={ref} type="file" accept={accept} className="hidden"
         onChange={e => { const f = e.target.files?.[0]; if (f) handleFile(f) }} />
+      {sizeWarning && !uploading && (
+        <p className="mt-1.5 text-[11px] text-amber-600 leading-relaxed">{sizeWarning}</p>
+      )}
       {hint && !url && !uploadError && !uploading && (
         <p className="mt-1.5 text-[11px] text-gray-400 leading-relaxed">{hint}</p>
       )}
@@ -314,7 +350,7 @@ function FileUploader({ label, url, accept, bucket, pathPrefix, dbSave, onDone, 
 const REQUIRED_STORY_FIELDS = new Set(['title', 'slug'])
 
 /* ── Main Editor ── */
-export default function StoryEditor({ story, onSaved, defaultLang }: StoryEditorProps) {
+export default function StoryEditor({ story, onSaved, defaultLang, onNavigate }: StoryEditorProps) {
   const { success: toastOk, error: toastErr } = useToast()
   const { confirm: confirmAction, dialog: confirmEl } = useConfirmDialog()
   const [activeLang, setActiveLang] = useState<Lang>(defaultLang ?? 'en')
@@ -927,9 +963,20 @@ export default function StoryEditor({ story, onSaved, defaultLang }: StoryEditor
                     </div>
                   </div>
                 ) : (
-                  <p className="text-[12px] text-amber-600 flex items-center gap-1.5 bg-amber-50 rounded-lg px-3 py-2">
-                    <AlertCircle size={14} /> Not configured yet
-                  </p>
+                  <div className="flex items-center justify-between gap-3 bg-amber-50 rounded-lg px-3 py-2.5">
+                    <p className="text-[12px] text-amber-700 flex items-center gap-1.5">
+                      <AlertCircle size={14} /> Slot not configured
+                    </p>
+                    {onNavigate && (
+                      <button
+                        type="button"
+                        onClick={() => onNavigate(`story_slots:${story.id}`)}
+                        className="text-[11px] font-bold text-amber-700 underline hover:text-amber-900 whitespace-nowrap"
+                      >
+                        Fix in Story Slots →
+                      </button>
+                    )}
+                  </div>
                 )}
               </div>
             )
@@ -1223,6 +1270,8 @@ function FlipFlopPageCard({ page, lang, onUpdated, index, total, onReorder }: {
     setBusy('image')
     const { error, storagePath } = await smartUpload('storyBook', `pages/${page.id}-${lang}-${Date.now()}.${f.name.split('.').pop()}`, f)
     if (!error) {
+      // Delete old image from storage before saving new one
+      if (langVer?.image_url) await deleteStorageFile(langVer.image_url).catch(() => {})
       const dbErr = langVer
         ? (await supabase.from('story_page_versions').update({ image_url: storagePath }).eq('id', langVer.id)).error
         : (await supabase.from('story_page_versions').insert({ story_page_id: page.id, language: lang, text: '', image_url: storagePath, audio_url: null, published: true })).error
@@ -1236,6 +1285,8 @@ function FlipFlopPageCard({ page, lang, onUpdated, index, total, onReorder }: {
     const ext = f.name.split('.').pop()
     const { error, storagePath } = await smartUpload('storyBook', `pages/audio-${page.id}-${Date.now()}.${ext}`, f)
     if (!error) {
+      // Delete old audio from storage before saving new one
+      if (langVer?.audio_url) await deleteStorageFile(langVer.audio_url).catch(() => {})
       const { error: dbErr } = langVer
         ? await supabase.from('story_page_versions').update({ audio_url: storagePath }).eq('id', langVer.id)
         : await supabase.from('story_page_versions').insert({ story_page_id: page.id, language: lang, text: '', audio_url: storagePath, published: true })
@@ -1247,6 +1298,15 @@ function FlipFlopPageCard({ page, lang, onUpdated, index, total, onReorder }: {
   const deletePage = async () => {
     const ok = await confirmDialog({ title: `Delete page #${page.page_number}?`, message: 'This will remove the image and all audio versions. Cannot be undone.' })
     if (!ok) return
+    // Clean up all storage files for this page before deleting DB rows
+    const allVersions = page.story_page_versions ?? []
+    await Promise.all([
+      page.image_url ? deleteStorageFile(page.image_url).catch(() => {}) : null,
+      ...allVersions.flatMap(v => [
+        v.image_url ? deleteStorageFile(v.image_url).catch(() => {}) : null,
+        v.audio_url ? deleteStorageFile(v.audio_url).catch(() => {}) : null,
+      ]),
+    ])
     const { error: e1 } = await supabase.from('story_page_versions').delete().eq('story_page_id', page.id)
     if (e1) { toastErr(`Delete failed: ${e1.message}`); return }
     const { error: e2 } = await supabase.from('story_pages').delete().eq('id', page.id)
@@ -1256,6 +1316,7 @@ function FlipFlopPageCard({ page, lang, onUpdated, index, total, onReorder }: {
 
   const removeAudio = async () => {
     if (!langVer) return
+    if (langVer.audio_url) await deleteStorageFile(langVer.audio_url).catch(() => {})
     const { error } = await supabase.from('story_page_versions').update({ audio_url: null }).eq('id', langVer.id)
     if (error) { toastErr(`Remove failed: ${error.message}`); return }
     onUpdated()
@@ -1353,6 +1414,7 @@ function ColoringPageCard({ page, onUpdated }: { page: ColoringPage; onUpdated: 
     setBusy(true)
     const { error, storagePath } = await smartUpload('storyBook', `coloring/${page.story_id ?? 'x'}/page-${page.page_number}-${Date.now()}.${f.name.split('.').pop()}`, f)
     if (!error) {
+      if (page.template_image_url) await deleteStorageFile(page.template_image_url).catch(() => {})
       const { error: dbErr } = await supabase.from('coloring_pages').update({ template_image_url: storagePath }).eq('id', page.id)
       if (dbErr) { toastErr(`Save failed: ${dbErr.message}`) } else { onUpdated() }
     }
@@ -1362,6 +1424,7 @@ function ColoringPageCard({ page, onUpdated }: { page: ColoringPage; onUpdated: 
   const deletePage = async () => {
     const ok = await confirmDialog({ title: 'Delete coloring template?', message: 'This cannot be undone.' })
     if (!ok) return
+    if (page.template_image_url) await deleteStorageFile(page.template_image_url).catch(() => {})
     const { error } = await supabase.from('coloring_pages').delete().eq('id', page.id)
     if (error) { toastErr(`Delete failed: ${error.message}`); return }
     onUpdated()

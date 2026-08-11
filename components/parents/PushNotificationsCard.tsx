@@ -72,7 +72,7 @@ export default function PushNotificationsCard({ push, childName }: Props) {
         <span className="text-xl">🔔</span>
         <h2 className="font-black text-ds-text text-lg">Learning Reminders</h2>
         {push.isSubscribed && (
-          <span className="ml-auto text-2xs font-black text-emerald-600 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full flex items-center gap-1">
+          <span className="ml-auto text-2xs font-black text-[var(--ds-text-brand)] bg-[var(--ds-brand-subtle)] border border-[var(--ds-border-brand)] px-2.5 py-1 rounded-full flex items-center gap-1">
             <Bell className="w-3 h-3" /> On · {reminderTime} daily
           </span>
         )}
@@ -128,7 +128,7 @@ export default function PushNotificationsCard({ push, childName }: Props) {
             ) : (
               <button
                 onClick={push.isSubscribed ? push.unsubscribe : push.subscribe}
-                className={`w-12 h-7 rounded-full flex items-center px-0.5 transition-colors shrink-0 ${push.isSubscribed ? "bg-[var(--nimi-green)]" : "bg-[var(--ds-surface-input)]"}`}>
+                className={`w-12 h-7 rounded-full flex items-center px-0.5 transition-colors shrink-0 ${push.isSubscribed ? "bg-[var(--ds-brand-primary)]" : "bg-[var(--ds-surface-input)]"}`}>
                 <motion.div
                   animate={{ x: push.isSubscribed ? 20 : 0 }}
                   transition={{ type: "spring", stiffness: 500, damping: 30 }}
@@ -158,7 +158,7 @@ export default function PushNotificationsCard({ push, childName }: Props) {
                         <p className="text-3xs text-[var(--ds-text-tertiary)] font-nunito">{item.desc}</p>
                       </div>
                       <button onClick={() => togglePref(item.key)}
-                        className={`w-10 h-6 rounded-full flex items-center px-0.5 transition-colors shrink-0 ${prefs[item.key] ? "bg-[var(--nimi-green)]" : "bg-[var(--ds-border-primary)]"}`}>
+                        className={`w-10 h-6 rounded-full flex items-center px-0.5 transition-colors shrink-0 ${prefs[item.key] ? "bg-[var(--ds-brand-primary)]" : "bg-[var(--ds-border-primary)]"}`}>
                         <motion.div
                           animate={{ x: prefs[item.key] ? 16 : 0 }}
                           transition={{ type: "spring", stiffness: 500, damping: 30 }}

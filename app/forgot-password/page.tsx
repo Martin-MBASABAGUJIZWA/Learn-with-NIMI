@@ -125,7 +125,7 @@ export default function ForgotPasswordPage() {
             disabled={loading}
             whileTap={m.buttonPress}
             className="w-full text-white font-black py-3.5 shadow-md transition disabled:opacity-60 flex items-center justify-center gap-2"
-            style={{ backgroundColor: 'var(--nimi-green)', borderRadius: 'var(--leaf-r)' }}
+            style={{ backgroundColor: 'var(--ds-brand-primary)', borderRadius: 'var(--leaf-r)' }}
           >
             <Mail className="w-4 h-4" />
             {loading ? t("resetSending") : t("resetSendBtn")}
@@ -133,7 +133,7 @@ export default function ForgotPasswordPage() {
 
           <p className="text-center text-sm text-gray-600">
             Remember your password?{" "}
-            <Link href="/loginpage" className="text-[var(--nimi-green)] font-bold hover:underline">
+            <Link href="/loginpage" className="text-[var(--ds-brand-primary)] font-bold hover:underline">
               Back to Login
             </Link>
           </p>

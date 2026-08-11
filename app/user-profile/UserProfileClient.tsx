@@ -480,7 +480,7 @@ export default function UserProfileClient({ initialChildren, initialHasSubscript
       <AppShell>
         <PageSurface className="relative overflow-hidden items-center justify-center gap-4 text-center px-4">
           <p className="relative z-10 text-ds-text font-semibold">{t("noChildrenYet")}</p>
-          <Link href="/home" className="relative z-10 text-white font-black px-6 py-2.5 shadow transition" style={{ backgroundColor: 'var(--nimi-green)', borderRadius: 'var(--leaf-r-sm)' }}>
+          <Link href="/home" className="relative z-10 text-white font-black px-6 py-2.5 shadow transition" style={{ backgroundColor: 'var(--ds-brand-primary)', color: 'var(--ds-nav-bg)', borderRadius: 'var(--leaf-r-sm)' }}>
             {t("goHomeBtn")}
           </Link>
         </PageSurface>
@@ -528,7 +528,7 @@ export default function UserProfileClient({ initialChildren, initialHasSubscript
                   imageMap={badgeImageMap}
                 />
                 {activeChild && (
-                  <AirwaysCard childId={activeChild.id} childName={childName} />
+                  <AirwaysCard childId={activeChild.id} childName={childName} avatarUrl={activeChild.avatar_url} />
                 )}
                 <EarnedAchievementsCard earnedSlugs={earnedBadgeSlugs} imageMap={badgeImageMap} certificates={certificates} hasSubscription={hasSubscription} childName={childName} />
               </motion.div>

@@ -28,12 +28,12 @@ export default function HomeWeekStreakPanel({ weekStreak, consecutiveStreak, tot
 
   /* Active colour — orange-red for fire streak, emerald for growth/broke, gray for zero */
   const noStreak   = !isBroke && consecutiveStreak === 0;
-  const accentBg   = isBroke ? "bg-emerald-100" : noStreak ? "bg-[var(--ds-surface-card-active)]" : "bg-orange-100";
-  const accentText = isBroke ? "text-emerald-600" : noStreak ? "text-[var(--ds-text-secondary)]" : "text-orange-500";
-  const eyebrow    = isBroke ? "text-emerald-500" : noStreak ? "text-[var(--ds-text-tertiary)]" : "text-orange-400";
-  const numColor   = isBroke ? "text-emerald-600" : noStreak ? "text-[var(--ds-text-tertiary)]" : "text-orange-500";
-  const dotDone    = isBroke ? "bg-emerald-400" : "bg-orange-400";
-  const todayRing  = isBroke ? "border-emerald-300 bg-emerald-50" : "border-orange-300 bg-orange-50";
+  const accentBg   = isBroke ? "bg-[var(--ds-brand-soft)]" : noStreak ? "bg-[var(--ds-surface-card-active)]" : "bg-orange-100";
+  const accentText = isBroke ? "text-[var(--ds-text-brand)]" : noStreak ? "text-[var(--ds-text-secondary)]" : "text-orange-500";
+  const eyebrow    = isBroke ? "text-[var(--ds-text-brand)]" : noStreak ? "text-[var(--ds-text-tertiary)]" : "text-orange-400";
+  const numColor   = isBroke ? "text-[var(--ds-text-brand)]" : noStreak ? "text-[var(--ds-text-tertiary)]" : "text-orange-500";
+  const dotDone    = isBroke ? "bg-[var(--ds-brand-primary)]" : "bg-orange-400";
+  const todayRing  = isBroke ? "border-[var(--ds-border-brand)] bg-[var(--ds-brand-subtle)]" : "border-orange-300 bg-orange-50";
 
   const heading = isBroke          ? "Keep going!"     :
     consecutiveStreak >= 7         ? "Unstoppable! 🚀" :
@@ -125,7 +125,7 @@ export default function HomeWeekStreakPanel({ weekStreak, consecutiveStreak, tot
                              null}
                 </motion.div>
                 <span className={`font-nunito font-bold text-4xs ${
-                  done ? (isBroke ? "text-emerald-500" : "text-orange-400") :
+                  done ? (isBroke ? "text-[var(--ds-text-brand)]" : "text-orange-400") :
                   isToday ? "text-[var(--ds-text-secondary)]" :
                   "text-[var(--ds-text-tertiary)]"
                 }`}>{day}</span>

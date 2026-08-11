@@ -43,8 +43,8 @@ function FloatCloud({ className = "", w = 140, delay = 0, opacity = 0.88, speed 
 
 function EarlyAccessPill() {
   return (
-    <span className="inline-flex items-center gap-1.5 font-nunito font-semibold text-[12px] text-gray-700 bg-white/85 backdrop-blur-sm border border-green-100 px-3 py-1 rounded-full shadow-sm">
-      <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse shrink-0" />
+    <span className="inline-flex items-center gap-1.5 font-nunito font-semibold text-[12px] text-gray-700 bg-white/85 backdrop-blur-sm border border-[var(--ds-border-brand)] px-3 py-1 rounded-full shadow-sm">
+      <span className="w-2 h-2 rounded-full bg-[var(--ds-brand-primary)] animate-pulse shrink-0" />
       <span>🌱 Now in early access — founding families only</span>
     </span>
   );
@@ -64,14 +64,14 @@ function StickyMobileCTA({ href, visible }: { href: string; visible: boolean }) 
         >
           <div className="bg-white/95 backdrop-blur-md border-t border-gray-100 shadow-2xl px-4 pt-2 pb-4">
             <p className="text-center font-nunito text-gray-400 text-[10px] mb-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block mr-1 animate-pulse" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[var(--ds-brand-primary)] inline-block mr-1 animate-pulse" />
               🏅 Founding family price — locks in forever
             </p>
             <div className="flex items-center gap-3">
               <Link
                 href={href}
                 className="flex-1 flex items-center justify-center gap-2 text-white font-baloo font-black text-[15px] py-3.5 rounded-2xl"
-                style={{ background: "linear-gradient(135deg, var(--nimi-green) 0%, #166534 100%)", boxShadow: "0 4px 16px rgba(21,128,61,0.40)" }}
+                style={{ background: "linear-gradient(135deg, var(--ds-brand-primary) 0%, var(--ds-brand-hover) 100%)", boxShadow: "0 4px 16px rgba(21,128,61,0.40)" }}
               >
                 🚀 Start Free Today
               </Link>
@@ -336,11 +336,11 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto relative z-10">
           <motion.div initial="hidden" whileInView="visible" viewport={{once:true,margin:"-80px"}} variants={stagger}>
             <motion.div variants={fadeUp} className="text-center mb-12">
-              <span className="eyebrow inline-block text-green-800 mb-4 bg-green-100 px-4 py-1.5 rounded-full border border-green-200">
+              <span className="eyebrow inline-block text-[var(--ds-text-primary)] mb-4 bg-[var(--ds-brand-soft)] px-4 py-1.5 rounded-full border border-[var(--ds-border-brand)]">
                 🌟 Six Pillars of Learning
               </span>
               <h2 className="font-baloo font-black text-gray-900 text-[26px] sm:text-[38px] leading-tight">
-                Every dimension of your child&rsquo;s growth —<br /><span className="text-nimi-green">covered in every story</span>
+                Every dimension of your child&rsquo;s growth —<br /><span className="text-[var(--ds-brand-primary)]">covered in every story</span>
               </h2>
             </motion.div>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-5">
@@ -370,11 +370,11 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto relative z-10">
           <motion.div initial="hidden" whileInView="visible" viewport={{once:true,margin:"-80px"}} variants={stagger}>
             <motion.div variants={fadeUp} className="text-center mb-14">
-              <span className="eyebrow inline-block text-green-800 mb-4 bg-green-100 px-4 py-1.5 rounded-full border border-green-200">
+              <span className="eyebrow inline-block text-[var(--ds-text-primary)] mb-4 bg-[var(--ds-brand-soft)] px-4 py-1.5 rounded-full border border-[var(--ds-border-brand)]">
                 🏰 Why families choose us
               </span>
               <h2 className="font-baloo font-black text-gray-900 text-[28px] sm:text-[42px] leading-tight">
-                More than an app —<br /><span className="text-nimi-green">a world they love coming back to</span>
+                More than an app —<br /><span className="text-[var(--ds-brand-primary)]">a world they love coming back to</span>
               </h2>
               <p className="font-nunito text-gray-600 mt-4 text-[15px] max-w-xl mx-auto leading-relaxed">
                 Every story, mission and challenge is crafted by educators to build real skills while kids genuinely have fun.
@@ -504,7 +504,7 @@ export default function LandingPage() {
                 🗺️ Your Journey Begins Here
               </span>
               <h2 className="font-baloo font-black text-gray-900 text-[28px] sm:text-[42px] leading-tight">
-                Ready in <span className="text-nimi-green">3 simple steps</span>
+                Ready in <span className="text-[var(--ds-brand-primary)]">3 simple steps</span>
               </h2>
               <p className="font-nunito text-gray-600 mt-4 text-[15px]">
                 Setup takes under 2 minutes. Your child starts their first story today.
@@ -514,7 +514,7 @@ export default function LandingPage() {
             <div className="relative grid sm:grid-cols-3 gap-8 sm:gap-6">
               {/* Dashed connector */}
               <div className="hidden sm:block absolute top-[52px] left-[calc(16.67%+32px)] right-[calc(16.67%+32px)] h-px"
-                style={{backgroundImage:"repeating-linear-gradient(90deg,#86efac 0px,#86efac 12px,transparent 12px,transparent 22px)"}} />
+                style={{backgroundImage:"repeating-linear-gradient(90deg,var(--ds-border-brand) 0px,var(--ds-border-brand) 12px,transparent 12px,transparent 22px)"}} />
               {([
                 {step:"1",char:"/themes/default/characters/nimi.png",alt:"Nimi",
                  title:"Create your child's profile",
@@ -557,7 +557,7 @@ export default function LandingPage() {
                 🌍 Three Languages, One Campus
               </span>
               <h2 className="font-baloo font-black text-gray-900 text-[28px] sm:text-[42px] leading-tight">
-                Your child learns in <span className="text-nimi-green">3 languages</span>
+                Your child learns in <span className="text-[var(--ds-brand-primary)]">3 languages</span>
               </h2>
               <p className="font-nunito text-gray-500 mt-4 text-[15px] max-w-lg mx-auto leading-relaxed">
                 Switch languages anytime — progress in each is saved. Give your child the gift of being truly multilingual.
@@ -610,12 +610,12 @@ export default function LandingPage() {
           <motion.div initial="hidden" whileInView="visible" viewport={{once:true,margin:"-60px"}} variants={stagger}>
             <motion.div variants={fadeUp} className="flex items-center justify-between mb-8">
               <div>
-                <span className="eyebrow text-nimi-green mb-1 block">📚 The Library</span>
+                <span className="eyebrow text-[var(--ds-brand-primary)] mb-1 block">📚 The Library</span>
                 <h2 className="font-baloo font-black text-gray-900 text-[20px] sm:text-[28px]">
                   Stories your child will love
                 </h2>
               </div>
-              <Link href="/stories" className="font-nunito font-bold text-nimi-green hover:underline text-sm transition-colors whitespace-nowrap">
+              <Link href="/stories" className="font-nunito font-bold text-[var(--ds-brand-primary)] hover:underline text-sm transition-colors whitespace-nowrap">
                 View all ›
               </Link>
             </motion.div>
@@ -631,13 +631,13 @@ export default function LandingPage() {
                               <Image src={getStorageUrl(story.cover_url)} alt={story.title} fill
                                 className="object-cover group-hover:scale-110 transition-transform duration-500" />
                             ) : (
-                              <div className="w-full h-full bg-gradient-to-br from-green-100 to-emerald-200 flex items-center justify-center">
+                              <div className="w-full h-full bg-[var(--ds-brand-subtle)] flex items-center justify-center">
                                 <span className="text-5xl">{story.theme_emoji ?? "📖"}</span>
                               </div>
                             )}
                             <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/20">
                               <div className="w-12 h-12 bg-white/95 rounded-full flex items-center justify-center shadow-xl">
-                                <svg className="w-5 h-5 fill-[var(--nimi-green)] ml-0.5" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                <svg className="w-5 h-5 fill-[var(--ds-brand-primary)] ml-0.5" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                               </div>
                             </div>
                           </div>
@@ -662,17 +662,17 @@ export default function LandingPage() {
 
       {/* ══ SAFE FOR KIDS ════════════════════════════════════════════ */}
       <section className="relative overflow-hidden px-5 sm:px-10 lg:px-14 py-20 sm:py-28"
-        style={{background:"linear-gradient(150deg,#f0fdf4 0%,#dcfce7 45%,#f0fdf4 100%)"}}>
+        style={{background:"var(--ds-brand-subtle)"}}>
         <div className="absolute inset-0 opacity-[0.05] pointer-events-none"
-          style={{backgroundImage:"radial-gradient(circle,#15803d 1.5px,transparent 1.5px)",backgroundSize:"36px 36px"}} />
+          style={{backgroundImage:"radial-gradient(circle,var(--ds-brand-primary) 1.5px,transparent 1.5px)",backgroundSize:"36px 36px"}} />
         <div className="max-w-5xl mx-auto relative z-10">
           <motion.div initial="hidden" whileInView="visible" viewport={{once:true,margin:"-80px"}} variants={stagger}>
             <motion.div variants={fadeUp} className="text-center mb-14">
-              <span className="eyebrow inline-block text-[var(--ds-brand-primary)] mb-4 bg-white/80 backdrop-blur-sm border border-green-200 px-4 py-1.5 rounded-full shadow-sm">
+              <span className="eyebrow inline-block text-[var(--ds-brand-primary)] mb-4 bg-white/80 backdrop-blur-sm border border-[var(--ds-border-brand)] px-4 py-1.5 rounded-full shadow-sm">
                 🛡️ Built for Families
               </span>
               <h2 className="font-baloo font-black text-gray-900 text-[28px] sm:text-[42px] leading-tight">
-                Built for kids.<br /><span className="text-nimi-green">Trusted by parents.</span>
+                Built for kids.<br /><span className="text-[var(--ds-brand-primary)]">Trusted by parents.</span>
               </h2>
               <p className="font-nunito text-gray-600 mt-4 text-[15px] max-w-xl mx-auto">
                 Every decision we make puts your child&apos;s safety and wellbeing first — no exceptions.
@@ -684,7 +684,7 @@ export default function LandingPage() {
                 {emoji:"🚫",title:"Zero Ads",       desc:"No ads. No distractions. Ever.",          grad:"from-red-500 to-rose-400"},
                 {emoji:"🔒",title:"100% Private",    desc:"We never share your child's data.",        grad:"from-blue-500 to-indigo-500"},
                 {emoji:"👨‍👩‍👧",title:"Parent Control", desc:"You manage your child's whole account.",  grad:"from-purple-500 to-violet-500"},
-                {emoji:"✅",title:"Safe Content",    desc:"Every story reviewed by educators.",        grad:"from-[var(--ds-brand-primary)] to-emerald-600"},
+                {emoji:"✅",title:"Safe Content",    desc:"Every story reviewed by educators.",        grad:"from-[var(--ds-brand-primary)] to-[var(--ds-brand-hover)]"},
               ] as const).map(({emoji,title,desc,grad}) => (
                 <motion.div key={title} variants={fadeUp}>
                   <motion.div whileHover={{y:-7,scale:1.02}} transition={{type:"spring",stiffness:300,damping:20}}
@@ -708,14 +708,14 @@ export default function LandingPage() {
       {/* ══ TESTIMONIALS — hidden until approved rows exist in DB ══ */}
       {testimonials.length > 0 && (
       <section className="relative overflow-hidden px-5 sm:px-10 lg:px-14 py-20 sm:py-28"
-        style={{background:"linear-gradient(135deg,#15803d 0%,#0f6b32 50%,#0a5228 100%)"}}>
+        style={{background:"linear-gradient(135deg,var(--ds-brand-primary) 0%,var(--ds-brand-hover) 100%)"}}>
         <div className="absolute inset-0 opacity-[0.04] pointer-events-none"
           style={{backgroundImage:"radial-gradient(circle, white 1px, transparent 1px)", backgroundSize:"28px 28px"}} />
 
         <div className="max-w-5xl mx-auto relative z-10">
           <motion.div initial="hidden" whileInView="visible" viewport={{once:true,margin:"-80px"}} variants={stagger}>
             <motion.div variants={fadeUp} className="text-center mb-10">
-              <span className="eyebrow inline-block text-green-200 mb-4 bg-white/10 px-4 py-1.5 rounded-full">
+              <span className="eyebrow inline-block text-white/80 mb-4 bg-white/10 px-4 py-1.5 rounded-full">
                 ❤️ Families Love NIMIPIKO
               </span>
               <h2 className="font-baloo font-black text-white text-[28px] sm:text-[42px] leading-tight">
@@ -726,7 +726,7 @@ export default function LandingPage() {
             <div className={`grid gap-6 ${testimonials.length === 1 ? '' : testimonials.length === 2 ? 'sm:grid-cols-2' : 'sm:grid-cols-3'}`}>
               {testimonials.map(t => {
                 const initials = t.name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
-                const colors = ['bg-pink-500','bg-sky-500','bg-amber-500','bg-violet-500','bg-emerald-500','bg-rose-500'];
+                const colors = ['bg-pink-500','bg-sky-500','bg-amber-500','bg-violet-500','bg-[var(--ds-brand-primary)]','bg-rose-500'];
                 const color  = colors[t.name.charCodeAt(0) % colors.length];
                 return (
                   <motion.div key={t.id} variants={fadeUp}>
@@ -774,15 +774,15 @@ export default function LandingPage() {
                 💫 Choose Your Adventure
               </span>
               <h2 className="font-baloo font-black text-gray-900 text-[28px] sm:text-[42px] leading-tight">
-                Simple, honest <span className="text-nimi-green">pricing</span>
+                Simple, honest <span className="text-[var(--ds-brand-primary)]">pricing</span>
               </h2>
               <p className="font-nunito text-gray-500 mt-4 text-[15px]">
                 One subscription. Unlimited learning. Cancel anytime.
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-2 mt-4">
-                <div className="inline-flex items-center gap-2 bg-green-50 border border-green-200 rounded-full px-4 py-2">
-                  <span className="text-green-600 text-[14px]">🎉</span>
-                  <span className="font-baloo font-black text-green-700 text-[13px]">Start exploring free — no credit card required</span>
+                <div className="inline-flex items-center gap-2 bg-[var(--ds-brand-subtle)] border border-[var(--ds-border-brand)] rounded-full px-4 py-2">
+                  <span className="text-[var(--ds-text-brand)] text-[14px]">🎉</span>
+                  <span className="font-baloo font-black text-[var(--ds-text-brand)] text-[13px]">Start exploring free — no credit card required</span>
                 </div>
                 <div className="inline-flex items-center gap-1.5 bg-amber-50 border border-amber-200 rounded-full px-4 py-2">
                   <span className="text-amber-500 text-[14px]">🏅</span>
@@ -798,7 +798,7 @@ export default function LandingPage() {
                     <motion.span
                       animate={{ boxShadow: ["0 0 0 0 rgba(21,128,61,0.5)", "0 0 0 8px rgba(21,128,61,0)", "0 0 0 0 rgba(21,128,61,0)"] }}
                       transition={{ duration: 2.2, repeat: Infinity, ease: "easeOut" }}
-                      className="flex items-center gap-1.5 bg-[var(--nimi-green)] text-white font-baloo font-black text-[11px] px-5 py-1.5 rounded-full shadow-lg whitespace-nowrap tracking-wide"
+                      className="flex items-center gap-1.5 bg-[var(--ds-brand-primary)] text-[var(--ds-nav-bg)] font-baloo font-black text-[11px] px-5 py-1.5 rounded-full shadow-lg whitespace-nowrap tracking-wide"
                       style={{ display: "inline-flex" }}>
                       ★ MOST POPULAR
                     </motion.span>
@@ -808,7 +808,7 @@ export default function LandingPage() {
                       <span className="text-[44px]">🌟</span>
                       <div>
                         <h3 className="font-baloo font-black text-white text-[22px] leading-tight">NIMIPIKO Club</h3>
-                        <p className="font-nunito text-green-100 text-[12px]">Unlimited learning, every month</p>
+                        <p className="font-nunito text-white/80 text-[12px]">Unlimited learning, every month</p>
                       </div>
                     </div>
                     <div className="bg-white p-7 flex flex-col gap-5 flex-1">
@@ -824,14 +824,14 @@ export default function LandingPage() {
                           </li>
                         ))}
                       </ul>
-                      <div className="flex items-center gap-2.5 bg-green-50 border border-green-100 rounded-2xl px-4 py-3 mt-1">
+                      <div className="flex items-center gap-2.5 bg-[var(--ds-brand-subtle)] border border-[var(--ds-border-brand)] rounded-2xl px-4 py-3 mt-1">
                         <span className="text-[22px] shrink-0">🛡️</span>
                         <div>
-                          <p className="font-baloo font-black text-green-800 text-[13px] leading-tight">30-day money-back guarantee</p>
-                          <p className="font-nunito text-green-600 text-[11px]">Not happy? Full refund, no questions asked.</p>
+                          <p className="font-baloo font-black text-[var(--ds-text-brand)] text-[13px] leading-tight">30-day money-back guarantee</p>
+                          <p className="font-nunito text-[var(--ds-text-brand)] text-[11px]">Not happy? Full refund, no questions asked.</p>
                         </div>
                       </div>
-                      <Link href="/pricing" className="mt-auto w-full text-center text-white font-baloo font-black py-3.5 shadow-md transition-all hover:-translate-y-0.5 active:scale-95 text-[15px]" style={{backgroundColor:'var(--nimi-green)', borderRadius:'var(--leaf-r)', boxShadow:'0 6px 20px rgba(5,150,105,0.35)'}}>
+                      <Link href="/pricing" className="mt-auto w-full text-center text-white font-baloo font-black py-3.5 shadow-md transition-all hover:-translate-y-0.5 active:scale-95 text-[15px]" style={{backgroundColor:'var(--ds-brand-primary)', borderRadius:'var(--leaf-r)', boxShadow:'0 6px 20px rgba(5,150,105,0.35)'}}>
                         Start Free → Get Full Access
                       </Link>
                       <p className="text-center font-nunito text-gray-400 text-[11px] -mt-2">No credit card needed to explore</p>
@@ -882,7 +882,7 @@ export default function LandingPage() {
                 🤝 Our Promise to Parents
               </span>
               <h2 className="font-baloo font-black text-gray-900 text-[24px] sm:text-[36px] leading-tight">
-                Screen time they&apos;ll <span className="text-nimi-green">actually grow from</span>
+                Screen time they&apos;ll <span className="text-[var(--ds-brand-primary)]">actually grow from</span>
               </h2>
             </motion.div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -893,7 +893,7 @@ export default function LandingPage() {
                 { icon: "🔄", title: "Cancel Anytime",    desc: "No lock-in, no hidden fees. Your trust is more valuable than your payment." },
               ] as const).map(({ icon, title, desc }) => (
                 <motion.div key={title} variants={fadeUp}
-                  className="flex flex-col gap-3 p-5 rounded-2xl border border-gray-100 bg-gray-50 hover:bg-green-50 hover:border-green-200 transition-all group">
+                  className="flex flex-col gap-3 p-5 rounded-2xl border border-gray-100 bg-gray-50 hover:bg-[var(--ds-brand-subtle)] hover:border-[var(--ds-border-brand)] transition-all group">
                   <span className="text-[32px] leading-none">{icon}</span>
                   <p className="font-baloo font-black text-gray-900 text-[16px] group-hover:text-[var(--ds-brand-primary)] transition-colors">{title}</p>
                   <p className="font-nunito text-gray-500 text-[13px] leading-relaxed">{desc}</p>
@@ -906,16 +906,16 @@ export default function LandingPage() {
 
       {/* ══ FINAL CTA ════════════════════════════════════════════════ */}
       <section className="relative overflow-hidden px-5 sm:px-10 lg:px-14 pt-20 sm:pt-28 pb-0"
-        style={{background:"linear-gradient(180deg,#f0fdf4 0%,#dcfce7 60%,#bbf7d0 100%)"}}>
+        style={{background:"linear-gradient(180deg,var(--ds-brand-subtle) 0%,var(--ds-brand-soft) 60%,var(--ds-brand-soft) 100%)"}}>
         <div className="absolute inset-0 opacity-[0.06] pointer-events-none"
-          style={{backgroundImage:"radial-gradient(circle, #15803d 1px, transparent 1px)", backgroundSize:"32px 32px"}} />
+          style={{backgroundImage:"radial-gradient(circle, var(--ds-brand-primary) 1px, transparent 1px)", backgroundSize:"32px 32px"}} />
 
         <motion.div initial="hidden" whileInView="visible" viewport={{once:true,margin:"-80px"}} variants={stagger}
           className="max-w-3xl mx-auto flex flex-col items-center text-center gap-6 relative z-10">
 
-          <motion.div variants={fadeUp} className="flex items-center gap-2 bg-green-900/40 border border-green-700/50 backdrop-blur-sm rounded-full px-4 py-2">
-            <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse shrink-0" />
-            <span className="font-baloo font-bold text-green-200 text-[12px] sm:text-[13px]">
+          <motion.div variants={fadeUp} className="flex items-center gap-2 bg-[var(--ds-brand-soft)] border border-[var(--ds-border-brand)] backdrop-blur-sm rounded-full px-4 py-2">
+            <span className="w-2 h-2 rounded-full bg-[var(--ds-brand-primary)] animate-pulse shrink-0" />
+            <span className="font-baloo font-bold text-[var(--ds-text-brand)] text-[12px] sm:text-[13px]">
               🌱 Early access — be a founding family
             </span>
           </motion.div>
@@ -933,7 +933,7 @@ export default function LandingPage() {
           </motion.div>
 
           <motion.h2 variants={fadeUp} className="font-baloo font-black text-gray-900 text-[32px] sm:text-[52px] leading-tight">
-            Start your child&apos;s<br /><span className="text-nimi-green">adventure today! 🚀</span>
+            Start your child&apos;s<br /><span className="text-[var(--ds-brand-primary)]">adventure today! 🚀</span>
           </motion.h2>
 
           <motion.p variants={fadeUp} className="font-nunito text-gray-600 text-[15px] sm:text-[16px] max-w-md leading-relaxed">
@@ -1037,7 +1037,7 @@ export default function LandingPage() {
               © {new Date().getFullYear()} Nimipiko Studio LTD. Made with ❤️ for curious kids everywhere.
             </p>
             <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+              <span className="w-2 h-2 rounded-full bg-[var(--ds-brand-primary)] animate-pulse" />
               <span className="font-nunito text-gray-500 text-[11px]">All systems operational</span>
             </div>
           </div>

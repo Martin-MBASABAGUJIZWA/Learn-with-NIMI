@@ -22,9 +22,9 @@ export default function StoryVideoPlayer({ url, title, poster, onEnded }: Props)
 
   if (!url) {
     return (
-      <div className="leaf border border-emerald-100 bg-gradient-to-br from-white via-emerald-50/70 to-amber-50/60 aspect-video flex flex-col items-center justify-center gap-2 shadow-card-2xl">
+      <div className="leaf border border-[var(--ds-border-brand)] bg-[var(--ds-brand-subtle)] aspect-video flex flex-col items-center justify-center gap-2 shadow-card-2xl">
         <div className="rounded-full bg-[var(--ds-surface-card)] p-3 shadow-sm">
-          <Sparkles className="h-6 w-6 text-emerald-600" />
+          <Sparkles className="h-6 w-6 text-[var(--ds-text-brand)]" />
         </div>
         <p className="text-[var(--ds-text-primary)] text-sm font-black">Coming Soon</p>
         {title && <p className="text-[var(--ds-text-secondary)] text-3xs">{title}</p>}
@@ -51,7 +51,7 @@ export default function StoryVideoPlayer({ url, title, poster, onEnded }: Props)
   };
 
   return (
-    <div className="overflow-hidden leaf border border-emerald-100 bg-black/40 shadow-card-3xl relative group">
+    <div className="overflow-hidden leaf border border-[var(--ds-border-brand)] bg-black/40 shadow-card-3xl relative group">
       <video
         ref={ref}
         src={src}

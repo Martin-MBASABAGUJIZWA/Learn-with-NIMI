@@ -17,7 +17,7 @@ import { claimChallengeReward } from "@/lib/queries";
 import { DRAWING_SUBJECTS } from "@/lib/drawingCoach";
 import type { DrawingCoachResponse, DrawingFeedbackResponse } from "@/lib/drawingCoach";
 
-const G = "var(--nimi-green,#15803D)";
+const G = "var(--ds-brand-primary)";
 const STARS_AWARD = 10;
 
 interface Props {
@@ -154,10 +154,10 @@ export default function DrawingCoachView({
                   whileTap={{ scale: 0.95 }}
                   disabled={step === "loading"}
                   onClick={() => void handleChoose(sub.id)}
-                  className="flex flex-col items-center gap-2 p-3.5 rounded-2xl border-2 hover:border-green-400 transition-colors bg-[var(--ds-surface-card)] shadow-sm disabled:opacity-50"
+                  className="flex flex-col items-center gap-2 p-3.5 rounded-2xl border-2 hover:border-[var(--ds-border-brand)] transition-colors bg-[var(--ds-surface-card)] shadow-sm disabled:opacity-50"
                   style={{
                     borderColor: subjectId === sub.id ? G : "var(--ds-border-primary)",
-                    background:  subjectId === sub.id ? "#F0FDF4" : "white",
+                    background:  subjectId === sub.id ? "var(--ds-brand-subtle)" : "var(--ds-surface-card)",
                   }}>
                   <span className="text-3xl">{sub.emoji}</span>
                   <p className="font-baloo font-black text-2xs text-center leading-tight" style={{ color: "var(--ds-text-primary)" }}>
@@ -224,7 +224,7 @@ export default function DrawingCoachView({
                 <p className="font-baloo font-black text-white text-xl sm:text-1.5xl leading-snug mb-3">
                   {currentStepData.instruction}
                 </p>
-                <p className="text-green-200 text-xs font-nunito italic">
+                <p className="text-white/80 text-xs font-nunito italic">
                   💡 {currentStepData.tip}
                 </p>
               </motion.div>
@@ -296,7 +296,7 @@ export default function DrawingCoachView({
             className="flex flex-col gap-4">
 
             <div className="p-5 leaf-lg text-center" style={{ background: G }}>
-              <p className="text-green-200 text-3xs font-black uppercase tracking-widest mb-2">Stars Earned</p>
+              <p className="text-white/80 text-3xs font-black uppercase tracking-widest mb-2">Stars Earned</p>
               <p className="font-baloo font-black text-5.5xl text-white leading-none">+{STARS_AWARD}</p>
               <div className="flex justify-center gap-1 mt-2">
                 {Array.from({ length: Math.min(STARS_AWARD, 10) }).map((_, i) => (
@@ -309,11 +309,11 @@ export default function DrawingCoachView({
               </div>
             </div>
 
-            <div className="p-4 rounded-2xl" style={{ background: "var(--ds-brand-soft)", border: "1px solid #BBF7D0" }}>
-              <p className="text-sm font-nunito leading-relaxed" style={{ color: "#166534" }}>
+            <div className="p-4 rounded-2xl" style={{ background: "var(--ds-brand-soft)", border: "1px solid var(--ds-border-brand)" }}>
+              <p className="text-sm font-nunito leading-relaxed" style={{ color: "var(--ds-text-brand)" }}>
                 💬 {feedback.praise}
               </p>
-              <p className="text-xs font-bold mt-2" style={{ color: "var(--nimi-green)" }}>
+              <p className="text-xs font-bold mt-2" style={{ color: "var(--ds-text-brand)" }}>
                 {feedback.encourage}
               </p>
             </div>

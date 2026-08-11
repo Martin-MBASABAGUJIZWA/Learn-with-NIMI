@@ -29,7 +29,7 @@ export default function HomeAdventureSection({ curStory, doneSlots, totalSlots, 
   return (
     <motion.section initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="relative">
       <motion.div variants={up}
-        className="leaf-lg overflow-hidden border border-white/80 shadow-[0_20px_50px_rgba(15,23,42,0.12)]">
+        className="leaf-lg overflow-hidden border border-[var(--ds-border-primary)] shadow-[0_20px_50px_rgba(15,23,42,0.12)]">
 
         {showPremiumUpsell ? (
           /* ── Premium upsell: free user finished all free stories ── */
@@ -96,7 +96,7 @@ export default function HomeAdventureSection({ curStory, doneSlots, totalSlots, 
                     {t("homeAdventureCompleteLabel")}
                   </span>
                 ) : (
-                  <span className="flex items-center gap-1.5 font-baloo font-black text-2xs text-white bg-emerald-600/90 backdrop-blur-sm px-3 py-1 rounded-full shadow-md">
+                  <span className="flex items-center gap-1.5 font-baloo font-black text-2xs bg-[var(--ds-nav-bg)]/90 text-[var(--ds-text-brand)] backdrop-blur-sm px-3 py-1 rounded-full shadow-md">
                     {t("homeAdventureLabel")}
                   </span>
                 )}
@@ -105,7 +105,7 @@ export default function HomeAdventureSection({ curStory, doneSlots, totalSlots, 
               {/* Play button — always visible on mobile, hover-reveal on desktop */}
               <div className="absolute inset-0 flex items-center justify-center opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200">
                 <div className="w-14 h-14 bg-[var(--ds-surface-card)] rounded-full flex items-center justify-center shadow-2xl">
-                  <Play className="w-6 h-6 fill-emerald-600 text-emerald-600 ml-0.5" />
+                  <Play className="w-6 h-6 fill-[var(--ds-brand-primary)] text-[var(--ds-brand-primary)] ml-0.5" />
                 </div>
               </div>
 
@@ -130,7 +130,7 @@ export default function HomeAdventureSection({ curStory, doneSlots, totalSlots, 
                       {slots.map((slot, i) => (
                         <div key={i} className={`w-7 h-7 rounded-full flex items-center justify-center text-2xs font-black shadow-sm transition-all ${
                           slot.completed
-                            ? "bg-emerald-500 text-white shadow-emerald-200"
+                            ? "bg-[var(--ds-brand-primary)] text-[var(--ds-nav-bg)] shadow-[var(--ds-shadow-cta)]"
                             : "bg-[var(--ds-surface-card-hover)] text-[var(--ds-text-tertiary)] border border-[var(--ds-border-primary)]"
                         }`}>
                           {slot.completed ? "⭐" : i + 1}
@@ -143,7 +143,7 @@ export default function HomeAdventureSection({ curStory, doneSlots, totalSlots, 
                   {/* Progress bar */}
                   <div className="h-2.5 bg-[var(--ds-surface-card-hover)] rounded-full overflow-hidden mb-4">
                     <motion.div className="h-full rounded-full"
-                      style={{ background: "linear-gradient(90deg,#34d399,#059669)" }}
+                      style={{ background: "linear-gradient(90deg,var(--ds-brand-primary),var(--ds-brand-hover))" }}
                       initial={{ width: 0 }} animate={{ width: `${pct}%` }}
                       transition={{ duration: 1.2, ease: "easeOut", delay: 0.3 }} />
                   </div>
@@ -153,13 +153,9 @@ export default function HomeAdventureSection({ curStory, doneSlots, totalSlots, 
               <Link href={`/stories/${curStory.slug}`}
                 className="flex items-center justify-center gap-2 w-full font-baloo font-black text-mbase sm:text-base py-3.5 leaf shadow-lg transition-all hover:-translate-y-0.5 active:scale-95"
                 style={{
-                  background: curStory.complete
-                    ? "linear-gradient(135deg,#fbbf24,#f59e0b)"
-                    : "linear-gradient(135deg,#059669,#047857)",
-                  color: curStory.complete ? "#78350f" : "white",
-                  boxShadow: curStory.complete
-                    ? "0 4px 18px rgba(245,158,11,0.35)"
-                    : "0 4px 18px rgba(5,150,105,0.35)",
+                  background: "linear-gradient(135deg,var(--ds-brand-primary),var(--ds-brand-hover))",
+                  color: "var(--ds-nav-bg)",
+                  boxShadow: "var(--ds-shadow-cta)",
                 }}>
                 {curStory.complete ? t("homeAdventureViewCert") : t("homeAdventureKeepGoing")}
                 <Play className="w-4 h-4" fill="currentColor" />
@@ -177,7 +173,7 @@ export default function HomeAdventureSection({ curStory, doneSlots, totalSlots, 
             </div>
             <Link href="/stories"
               className="flex items-center gap-2 font-baloo font-black text-white text-base px-8 py-3.5 leaf shadow-xl transition-all hover:-translate-y-0.5 active:scale-95"
-              style={{ background: "linear-gradient(135deg,#059669,#047857)", boxShadow: "0 6px 22px rgba(5,150,105,0.4)" }}>
+              style={{ background: "linear-gradient(135deg,var(--ds-brand-primary),var(--ds-brand-hover))", color: "var(--ds-nav-bg)", boxShadow: "var(--ds-shadow-cta)" }}>
               {t("homeAdventureStartJourney")} <ChevronRight className="w-4 h-4" />
             </Link>
           </div>

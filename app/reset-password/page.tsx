@@ -119,7 +119,7 @@ export default function ResetPassword() {
             </div>
 
             {resendSent ? (
-              <div className="leaf p-4 bg-green-50 text-green-700 text-sm font-semibold text-center flex items-center justify-center gap-2">
+              <div className="leaf p-4 bg-[var(--ds-brand-subtle)] text-[var(--ds-text-brand)] text-sm font-semibold text-center flex items-center justify-center gap-2">
                 <CheckCircle className="w-4 h-4 flex-shrink-0" />
                 New link sent! Check your inbox.
               </div>
@@ -143,7 +143,7 @@ export default function ResetPassword() {
                   disabled={resendLoading}
                   whileTap={m.buttonPress}
                   className="w-full text-white font-black py-3.5 shadow-md transition disabled:opacity-60 flex items-center justify-center gap-2"
-                  style={{ backgroundColor: 'var(--nimi-green)', borderRadius: 'var(--leaf-r)' }}
+                  style={{ backgroundColor: 'var(--ds-brand-primary)', borderRadius: 'var(--leaf-r)' }}
                 >
                   <RotateCcw className="w-4 h-4" />
                   {resendLoading ? 'Sending…' : 'Send New Reset Link'}
@@ -236,7 +236,7 @@ export default function ResetPassword() {
             disabled={loading}
             whileTap={m.buttonPress}
             className="w-full text-white font-black py-3.5 shadow-md transition disabled:opacity-60 flex items-center justify-center gap-2"
-            style={{ backgroundColor: 'var(--nimi-green)', borderRadius: 'var(--leaf-r)' }}
+            style={{ backgroundColor: 'var(--ds-brand-primary)', borderRadius: 'var(--leaf-r)' }}
           >
             <Lock className="w-4 h-4" />
             {loading ? "Updating Password..." : "Update Password"}

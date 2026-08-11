@@ -500,7 +500,7 @@ export default function PricingGiftModal({ currency, onClose }: Props) {
               <div className="flex gap-3 mt-4">
                 <button onClick={onClose} className="flex-1 py-3 leaf border border-ds-border text-[var(--ds-text-tertiary)] font-bold text-[13px] hover:bg-[var(--ds-surface-card-hover)] transition">Cancel</button>
                 <motion.button whileTap={m.buttonPress} onClick={handleMomoPay}
-                  className="flex-1 py-3 leaf bg-[var(--nimi-green)] text-white font-black text-[14px] shadow-md">
+                  className="flex-1 py-3 leaf bg-[var(--ds-brand-primary)] text-white font-black text-[14px] shadow-md">
                   Send Gift 🎁
                 </motion.button>
               </div>

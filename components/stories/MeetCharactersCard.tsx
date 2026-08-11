@@ -9,9 +9,9 @@ interface Props {
 }
 
 const CHARS = (assets: Props["assets"]) => [
-  { img: assets.nimiCircle, name: "Nimi", desc: "Joyful explorer who loves stories",   border: "border-green-400", bg: "from-green-400 to-emerald-500" },
+  { img: assets.nimiCircle, name: "Nimi", desc: "Joyful explorer who loves stories",   border: "border-[var(--ds-border-brand)]", bg: "from-[var(--ds-brand-primary)] to-[var(--ds-brand-hover)]" },
   { img: assets.pikoCircle, name: "Piko", desc: "Curious robot who loves creativity",  border: "border-blue-400",  bg: "from-blue-400 to-indigo-500"   },
-  { img: null,              name: "Zilo", desc: "Nature guardian with grass hair 🌿",  border: "border-lime-400",  bg: "from-lime-400 to-green-500"    },
+  { img: null,              name: "Zilo", desc: "Nature guardian with grass hair 🌿",  border: "border-lime-400",  bg: "from-lime-400 to-[var(--ds-brand-primary)]"    },
 ];
 
 export default function MeetCharactersCard({ assets }: Props) {
@@ -38,7 +38,7 @@ export default function MeetCharactersCard({ assets }: Props) {
           </motion.div>
         ))}
       </div>
-      <p className="font-nunito text-center text-green-700 text-2xs font-bold mt-4 bg-green-50 rounded-full py-1.5 px-3">
+      <p className="font-nunito text-center text-[var(--ds-text-brand)] text-2xs font-bold mt-4 bg-[var(--ds-brand-subtle)] rounded-full py-1.5 px-3">
         They will guide you through every adventure! 🌟
       </p>
     </motion.div>

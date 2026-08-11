@@ -49,7 +49,7 @@ export default function ChatQuestBanner({ exchangeCount, target, claimed, canCla
                 {Array.from({ length: target }).map((_, i) => (
                   <motion.div key={i}
                     className={`w-2.5 h-2.5 rounded-full transition-colors duration-300 ${
-                      i < exchangeCount ? "bg-nimi-green" : "bg-[var(--ds-border-primary)]"
+                      i < exchangeCount ? "bg-[var(--ds-brand-primary)]" : "bg-[var(--ds-border-primary)]"
                     }`}
                     animate={i === exchangeCount - 1 && exchangeCount <= target ? { scale:[1,1.5,1] } : {}}
                     transition={{ duration:0.4 }}
@@ -65,7 +65,7 @@ export default function ChatQuestBanner({ exchangeCount, target, claimed, canCla
               {claimed ? (
                 <motion.div key="claimed"
                   initial={{ opacity:0, scale:0.8 }} animate={{ opacity:1, scale:1 }}
-                  className="flex items-center gap-1.5 bg-emerald-50 border border-emerald-200 text-emerald-600 font-black text-xs px-3 py-2 rounded-2xl">
+                  className="flex items-center gap-1.5 bg-[var(--ds-brand-subtle)] border border-[var(--ds-border-brand)] text-[var(--ds-text-brand)] font-black text-xs px-3 py-2 rounded-2xl">
                   <CheckCircle2 className="w-4 h-4" />
                   Claimed!
                 </motion.div>
@@ -75,7 +75,7 @@ export default function ChatQuestBanner({ exchangeCount, target, claimed, canCla
                   whileTap={{ scale:0.93 }}
                   onClick={onClaim}
                   className="flex items-center gap-1.5 text-white font-black text-sml px-4 py-2 rounded-2xl shadow-md"
-                  style={{ backgroundColor:"var(--nimi-green)" }}
+                  style={{ backgroundColor:"var(--ds-brand-primary)" }}
                 >
                   <Star className="w-4 h-4 fill-yellow-300 text-yellow-300" />
                   Claim +10 ⭐

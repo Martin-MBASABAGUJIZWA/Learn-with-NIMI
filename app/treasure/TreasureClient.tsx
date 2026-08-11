@@ -73,7 +73,7 @@ function Toast({ message, onDone }: { message: string; onDone: () => void }) {
       exit={{   opacity:0, y:24, scale:0.95 }}
       transition={{ type:"spring", stiffness:380, damping:26 }}
       className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2.5 px-5 py-3 rounded-2xl shadow-2xl font-black text-sm text-white whitespace-nowrap"
-      style={{ background:"var(--nimi-green)" }}
+      style={{ background:"var(--ds-brand-primary)" }}
     >
       <span className="text-lg">⭐</span>{message}
     </motion.div>
@@ -87,8 +87,8 @@ function SectionCleared({ label }: { label: string }) {
     <motion.div
       initial={{ opacity:0, scale:0.92, y:6 }}
       animate={{ opacity:1, scale:1,   y:0 }}
-      className="flex items-center justify-center gap-2 py-2 px-4 rounded-xl bg-[var(--nimi-green)]/10 border border-[var(--nimi-green)]/30 text-sml font-black"
-      style={{ color:"var(--nimi-green)" }}
+      className="flex items-center justify-center gap-2 py-2 px-4 rounded-xl bg-[var(--ds-brand-primary)]/10 border border-[var(--ds-brand-primary)]/30 text-sml font-black"
+      style={{ color:"var(--ds-brand-primary)" }}
     >
       <motion.span animate={{ rotate:[0,15,-10,0] }} transition={{ duration:0.6, delay:0.2 }}>🎉</motion.span>
       {label} — {t("treasureAllComplete")}
@@ -126,7 +126,7 @@ function ChallengeCard({
         state === "claimed"
           ? "border-ds-border bg-ds-surface/50 opacity-60"
           : state === "ready"
-          ? "border-[var(--nimi-green)] bg-ds-surface shadow-[0_0_0_3px_rgba(34,197,94,0.10),0_8px_28px_rgba(0,0,0,0.09)]"
+          ? "border-[var(--ds-brand-primary)] bg-ds-surface shadow-[0_0_0_3px_rgba(34,197,94,0.10),0_8px_28px_rgba(0,0,0,0.09)]"
           : premium
           ? "border-amber-300/60 bg-gradient-to-br from-amber-50/40 to-ds-surface shadow-[0_4px_20px_rgba(0,0,0,0.06)]"
           : "border-ds-border bg-ds-surface shadow-[0_2px_12px_rgba(0,0,0,0.05)]"
@@ -162,7 +162,7 @@ function ChallengeCard({
               initial={{ scale:0, opacity:0 }}
               animate={{ scale:1, opacity:1 }}
               className="text-4xs font-black px-2 py-0.5 rounded-full text-white shrink-0"
-              style={{ background:"var(--nimi-green)",
+              style={{ background:"var(--ds-brand-primary)",
                 boxShadow:"0 0 0 3px rgba(34,197,94,0.25)" }}
             >
               {t("treasureReady")}
@@ -206,7 +206,7 @@ function ChallengeCard({
             <motion.div key="done"
               initial={{ scale:0 }} animate={{ scale:1 }}
               className="w-8 h-8 rounded-full flex items-center justify-center"
-              style={{ background:"var(--nimi-green)" }}
+              style={{ background:"var(--ds-brand-primary)" }}
             >
               <Check className="w-4 h-4 text-white" strokeWidth={2.5} />
             </motion.div>
@@ -219,7 +219,7 @@ function ChallengeCard({
               onClick={() => onClaim(challenge)}
               disabled={claiming}
               className="text-2xs font-black px-3 py-1.5 rounded-xl text-white shadow-md disabled:opacity-60 transition-opacity"
-              style={{ background:"var(--nimi-green)" }}
+              style={{ background:"var(--ds-brand-primary)" }}
             >
               {claiming ? "…" : t("treasureClaim")}
             </motion.button>

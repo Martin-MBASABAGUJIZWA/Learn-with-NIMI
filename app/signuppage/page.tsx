@@ -3,19 +3,30 @@
 import { Suspense, useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { motion, MotionConfig } from "framer-motion";
-import { User, Mail, Lock, Eye, EyeOff, UserPlus, Star, Gift, ChevronDown } from "lucide-react";
+import { motion, MotionConfig, AnimatePresence } from "framer-motion";
+import { User, Mail, Lock, Eye, EyeOff, Plane, Gift, ChevronDown, Star } from "lucide-react";
 import supabase from "@/lib/supabaseClient";
 import { PENDING_REF_KEY, REFERRAL_CODE_LENGTH } from "@/lib/referralConstants";
-import AuthBackground from "@/components/auth/AuthBackground";
 import { useThemeMotion } from "@/hooks/useThemeMotion";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAppTheme } from "@/contexts/AppThemeProvider";
 import { getThemeAssets } from "@/lib/design-system/assetRegistry";
 
+const DOTS = [
+  { top: "5%",  left: "10%",  d: 0    },
+  { top: "10%", left: "35%",  d: 0.4  },
+  { top: "6%",  right: "15%", d: 0.8  },
+  { top: "18%", left: "5%",   d: 0.2  },
+  { top: "22%", right: "25%", d: 1.0  },
+  { top: "30%", left: "28%",  d: 0.6  },
+  { top: "42%", right: "8%",  d: 1.3  },
+  { top: "55%", left: "12%",  d: 0.3  },
+  { top: "68%", right: "18%", d: 0.9  },
+] as const;
+
 export default function SignupPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-gray-50" />}>
+    <Suspense fallback={<div className="min-h-screen bg-[var(--ds-surface-card)]" />}>
       <SignupInner />
     </Suspense>
   );
@@ -25,30 +36,31 @@ function SignupInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { t } = useLanguage();
-  const { themeId } = useAppTheme();
+  const { themeId, theme } = useAppTheme();
   const assets = getThemeAssets(themeId);
-
   const m = useThemeMotion();
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [referralCode, setReferralCode]   = useState<string | null>(null);
-  const [referrerName, setReferrerName]   = useState<string | null>(null);
-  const [codeInput, setCodeInput]         = useState("");
-  const [codeOpen, setCodeOpen]           = useState(false);
-  const [codeError, setCodeError]         = useState("");
-  const [validating, setValidating]       = useState(false);
-  const [linkChecking, setLinkChecking]   = useState(false);
-  const [linkInvalid, setLinkInvalid]     = useState(false);
 
+  const [name,            setName]           = useState("");
+  const [email,           setEmail]          = useState("");
+  const [password,        setPassword]       = useState("");
+  const [confirmPassword, setConfirmPassword]= useState("");
+  const [showPassword,    setShowPassword]   = useState(false);
+  const [showConfirm,     setShowConfirm]    = useState(false);
+  const [agreed,          setAgreed]         = useState(true);
+  const [loading,         setLoading]        = useState(false);
+  const [error,           setError]          = useState("");
 
+  const [referralCode, setReferralCode] = useState<string | null>(null);
+  const [referrerName, setReferrerName] = useState<string | null>(null);
+  const [codeInput,    setCodeInput]    = useState("");
+  const [codeOpen,     setCodeOpen]     = useState(false);
+  const [codeError,    setCodeError]    = useState("");
+  const [validating,   setValidating]   = useState(false);
+  const [linkChecking, setLinkChecking] = useState(false);
+  const [linkInvalid,  setLinkInvalid]  = useState(false);
 
-  // Single effect: handle ?ref= link OR restore sessionStorage.
-  // Code is ONLY committed to state/sessionStorage after validation passes.
   useEffect(() => {
     const ref = searchParams?.get("ref");
-
     if (ref) {
       const clean = ref.toUpperCase().slice(0, REFERRAL_CODE_LENGTH);
       setLinkChecking(true);
@@ -67,28 +79,23 @@ function SignupInner() {
         .finally(() => setLinkChecking(false));
       return;
     }
-
-    // No URL param — restore a previously validated code from sessionStorage
     const stored = sessionStorage.getItem(PENDING_REF_KEY);
-    if (stored) {
-      setReferralCode(stored);
-      setCodeInput(stored);
-    }
+    if (stored) { setReferralCode(stored); setCodeInput(stored); }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const applyCode = async () => {
     const clean = codeInput.trim().toUpperCase();
     if (!clean) { setCodeError("Please enter a code."); return; }
-    if (clean.length !== REFERRAL_CODE_LENGTH) { setCodeError(`Codes are ${REFERRAL_CODE_LENGTH} characters — check and try again.`); return; }
+    if (clean.length !== REFERRAL_CODE_LENGTH) { setCodeError(`Codes are ${REFERRAL_CODE_LENGTH} characters.`); return; }
     setValidating(true);
     try {
       const res  = await fetch(`/api/referral/validate?code=${encodeURIComponent(clean)}`);
-      if (!res.ok) { setCodeError("That code doesn't exist. Double-check it and try again."); return; }
+      if (!res.ok) { setCodeError("That code doesn't exist."); return; }
       const json = await res.json() as { valid: boolean; referrerName?: string };
       setReferrerName(json.referrerName ?? null);
     } catch {
-      setCodeError("Couldn't verify the code. Check your connection and try again.");
+      setCodeError("Couldn't verify the code. Check your connection.");
       return;
     } finally { setValidating(false); }
     sessionStorage.setItem(PENDING_REF_KEY, clean);
@@ -96,51 +103,22 @@ function SignupInner() {
     setCodeError("");
     setCodeOpen(false);
   };
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [agreed, setAgreed] = useState(true);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
 
   const signup = async () => {
-    if (!name.trim() || !email.trim() || !password) {
-      setError(t("signupErrFillAll"));
-      return;
-    }
-    if (password !== confirmPassword) {
-      setError(t("signupErrNoMatch"));
-      return;
-    }
-    if (!agreed) {
-      setError(t("signupErrTerms"));
-      return;
-    }
-
+    if (!name.trim() || !email.trim() || !password) { setError(t("signupErrFillAll")); return; }
+    if (password !== confirmPassword) { setError(t("signupErrNoMatch")); return; }
+    if (!agreed) { setError(t("signupErrTerms")); return; }
     setLoading(true);
     setError("");
-
-    const { data, error: signUpError } = await supabase.auth.signUp({
-      email,
-      password,
-    });
-
-    if (signUpError) {
-      setError(signUpError.message);
-      setLoading(false);
-      return;
-    }
-
+    const { data, error: signUpError } = await supabase.auth.signUp({ email, password });
+    if (signUpError) { setError(signUpError.message); setLoading(false); return; }
     if (data.user) {
-      // Upsert parent row (trigger may have already created it)
       await supabase.from("parents").upsert(
         { id: data.user.id, email: data.user.email ?? email, name },
-        { onConflict: "id" }
+        { onConflict: "id" },
       );
-
       const { data: { session } } = await supabase.auth.getSession();
-
       if (session?.access_token) {
-        // Session available immediately (email verification disabled) — apply now
         void fetch("/api/account/welcome-email", {
           method: "POST",
           headers: { Authorization: `Bearer ${session.access_token}` },
@@ -155,264 +133,354 @@ function SignupInner() {
         }
         router.replace("/onboarding");
       } else {
-        // Email verification required — code stays in sessionStorage.
-        // The onboarding page will pick it up and apply it once the session is live.
         router.replace("/onboarding?verify=1");
       }
     } else {
       setError(t("signupErrNoUser"));
     }
-
     setLoading(false);
+  };
+
+  const onFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    e.target.style.borderColor = "var(--ds-state-focus)";
+    e.target.style.boxShadow   = "0 0 0 3px var(--ds-brand-soft)";
+  };
+  const onBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    e.target.style.borderColor = "var(--ds-border-primary)";
+    e.target.style.boxShadow   = "none";
   };
 
   return (
     <MotionConfig reducedMotion="user">
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center px-4 py-10 sm:py-14 relative overflow-hidden">
+      <div className={`min-h-screen flex flex-col lg:flex-row relative overflow-hidden bg-gradient-to-br ${theme.gradients.pageBg}`}>
 
-      <AuthBackground />
+        {/* Ambient dots */}
+        <div className="absolute inset-0 pointer-events-none select-none">
+          {DOTS.map((d, i) => (
+            <motion.div key={i}
+              className="absolute w-[3px] h-[3px] rounded-full bg-[var(--ds-text-brand)]"
+              style={{ top: d.top, ...(("left" in d) ? { left: d.left } : { right: (d as { right: string }).right }) }}
+              animate={{ opacity: [0.15, 0.70, 0.15] }}
+              transition={{ duration: 2.8 + (i % 4) * 0.5, repeat: Infinity, ease: "easeInOut", delay: d.d }} />
+          ))}
+        </div>
 
-      <div className="relative z-10 w-full max-w-6xl mx-auto lg:grid lg:grid-cols-2 lg:gap-12 lg:items-center">
+        {/* ── Left hero panel ───────────────────────────────────────── */}
+        <div className="relative z-10 flex flex-col justify-between px-6 py-8 lg:w-[42%] lg:py-14 lg:px-12">
 
-        {/* Left: hero copy + mascot */}
-        <div className="text-center lg:text-left mb-10 lg:mb-0">
-          <span className="inline-flex items-center gap-2 bg-[var(--ds-brand-subtle)] border border-[var(--ds-border-brand)]/20 rounded-full px-4 py-1.5 text-sm font-bold text-[var(--ds-brand-primary)]">
-            <Star className="w-3.5 h-3.5 text-yellow-500" fill="currentColor" /> Create your account
-          </span>
-
-          <h1 className="font-black text-4xl sm:text-5xl lg:text-6xl text-ds-text leading-tight mt-4">
-            Start Your<br />
-            <span className="text-[var(--ds-brand-primary)]">Adventure!</span>
-          </h1>
-
-          <p className="text-gray-500 mt-4 text-sm sm:text-base max-w-sm mx-auto lg:mx-0">
-            Join Nimipiko Studio and unlock a world of creativity.
-          </p>
-
-          <div className="mt-10 flex flex-col items-center lg:items-start gap-2">
-            <div className="bg-white border border-ds-border rounded-2xl rounded-bl-sm shadow-sm px-4 py-3 max-w-[220px] ml-0 sm:ml-10">
-              <p className="text-sm font-bold text-ds-text text-center leading-snug">
-                I can&apos;t wait to see what we&apos;ll create together! ✨
+          {/* Wordmark */}
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-full flex items-center justify-center bg-[var(--ds-brand-soft)]"
+              style={{ border: "1px solid var(--ds-border-brand)" }}>
+              <Plane className="w-4 h-4 text-[var(--ds-text-brand)]" />
+            </div>
+            <div>
+              <p className="font-black tracking-[0.24em] text-[10px] uppercase text-[var(--ds-text-brand)]">
+                Nimipiko Airways
+              </p>
+              <p className="text-[var(--ds-text-secondary)] text-[9px] font-nunito tracking-widest uppercase">
+                New Passenger Registration
               </p>
             </div>
-            <motion.img
-              src={assets.nimiAuth} alt="NIMI"
-              className="w-56 h-56 sm:w-64 sm:h-64 rounded-full object-cover -mt-2"
-              animate={{ y: [0, -10, 0] }}
-              transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }} />
-          </div>
-        </div>
-
-        {/* Right: sign-up card */}
-        <div className="w-full max-w-md mx-auto lg:mx-0 bg-white border border-ds-border shadow-ds-card p-6 sm:p-8 space-y-4" style={{ borderRadius: 'var(--leaf-r-lg)' }}>
-
-          <div className="flex flex-col items-center text-center mb-1">
-            <div className="w-16 h-16 rounded-full bg-[var(--ds-brand-subtle)] flex items-center justify-center mb-3">
-              <UserPlus className="w-7 h-7 text-[var(--ds-brand-primary)]" />
-            </div>
-            <h2 className="font-black text-2xl text-ds-text">Sign Up</h2>
-            <p className="text-gray-500 text-sm mt-1">Create your account to begin your creative journey.</p>
           </div>
 
-          {/* Trial badge */}
-          <div className="flex items-center gap-2.5 bg-emerald-50 border border-emerald-200 rounded-xl px-3.5 py-2.5">
-            <span className="text-xl shrink-0">🎁</span>
-            <div>
-              <p className="font-baloo font-black text-emerald-800 text-[13px] leading-tight">7-day free trial included</p>
-              <p className="text-emerald-700/80 text-[11px]">Full Club access free — no credit card needed</p>
-            </div>
-          </div>
-
-          {error && (
-            <div className="leaf p-2.5 text-center text-sm font-semibold bg-red-50 text-red-600">
-              {error}
-            </div>
-          )}
-
-          {/* Referral code — link checking / applied / invalid / manual entry */}
-          {linkChecking ? (
-            <div className="bg-gray-50 border border-ds-border rounded-xl px-4 py-3 flex items-center gap-3">
-              <span className="w-4 h-4 border-2 border-gray-300 border-t-emerald-500 rounded-full animate-spin shrink-0" />
-              <p className="font-nunito text-gray-500 text-[13px]">Checking your invite link…</p>
-            </div>
-          ) : linkInvalid ? (
-            <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 flex items-center gap-3">
-              <span className="text-xl shrink-0">⚠️</span>
-              <div className="flex-1 min-w-0">
-                <p className="font-baloo font-black text-red-700 text-[13px]">This invite link is invalid or has expired.</p>
-                <p className="font-nunito text-red-500/80 text-[11px]">Ask your friend to share their code directly, or enter it below.</p>
+          {/* Hero copy + benefits + Nimi */}
+          <div className="mt-8 lg:mt-0 lg:flex-1 flex flex-col justify-center items-center lg:items-start gap-5">
+            <div className="lg:text-left text-center">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full mb-3 bg-[var(--ds-brand-soft)]"
+                style={{ border: "1px solid var(--ds-border-brand)" }}>
+                <Star className="w-3.5 h-3.5 text-[var(--ds-text-brand)]" fill="currentColor" />
+                <span className="font-black text-[10px] tracking-[0.16em] uppercase text-[var(--ds-text-brand)]">
+                  7-day free trial
+                </span>
               </div>
-              <button onClick={() => { setLinkInvalid(false); setCodeOpen(true); }}
-                className="text-[11px] text-red-500 hover:text-red-700 font-bold shrink-0">Enter code</button>
+              <h1 className="font-baloo font-black text-[var(--ds-text-primary)] leading-tight text-3xl sm:text-4xl lg:text-5xl">
+                Register Your<br />
+                <span className="text-[var(--ds-text-brand)]">Family Account ✈️</span>
+              </h1>
+              <p className="text-[var(--ds-text-secondary)] font-nunito mt-2 text-sm max-w-xs">
+                Create your parent account and book your children's learning journey with Nimipiko Airways.
+              </p>
             </div>
-          ) : referralCode ? (
-            <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-3 flex items-center gap-3">
-              <span className="text-2xl shrink-0">🎁</span>
-              <div className="flex-1 min-w-0">
-                <p className="font-baloo font-black text-green-700 text-[13px]">
-                  {referrerName ? `${referrerName} invited you!` : "Referral code applied!"}
-                </p>
-                <p className="font-nunito text-green-600/80 text-[11px]">
-                  Code <strong>{referralCode}</strong> · You both get 1 free month when you subscribe.
-                </p>
-              </div>
-              <button onClick={() => { setReferralCode(null); setReferrerName(null); setCodeInput(""); setCodeOpen(true); sessionStorage.removeItem(PENDING_REF_KEY); }}
-                className="text-[11px] text-green-500 hover:text-green-700 font-bold shrink-0">Change</button>
-            </div>
-          ) : (
-            <div>
-              <button onClick={() => setCodeOpen(o => !o)}
-                className="flex items-center gap-1.5 text-[12px] font-bold text-gray-400 hover:text-gray-600 transition w-full">
-                <Gift className="w-3.5 h-3.5" />
-                Have a referral code?
-                <ChevronDown className={`w-3.5 h-3.5 ml-auto transition-transform ${codeOpen ? "rotate-180" : ""}`} />
-              </button>
-              {codeOpen && (
-                <div className="mt-2 flex gap-2">
-                  <input
-                    type="text"
-                    value={codeInput}
-                    onChange={e => { setCodeInput(e.target.value.toUpperCase()); setCodeError(""); }}
-                    onKeyDown={e => e.key === "Enter" && applyCode()}
-                    placeholder="e.g. ABC12345"
-                    maxLength={REFERRAL_CODE_LENGTH}
-                    className="flex-1 border border-ds-border bg-ds-input rounded-xl px-3 py-2 text-[13px] font-mono font-bold tracking-widest focus:outline-none focus:ring-2 focus:ring-[var(--ds-state-focus)] uppercase"
-                  />
-                  <button onClick={applyCode} disabled={validating}
-                    className="px-4 py-2 bg-[var(--nimi-green)] text-white font-black text-[12px] rounded-xl hover:opacity-90 active:scale-95 transition disabled:opacity-60 flex items-center gap-1.5">
-                    {validating && <span className="w-3 h-3 border-2 border-white/40 border-t-white rounded-full animate-spin" />}
-                    {validating ? "Checking…" : "Apply"}
-                  </button>
+
+            <div className="hidden lg:flex flex-col gap-2">
+              {["Personalised journey for each child", "Boarding pass, passport & badge for your kids", "Progress tracking across 3 languages"].map(b => (
+                <div key={b} className="flex items-center gap-2.5">
+                  <div className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 bg-[var(--ds-brand-soft)]">
+                    <span className="text-[10px] text-[var(--ds-text-brand)]">✓</span>
+                  </div>
+                  <p className="font-nunito text-[var(--ds-text-secondary)] text-[13px]">{b}</p>
                 </div>
-              )}
-              {codeError && <p className="text-red-500 text-[11px] mt-1 font-nunito">{codeError}</p>}
+              ))}
             </div>
-          )}
 
-          {/* Full Name */}
-          <div className="flex items-center gap-3 border border-ds-border bg-ds-input leaf px-3 py-2 focus-within:ring-2 focus-within:ring-[var(--ds-state-focus)] transition">
-            <div className="w-9 h-9 rounded-xl bg-[var(--ds-brand-subtle)] flex items-center justify-center flex-shrink-0">
-              <User className="w-4 h-4 text-[var(--ds-brand-primary)]" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <label htmlFor="signup-name" className="block text-xs font-bold text-gray-500">Full Name</label>
-              <input
-                id="signup-name"
-                type="text" value={name}
-                onChange={e => setName(e.target.value)}
-                placeholder={t("signupPlaceholderName")}
-                disabled={loading}
-                className="w-full text-sm font-semibold text-ds-text placeholder:text-gray-400 focus:outline-none bg-transparent" />
+            <div className="flex items-end gap-3">
+              <motion.img src={assets.nimiCircle} alt="NIMI"
+                className="w-20 h-20 rounded-full object-cover shrink-0"
+                style={{ border: "3px solid var(--ds-border-brand)", boxShadow: "0 0 24px var(--ds-brand-soft)" }}
+                animate={{ y: [0, -8, 0] }}
+                transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }} />
+              <div className="rounded-2xl rounded-bl-sm px-4 py-2.5 max-w-[180px]"
+                style={{ background: "var(--ds-surface-nav)", border: "1px solid var(--ds-border-brand)" }}>
+                <p className="font-nunito font-bold text-[var(--ds-text-brand)] text-[13px] leading-snug">
+                  I&apos;ll take good care of your little explorers! ✨
+                </p>
+              </div>
             </div>
           </div>
+        </div>
 
-          {/* Email */}
-          <div className="flex items-center gap-3 border border-ds-border bg-ds-input leaf px-3 py-2 focus-within:ring-2 focus-within:ring-[var(--ds-state-focus)] transition">
-            <div className="w-9 h-9 rounded-xl bg-[var(--ds-brand-subtle)] flex items-center justify-center flex-shrink-0">
-              <Mail className="w-4 h-4 text-[var(--ds-brand-primary)]" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <label htmlFor="signup-email" className="block text-xs font-bold text-gray-500">Email Address</label>
-              <input
-                id="signup-email"
-                type="email" value={email}
-                onChange={e => setEmail(e.target.value)}
-                placeholder={t("signupPlaceholderEmail")}
-                disabled={loading}
-                className="w-full text-sm font-semibold text-ds-text placeholder:text-gray-400 focus:outline-none bg-transparent" />
-            </div>
-          </div>
-
-          {/* Password */}
-          <div className="flex items-center gap-3 border border-ds-border bg-ds-input leaf px-3 py-2 focus-within:ring-2 focus-within:ring-[var(--ds-state-focus)] transition">
-            <div className="w-9 h-9 rounded-xl bg-[var(--ds-brand-subtle)] flex items-center justify-center flex-shrink-0">
-              <Lock className="w-4 h-4 text-[var(--ds-brand-primary)]" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <label htmlFor="signup-password" className="block text-xs font-bold text-gray-500">Password</label>
-              <input
-                id="signup-password"
-                type={showPassword ? "text" : "password"} value={password}
-                onChange={e => setPassword(e.target.value)}
-                placeholder={t("signupPlaceholderPassword")}
-                disabled={loading}
-                className="w-full text-sm font-semibold text-ds-text placeholder:text-gray-400 focus:outline-none bg-transparent" />
-            </div>
-            <button type="button" onClick={() => setShowPassword(p => !p)}
-              className="flex-shrink-0 text-gray-400 hover:text-gray-600 transition">
-              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-            </button>
-          </div>
-
-          {/* Confirm Password */}
-          <div className="flex items-center gap-3 border border-ds-border bg-ds-input leaf px-3 py-2 focus-within:ring-2 focus-within:ring-[var(--ds-state-focus)] transition">
-            <div className="w-9 h-9 rounded-xl bg-[var(--ds-brand-subtle)] flex items-center justify-center flex-shrink-0">
-              <Lock className="w-4 h-4 text-[var(--ds-brand-primary)]" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <label htmlFor="signup-confirm" className="block text-xs font-bold text-gray-500">Confirm Password</label>
-              <input
-                id="signup-confirm"
-                type={showConfirmPassword ? "text" : "password"} value={confirmPassword}
-                onChange={e => setConfirmPassword(e.target.value)}
-                onKeyDown={e => e.key === "Enter" && signup()}
-                placeholder={t("signupPlaceholderConfirm")}
-                disabled={loading}
-                className="w-full text-sm font-semibold text-ds-text placeholder:text-gray-400 focus:outline-none bg-transparent" />
-            </div>
-            <button type="button" onClick={() => setShowConfirmPassword(p => !p)}
-              className="flex-shrink-0 text-gray-400 hover:text-gray-600 transition">
-              {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-            </button>
-          </div>
-
-          {/* Terms */}
-          <label className="flex items-start gap-2 text-sm text-gray-600 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={agreed}
-              onChange={e => setAgreed(e.target.checked)}
-              className="w-4 h-4 mt-0.5 accent-green-600 rounded flex-shrink-0" />
-            <span>
-              I agree to the{" "}
-              <Link href="/terms" target="_blank" className="text-ds-text font-bold hover:underline">Terms of Service</Link>{" "}
-              and{" "}
-              <Link href="/privacy" target="_blank" className="text-ds-text font-bold hover:underline">Privacy Policy</Link>
-            </span>
-          </label>
-
-          <motion.button
-            onClick={signup}
-            disabled={loading}
-            whileTap={m.buttonPress}
-            className="w-full text-white font-black py-3.5 shadow-md transition disabled:opacity-60 flex items-center justify-center gap-2"
-            style={{ backgroundColor: 'var(--nimi-green)', borderRadius: 'var(--leaf-r)' }}
+        {/* ── Right: registration card ──────────────────────────────── */}
+        <div className="relative z-10 flex-1 flex items-start lg:items-center justify-center px-4 py-6 lg:py-14 lg:pr-12">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ type: "spring", stiffness: 200, damping: 22, delay: 0.1 }}
+            className="w-full max-w-md"
           >
-            {loading ? t("signupCreating") : <>🚀 {t("signupCreateBtn")}</>}
-          </motion.button>
+            <div className="bg-[var(--ds-surface-card)] overflow-hidden rounded-[20px]"
+              style={{ boxShadow: "0 24px 60px rgba(0,0,0,0.45)" }}>
 
-          <p className="text-center text-sm text-gray-600">
-            Already have an account?{" "}
-            <Link href="/loginpage" className="text-[var(--nimi-green)] font-bold hover:underline">
-              Log in
-            </Link>
-          </p>
+              {/* Card header */}
+              <div className="px-6 py-4 flex items-center justify-between"
+                style={{ background: "linear-gradient(135deg, var(--ds-nav-bg) 0%, var(--ds-surface-nav) 100%)" }}>
+                <div>
+                  <p className="font-black tracking-[0.22em] text-[9px] uppercase text-[var(--ds-text-brand)]">
+                    Nimipiko Airways
+                  </p>
+                  <p className="font-baloo font-black text-[var(--ds-text-primary)] text-base leading-tight">
+                    Family Account 🎟️
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="text-[9px] font-black tracking-[0.18em] uppercase text-[var(--ds-text-secondary)]">Class</p>
+                  <p className="font-baloo font-black text-sm text-[var(--ds-text-brand)]">EXPLORER</p>
+                </div>
+              </div>
+
+              {/* Perforation */}
+              <div className="relative h-5 flex items-center overflow-hidden bg-[var(--ds-surface-card-hover)]">
+                <div className="absolute -left-3 w-6 h-6 rounded-full bg-[var(--ds-nav-bg)]" />
+                <div className="flex-1 mx-4 border-t-2 border-dashed border-[var(--ds-border-strong)]" />
+                <div className="absolute -right-3 w-6 h-6 rounded-full bg-[var(--ds-nav-bg)]" />
+              </div>
+
+              {/* Form */}
+              <div className="px-6 py-5 space-y-3.5 bg-[var(--ds-surface-card-hover)]">
+
+                <AnimatePresence mode="wait">
+                  {error && (
+                    <motion.div key={error}
+                      initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+                      className="rounded-xl px-4 py-2.5 text-sm font-semibold text-center bg-red-50 text-red-600 border border-red-200">
+                      {error}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Trial badge */}
+                <div className="flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 bg-[var(--ds-brand-soft)]"
+                  style={{ border: "1px solid var(--ds-border-brand)" }}>
+                  <span className="text-lg shrink-0">🎁</span>
+                  <div>
+                    <p className="font-baloo font-black text-[13px] leading-tight text-[var(--ds-text-primary)]">
+                      7-day free trial included
+                    </p>
+                    <p className="font-nunito text-[11px] text-[var(--ds-text-secondary)]">
+                      Full Club access — no credit card needed
+                    </p>
+                  </div>
+                </div>
+
+                {/* Referral */}
+                {linkChecking ? (
+                  <div className="rounded-xl px-4 py-3 flex items-center gap-3 bg-[var(--ds-surface-card)] border border-[var(--ds-border-primary)]">
+                    <span className="w-4 h-4 border-2 border-gray-300 border-t-[var(--ds-brand-primary)] rounded-full animate-spin shrink-0" />
+                    <p className="font-nunito text-[var(--ds-text-secondary)] text-[13px]">Checking your invite…</p>
+                  </div>
+                ) : linkInvalid ? (
+                  <div className="rounded-xl px-4 py-3 flex items-center gap-3 bg-red-50 border border-red-200">
+                    <span className="text-xl shrink-0">⚠️</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-baloo font-black text-red-700 text-[13px]">Invalid invite link.</p>
+                      <p className="font-nunito text-red-500/80 text-[11px]">Enter your code below.</p>
+                    </div>
+                    <button onClick={() => { setLinkInvalid(false); setCodeOpen(true); }}
+                      className="text-[11px] text-red-500 hover:text-red-700 font-bold shrink-0">Enter code</button>
+                  </div>
+                ) : referralCode ? (
+                  <div className="rounded-xl px-4 py-3 flex items-center gap-3 bg-[var(--ds-surface-card)] border border-[var(--ds-border-brand)]">
+                    <span className="text-2xl shrink-0">🎁</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-baloo font-black text-[13px] text-[var(--ds-text-primary)]">
+                        {referrerName ? `${referrerName} invited you!` : "Referral code applied!"}
+                      </p>
+                      <p className="font-nunito text-[11px] text-[var(--ds-text-secondary)]">
+                        Code <strong>{referralCode}</strong> · You both get 1 free month.
+                      </p>
+                    </div>
+                    <button onClick={() => { setReferralCode(null); setReferrerName(null); setCodeInput(""); setCodeOpen(true); sessionStorage.removeItem(PENDING_REF_KEY); }}
+                      className="text-[11px] font-bold shrink-0 text-[var(--ds-text-brand)]">Change</button>
+                  </div>
+                ) : (
+                  <div>
+                    <button onClick={() => setCodeOpen(o => !o)}
+                      className="flex items-center gap-1.5 text-[12px] font-bold text-[var(--ds-text-secondary)] hover:text-[var(--ds-text-primary)] transition w-full">
+                      <Gift className="w-3.5 h-3.5" />
+                      Have a referral code?
+                      <ChevronDown className={`w-3.5 h-3.5 ml-auto transition-transform ${codeOpen ? "rotate-180" : ""}`} />
+                    </button>
+                    {codeOpen && (
+                      <div className="mt-2 flex gap-2">
+                        <input type="text" value={codeInput}
+                          onChange={e => { setCodeInput(e.target.value.toUpperCase()); setCodeError(""); }}
+                          onKeyDown={e => e.key === "Enter" && applyCode()}
+                          placeholder="e.g. ABC12345" maxLength={REFERRAL_CODE_LENGTH}
+                          onFocus={onFocus} onBlur={onBlur}
+                          className="flex-1 border-2 border-[var(--ds-border-primary)] bg-[var(--ds-surface-card)] rounded-xl px-3 py-2 text-[13px] font-mono font-bold tracking-widest focus:outline-none uppercase transition" />
+                        <button onClick={applyCode} disabled={validating}
+                          className="px-4 py-2 font-black text-[12px] rounded-xl hover:opacity-90 active:scale-95 transition disabled:opacity-60 flex items-center gap-1.5 text-[var(--ds-nav-bg)] bg-[var(--ds-brand-primary)]">
+                          {validating && <span className="w-3 h-3 border-2 border-white/40 border-t-white rounded-full animate-spin" />}
+                          {validating ? "…" : "Apply"}
+                        </button>
+                      </div>
+                    )}
+                    {codeError && <p className="text-red-500 text-[11px] mt-1">{codeError}</p>}
+                  </div>
+                )}
+
+                {/* Name */}
+                <div>
+                  <label className="block font-black text-[9px] uppercase tracking-[0.22em] mb-1.5 text-[var(--ds-text-brand)]">
+                    Your Name
+                  </label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--ds-text-tertiary)]" />
+                    <input type="text" value={name}
+                      onChange={e => setName(e.target.value)} disabled={loading}
+                      placeholder={t("signupPlaceholderName")}
+                      onFocus={onFocus} onBlur={onBlur}
+                      className="w-full pl-9 pr-4 py-2.5 text-sm font-semibold text-[var(--ds-text-primary)] bg-[var(--ds-surface-card)] border-2 border-[var(--ds-border-primary)] rounded-xl focus:outline-none transition placeholder:text-[var(--ds-text-tertiary)]" />
+                  </div>
+                </div>
+
+                {/* Email */}
+                <div>
+                  <label className="block font-black text-[9px] uppercase tracking-[0.22em] mb-1.5 text-[var(--ds-text-brand)]">
+                    Your Email
+                  </label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--ds-text-tertiary)]" />
+                    <input type="email" value={email}
+                      onChange={e => setEmail(e.target.value)} disabled={loading}
+                      placeholder={t("signupPlaceholderEmail")}
+                      onFocus={onFocus} onBlur={onBlur}
+                      className="w-full pl-9 pr-4 py-2.5 text-sm font-semibold text-[var(--ds-text-primary)] bg-[var(--ds-surface-card)] border-2 border-[var(--ds-border-primary)] rounded-xl focus:outline-none transition placeholder:text-[var(--ds-text-tertiary)]" />
+                  </div>
+                </div>
+
+                {/* Password */}
+                <div>
+                  <label className="block font-black text-[9px] uppercase tracking-[0.22em] mb-1.5 text-[var(--ds-text-brand)]">
+                    Boarding Code
+                  </label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--ds-text-tertiary)]" />
+                    <input type={showPassword ? "text" : "password"} value={password}
+                      onChange={e => setPassword(e.target.value)} disabled={loading}
+                      placeholder={t("signupPlaceholderPassword")}
+                      onFocus={onFocus} onBlur={onBlur}
+                      className="w-full pl-9 pr-10 py-2.5 text-sm font-semibold text-[var(--ds-text-primary)] bg-[var(--ds-surface-card)] border-2 border-[var(--ds-border-primary)] rounded-xl focus:outline-none transition placeholder:text-[var(--ds-text-tertiary)]" />
+                    <button type="button" onClick={() => setShowPassword(p => !p)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--ds-text-tertiary)] hover:text-[var(--ds-text-secondary)] transition">
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Confirm */}
+                <div>
+                  <label className="block font-black text-[9px] uppercase tracking-[0.22em] mb-1.5 text-[var(--ds-text-brand)]">
+                    Confirm Code
+                  </label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--ds-text-tertiary)]" />
+                    <input type={showConfirm ? "text" : "password"} value={confirmPassword}
+                      onChange={e => setConfirmPassword(e.target.value)}
+                      onKeyDown={e => e.key === "Enter" && signup()}
+                      disabled={loading}
+                      placeholder={t("signupPlaceholderConfirm")}
+                      onFocus={onFocus} onBlur={onBlur}
+                      className="w-full pl-9 pr-10 py-2.5 text-sm font-semibold text-[var(--ds-text-primary)] bg-[var(--ds-surface-card)] border-2 border-[var(--ds-border-primary)] rounded-xl focus:outline-none transition placeholder:text-[var(--ds-text-tertiary)]" />
+                    <button type="button" onClick={() => setShowConfirm(p => !p)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--ds-text-tertiary)] hover:text-[var(--ds-text-secondary)] transition">
+                      {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Terms */}
+                <label className="flex items-start gap-2 text-xs text-[var(--ds-text-secondary)] cursor-pointer select-none">
+                  <input type="checkbox" checked={agreed}
+                    onChange={e => setAgreed(e.target.checked)}
+                    className="w-3.5 h-3.5 mt-0.5 rounded flex-shrink-0 accent-[var(--ds-brand-primary)]" />
+                  <span>
+                    I agree to the{" "}
+                    <Link href="/terms" target="_blank" className="font-bold text-[var(--ds-text-brand)] hover:underline">Terms of Service</Link>{" "}
+                    and{" "}
+                    <Link href="/privacy" target="_blank" className="font-bold text-[var(--ds-text-brand)] hover:underline">Privacy Policy</Link>
+                  </span>
+                </label>
+
+                {/* CTA */}
+                <motion.button onClick={signup} disabled={loading} whileTap={m.buttonPress}
+                  className="w-full font-baloo font-black text-[15px] py-3.5 flex items-center justify-center gap-2 rounded-[14px] transition disabled:opacity-60"
+                  style={{
+                    background: `linear-gradient(135deg, var(--ds-brand-primary) 0%, var(--ds-brand-hover) 100%)`,
+                    color:      "var(--ds-nav-bg)",
+                    boxShadow:  "var(--ds-shadow-cta)",
+                  }}>
+                  {loading ? (
+                    <motion.span animate={{ rotate: [0, 360] }}
+                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}>✈️</motion.span>
+                  ) : (
+                    <><Plane className="w-4 h-4" /> Get My Boarding Pass</>
+                  )}
+                </motion.button>
+
+                <div className="flex items-center gap-3">
+                  <div className="flex-1 h-px bg-[var(--ds-border-strong)]" />
+                  <span className="text-[10px] font-black uppercase tracking-widest text-[var(--ds-text-tertiary)]">or</span>
+                  <div className="flex-1 h-px bg-[var(--ds-border-strong)]" />
+                </div>
+
+                <p className="text-center text-xs text-[var(--ds-text-secondary)] font-nunito">
+                  Already have an account?{" "}
+                  <Link href="/loginpage" className="font-black text-[var(--ds-text-brand)] hover:opacity-80 transition">
+                    Log in here →
+                  </Link>
+                </p>
+              </div>
+
+              {/* Barcode */}
+              <div className="px-6 pb-5 pt-1 flex items-center gap-3 bg-[var(--ds-surface-card-hover)]">
+                <div className="flex gap-[2px] items-end flex-1">
+                  {Array.from({ length: 38 }, (_, i) => (
+                    <div key={i} className="flex-1 bg-[var(--ds-nav-bg)] rounded-sm opacity-80"
+                      style={{ height: `${[10,16,8,20,12,18,8,14,20,10,16,8,18,12,20,10,14,18,8,16,12,20,10,16,8,20,14,10,18,12,16,8,20,10,14,18,8,16][i]}px` }} />
+                  ))}
+                </div>
+                <div className="shrink-0 text-right">
+                  <p className="font-mono text-[7px] font-bold leading-none text-[var(--ds-nav-bg)] opacity-50">NMP-NEW-KGL</p>
+                  <p className="font-mono text-[7px] leading-none text-[var(--ds-nav-bg)] opacity-50">
+                    {new Date().toISOString().slice(0, 10).replace(/-/g, "")}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </motion.div>
         </div>
       </div>
-
-      {/* Bottom mascot bubble */}
-      <div className="relative z-10 flex items-center gap-3 mt-10 max-w-md">
-        <img
-          src={assets.nimiCircle} alt="NIMI"
-          className="w-12 h-12 rounded-full object-cover border-2 border-yellow-400 shadow-md flex-shrink-0"  loading="lazy" />
-        <div className="bg-white border border-ds-border rounded-2xl rounded-bl-sm shadow-sm px-4 py-3">
-          <p className="text-sm font-bold text-ds-text leading-snug">
-            Every great adventure starts with a single step. Let&apos;s go! ✨
-          </p>
-        </div>
-      </div>
-    </div>
     </MotionConfig>
   );
 }
-

@@ -28,7 +28,6 @@ import { getThemeAssets } from "@/lib/design-system/assetRegistry";
 import AppShell              from "@/components/layout/AppShell";
 import { Bone }             from "@/components/ui/Bone";
 import { RefreshingBadge }  from "@/components/layout/RefreshingBadge";
-import CreateExplorerProfile from "@/components/home/CreateExplorerProfile";
 import HomeAdventureSection  from "@/components/home/HomeAdventureSection";
 import HomeStoryLibrarySection from "@/components/home/HomeStoryLibrarySection";
 import HomeStoryJourneyPanel from "@/components/home/HomeStoryJourneyPanel";
@@ -155,7 +154,7 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
   const router = useRouter();
   const m = useThemeMotion();
   const { setLanguage, t } = useLanguage();
-  const { themeId } = useAppTheme();
+  const { themeId, theme } = useAppTheme();
   const assets = getThemeAssets(themeId);
 
   const activeChildRef       = useRef<Child | null>(null);
@@ -509,8 +508,8 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
         </div>
         <button
           onClick={() => { setInitError(false); setLoading(true); void init(); }}
-          className="font-baloo font-black text-white px-8 py-3.5 leaf shadow-lg hover:-translate-y-0.5 active:scale-95 transition-all"
-          style={{ background: "linear-gradient(135deg,#059669,#047857)", boxShadow: "0 6px 22px rgba(5,150,105,0.4)" }}
+          className="font-baloo font-black px-8 py-3.5 leaf shadow-lg hover:-translate-y-0.5 active:scale-95 transition-all"
+          style={{ background: "linear-gradient(135deg,var(--ds-brand-primary),var(--ds-brand-hover))", color: "var(--ds-nav-bg)", boxShadow: "var(--ds-shadow-cta)" }}
         >
           Try Again
         </button>
@@ -518,7 +517,7 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
     </AppShell>
   );
 
-  if (noChildrenYet) return <AppShell><CreateExplorerProfile onCreated={handleCreated} /></AppShell>;
+  if (noChildrenYet) { router.replace("/onboarding"); return null; }
 
   /* ─── Derived ──────────────────────────────────────────────────────────── */
   const WEEK_DAYS = [t("dayMon"), t("dayTue"), t("dayWed"), t("dayThu"), t("dayFri"), t("daySat"), t("daySun")];
@@ -591,7 +590,7 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
           </div>
         </>
       ) : (
-        <div className={`min-h-screen content-enter transition-opacity duration-300${refreshing ? " opacity-50 pointer-events-none" : ""}`} style={{ background: "linear-gradient(180deg, #ecfdf5 0%, #f4fef6 8%, #f9fafb 20%, #ffffff 36%)" }}>
+        <div className={`min-h-screen content-enter transition-opacity duration-300${refreshing ? " opacity-50 pointer-events-none" : ""}`} style={{ background: "linear-gradient(180deg, #f0f4f8 0%, #f5f8fb 40%, #ffffff 100%)" }}>
 
           {/* ════════════════════════════════ HERO ══════════════════════════ */}
           <motion.div
@@ -601,102 +600,61 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
             {/* ═══════════════════════ HERO: WORLD STAGE ═══════════════════════ */}
             <div className="relative overflow-hidden" style={{ minHeight: 460 }}>
 
-              {/* ── Layer 1: Bright daytime sky → lush ground ── */}
-              <div className="absolute inset-0 pointer-events-none" style={{
-                background: "linear-gradient(180deg, #0ea5e9 0%, #38bdf8 25%, #7dd3fc 50%, #d1fae5 72%, #4ade80 88%, #22c55e 100%)"
-              }} />
-              {/* Warm sun glow high up */}
+              {/* ── Layer 1: Hero background ── */}
+              <div className={`absolute inset-0 pointer-events-none bg-gradient-to-br ${theme.gradients.hero}`} />
+              {/* Soft radial glow from top */}
               <div className="absolute inset-x-0 top-0 h-[45%] pointer-events-none"
-                style={{ background: "radial-gradient(ellipse 60% 55% at 50% 0%, rgba(254,240,138,0.30) 0%, transparent 70%)" }} />
+                style={{ background: "radial-gradient(ellipse 60% 55% at 50% 0%, rgba(255,255,255,0.15) 0%, transparent 70%)" }} />
 
-              {/* ── Sky decorations: clouds, stars, birds ── */}
-              {/* Clouds */}
-              <motion.div className="absolute top-[6%] left-[18%] text-4xl pointer-events-none select-none leading-none opacity-80"
-                animate={{ x: [0, 18, 0], y: [0, -4, 0] }} transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}>☁️</motion.div>
-              <motion.div className="absolute top-[3%] left-[52%] text-3.5xl pointer-events-none select-none leading-none opacity-70"
-                animate={{ x: [0, -14, 0], y: [0, -3, 0] }} transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}>☁️</motion.div>
-              <motion.div className="absolute top-[8%] right-[20%] text-3xl pointer-events-none select-none leading-none opacity-75"
-                animate={{ x: [0, 12, 0], y: [0, -5, 0] }} transition={{ duration: 9, repeat: Infinity, ease: "easeInOut", delay: 0.8 }}>⛅</motion.div>
-              {/* Stars in sky */}
-              <motion.div className="absolute top-[4%] left-[28%] text-xl pointer-events-none select-none leading-none"
-                animate={{ scale: [1, 1.4, 1], opacity: [0.6, 1, 0.6] }} transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}>⭐</motion.div>
-              <motion.div className="absolute top-[2%] right-[30%] text-base pointer-events-none select-none leading-none"
+              {/* ── Clouds ── */}
+              <motion.div className="absolute top-[5%] left-[8%] text-5xl pointer-events-none select-none leading-none opacity-85"
+                animate={{ x: [0, 20, 0], y: [0, -5, 0] }} transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}>☁️</motion.div>
+              <motion.div className="absolute top-[2%] left-[46%] text-4xl pointer-events-none select-none leading-none opacity-70"
+                animate={{ x: [0, -16, 0], y: [0, -3, 0] }} transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}>☁️</motion.div>
+              <motion.div className="absolute top-[7%] right-[10%] text-4xl pointer-events-none select-none leading-none opacity-80"
+                animate={{ x: [0, 14, 0], y: [0, -6, 0] }} transition={{ duration: 9, repeat: Infinity, ease: "easeInOut", delay: 0.8 }}>⛅</motion.div>
+              {/* Sparkles */}
+              <motion.div className="absolute top-[5%] left-[30%] text-2xl pointer-events-none select-none leading-none"
+                animate={{ scale: [1, 1.4, 1], opacity: [0.7, 1, 0.7] }} transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}>✨</motion.div>
+              <motion.div className="absolute top-[3%] right-[26%] text-xl pointer-events-none select-none leading-none"
                 animate={{ scale: [1, 1.5, 1], opacity: [0.5, 1, 0.5] }} transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut", delay: 0.7 }}>✨</motion.div>
-              <motion.div className="absolute top-[10%] left-[42%] text-sm pointer-events-none select-none leading-none"
+              <motion.div className="absolute top-[12%] left-[44%] text-lg pointer-events-none select-none leading-none"
                 animate={{ scale: [1, 1.6, 1], opacity: [0.4, 0.9, 0.4] }} transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut", delay: 1.2 }}>⭐</motion.div>
-              {/* Birds flying */}
-              <motion.div className="absolute top-[12%] left-[32%] text-xl pointer-events-none select-none leading-none opacity-80"
-                animate={{ x: [0, 30, 60, 90], y: [0, -6, 2, -4], opacity: [0, 0.8, 0.8, 0] }}
-                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 2 }}>🐦</motion.div>
-              <motion.div className="absolute top-[18%] right-[35%] text-lg pointer-events-none select-none leading-none opacity-80"
-                animate={{ x: [0, -25, -50, -75], y: [0, -5, 3, -3], opacity: [0, 0.8, 0.8, 0] }}
-                transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}>🦅</motion.div>
-              {/* Butterflies near flowers */}
-              <motion.div className="absolute bottom-[22%] left-[18%] text-1.5xl pointer-events-none select-none leading-none opacity-85"
-                animate={{ x: [0, 12, -8, 0], y: [0, -8, -14, 0], rotate: [0, 15, -10, 0] }}
-                transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: 1 }}>🦋</motion.div>
-              <motion.div className="absolute bottom-[20%] right-[18%] text-xl pointer-events-none select-none leading-none opacity-80"
-                animate={{ x: [0, -10, 8, 0], y: [0, -10, -6, 0], rotate: [0, -12, 8, 0] }}
-                transition={{ duration: 4.0, repeat: Infinity, ease: "easeInOut", delay: 2.2 }}>🦋</motion.div>
-              {/* Flowers near ground */}
-              <motion.div className="absolute bottom-[14%] left-[22%] text-lg pointer-events-none select-none leading-none opacity-80"
-                animate={{ rotate: [0, 8, -8, 0], scale: [1, 1.1, 1] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}>🌸</motion.div>
-              <motion.div className="absolute bottom-[12%] right-[22%] text-xl pointer-events-none select-none leading-none opacity-80"
-                animate={{ rotate: [0, -10, 10, 0], scale: [1, 1.12, 1] }} transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 0.8 }}>🌺</motion.div>
-              <motion.div className="absolute bottom-[16%] left-[28%] text-base pointer-events-none select-none leading-none opacity-70"
-                animate={{ rotate: [0, 6, -6, 0] }} transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}>🌼</motion.div>
-              <motion.div className="absolute bottom-[13%] right-[28%] text-base pointer-events-none select-none leading-none opacity-70"
-                animate={{ rotate: [0, -8, 8, 0] }} transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut", delay: 0.4 }}>🌷</motion.div>
+              {/* Butterflies */}
+              <motion.div className="absolute top-[18%] left-[7%] text-4xl pointer-events-none select-none leading-none"
+                animate={{ x: [0, 28, 10, 35, 0], y: [0, -16, 6, -12, 0], rotate: [0, 15, -10, 8, 0] }}
+                transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}>🦋</motion.div>
+              <motion.div className="absolute top-[22%] right-[7%] text-3xl pointer-events-none select-none leading-none"
+                animate={{ x: [0, -22, -8, -30, 0], y: [0, -12, 8, -8, 0], rotate: [0, -12, 8, -5, 0] }}
+                transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 1.8 }}>🦋</motion.div>
+              <motion.div className="absolute top-[9%] left-[63%] text-2xl pointer-events-none select-none leading-none"
+                animate={{ x: [0, 14, -8, 18, 0], y: [0, -14, 5, -8, 0] }}
+                transition={{ duration: 9, repeat: Infinity, ease: "easeInOut", delay: 3.5 }}>🦋</motion.div>
+              {/* Flower cluster — left */}
+              <motion.div className="absolute bottom-[24%] left-[0.5%] text-5xl pointer-events-none select-none leading-none"
+                animate={{ rotate: [0, 8, -6, 0], scale: [1, 1.07, 1] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}>🌸</motion.div>
+              <motion.div className="absolute bottom-[19%] left-[5%] text-4xl pointer-events-none select-none leading-none"
+                animate={{ rotate: [0, -6, 8, 0], scale: [1, 1.09, 1] }} transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}>🌺</motion.div>
+              <motion.div className="absolute bottom-[25%] left-[10%] text-3xl pointer-events-none select-none leading-none"
+                animate={{ rotate: [0, 10, -7, 0], scale: [1, 1.06, 1] }} transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: 0.9 }}>🌼</motion.div>
+              <motion.div className="absolute bottom-[20%] left-[15%] text-2xl pointer-events-none select-none leading-none"
+                animate={{ rotate: [0, -8, 6, 0], scale: [1, 1.08, 1] }} transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut", delay: 1.4 }}>🌷</motion.div>
+              {/* Flower cluster — right */}
+              <motion.div className="absolute bottom-[23%] right-[0.5%] text-5xl pointer-events-none select-none leading-none"
+                animate={{ rotate: [0, -8, 6, 0], scale: [1, 1.07, 1] }} transition={{ duration: 4.2, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}>🌼</motion.div>
+              <motion.div className="absolute bottom-[18%] right-[5%] text-4xl pointer-events-none select-none leading-none"
+                animate={{ rotate: [0, 6, -8, 0], scale: [1, 1.09, 1] }} transition={{ duration: 5.2, repeat: Infinity, ease: "easeInOut", delay: 0.8 }}>🌷</motion.div>
+              <motion.div className="absolute bottom-[24%] right-[10%] text-3xl pointer-events-none select-none leading-none"
+                animate={{ rotate: [0, -6, 8, 0], scale: [1, 1.07, 1] }} transition={{ duration: 4.8, repeat: Infinity, ease: "easeInOut", delay: 1.3 }}>🌸</motion.div>
+              <motion.div className="absolute bottom-[19%] right-[15%] text-2xl pointer-events-none select-none leading-none"
+                animate={{ rotate: [0, 8, -6, 0], scale: [1, 1.06, 1] }} transition={{ duration: 5.8, repeat: Infinity, ease: "easeInOut", delay: 1.9 }}>🌺</motion.div>
 
-              {/* ── Layer 2: World environment assets ── */}
-              {/* Left forest edge */}
-              <img src="/themes/default/world/tree-2.png" alt="" aria-hidden
-                className="absolute bottom-0 left-0 h-[230px] w-auto object-contain pointer-events-none select-none"  loading="lazy" />
-              <img src="/themes/default/world/tree-1.png" alt="" aria-hidden
-                className="absolute bottom-0 left-[7%] h-[175px] w-auto object-contain pointer-events-none select-none opacity-85"  loading="lazy" />
-              <img src="/themes/default/world/birdhouse.png" alt="" aria-hidden
-                className="absolute bottom-14 left-[14%] h-[90px] w-auto object-contain pointer-events-none select-none opacity-90"  loading="lazy" />
-              {/* Right forest edge */}
-              <img src="/themes/default/world/greenhouse.png" alt="" aria-hidden
-                className="absolute bottom-0 right-0 h-[210px] w-auto object-contain pointer-events-none select-none"  loading="lazy" />
-              <img src="/themes/default/world/tree-4.png" alt="" aria-hidden
-                className="absolute bottom-0 right-[7%] h-[170px] w-auto object-contain pointer-events-none select-none opacity-85"  loading="lazy" />
-              <img src="/themes/default/world/tree-3.png" alt="" aria-hidden
-                className="absolute bottom-0 right-[15%] h-[145px] w-auto object-contain pointer-events-none select-none opacity-75"  loading="lazy" />
-              {/* Ground flowers + stones */}
-              <img src="/themes/default/world/flower-garden.png" alt="" aria-hidden
-                className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[65px] w-auto object-contain pointer-events-none select-none opacity-80"  loading="lazy" />
-              <img src="/themes/default/world/stepping-stones.png" alt="" aria-hidden
-                className="absolute bottom-0 left-[38%] h-[42px] w-auto object-contain pointer-events-none select-none opacity-60"  loading="lazy" />
+              {/* ── Layer 2: Ground glow ── */}
+              {/* Subtle bottom fade to blend into page */}
+              <div className="absolute bottom-0 inset-x-0 h-[25%] pointer-events-none"
+                style={{ background: "linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.12) 100%)" }} />
 
-              {/* ── Corner art frames ── */}
-              <Image src="/themes/default/decorations/corner-tl.png" alt="" aria-hidden
-                width={110} height={110} className="absolute top-0 left-0 pointer-events-none select-none opacity-55" />
-              <Image src="/themes/default/decorations/corner-tr.png" alt="" aria-hidden
-                width={110} height={110} className="absolute top-0 right-0 pointer-events-none select-none opacity-55" />
 
-              {/* ── Floating magical orbs ── */}
-              <motion.img src="/themes/default/decorations/floating-1.png" alt="" aria-hidden
-                className="absolute top-10 left-[36%] w-12 pointer-events-none select-none"
-                animate={{ y: [0, -10, 0], rotate: [0, 6, 0] }}
-                transition={{ duration: 4.2, repeat: Infinity, ease: "easeInOut" }}
-                onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
-              <motion.img src="/themes/default/decorations/floating-2.png" alt="" aria-hidden
-                className="absolute top-14 right-[36%] w-10 pointer-events-none select-none"
-                animate={{ y: [0, -8, 0], rotate: [0, -5, 0] }}
-                transition={{ duration: 3.6, repeat: Infinity, ease: "easeInOut", delay: 0.8 }}
-                onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
-              <motion.img src="/themes/default/decorations/floating-3.png" alt="" aria-hidden
-                className="absolute top-7 left-1/2 -translate-x-1/2 w-9 pointer-events-none select-none"
-                animate={{ y: [0, -13, 0] }}
-                transition={{ duration: 5.1, repeat: Infinity, ease: "easeInOut", delay: 1.4 }}
-                onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
-
-              {/* ── Sparkles only — confetti strips removed (too noisy) ── */}
-              <Image src="/themes/default/decorations/sparkle.png" alt="" aria-hidden
-                width={28} height={28} className="absolute top-5 left-[38%] opacity-55 pointer-events-none select-none" />
-              <Image src="/themes/default/decorations/sparkle.png" alt="" aria-hidden
-                width={20} height={20} className="absolute top-8 right-[38%] opacity-45 pointer-events-none select-none" />
 
               {/* ══════════════════════════════════════════════════════════════
                    Layer 3 — CONTENT (3 columns, items aligned to bottom)
@@ -738,7 +696,7 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
                             alt={curStory.title} fill className="object-cover" />
                           <div className="absolute inset-0 bg-black/10 flex items-center justify-center">
                             <div className="w-10 h-10 bg-[var(--ds-surface-card)] rounded-full flex items-center justify-center shadow-xl">
-                              <Play className="w-4 h-4 fill-violet-600 text-violet-600 ml-0.5" />
+                              <Play className="w-4 h-4 fill-[var(--ds-brand-primary)] text-[var(--ds-brand-primary)] ml-0.5" />
                             </div>
                           </div>
                         </div>
@@ -798,8 +756,8 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
 
                     {/* Name + XP section */}
                     <div className="px-5 pt-4 pb-3">
-                      <p className="font-nunito font-semibold text-sky-600 text-2xs tracking-wide mb-0.5 uppercase">
-                        {greeting} ✨
+                      <p className="font-nunito font-semibold text-[var(--ds-text-brand)] text-2xs tracking-wide mb-0.5 uppercase">
+                        {greeting} ✈️
                       </p>
                       <h1 className="font-baloo font-black text-[var(--ds-text-primary)]"
                         style={{ fontSize: "clamp(1.4rem,3.8vw,2rem)", lineHeight: 1.15 }}>
@@ -814,11 +772,11 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
                       <div className="mt-3">
                         <div className="flex items-center justify-between mb-1">
                           <span className="font-nunito font-bold text-[var(--ds-text-tertiary)] text-3xs">{levelInfo?.icon} Lv.{xpLevel} · {levelInfo ? t(levelInfo.labelKey) : ""}</span>
-                          <span className="font-baloo font-black text-emerald-600 text-3xs">{xpIn}/{xpNeeded} ⭐</span>
+                          <span className="font-baloo font-black text-[var(--ds-text-brand)] text-3xs">{xpIn}/{xpNeeded} ⭐</span>
                         </div>
                         <div className="h-2 bg-[var(--ds-surface-card-active)] rounded-full overflow-hidden">
                           <motion.div key={`xp-${activeChild?.id}`} className="h-full rounded-full"
-                            style={{ background: "linear-gradient(90deg,#34d399,#059669)" }}
+                            style={{ background: "linear-gradient(90deg,var(--ds-brand-primary),var(--ds-brand-hover))" }}
                             initial={{ width: 0 }} animate={{ width: `${xpPct}%` }}
                             transition={{ duration: 1.2, ease: "easeOut", delay: 0.4 }} />
                         </div>
@@ -849,9 +807,9 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
 
                   {/* Characters on their world stage */}
                   <motion.div variants={up} className="relative flex items-end justify-center">
-                    {/* Stage spotlight — warm glow rising from ground under characters */}
+                    {/* Stage spotlight — gold runway glow rising from ground */}
                     <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[340px] sm:w-[440px] h-[110px] pointer-events-none"
-                      style={{ background: "radial-gradient(ellipse 70% 60% at 50% 100%, rgba(251,191,36,0.30) 0%, rgba(52,211,153,0.14) 50%, transparent 75%)" }} />
+                      style={{ background: "radial-gradient(ellipse 70% 60% at 50% 100%, rgba(201,168,76,0.35) 0%, rgba(201,168,76,0.08) 50%, transparent 75%)" }} />
 
                     {/* NIMI with outfit badge */}
                     <div className="relative">
@@ -906,7 +864,7 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
                     return (
                       <div className="px-4 py-3.5 rounded-2xl border border-white/50 shadow-2xl"
                         style={{ background: "rgba(255,255,255,0.65)", backdropFilter: "blur(18px)" }}>
-                        <p className="font-baloo font-black text-sky-700 text-2xs uppercase tracking-widest mb-2.5">Latest Badge</p>
+                        <p className="font-baloo font-black text-[var(--ds-text-brand)] text-2xs uppercase tracking-widest mb-2.5">Latest Badge</p>
                         <div className="flex items-center gap-3">
                           <div className="relative shrink-0">
                             <div className="w-[52px] h-[52px] rounded-2xl flex items-center justify-center text-3.5xl shadow-lg"
@@ -921,7 +879,7 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
                           </div>
                           <div>
                             <p className="font-baloo font-black text-amber-600 text-mbase leading-tight">{badge.label}</p>
-                            <p className="font-nunito font-bold text-emerald-600 text-2xs">
+                            <p className="font-nunito font-bold text-[var(--ds-text-brand)] text-2xs">
                               {new Date(latest.earned_at).toDateString() === today ? "Earned today 🎉" : "Recently earned ✨"}
                             </p>
                           </div>
@@ -948,7 +906,7 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
                         return (
                           <div key={i} className="flex flex-col items-center gap-1">
                             <div className={`w-8 h-8 rounded-full flex items-center justify-center shadow-sm transition-all ${
-                              done    ? "bg-emerald-500 shadow-emerald-200" :
+                              done    ? "bg-[var(--ds-brand-primary)] shadow-[var(--ds-brand-soft)]" :
                               isToday ? "bg-amber-100 border-2 border-amber-400" :
                               future  ? "bg-amber-50 border border-amber-100 opacity-40" :
                                         "bg-amber-100/60 border border-amber-200"
@@ -958,7 +916,7 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
                                          null}
                             </div>
                             <span className={`font-nunito font-bold text-4xs ${
-                              done ? "text-emerald-700" : isToday ? "text-amber-600 font-black" : "text-amber-400"
+                              done ? "text-[var(--ds-text-brand)]" : isToday ? "text-amber-600 font-black" : "text-amber-400"
                             }`}>{day}</span>
                           </div>
                         );
@@ -976,22 +934,22 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
                   className="w-full block" preserveAspectRatio="none">
                   <defs>
                     <linearGradient id="waveGradA" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#d1fae5" stopOpacity="0" />
-                      <stop offset="100%" stopColor="#d1fae5" stopOpacity="0.55" />
+                      <stop offset="0%" stopColor="#f0f4f8" stopOpacity="0" />
+                      <stop offset="100%" stopColor="#f0f4f8" stopOpacity="0.6" />
                     </linearGradient>
                   </defs>
-                  {/* Wave 1 — deep back, airy */}
+                  {/* Wave 1 — deep back, faint */}
                   <path
                     d="M0,38 C240,76 480,8 720,42 C960,78 1200,12 1440,46 L1440,110 L0,110 Z"
-                    fill="rgba(209,250,229,0.22)" />
+                    fill="rgba(255,255,255,0.15)" />
                   {/* Wave 2 — mid layer, gradient */}
                   <path
                     d="M0,57 C180,92 360,22 540,58 C720,94 900,20 1080,55 C1260,90 1380,34 1440,58 L1440,110 L0,110 Z"
                     fill="url(#waveGradA)" />
-                  {/* Wave 3 — front, solid mint */}
+                  {/* Wave 3 — front, solid light */}
                   <path
                     d="M0,76 C200,46 400,104 600,74 C800,44 1000,100 1200,72 C1320,56 1400,82 1440,76 L1440,110 L0,110 Z"
-                    fill="#d1fae5" />
+                    fill="#f0f4f8" />
                 </svg>
               </div>
 
@@ -1000,18 +958,18 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
 
           {/* ── Campus Welcome Strip ──────────────────────────────────────── */}
           <div className="relative z-30 -mt-3 px-4 sm:px-6 pb-2 max-w-[1400px] mx-auto">
-            <div className="flex items-center gap-2.5 px-4 py-2.5 bg-[var(--ds-surface-card)]/95 backdrop-blur-sm rounded-2xl shadow-sm border border-emerald-100 w-fit">
+            <div className="flex items-center gap-2.5 px-4 py-2.5 bg-[var(--ds-surface-card)]/95 backdrop-blur-sm rounded-2xl shadow-sm border border-[var(--ds-border-brand)]/40 w-fit">
               <motion.img
                 src={assets.nimiCircle}
                 alt="Nimi"
-                className="w-6 h-6 rounded-full object-cover shrink-0 border border-emerald-200"
+                className="w-6 h-6 rounded-full object-cover shrink-0 border border-[var(--ds-border-brand)]/50"
                 animate={{ y: [0, -3, 0] }}
                 transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
                 onError={e => { (e.target as HTMLImageElement).style.display = "none"; }}
               />
-              <span className="font-baloo font-black text-emerald-700 text-xs sm:text-sml">{t("homeCampusOpen")}</span>
-              <span className="font-nunito text-emerald-500 text-2xs hidden sm:inline">
-                • {new Date().toLocaleDateString(dateLocale, { weekday: "long", month: "long", day: "numeric" })}
+              <span className="font-baloo font-black text-[var(--ds-text-brand)] text-xs sm:text-sml">{t("homeCampusOpen")}</span>
+              <span className="font-nunito text-[var(--ds-text-secondary)] text-2xs hidden sm:inline">
+                · {new Date().toLocaleDateString(dateLocale, { weekday: "long", month: "long", day: "numeric" })}
               </span>
             </div>
           </div>
@@ -1024,7 +982,7 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
               {ACTIVITIES.map(({ img, labelKey, subKey, href }) => (
                 <motion.div key={labelKey} variants={pop}>
                   <Link href={href}
-                    className="group flex flex-col items-center gap-1.5 bg-[var(--ds-surface-card)]/90 backdrop-blur-sm border border-white hover:border-emerald-200 rounded-2xl px-2 py-3.5 sm:py-4 shadow-sm hover:shadow-md hover:-translate-y-1 active:scale-95 transition-all">
+                    className="group flex flex-col items-center gap-1.5 bg-[var(--ds-surface-card)]/90 backdrop-blur-sm border border-[var(--ds-border-primary)] hover:border-[var(--ds-border-brand)] rounded-2xl px-2 py-3.5 sm:py-4 shadow-sm hover:shadow-md hover:-translate-y-1 active:scale-95 transition-all">
                     <img src={img} alt={t(labelKey)} className="w-10 h-10 sm:w-11 sm:h-11 object-contain drop-shadow-sm group-hover:scale-110 transition-transform duration-200" />
                     <p className="font-baloo font-black text-[var(--ds-text-primary)] text-xs sm:text-sml leading-tight text-center">{t(labelKey)}</p>
                     <p className="font-nunito text-[var(--ds-text-tertiary)] text-4xs sm:text-3xs text-center hidden sm:block leading-tight">{t(subKey)}</p>
@@ -1044,8 +1002,8 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
               style={{
                 left: 22,
                 width: 2,
-                background: "repeating-linear-gradient(to bottom, #86efac 0px, #86efac 5px, transparent 5px, transparent 17px)",
-                opacity: 0.14,
+                background: "repeating-linear-gradient(to bottom, var(--ds-brand-primary) 0px, var(--ds-brand-primary) 5px, transparent 5px, transparent 17px)",
+                opacity: 0.18,
               }}
             />
 

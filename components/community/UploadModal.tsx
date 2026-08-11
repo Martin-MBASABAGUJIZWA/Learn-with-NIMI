@@ -73,7 +73,7 @@ export default function UploadModal({
           className="bg-[var(--ds-surface-card)] border border-ds-border shadow-2xl w-full max-w-lg my-8 overflow-hidden"
           style={{ borderRadius: 'var(--leaf-r-lg)' }}
         >
-          <div className="px-5 py-4 flex items-center justify-between sticky top-0" style={{ backgroundColor: 'var(--nimi-green)' }}>
+          <div className="px-5 py-4 flex items-center justify-between sticky top-0" style={{ backgroundColor: 'var(--ds-brand-primary)' }}>
             <p className="text-white font-black text-lg tracking-wide">{t("uploadArtworkTitle")}</p>
             <button
               onClick={() => !formState.isUploading && onClose()}
@@ -199,7 +199,7 @@ export default function UploadModal({
 
             {/* COPPA/GDPR consent — required before submit */}
             <label className={`flex items-start gap-3 cursor-pointer p-3 rounded-xl border transition ${
-              consentChecked ? "border-green-300 bg-green-50" : "border-amber-200 bg-amber-50"
+              consentChecked ? "border-[var(--ds-border-brand)] bg-[var(--ds-brand-subtle)]" : "border-amber-200 bg-amber-50"
             }`}>
               <input
                 type="checkbox"
@@ -210,7 +210,7 @@ export default function UploadModal({
               />
               <span className="font-nunito text-xs text-[var(--ds-text-primary)] leading-relaxed">
                 I agree to the{" "}
-                <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-green-700 underline font-bold">
+                <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-[var(--ds-text-brand)] underline font-bold">
                   Terms of Use
                 </a>{" "}
                 and confirm I have the right to share this content on Nimipiko.
@@ -222,7 +222,7 @@ export default function UploadModal({
                 onClick={(e) => onSubmit(e)}
                 disabled={formState.isUploading || !formState.imageFile || !consentChecked}
                 className="flex-1 text-white font-black py-2.5 text-sm transition disabled:opacity-60"
-                style={{ backgroundColor: 'var(--nimi-green)', borderRadius: 'var(--leaf-r-sm)' }}
+                style={{ backgroundColor: 'var(--ds-brand-primary)', borderRadius: 'var(--leaf-r-sm)' }}
               >
                 {formState.isUploading ? t("uploadingLabel") : t("uploadBtnLabel")}
               </button>

@@ -39,18 +39,18 @@ export default function ComprehensionQuestion({ question, onAnswered, current, t
     <motion.div
       initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
       transition={SPRING.card}
-      className="leaf-lg border border-violet-200/60 bg-gradient-to-br from-violet-50 via-white to-indigo-50/50 p-5 shadow-card-2xl"
+      className="leaf-lg border border-[var(--ds-border-brand)]/60 bg-[var(--ds-brand-subtle)] p-5 shadow-card-2xl"
     >
       {/* Header */}
       <div className="flex items-center gap-2 mb-4">
-        <div className="w-9 h-9 rounded-xl bg-violet-100 flex items-center justify-center flex-shrink-0">
+        <div className="w-9 h-9 rounded-xl bg-[var(--ds-brand-soft)] flex items-center justify-center flex-shrink-0">
           <span className="text-lg select-none">{question.emoji ?? "🧠"}</span>
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <p className="font-nunito font-black text-3xs uppercase tracking-[0.2em] text-violet-400">{t("comprehensionTitle")}</p>
+            <p className="font-nunito font-black text-3xs uppercase tracking-[0.2em] text-[var(--ds-text-brand)]">{t("comprehensionTitle")}</p>
             {total && total > 1 && (
-              <span className="ml-auto font-nunito font-bold text-3xs text-violet-300">
+              <span className="ml-auto font-nunito font-bold text-3xs text-[var(--ds-text-secondary)]">
                 {current}/{total}
               </span>
             )}
@@ -66,8 +66,8 @@ export default function ComprehensionQuestion({ question, onAnswered, current, t
           const isRight = i === question.correct;
           const showResult = locked;
 
-          let ringClass = "border-[var(--ds-border-primary)] bg-[var(--ds-surface-card)] hover:border-violet-300 hover:bg-violet-50";
-          if (showResult && isRight) ringClass = "border-emerald-400 bg-emerald-50";
+          let ringClass = "border-[var(--ds-border-primary)] bg-[var(--ds-surface-card)] hover:border-[var(--ds-border-brand)] hover:bg-[var(--ds-brand-subtle)]";
+          if (showResult && isRight) ringClass = "border-[var(--ds-border-brand)] bg-[var(--ds-brand-subtle)]";
           else if (showResult && isSelected && !isRight) ringClass = "border-red-300 bg-red-50";
 
           return (
@@ -81,7 +81,7 @@ export default function ComprehensionQuestion({ question, onAnswered, current, t
               className={`w-full flex items-center gap-3 rounded-2xl border-2 px-4 py-3 text-left transition-all ${ringClass} disabled:cursor-default`}
             >
               <span className={`w-7 h-7 rounded-full flex items-center justify-center font-black text-xs flex-shrink-0 ${
-                showResult && isRight ? "bg-emerald-400 text-white" :
+                showResult && isRight ? "bg-[var(--ds-brand-primary)] text-[var(--ds-nav-bg)]" :
                 showResult && isSelected ? "bg-red-400 text-white" :
                 "bg-[var(--ds-surface-card-hover)] text-[var(--ds-text-secondary)]"
               }`}>
@@ -100,7 +100,7 @@ export default function ComprehensionQuestion({ question, onAnswered, current, t
         {locked && (
           <motion.p
             initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-            className={`mt-3 font-baloo font-black text-mbase text-center ${isCorrect ? "text-emerald-600" : "text-rose-500"}`}
+            className={`mt-3 font-baloo font-black text-mbase text-center ${isCorrect ? "text-[var(--ds-text-brand)]" : "text-rose-500"}`}
           >
             {isCorrect ? t("comprehensionCorrect") : t("comprehensionTryAgain")}
           </motion.p>

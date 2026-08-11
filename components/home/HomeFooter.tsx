@@ -18,7 +18,7 @@ const TRUST_BADGES = [
   { emoji: "🛡️", label: "SAFE ENVIRONMENT",  bg: "bg-blue-600"   },
   { emoji: "🎯", label: "FUN LEARNING",       bg: "bg-pink-600"   },
   { emoji: "💪", label: "BUILD CONFIDENCE",   bg: "bg-orange-500" },
-  { emoji: "🎮", label: "LEARN THROUGH PLAY", bg: "bg-[var(--nimi-green)]"  },
+  { emoji: "🎮", label: "LEARN THROUGH PLAY", bg: "bg-[var(--ds-brand-primary)]"  },
 ];
 
 export default function HomeFooter() {
@@ -48,9 +48,9 @@ export default function HomeFooter() {
 
         {/* Divider */}
         <div className="flex items-center gap-3 w-full max-w-sm">
-          <div className="flex-1 h-px bg-[var(--nimi-green)]" />
+          <div className="flex-1 h-px bg-[var(--ds-brand-primary)]" />
           <span className="text-yellow-400 text-sm">✦</span>
-          <div className="flex-1 h-px bg-[var(--nimi-green)]" />
+          <div className="flex-1 h-px bg-[var(--ds-brand-primary)]" />
         </div>
 
         {/* Trust badges */}
@@ -72,7 +72,7 @@ export default function HomeFooter() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label={label}
-              className="w-9 h-9 rounded-full bg-[var(--nimi-green)] hover:bg-[var(--ds-brand-hover)] flex items-center justify-center transition-colors shadow-md"
+              className="w-9 h-9 rounded-full bg-[var(--ds-brand-primary)] hover:bg-[var(--ds-brand-hover)] flex items-center justify-center transition-colors shadow-md"
             >
               <Icon size={16} className="text-white" strokeWidth={1.8} />
             </Link>

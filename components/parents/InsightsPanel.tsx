@@ -26,10 +26,10 @@ const TYPE_STYLE: Record<InsightType, InsightStyle> = {
   strength: {
     emoji:  "⭐",
     label:  "Strength",
-    bg:     "bg-emerald-50",
-    border: "border-emerald-200",
-    pill:   "bg-emerald-100 text-emerald-700 border-emerald-200",
-    text:   "text-emerald-800",
+    bg:     "bg-[var(--ds-brand-subtle)]",
+    border: "border-[var(--ds-border-brand)]",
+    pill:   "bg-[var(--ds-brand-soft)] text-[var(--ds-text-brand)] border-[var(--ds-border-brand)]",
+    text:   "text-[var(--ds-text-brand)]",
   },
   improvement: {
     emoji:  "📈",

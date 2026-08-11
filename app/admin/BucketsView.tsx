@@ -5,7 +5,7 @@ import { getCachedAdmin } from './adminAuth'
 import {
   HardDrive, Menu, ChevronDown, ChevronRight, ArrowLeft, Folder, Search, Upload,
   ExternalLink, Trash2, ImageIcon, Video, Music, FileText, File as FileIcon,
-  BookOpen, Palette, Film, AlertCircle, RefreshCw, X,
+  BookOpen, Palette, Film, AlertCircle, RefreshCw, X, Plane, Lock,
   type LucideIcon,
 } from 'lucide-react'
 import { ACCENT } from './missionMeta'
@@ -26,12 +26,15 @@ interface StorageEntry {
 
 const accent = ACCENT.orange
 
-const BUCKETS = ['storyBook', 'Coloriage', 'preview'] as const
+const BUCKETS = ['storyBook', 'Coloriage', 'preview', 'airways-templates', 'child-songs', 'story-pages'] as const
 
-const BUCKET_META: Record<string, { label: string; description: string; icon: LucideIcon }> = {
-  storyBook: { label: 'Story Book', description: 'Mission media, story pages & cover art', icon: BookOpen },
-  Coloriage: { label: 'Coloring Pages', description: 'Coloring book page templates', icon: Palette },
-  preview: { label: 'Preview Media', description: 'Reserved for upcoming preview assets', icon: Film },
+const BUCKET_META: Record<string, { label: string; description: string; icon: LucideIcon; private?: boolean }> = {
+  storyBook:           { label: 'Story Book',         description: 'Mission media, story pages & cover art',      icon: BookOpen },
+  Coloriage:           { label: 'Coloring Pages',      description: 'Coloring book page templates',                icon: Palette },
+  preview:             { label: 'Preview Media',       description: 'Reserved for upcoming preview assets',         icon: Film },
+  'airways-templates': { label: 'Airways Templates',   description: 'Passport, kit, badge & certificate templates', icon: Plane },
+  'child-songs':       { label: 'Songs Enfants',       description: 'Per-child personalised audio files',           icon: Music, private: true },
+  'story-pages':       { label: 'Pages d\'histoires',  description: 'Blank story page PNGs for PDF generation',     icon: BookOpen },
 }
 
 function formatSize(bytes?: number) {
@@ -229,7 +232,7 @@ export default function BucketsView({ onNavigate, onOpenSidebar }: BucketsViewPr
         )}
 
         {/* Bucket picker */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {BUCKETS.map(b => {
             const m = BUCKET_META[b]
             const isActive = b === bucket
@@ -241,8 +244,15 @@ export default function BucketsView({ onNavigate, onOpenSidebar }: BucketsViewPr
                   isActive ? `${accent.soft} ${accent.border} shadow-sm` : 'bg-white border-gray-100 hover:border-gray-200 hover:shadow-sm'
                 }`}
               >
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-2 ${accent.tile}`}>
-                  <m.icon className="w-5 h-5" />
+                <div className="flex items-start justify-between mb-2">
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${accent.tile}`}>
+                    <m.icon className="w-5 h-5" />
+                  </div>
+                  {m.private && (
+                    <span className="flex items-center gap-1 text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-2 py-0.5">
+                      <Lock className="w-2.5 h-2.5" /> Private
+                    </span>
+                  )}
                 </div>
                 <p className="font-bold text-gray-800">{m.label}</p>
                 <p className="text-xs text-gray-500 mt-0.5">{m.description}</p>

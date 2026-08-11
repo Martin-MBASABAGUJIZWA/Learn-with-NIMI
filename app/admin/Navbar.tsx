@@ -4,7 +4,7 @@ import supabase from "@/lib/supabaseClient"
 import { getCachedAdmin } from './adminAuth'
 import {
   LogOut, Search, ChevronDown, LayoutDashboard, UserCog, Bell, Menu,
-  Compass, Baby, Users, BookOpen, X, Loader2, type LucideIcon,
+  Compass, Baby, Users, BookOpen, X, Loader2, CreditCard, type LucideIcon,
 } from 'lucide-react'
 import { ACCENT, CATEGORY_META, FALLBACK_META } from './missionMeta'
 import { LANGUAGE_META, LANGUAGES, type Lang } from './missionMeta'
@@ -24,6 +24,7 @@ type SearchResult =
   | { kind: 'child'; id: string; name: string }
   | { kind: 'parent'; id: string; name: string; email: string | null }
   | { kind: 'story'; id: string; title: string }
+  | { kind: 'product'; id: string; name: string; tier: string }
   | { kind: 'page'; table: string; label: string }
 
 const GROUP_META: Record<SearchResult['kind'], { label: string; icon: LucideIcon }> = {
@@ -31,6 +32,7 @@ const GROUP_META: Record<SearchResult['kind'], { label: string; icon: LucideIcon
   child: { label: 'Children', icon: Baby },
   parent: { label: 'Parents', icon: Users },
   story: { label: 'Stories', icon: BookOpen },
+  product: { label: 'Products', icon: CreditCard },
   page: { label: 'Pages', icon: LayoutDashboard },
 }
 
@@ -73,6 +75,16 @@ function ResultRow({ result }: { result: SearchResult }) {
           <span className="flex-1 min-w-0"><span className="block font-semibold text-gray-700 truncate">{result.title}</span></span>
         </>
       )
+    case 'product':
+      return (
+        <>
+          <span className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 bg-emerald-50 text-emerald-500"><CreditCard size={14} /></span>
+          <span className="flex-1 min-w-0">
+            <span className="block font-semibold text-gray-700 truncate">{result.name}</span>
+            <span className="block text-xs text-gray-400 capitalize truncate">{result.tier}</span>
+          </span>
+        </>
+      )
     case 'page':
       return (
         <>
@@ -93,6 +105,7 @@ export default function Navbar({ tables, currentTable, setCurrentTable, onOpenSi
   const [activeIndex, setActiveIndex] = useState(-1)
   const [searchFocused, setSearchFocused] = useState(false)
   const searchBoxRef = useRef<HTMLDivElement>(null)
+  const searchInputRef = useRef<HTMLInputElement>(null)
   const [profileOpen, setProfileOpen] = useState(false)
   const [langPickerOpen, setLangPickerOpen] = useState(false)
   const profileRef = useRef<HTMLDivElement>(null)
@@ -100,6 +113,18 @@ export default function Navbar({ tables, currentTable, setCurrentTable, onOpenSi
 
   useEffect(() => {
     void getCachedAdmin().then(d => { if (d?.name) setAdminName(d.name) })
+  }, [])
+
+  useEffect(() => {
+    const h = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault()
+        searchInputRef.current?.focus()
+        setSearchFocused(true)
+      }
+    }
+    document.addEventListener('keydown', h)
+    return () => document.removeEventListener('keydown', h)
   }, [])
 
   useEffect(() => {
@@ -115,11 +140,12 @@ export default function Navbar({ tables, currentTable, setCurrentTable, onOpenSi
     const orSafeQ = q.replace(/[,()]/g, '')
     void (async () => {
       try {
-        const [missionsRes, childrenRes, parentsRes, storiesRes] = await Promise.all([
+        const [missionsRes, childrenRes, parentsRes, storiesRes, productsRes] = await Promise.all([
           supabase.from('mission_versions').select('mission_id, title, missions(category_slug)').eq('language', 'en').ilike('title', `%${q}%`).limit(5),
           supabase.from('children').select('id, name').ilike('name', `%${q}%`).limit(5),
           supabase.from('parents').select('id, name, email').or(`name.ilike.%${orSafeQ}%,email.ilike.%${orSafeQ}%`).limit(5),
           supabase.from('stories').select('id, title').ilike('title', `%${q}%`).limit(5),
+          supabase.from('products').select('id, name, tier').ilike('name', `%${q}%`).limit(3),
         ])
         if (cancelled) return
         const all: SearchResult[] = [
@@ -130,6 +156,7 @@ export default function Navbar({ tables, currentTable, setCurrentTable, onOpenSi
           ...(childrenRes.data ?? []).map((c: { id: string; name: string }) => ({ kind: 'child' as const, id: c.id, name: c.name })),
           ...(parentsRes.data ?? []).map((p: { id: string; name: string | null; email: string | null }) => ({ kind: 'parent' as const, id: p.id, name: p.name || p.email || 'Parent', email: p.email ?? null })),
           ...(storiesRes.data ?? []).map((s: { id: string; title: string }) => ({ kind: 'story' as const, id: s.id, title: s.title })),
+          ...(productsRes.data ?? []).map((p: { id: string; name: string; tier: string }) => ({ kind: 'product' as const, id: p.id, name: p.name, tier: p.tier })),
           ...tables.filter(t => t.toLowerCase().includes(q.toLowerCase())).slice(0, 3).map(t => ({
             kind: 'page' as const, table: t, label: t.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
           })),
@@ -173,6 +200,7 @@ export default function Navbar({ tables, currentTable, setCurrentTable, onOpenSi
       case 'child': setCurrentTable(`children:${r.id}`); break
       case 'parent': setCurrentTable(`parents:${r.id}`); break
       case 'story': setCurrentTable(`stories:${r.id}`); break
+      case 'product': setCurrentTable('products'); break
       case 'page': setCurrentTable(r.table); break
     }
     setSearch(''); setDebouncedSearch(''); setResults([]); setSearchFocused(false)
@@ -208,11 +236,13 @@ export default function Navbar({ tables, currentTable, setCurrentTable, onOpenSi
         <div className="relative flex-1 max-w-lg hidden sm:block" ref={searchBoxRef}>
           <div className="flex items-center bg-gray-50 border border-gray-100 rounded-lg px-3 py-2 focus-within:border-green-500 focus-within:bg-white transition">
             <Search size={15} className="text-gray-400 mr-2 flex-shrink-0" />
-            <input type="text" placeholder="Search stories, children, parents..." value={search}
+            <input ref={searchInputRef} type="text" placeholder="Search stories, families, products..." value={search}
               onChange={e => setSearch(e.target.value)} onFocus={() => setSearchFocused(true)} onKeyDown={handleSearchKeyDown}
               className="flex-1 min-w-0 bg-transparent text-[13px] text-gray-700 placeholder:text-gray-400 focus:outline-none" />
-            {search && (
+            {search ? (
               <button onClick={() => { setSearch(''); setResults([]); setSearchFocused(false) }} className="text-gray-300 hover:text-gray-500 ml-1"><X size={14} /></button>
+            ) : (
+              <kbd className="hidden sm:inline-flex items-center gap-0.5 text-[10px] font-semibold text-gray-300 bg-gray-100 border border-gray-200 rounded px-1 py-0.5 ml-1 flex-shrink-0">⌘K</kbd>
             )}
           </div>
         {showDropdown && (

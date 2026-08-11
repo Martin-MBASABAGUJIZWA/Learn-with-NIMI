@@ -18,10 +18,10 @@ interface FeedItem {
 }
 
 const AVATAR_COLORS = [
-  "from-green-400 to-emerald-500",
+  "from-[var(--ds-brand-primary)] to-[var(--ds-brand-hover)]",
   "from-blue-400 to-cyan-500",
   "from-orange-400 to-pink-400",
-  "from-green-400 to-teal-500",
+  "from-[var(--ds-brand-primary)] to-teal-500",
 ];
 
 export default function CommunityPreview() {
@@ -57,8 +57,8 @@ export default function CommunityPreview() {
           </div>
           <Link href="/community">
             <motion.button whileHover={{ scale: 1.03 }} whileTap={m.buttonPress}
-              className="text-white font-black text-2xs px-4 py-2 shadow-sm flex items-center gap-1"
-              style={{ backgroundColor: 'var(--nimi-green)', borderRadius: 'var(--leaf-r-sm)' }}>
+              className="text-[var(--ds-nav-bg)] font-black text-2xs px-4 py-2 shadow-sm flex items-center gap-1"
+              style={{ backgroundColor: 'var(--ds-brand-primary)', borderRadius: 'var(--leaf-r-sm)' }}>
               Visit Community <ChevronRight className="w-3 h-3" />
             </motion.button>
           </Link>

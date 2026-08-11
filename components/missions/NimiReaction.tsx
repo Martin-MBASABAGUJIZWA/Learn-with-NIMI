@@ -42,8 +42,8 @@ export default function NimiReaction({ missionType }: NimiReactionProps) {
   const reactions = REACTIONS[missionType] ?? REACTIONS.story;
   // deterministic pick from the list (no random so it doesn't re-render differently on re-mount)
   const reaction = reactions[0];
-  const borderBg = COLORS[missionType] ?? "border-emerald-200 bg-emerald-50";
-  const textColor = TEXT_COLORS[missionType] ?? "text-emerald-800";
+  const borderBg = COLORS[missionType] ?? "border-[var(--ds-border-brand)] bg-[var(--ds-brand-subtle)]";
+  const textColor = TEXT_COLORS[missionType] ?? "text-[var(--ds-text-brand)]";
 
   return (
     <motion.div

@@ -23,7 +23,7 @@ export default function Error({
           <button
             onClick={() => reset()}
             className="text-white font-bold px-6 py-3 shadow-md transition"
-            style={{ backgroundColor: 'var(--nimi-green)', borderRadius: 'var(--leaf-r)' }}
+            style={{ backgroundColor: 'var(--ds-brand-primary)', borderRadius: 'var(--leaf-r)' }}
           >
             Try Again
           </button>

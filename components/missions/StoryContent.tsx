@@ -29,7 +29,7 @@ function BookSkeleton() {
   return (
     <div className="flex flex-col gap-3 animate-pulse">
       {/* toolbar row */}
-      <div className="leaf border border-emerald-100 bg-[var(--ds-surface-card)]/80 px-3 py-2.5 flex items-center gap-3">
+      <div className="leaf border border-[var(--ds-border-brand)] bg-[var(--ds-surface-card)]/80 px-3 py-2.5 flex items-center gap-3">
         <div className="flex-1 space-y-2">
           <div className="h-3 rounded-full bg-[var(--ds-surface-card-active)] w-2/3" />
           <div className="h-1.5 rounded-full bg-[var(--ds-surface-card-hover)] w-full" />
@@ -44,7 +44,7 @@ function BookSkeleton() {
         <div className="w-12 h-12 border-[3px] border-amber-200 border-t-amber-500 rounded-full animate-spin" />
       </div>
       {/* controls row */}
-      <div className="flex items-center justify-center gap-3 leaf border border-emerald-100 bg-[var(--ds-surface-card)]/80 py-3">
+      <div className="flex items-center justify-center gap-3 leaf border border-[var(--ds-border-brand)] bg-[var(--ds-surface-card)]/80 py-3">
         {[48, 40, 64, 40, 48].map((s, i) => (
           <div key={i} className="rounded-full bg-[var(--ds-surface-card-active)]" style={{ width: s, height: s }} />
         ))}

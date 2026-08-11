@@ -103,7 +103,7 @@ export default function MyProfilePage() {
             <div className="bg-[var(--ds-surface-card)] border border-ds-border rounded-2xl rounded-tl-none px-5 py-3 shadow-ds-card">
               <p className="font-baloo font-black text-ds-text text-base leading-snug">{t("noChildrenYet")}</p>
             </div>
-            <Link href="/home" className="text-white font-baloo font-black px-8 py-3 shadow-md transition hover:-translate-y-0.5 active:scale-95" style={{ backgroundColor: 'var(--nimi-green)', borderRadius: 'var(--leaf-r)' }}>
+            <Link href="/home" className="text-white font-baloo font-black px-8 py-3 shadow-md transition hover:-translate-y-0.5 active:scale-95" style={{ backgroundColor: 'var(--ds-brand-primary)', borderRadius: 'var(--leaf-r)' }}>
               🏠 {t("goHomeBtn")}
             </Link>
           </div>

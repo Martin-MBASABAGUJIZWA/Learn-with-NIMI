@@ -48,11 +48,15 @@ export function AppThemeProvider({ children }: { children: React.ReactNode }) {
   // Effective theme: preview overrides saved while active
   const themeId: AppThemeId = previewThemeId ?? savedThemeId;
 
-  // Read persisted theme on mount — only "default" is accepted; clear any stale value
+  // Read persisted theme on mount
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved !== "default") {
+    const saved = localStorage.getItem(STORAGE_KEY) as AppThemeId | null;
+    // "airways" was force-set by a previous migration — reset it to default
+    if (!saved || saved === "airways") {
       localStorage.setItem(STORAGE_KEY, "default");
+      setSavedThemeId("default");
+    } else {
+      setSavedThemeId(saved as AppThemeId);
     }
   }, []);
 

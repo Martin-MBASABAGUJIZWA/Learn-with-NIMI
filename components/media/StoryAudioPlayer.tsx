@@ -15,7 +15,7 @@ interface Props {
   onEnded?: () => void;
 }
 
-export default function StoryAudioPlayer({ url, title, subtitle, color = "bg-[var(--nimi-green)]", onEnded }: Props) {
+export default function StoryAudioPlayer({ url, title, subtitle, color = "bg-[var(--ds-brand-primary)]", onEnded }: Props) {
   const ref = useRef<HTMLAudioElement>(null);
   const [playing, setPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -29,10 +29,10 @@ export default function StoryAudioPlayer({ url, title, subtitle, color = "bg-[va
 
   if (!url) {
     return (
-      <div className="leaf border border-emerald-100 bg-gradient-to-br from-white via-emerald-50/70 to-amber-50/60 p-6 shadow-card-2xl">
+      <div className="leaf border border-[var(--ds-border-brand)] bg-[var(--ds-brand-subtle)] p-6 shadow-card-2xl">
         <div className="flex items-center gap-4">
           <div className="flex h-14 w-14 items-center justify-center leaf bg-[var(--ds-surface-card)] shadow-sm text-2xl shrink-0">
-            <Sparkles className="h-6 w-6 text-emerald-600" />
+            <Sparkles className="h-6 w-6 text-[var(--ds-text-brand)]" />
           </div>
           <div>
             <p className="text-[var(--ds-text-primary)] text-sm font-black">Coming Soon</p>
@@ -77,7 +77,7 @@ export default function StoryAudioPlayer({ url, title, subtitle, color = "bg-[va
   };
 
   return (
-    <div className="leaf border border-emerald-100 bg-gradient-to-br from-white via-emerald-50/70 to-amber-50/60 p-5 shadow-card-2xl">
+    <div className="leaf border border-[var(--ds-border-brand)] bg-[var(--ds-brand-subtle)] p-5 shadow-card-2xl">
       <audio
         ref={ref}
         src={src}
@@ -100,7 +100,7 @@ export default function StoryAudioPlayer({ url, title, subtitle, color = "bg-[va
 
           {/* Progress bar */}
           <div className="mt-2 flex items-center gap-2">
-            <div className="flex-1 bg-[var(--ds-surface-card)]/80 rounded-full h-[6px] overflow-hidden border border-emerald-100">
+            <div className="flex-1 bg-[var(--ds-surface-card)]/80 rounded-full h-[6px] overflow-hidden border border-[var(--ds-border-brand)]">
               <motion.div
                 className={`${color} h-full rounded-full`}
                 style={{ width: duration > 0 ? `${(progress / duration) * 100}%` : "0%" }}
@@ -114,7 +114,7 @@ export default function StoryAudioPlayer({ url, title, subtitle, color = "bg-[va
 
         {/* Restart */}
         <button onClick={restart}
-          className="w-10 h-10 rounded-full bg-[var(--ds-surface-card)]/80 border border-emerald-100 flex items-center justify-center text-[var(--ds-text-secondary)] hover:text-emerald-700 transition shrink-0 shadow-sm">
+          className="w-10 h-10 rounded-full bg-[var(--ds-surface-card)]/80 border border-[var(--ds-border-brand)] flex items-center justify-center text-[var(--ds-text-secondary)] hover:text-[var(--ds-text-brand)] transition shrink-0 shadow-sm">
           <RotateCcw className="w-4 h-4" />
         </button>
       </div>

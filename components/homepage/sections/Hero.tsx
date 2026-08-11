@@ -13,7 +13,7 @@ function HeroCopy() {
     <div className="flex flex-col items-start">
       <h1 className="font-baloo font-black text-[var(--ds-text-primary)] text-h1 sm:text-display leading-[1.1]">
         Grow with<br />
-        <span className="text-nimi-green">every story.</span>
+        <span className="text-[var(--ds-brand-primary)]">every story.</span>
       </h1>
       <p className="font-nunito text-[var(--ds-text-secondary)] text-body sm:text-body-lg mt-4 max-w-sm leading-relaxed">
         Read, create, explore and grow with<br />Nimi, Piko &amp; Zilo.

@@ -23,7 +23,7 @@ export default function UpdateToast({ visible, onDismiss }: UpdateToastProps) {
           transition={{ type: "spring", stiffness: 300, damping: 28 }}
           className="fixed top-3 left-1/2 z-fullscreen -translate-x-1/2 w-[calc(100%-2rem)] max-w-sm"
         >
-          <div className="flex items-center gap-3 bg-[var(--nimi-green)] text-white rounded-2xl shadow-xl px-4 py-3">
+          <div className="flex items-center gap-3 bg-[var(--ds-brand-primary)] text-white rounded-2xl shadow-xl px-4 py-3">
             <div className="w-8 h-8 rounded-full bg-[var(--ds-surface-card)]/20 flex items-center justify-center flex-shrink-0">
               <span className="text-base">🌿</span>
             </div>
@@ -33,7 +33,7 @@ export default function UpdateToast({ visible, onDismiss }: UpdateToastProps) {
             </div>
             <button
               onClick={handleReload}
-              className="flex items-center gap-1.5 bg-[var(--ds-surface-card)] text-[var(--nimi-green)] font-black text-xs px-3 py-1.5 rounded-xl hover:bg-[var(--ds-surface-card)]/90 transition flex-shrink-0"
+              className="flex items-center gap-1.5 bg-[var(--ds-surface-card)] text-[var(--ds-brand-primary)] font-black text-xs px-3 py-1.5 rounded-xl hover:bg-[var(--ds-surface-card)]/90 transition flex-shrink-0"
             >
               <RefreshCw className="w-3.5 h-3.5" />
               Reload

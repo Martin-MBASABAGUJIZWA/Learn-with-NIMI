@@ -100,7 +100,7 @@ export default function LandingNav({ scrolled, menuOpen, setMenuOpen, authed }: 
 
           <div className="hidden lg:flex items-center gap-2.5 shrink-0">
             {authed ? (
-              <Link href="/home" className="font-baloo font-bold text-[13px] xl:text-[14px] text-white px-4 xl:px-5 py-2 rounded-full shadow-sm transition-colors whitespace-nowrap" style={{backgroundColor:'var(--nimi-green)'}}>
+              <Link href="/home" className="font-baloo font-bold text-[13px] xl:text-[14px] text-white px-4 xl:px-5 py-2 rounded-full shadow-sm transition-colors whitespace-nowrap" style={{backgroundColor:'var(--ds-brand-primary)'}}>
                 Go to Dashboard
               </Link>
             ) : (
@@ -108,7 +108,7 @@ export default function LandingNav({ scrolled, menuOpen, setMenuOpen, authed }: 
                 <Link href="/loginpage" className="font-baloo font-bold text-[13px] xl:text-[14px] text-[var(--ds-text-primary)] px-4 xl:px-5 py-2 rounded-full border border-[var(--ds-border-primary)]/80 hover:bg-[var(--ds-surface-card)]/80 transition-all whitespace-nowrap backdrop-blur-sm">
                   Log In
                 </Link>
-                <Link href="/signuppage" className="font-baloo font-bold text-[13px] xl:text-[14px] text-white px-4 xl:px-5 py-2 rounded-full shadow-sm transition-all hover:-translate-y-px whitespace-nowrap" style={{backgroundColor:'var(--nimi-green)', boxShadow:'0 2px 12px rgba(21,128,61,0.30)'}}>
+                <Link href="/signuppage" className="font-baloo font-bold text-[13px] xl:text-[14px] text-white px-4 xl:px-5 py-2 rounded-full shadow-sm transition-all hover:-translate-y-px whitespace-nowrap" style={{backgroundColor:'var(--ds-brand-primary)', boxShadow:'0 2px 12px rgba(21,128,61,0.30)'}}>
                   Get Started
                 </Link>
               </>
@@ -155,7 +155,7 @@ export default function LandingNav({ scrolled, menuOpen, setMenuOpen, authed }: 
                 {authed ? (
                   <Link href="/home" onClick={() => setMenuOpen(() => false)}
                     className="w-full text-center font-baloo font-bold text-white py-2.5 rounded-full text-[14px] shadow-md transition-colors"
-                    style={{backgroundColor:'var(--nimi-green)'}}>
+                    style={{backgroundColor:'var(--ds-brand-primary)'}}>
                     Go to Dashboard
                   </Link>
                 ) : (
@@ -166,7 +166,7 @@ export default function LandingNav({ scrolled, menuOpen, setMenuOpen, authed }: 
                     </Link>
                     <Link href="/signuppage" onClick={() => setMenuOpen(() => false)}
                       className="w-full text-center font-baloo font-bold text-white py-2.5 rounded-full text-[14px] shadow-md transition-colors"
-                      style={{backgroundColor:'var(--nimi-green)'}}>
+                      style={{backgroundColor:'var(--ds-brand-primary)'}}>
                       Get Started
                     </Link>
                   </>

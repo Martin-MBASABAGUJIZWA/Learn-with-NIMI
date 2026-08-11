@@ -72,14 +72,16 @@ function renderTextOverlay(W: number, H: number, fields: TextField[]): Buffer {
 
 
 export interface KitData {
-  childName:   string
-  age:         number | null
-  storyTitle:  string
-  storyNumber: number
-  storySlug:   string
-  childId:     string
-  photoBuffer: Buffer | null
-  layout?:     KitLayout | null
+  childName:      string
+  age:            number | null
+  storyTitle:     string
+  storyNumber:    number
+  storySlug:      string
+  childId:        string
+  photoBuffer:    Buffer | null
+  isPersonalized?: boolean
+  variant?:       'day' | 'night'
+  layout?:        KitLayout | null
 }
 
 // Generates a soft grey silhouette placeholder when no child photo is available
@@ -99,9 +101,14 @@ async function placeholderPhoto(w: number, h: number): Promise<Buffer> {
 }
 
 export async function buildKitImage(data: KitData): Promise<Buffer> {
+  const personalized = data.isPersonalized !== false
   const layout: KitLayout = data.layout && Object.keys(data.layout).length ? data.layout : DEFAULTS
 
-  const template = await fetchTemplate('champion-kit')
+  const isNight = data.variant === 'night'
+  const kitTemplateKey = personalized
+    ? (isNight ? 'carry-on-night'      : 'carry-on-day')
+    : (isNight ? 'carry-on-night-free' : 'carry-on-day-free')
+  const template = await fetchTemplate(kitTemplateKey)
 
   const appUrl   = process.env.NEXT_PUBLIC_APP_URL ?? 'https://nimipiko.com'
   const storyUrl = `${appUrl}/missions?story=${data.storySlug}`
@@ -137,32 +144,33 @@ export async function buildKitImage(data: KitData): Promise<Buffer> {
 
   const composites: sharp.OverlayOptions[] = []
 
-  const pw = phPos.w ?? 133
-  const ph = phPos.h ?? 195
+  if (personalized) {
+    // ── Photo composites — only for subscribed users ─────────────────
+    const pw = phPos.w ?? 133
+    const ph = phPos.h ?? 195
+    const photoSrc = data.photoBuffer ?? await placeholderPhoto(pw, ph)
 
-  const photoSrc = data.photoBuffer ?? await placeholderPhoto(pw, ph)
+    // Boarding-pass window photo (rectangle)
+    const photo = await sharp(photoSrc)
+      .resize(pw, ph, { fit: 'cover', position: 'attention' })
+      .png().toBuffer()
+    composites.push({ input: photo, left: phPos.x, top: phPos.y })
 
-  // Boarding-pass photo (rectangle)
-  const photo = await sharp(photoSrc)
-    .resize(pw, ph, { fit: 'cover', position: 'attention' })
-    .png().toBuffer()
-  composites.push({ input: photo, left: phPos.x, top: phPos.y })
-
-  // Handle photo (oval clip — same image, different position + mask)
-  const hPos = get(layout, 'handle_photo')
-  const hw = hPos.w ?? 270
-  const hh = hPos.h ?? 170
-  const handlePhoto = await sharp(photoSrc)
-    .resize(hw, hh, { fit: 'cover', position: 'attention' })
-    .png().toBuffer()
-  // Oval mask SVG
-  const ovalMask = `<svg width="${hw}" height="${hh}" xmlns="http://www.w3.org/2000/svg">
-    <ellipse cx="${hw / 2}" cy="${hh / 2}" rx="${hw / 2}" ry="${hh / 2}" fill="white"/>
-  </svg>`
-  const handlePhotoOval = await sharp(handlePhoto)
-    .composite([{ input: Buffer.from(ovalMask), blend: 'dest-in' }])
-    .png().toBuffer()
-  composites.push({ input: handlePhotoOval, left: hPos.x, top: hPos.y })
+    // Handle photo (oval clip)
+    const hPos = get(layout, 'handle_photo')
+    const hw = hPos.w ?? 270
+    const hh = hPos.h ?? 170
+    const handlePhoto = await sharp(photoSrc)
+      .resize(hw, hh, { fit: 'cover', position: 'attention' })
+      .png().toBuffer()
+    const ovalMask = `<svg width="${hw}" height="${hh}" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="${hw / 2}" cy="${hh / 2}" rx="${hw / 2}" ry="${hh / 2}" fill="white"/>
+    </svg>`
+    const handlePhotoOval = await sharp(handlePhoto)
+      .composite([{ input: Buffer.from(ovalMask), blend: 'dest-in' }])
+      .png().toBuffer()
+    composites.push({ input: handlePhotoOval, left: hPos.x, top: hPos.y })
+  }
 
   composites.push(
     { input: textOverlay,    left: 0,        top: 0        },

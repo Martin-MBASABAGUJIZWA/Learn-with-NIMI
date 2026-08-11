@@ -294,10 +294,103 @@ const defaultVariant: ComponentVariant = {
   },
 };
 
+// ─── Airways variant ──────────────────────────────────────────────────────
+
+const airwaysVariant: ComponentVariant = {
+  cardStyle: {
+    radius:     "rounded-2xl",
+    shadow:     "shadow-[0_4px_20px_rgba(0,0,0,0.10)]",
+    border:     "border border-[var(--ds-border-primary)]",
+    background: "bg-[var(--ds-surface-card)]",
+    overlay:    "bg-gradient-to-br from-[var(--ds-brand-subtle)]/20 to-transparent",
+  },
+  heroStyle: {
+    overlayOpacity:   "0.30",
+    gradientStrength: "moderate",
+    titleWeight:      "font-black",
+    imageScale:       "scale-100",
+  },
+  buttonStyle: {
+    primary:     "bg-[var(--ds-brand-primary)] text-[var(--ds-nav-bg)] shadow-sm hover:opacity-90",
+    secondary:   "bg-[var(--ds-surface-card)] border border-[var(--ds-border-primary)] hover:bg-[var(--ds-surface-card-hover)] text-[var(--ds-text-primary)]",
+    success:     "bg-[var(--ds-brand-primary)] text-[var(--ds-nav-bg)] shadow-sm",
+    primaryBg:   "bg-[var(--ds-brand-primary)] hover:bg-[var(--ds-brand-hover)] text-[var(--ds-nav-bg)]",
+    secondaryBg: "border border-[var(--ds-border-primary)] text-[var(--ds-text-primary)] hover:bg-[var(--ds-surface-card-hover)]",
+    radius:      "rounded-xl",
+    shadow:      "shadow-md",
+    hoverScale:  "hover:scale-[1.02]",
+  },
+  badgeStyle: {
+    shape:     "rounded-full",
+    border:    "border-2 border-[var(--ds-border-brand)]",
+    fill:      "bg-[var(--ds-brand-subtle)]",
+    iconStyle: "text-[var(--ds-text-brand)]",
+  },
+  panelStyle: {
+    background: "bg-[var(--ds-surface-card)]",
+    border:     "border border-[var(--ds-border-primary)]",
+    radius:     "rounded-2xl",
+    shadow:     "shadow-sm",
+  },
+  dialogStyle: {
+    background:      "bg-[var(--ds-surface-card)]",
+    border:          "border border-[var(--ds-border-primary)]",
+    radius:          "rounded-2xl",
+    shadow:          "shadow-2xl",
+    overlay:         "bg-black/60 backdrop-blur-sm",
+    containerRadius: "rounded-t-[28px] sm:rounded-2xl",
+  },
+  navigationStyle: {
+    background:        "bg-[var(--ds-nav-bg)]",
+    border:            "border-t border-[var(--ds-nav-border)]",
+    activeItem:        "bg-[var(--ds-nav-active-bg)] text-[var(--ds-nav-active-text)]",
+    hoverItem:         "hover:bg-[var(--ds-nav-active-bg)]/50",
+    fabGradient:       "bg-[var(--ds-brand-primary)]",
+    fabShadow:         "shadow-[var(--ds-shadow-cta)]",
+    activeIconBg:      "bg-[var(--ds-nav-active-bg)]",
+    activeIconColor:   "text-[var(--ds-nav-active-text)]",
+    inactiveIconColor: "text-[var(--ds-nav-inactive-icon)]",
+  },
+  progressStyle: {
+    track:  "bg-[var(--ds-surface-card-hover)]",
+    fill:   "bg-[var(--ds-brand-primary)]",
+    radius: "rounded-full",
+    height: "h-2",
+  },
+  backgroundStyle: {
+    page:         "bg-[var(--ds-surface-card)]",
+    subtle:       "bg-[var(--ds-surface-card)]",
+    accent:       "bg-[var(--ds-brand-subtle)]",
+    accentBorder: "border border-[var(--ds-border-brand)]",
+  },
+  chipStyle: {
+    background:  "bg-[var(--ds-brand-subtle)] hover:bg-[var(--ds-brand-subtle)]/80",
+    border:      "border border-[var(--ds-border-brand)]/50",
+    radius:      "rounded-full",
+    text:        "text-[var(--ds-text-primary)]",
+    scrollFill:  "bg-[var(--ds-brand-primary)]",
+    scrollTrack: "bg-[var(--ds-brand-subtle)]",
+  },
+  // Zone and content gradients stay the same — these are content colours, not theme chrome
+  zoneGradients: {
+    library:         "from-amber-500 via-yellow-400 to-amber-500",
+    activityGrounds: "from-amber-500 via-orange-500 to-rose-500",
+    communitySquare: "from-sky-400 via-cyan-400 to-teal-500",
+    profile:         "from-yellow-400 via-amber-400 to-amber-500",
+    treasureRoom:    "from-amber-400 via-yellow-500 to-orange-500",
+    familyHub:       "from-sky-500 via-blue-500 to-indigo-500",
+    achievement:     "from-yellow-400 via-amber-400 to-orange-400",
+    nimiChat:        "from-violet-500 via-purple-500 to-indigo-500",
+    creative:        "from-rose-400 via-pink-500 to-purple-500",
+  },
+  contentGradients: defaultVariant.contentGradients,
+};
+
 // ─── Registry & getter ─────────────────────────────────────────────────────
 
 const COMPONENT_VARIANTS: Record<AppThemeId, ComponentVariant> = {
   default: defaultVariant,
+  airways: airwaysVariant,
 };
 
 export function getComponentVariant(themeId: AppThemeId): ComponentVariant {

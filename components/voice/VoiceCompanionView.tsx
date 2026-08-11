@@ -107,13 +107,13 @@ function PhoneticGuidePanel({ language }: { language: VoiceLang }) {
 
   return (
     <div className="mt-4 p-4 rounded-2xl" style={{ background: "var(--ds-brand-soft)", border: "1px solid #BBF7D0" }}>
-      <p className="text-3xs font-black uppercase tracking-widest mb-3" style={{ color: "var(--nimi-green)" }}>
+      <p className="text-3xs font-black uppercase tracking-widest mb-3" style={{ color: "var(--ds-brand-primary)" }}>
         🇷🇼 Kinyarwanda Pronunciation Guide
       </p>
       <div className="grid grid-cols-2 gap-2">
         {guide.slice(0, 6).map(entry => (
           <div key={entry.grapheme} className="flex items-start gap-2">
-            <span className="font-black text-sml shrink-0 w-8" style={{ color: "var(--nimi-green)" }}>
+            <span className="font-black text-sml shrink-0 w-8" style={{ color: "var(--ds-brand-primary)" }}>
               {entry.grapheme}
             </span>
             <span className="text-2xs font-nunito leading-relaxed" style={{ color: "var(--ds-text-primary)" }}>
@@ -395,12 +395,12 @@ export default function VoiceCompanionView({
             {/* Score card */}
             <div className="p-5 leaf-lg text-center"
               style={{ background: G }}>
-              <p className="text-green-200 text-3xs font-black uppercase tracking-widest mb-2">
+              <p className="text-white/80 text-3xs font-black uppercase tracking-widest mb-2">
                 Your Score
               </p>
               <p className="font-baloo font-black text-4.5xl text-white leading-none mb-2">
                 {analysis.score}
-                <span className="text-1.5xl text-green-200">/100</span>
+                <span className="text-1.5xl text-white/80">/100</span>
               </p>
               <Stars count={analysis.stars} />
               <div className="flex justify-center gap-4 mt-3">
@@ -441,7 +441,7 @@ export default function VoiceCompanionView({
                   </div>
                 )}
                 {feedback.invite_retry && (
-                  <p className="text-xs font-bold mt-2" style={{ color: "var(--nimi-green)" }}>
+                  <p className="text-xs font-bold mt-2" style={{ color: "var(--ds-brand-primary)" }}>
                     {feedback.invite_retry}
                   </p>
                 )}

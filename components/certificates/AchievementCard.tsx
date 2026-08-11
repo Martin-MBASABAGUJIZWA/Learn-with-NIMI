@@ -58,7 +58,7 @@ interface Props {
 
 const TIER_STYLES: Record<AchievementTier, { border: string; text: string }> = {
   languageExplorer: { border: "border-amber-300", text: "text-amber-600" },
-  explorer:         { border: "border-green-400",  text: "text-[var(--ds-text-secondary)]"  },
+  explorer:         { border: "border-[var(--ds-border-brand)]", text: "text-[var(--ds-text-secondary)]" },
   categoryMaster:   { border: "border-blue-300",   text: "text-blue-600"  },
 };
 

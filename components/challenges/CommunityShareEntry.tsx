@@ -29,7 +29,7 @@ export default function CommunityShareEntry({ onShare, parentOnly = true }: Prop
       )}
       <button
         onClick={onShare}
-        className="bg-[var(--nimi-green)] hover:bg-[var(--ds-brand-hover)] text-white font-black text-3xs rounded-full px-3 py-1.5 shrink-0 transition"
+        className="bg-[var(--ds-brand-primary)] hover:bg-[var(--ds-brand-hover)] text-white font-black text-3xs rounded-full px-3 py-1.5 shrink-0 transition"
       >
         Share
       </button>

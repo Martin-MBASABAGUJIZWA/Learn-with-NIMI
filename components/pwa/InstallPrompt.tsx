@@ -102,7 +102,7 @@ export default function InstallPrompt() {
         <div className="flex items-center gap-2 mt-1">
           <button
             onClick={install}
-            className="flex-1 bg-[var(--nimi-green)] hover:bg-[var(--ds-brand-hover)] text-white font-black text-xs rounded-full py-2 shadow transition"
+            className="flex-1 bg-[var(--ds-brand-primary)] hover:bg-[var(--ds-brand-hover)] text-white font-black text-xs rounded-full py-2 shadow transition"
           >
             {t("installBtn")}
           </button>

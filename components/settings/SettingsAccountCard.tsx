@@ -147,7 +147,7 @@ export default function SettingsAccountCard() {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5 flex-wrap">
                   <span className="font-bold text-sml text-ds-text">NIMIPIKO Club</span>
-                  <span className="inline-flex items-center gap-0.5 bg-green-100 text-green-700 text-3xs font-black px-1.5 py-0.5 rounded-full">
+                  <span className="inline-flex items-center gap-0.5 bg-[var(--ds-brand-soft)] text-[var(--ds-text-brand)] text-3xs font-black px-1.5 py-0.5 rounded-full">
                     <CheckCircle2 className="w-3 h-3" /> Active
                   </span>
                 </div>
@@ -200,8 +200,8 @@ export default function SettingsAccountCard() {
 
       {/* Display name */}
       <div className="flex items-center gap-3 py-3 border-b border-ds-border px-1 -mx-1">
-        <div className="w-9 h-9 bg-emerald-100 rounded-full flex items-center justify-center shrink-0">
-          <Pencil className="w-4 h-4 text-emerald-600" />
+        <div className="w-9 h-9 bg-[var(--ds-brand-soft)] rounded-full flex items-center justify-center shrink-0">
+          <Pencil className="w-4 h-4 text-[var(--ds-text-brand)]" />
         </div>
         {editingName ? (
           <div className="flex-1 flex items-center gap-2 min-w-0">
@@ -212,10 +212,10 @@ export default function SettingsAccountCard() {
               onKeyDown={e => { if (e.key === "Enter") void saveName(); if (e.key === "Escape") cancelEditName(); }}
               placeholder="Your name"
               maxLength={80}
-              className="flex-1 min-w-0 border border-emerald-300 rounded-lg px-2.5 py-1.5 text-sm font-medium text-ds-text focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-200"
+              className="flex-1 min-w-0 border border-[var(--ds-border-brand)] rounded-lg px-2.5 py-1.5 text-sm font-medium text-ds-text focus:outline-none focus:border-[var(--ds-brand-primary)] focus:ring-1 focus:ring-[var(--ds-brand-primary)]/20"
             />
             <button onClick={() => void saveName()} disabled={savingName}
-              className="w-7 h-7 flex items-center justify-center rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white transition disabled:opacity-60 shrink-0">
+              className="w-7 h-7 flex items-center justify-center rounded-lg bg-[var(--ds-brand-primary)] hover:bg-[var(--ds-brand-hover)] text-[var(--ds-nav-bg)] transition disabled:opacity-60 shrink-0">
               <Check className="w-3.5 h-3.5" />
             </button>
             <button onClick={cancelEditName} disabled={savingName}
@@ -231,7 +231,7 @@ export default function SettingsAccountCard() {
               {!nameError && <span className="text-2xs text-[var(--ds-text-tertiary)]">{parentName ?? "Not set"}</span>}
             </div>
             <button onClick={startEditName}
-              className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[var(--ds-surface-card-active)] text-[var(--ds-text-tertiary)] hover:text-emerald-600 transition shrink-0">
+              className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[var(--ds-surface-card-active)] text-[var(--ds-text-tertiary)] hover:text-[var(--ds-text-brand)] transition shrink-0">
               <Pencil className="w-3.5 h-3.5" />
             </button>
           </>

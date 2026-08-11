@@ -13,7 +13,7 @@ const SKILL_GROUPS: {
   categories: ActivityCategory[]; gradient: string;
 }[] = [
   { icon: "🎤", titleKey: "skillMusic",      categories: ["morning"],             gradient: "from-pink-400 to-rose-500" },
-  { icon: "🤸", titleKey: "skillMovement",   categories: ["movement"],            gradient: "from-green-400 to-emerald-500" },
+  { icon: "🤸", titleKey: "skillMovement",   categories: ["movement"],            gradient: "from-[var(--ds-brand-primary)] to-[var(--ds-brand-hover)]" },
   { icon: "🎨", titleKey: "skillCreativity", categories: ["artistic", "coloring"], gradient: "from-orange-400 to-amber-500" },
   { icon: "📖", titleKey: "skillReading",    categories: ["flipflop", "histoire"], gradient: "from-blue-400 to-indigo-500" },
   { icon: "🔍", titleKey: "skillExploration",categories: ["zoom", "discovery"],    gradient: "from-teal-400 to-cyan-500" },
@@ -23,7 +23,7 @@ const LEVEL_META = {
   notStarted: { key: "levelNotStarted", bg: "bg-[var(--ds-surface-card-hover)]", text: "text-[var(--ds-text-secondary)]",     ring: "ring-gray-200" },
   beginner:   { key: "levelBeginner",   bg: "bg-blue-50",  text: "text-blue-600",     ring: "ring-blue-200" },
   growing:    { key: "levelGrowing",    bg: "bg-amber-50", text: "text-amber-600",    ring: "ring-amber-200" },
-  mastered:   { key: "levelMastered",   bg: "bg-emerald-50",text: "text-emerald-700", ring: "ring-emerald-300" },
+  mastered:   { key: "levelMastered",   bg: "bg-[var(--ds-brand-subtle)]", text: "text-[var(--ds-text-brand)]", ring: "ring-[var(--ds-border-brand)]" },
 } as const;
 
 function getLevel(pct: number, total: number): keyof typeof LEVEL_META {

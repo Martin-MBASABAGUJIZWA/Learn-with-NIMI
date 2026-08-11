@@ -22,7 +22,7 @@ const SIGNAL_STYLE: Record<EvidenceSignal['type'], { bg: string; text: string; d
   spaced_repetition:{ bg: "bg-amber-50",   text: "text-amber-700",   dot: "bg-amber-400"   },
   in_progress:      { bg: "bg-blue-50",    text: "text-blue-700",    dot: "bg-blue-400"    },
   quiz_performance: { bg: "bg-purple-50",  text: "text-purple-700",  dot: "bg-purple-400"  },
-  interest_match:   { bg: "bg-green-50",   text: "text-green-700",   dot: "bg-green-400"   },
+  interest_match:   { bg: "bg-[var(--ds-brand-subtle)]", text: "text-[var(--ds-text-brand)]", dot: "bg-[var(--ds-brand-primary)]" },
   achievement_unlock:{ bg: "bg-yellow-50", text: "text-yellow-700",  dot: "bg-yellow-400"  },
   level_progression:{ bg: "bg-indigo-50",  text: "text-indigo-700",  dot: "bg-indigo-400"  },
   time_based:       { bg: "bg-[var(--ds-surface-card)]",    text: "text-[var(--ds-text-secondary)]",    dot: "bg-gray-400"    },
@@ -32,7 +32,7 @@ const MASTERY_COLOUR: Record<string, string> = {
   none:       "text-rose-600 bg-rose-50 border-rose-200",
   emerging:   "text-amber-700 bg-amber-50 border-amber-200",
   developing: "text-blue-700 bg-blue-50 border-blue-200",
-  strong:     "text-emerald-700 bg-emerald-50 border-emerald-200",
+  strong:     "text-[var(--ds-text-brand)] bg-[var(--ds-brand-subtle)] border-[var(--ds-border-brand)]",
 };
 
 // ── Sub-components ─────────────────────────────────────────────────────────────

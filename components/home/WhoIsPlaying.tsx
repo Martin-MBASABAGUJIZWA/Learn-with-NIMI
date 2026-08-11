@@ -22,9 +22,9 @@ const LANGUAGE_DISPLAY: Record<string, { flag: string; name: string }> = {
 
 const AVATAR_COLORS = [
   "from-pink-400 to-rose-500",
-  "from-green-500 to-emerald-600",
+  "from-[var(--ds-brand-primary)] to-[var(--ds-brand-hover)]",
   "from-yellow-400 to-orange-500",
-  "from-green-400 to-teal-500",
+  "from-[var(--ds-brand-primary)] to-teal-500",
   "from-blue-400 to-cyan-500",
   "from-fuchsia-400 to-pink-500",
 ];

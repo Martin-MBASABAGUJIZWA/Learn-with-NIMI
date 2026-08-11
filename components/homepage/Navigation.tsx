@@ -71,7 +71,7 @@ export default function Navigation() {
                 href={link.href}
                 className={`font-nunito font-bold text-[14px] transition-colors pb-0.5 ${
                   link.active
-                    ? "text-[var(--ds-text-primary)] border-b-2 border-nimi-green"
+                    ? "text-[var(--ds-text-primary)] border-b-2 border-[var(--ds-border-brand)]"
                     : "text-[var(--ds-text-primary)] hover:text-[var(--ds-text-primary)] border-b-2 border-transparent"
                 }`}
               >
@@ -89,7 +89,7 @@ export default function Navigation() {
             </Link>
             <Link
               href="/signuppage"
-              className="font-baloo font-black text-white text-[13px] px-5 py-2 rounded-full bg-nimi-green shadow-md hover:brightness-105 transition"
+              className="font-baloo font-black text-white text-[13px] px-5 py-2 rounded-full bg-[var(--ds-brand-primary)] shadow-md hover:brightness-105 transition"
             >
               Get Started
             </Link>
@@ -145,7 +145,7 @@ export default function Navigation() {
                     href={link.href}
                     onClick={() => setMenuOpen(false)}
                     className={`block font-baloo font-black text-[24px] py-3 active:scale-95 transition-transform ${
-                      link.active ? "text-nimi-green" : "text-[var(--ds-text-primary)]"
+                      link.active ? "text-[var(--ds-brand-primary)]" : "text-[var(--ds-text-primary)]"
                     }`}
                   >
                     {link.label}
@@ -171,7 +171,7 @@ export default function Navigation() {
               <Link
                 href="/signuppage"
                 onClick={() => setMenuOpen(false)}
-                className="font-baloo font-black text-white text-[15px] text-center px-4 py-3 rounded-full bg-nimi-green shadow-md"
+                className="font-baloo font-black text-white text-[15px] text-center px-4 py-3 rounded-full bg-[var(--ds-brand-primary)] shadow-md"
               >
                 Get Started
               </Link>

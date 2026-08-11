@@ -10,7 +10,7 @@ const STARS: { className: string; size: string; color: string; delay: number }[]
   { className: "top-[10%] right-[8%]", size: "w-6 h-6", color: "text-yellow-300", delay: 1.2 },
   { className: "top-[12%] right-[16%]", size: "w-3 h-3", color: "text-pink-300", delay: 0.2 },
   { className: "top-[12%] left-[18%]", size: "w-4 h-4", color: "text-pink-300", delay: 0.6 },
-  { className: "top-[14%] left-[32%]", size: "w-3 h-3", color: "text-green-400", delay: 1.0 },
+  { className: "top-[14%] left-[32%]", size: "w-3 h-3", color: "text-[var(--ds-text-brand)]", delay: 1.0 },
   { className: "top-[20%] left-[12%]", size: "w-4 h-4", color: "text-blue-300", delay: 0.3 },
   { className: "top-[22%] left-[25%]", size: "w-3 h-3", color: "text-[var(--ds-text-tertiary)]", delay: 0.9 },
   { className: "top-[18%] right-[20%]", size: "w-3 h-3", color: "text-pink-300", delay: 0.5 },
@@ -43,7 +43,7 @@ export default function AuthBackground() {
       </div>
 
       <svg
-        className="absolute bottom-0 left-0 w-full h-32 sm:h-40 text-green-100 pointer-events-none select-none"
+        className="absolute bottom-0 left-0 w-full h-32 sm:h-40 text-[var(--ds-brand-subtle)] pointer-events-none select-none"
         viewBox="0 0 1600 200" preserveAspectRatio="none" fill="currentColor"
       >
         <ellipse cx="100" cy="190" rx="180" ry="100" />

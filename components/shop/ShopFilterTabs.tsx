@@ -37,7 +37,7 @@ export default function ShopFilterTabs({ filter, onFilterChange }: Props) {
               <motion.div
                 layoutId="shop-filter-pill"
                 className="absolute inset-0 rounded-xl"
-                style={{ backgroundColor: "var(--nimi-green)" }}
+                style={{ backgroundColor: "var(--ds-brand-primary)" }}
                 transition={{ type: "spring", stiffness: 380, damping: 32 }}
               />
             )}

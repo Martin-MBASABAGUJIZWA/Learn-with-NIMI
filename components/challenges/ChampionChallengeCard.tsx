@@ -129,7 +129,7 @@ export default function ChampionChallengeCard({
             </span>
             {difficulty && (
               <span className={`text-3xs font-bold px-2 py-0.5 rounded-full ${
-                difficulty === 'easy' ? 'bg-green-100 text-green-700 border border-green-200' :
+                difficulty === 'easy' ? 'bg-[var(--ds-brand-soft)] text-[var(--ds-text-brand)] border border-[var(--ds-border-brand)]' :
                 difficulty === 'medium' ? 'bg-amber-100 text-amber-700 border border-amber-200' :
                 'bg-red-100 text-red-700 border border-red-200'
               }`}>
@@ -139,7 +139,7 @@ export default function ChampionChallengeCard({
           </div>
 
           {completed ? (
-            <div className="mt-4 inline-flex items-center gap-2 text-white font-black px-6 py-3 text-mbase shadow-lg" style={{ backgroundColor: 'var(--nimi-green)', borderRadius: 'var(--leaf-r)' }}>
+            <div className="mt-4 inline-flex items-center gap-2 text-[var(--ds-nav-bg)] font-black px-6 py-3 text-mbase shadow-lg" style={{ backgroundColor: 'var(--ds-brand-primary)', borderRadius: 'var(--leaf-r)' }}>
               ✅ {t("iDidItBtn")}
             </div>
           ) : (

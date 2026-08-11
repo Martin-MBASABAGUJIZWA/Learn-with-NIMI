@@ -402,7 +402,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
         <PageSurface className="items-center justify-center gap-4 px-4">
           <span className="text-5xl">👶</span>
           <p className="text-ds-text font-bold text-center text-base">No children profiles yet</p>
-          <Link href="/home" className="text-white font-black px-6 py-3 shadow-lg text-sm" style={{ backgroundColor: 'var(--nimi-green)', borderRadius: 'var(--leaf-r-sm)' }}>
+          <Link href="/home" className="text-white font-black px-6 py-3 shadow-lg text-sm" style={{ backgroundColor: 'var(--ds-brand-primary)', borderRadius: 'var(--leaf-r-sm)' }}>
             Create a Profile
           </Link>
         </PageSurface>
@@ -568,7 +568,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
               initial={{ opacity: 0, y: -12 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -12 }}
-              className="fixed top-20 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-4 py-2.5 rounded-full bg-emerald-600 text-white text-sml font-black shadow-xl"
+              className="fixed top-20 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-4 py-2.5 rounded-full bg-[var(--ds-brand-primary)] text-[var(--ds-nav-bg)] text-sml font-black shadow-xl"
             >
               {`🎮 Switched to ${childrenData.find(d => d.child.id === playingChildId)?.child.name ?? "kid"} — whole app updated!`}
             </motion.div>
@@ -608,7 +608,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                 </div>
                 <div className="px-4 pb-4 border-t border-red-100 pt-3 flex gap-2">
                   <a href="/pricing" className="flex-1 text-center py-2 text-xs font-black text-white rounded-xl transition"
-                    style={{ backgroundColor: "var(--nimi-green)" }}>
+                    style={{ backgroundColor: "var(--ds-brand-primary)" }}>
                     Resubscribe →
                   </a>
                   {subscription?.payment_provider === "cybersource" && (
@@ -764,7 +764,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                     className={`flex items-center gap-2.5 px-3.5 py-2.5 font-bold text-sml transition border-2 ${
                       isSelected ? "text-white shadow-sm" : "bg-[var(--ds-surface-card)] text-ds-text border-ds-border hover:bg-[var(--ds-surface-card-hover)]"
                     }`}
-                    style={{ borderRadius: 'var(--leaf-r)', ...(isSelected ? { backgroundColor: 'var(--nimi-green)', borderColor: 'var(--nimi-green)' } : {}) }}>
+                    style={{ borderRadius: 'var(--leaf-r)', ...(isSelected ? { backgroundColor: 'var(--ds-brand-primary)', borderColor: 'var(--ds-brand-primary)' } : {}) }}>
                     <div className="relative w-8 h-8 rounded-full overflow-hidden shrink-0 bg-[var(--ds-surface-card)]/20 flex items-center justify-center">
                       <ChildAvatar avatarUrl={d.child.avatar_url} name={d.child.name} size={32} />
                       {isPlaying && (
@@ -819,7 +819,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                   </div>
                   <div className="px-3 pb-3 border-t border-red-100 pt-2 space-y-1.5">
                     <a href="/pricing" className="block text-center py-1.5 text-2xs font-black text-white rounded-xl transition"
-                      style={{ backgroundColor: "var(--nimi-green)" }}>
+                      style={{ backgroundColor: "var(--ds-brand-primary)" }}>
                       Resubscribe →
                     </a>
                     {subscription?.payment_provider === "cybersource" && (
@@ -986,7 +986,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                                 {d.child.name}
                               </p>
                               {isPlaying && (
-                                <span className="shrink-0 text-4xs font-black text-emerald-600 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-full leading-none">
+                                <span className="shrink-0 text-4xs font-black text-[var(--ds-text-brand)] bg-[var(--ds-brand-subtle)] border border-[var(--ds-border-brand)] px-1.5 py-0.5 rounded-full leading-none">
                                   PLAYING
                                 </span>
                               )}
@@ -994,7 +994,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                             <div className="flex items-center gap-1.5 mt-1">
                               <div className="flex-1 h-1.5 bg-[var(--ds-surface-card-active)] rounded-full overflow-hidden">
                                 <div
-                                  className="h-full rounded-full bg-[var(--nimi-green)] transition-all duration-500"
+                                  className="h-full rounded-full bg-[var(--ds-brand-primary)] transition-all duration-500"
                                   style={{ width: `${total > 0 ? (done / total) * 100 : 0}%` }}
                                 />
                               </div>
@@ -1009,7 +1009,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                                   <>
                                     <span className={`text-4xs font-black px-1.5 py-0.5 rounded-full leading-none ${
                                       todaySessions > 0
-                                        ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                                        ? "bg-[var(--ds-brand-subtle)] text-[var(--ds-text-brand)] border border-[var(--ds-border-brand)]"
                                         : "bg-[var(--ds-surface-card-hover)] text-[var(--ds-text-tertiary)] border border-[var(--ds-border-primary)]"
                                     }`}>
                                       {todaySessions > 0 ? `${todaySessions} today` : "0 today"}
@@ -1066,7 +1066,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                 <div className="shrink-0 flex items-center gap-2">
                   <div className="w-20 h-1.5 bg-[var(--ds-surface-card-active)] rounded-full overflow-hidden">
                     <div
-                      className="h-full rounded-full bg-[var(--nimi-green)]"
+                      className="h-full rounded-full bg-[var(--ds-brand-primary)]"
                       style={{ width: `${totalStories > 0 ? (storiesComplete / totalStories) * 100 : 0}%` }}
                     />
                   </div>
@@ -1139,7 +1139,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                             initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.18 }}
                             onClick={() => setShowSwitchMenu(v => !v)}
-                            className="flex items-center gap-2 px-4 py-2.5 border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-baloo font-black text-xs transition"
+                            className="flex items-center gap-2 px-4 py-2.5 border border-[var(--ds-border-brand)] bg-[var(--ds-brand-subtle)] text-[var(--ds-text-brand)] hover:bg-[var(--ds-brand-soft)] font-baloo font-black text-xs transition"
                             style={{ borderRadius: "var(--leaf-r)" }}
                           >
                             <span className="text-base">🔄</span>
@@ -1166,7 +1166,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                                       <button
                                         key={d.child.id}
                                         onClick={() => { switchPlaying(d.child.id); setShowSwitchMenu(false); }}
-                                        className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-emerald-50 transition text-left"
+                                        className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-[var(--ds-brand-subtle)] transition text-left"
                                       >
                                         <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 bg-[var(--ds-surface-card-active)] flex items-center justify-center">
                                           <ChildAvatar avatarUrl={d.child.avatar_url} name={d.child.name} size={32} />
@@ -1225,7 +1225,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                                     <span>🔥 {d.streak}</span>
                                   </div>
                                   <div className="h-1.5 bg-[var(--ds-surface-card-active)] rounded-full overflow-hidden">
-                                    <div className="h-full rounded-full bg-[var(--nimi-green)] transition-all" style={{ width: `${pct * 100}%` }} />
+                                    <div className="h-full rounded-full bg-[var(--ds-brand-primary)] transition-all" style={{ width: `${pct * 100}%` }} />
                                   </div>
                                   <p className="text-4xs text-ds-muted font-semibold mt-0.5 text-center">{done}/{total} stories</p>
                                 </div>
@@ -1446,7 +1446,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                                 <motion.circle
                                   cx="36" cy="36" r="28"
                                   fill="none"
-                                  stroke={done ? "var(--nimi-green)" : "#6366f1"}
+                                  stroke={done ? "var(--ds-brand-primary)" : "#6366f1"}
                                   strokeWidth="6"
                                   strokeLinecap="round"
                                   strokeDasharray={`${C} ${C}`}
@@ -1456,7 +1456,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                                 />
                               </svg>
                               <div className="text-center z-10">
-                                <p className={`font-baloo font-black text-lg leading-none ${done ? "text-[var(--nimi-green)]" : "text-indigo-600"}`}>
+                                <p className={`font-baloo font-black text-lg leading-none ${done ? "text-[var(--ds-brand-primary)]" : "text-indigo-600"}`}>
                                   {todaySessions}
                                 </p>
                                 <p className="text-ds-muted text-4xs font-bold leading-none">/{dailyGoal}</p>
@@ -1506,8 +1506,8 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                           const isFuture = i > todayIdx;
                           const isToday = i === todayIdx;
                           const intensity = count === 0 ? 0 : count < 3 ? 1 : count < 6 ? 2 : 3;
-                          const bgColors = ["bg-[var(--ds-surface-card-active)]", "bg-emerald-200", "bg-emerald-400", "bg-emerald-600"];
-                          const textColors = ["text-[var(--ds-text-tertiary)]", "text-emerald-800", "text-white", "text-white"];
+                          const bgColors = ["bg-[var(--ds-surface-card-active)]", "bg-[var(--ds-brand-soft)]", "bg-[var(--ds-brand-primary)]/60", "bg-[var(--ds-brand-primary)]"];
+                          const textColors = ["text-[var(--ds-text-tertiary)]", "text-[var(--ds-text-brand)]", "text-[var(--ds-nav-bg)]", "text-[var(--ds-nav-bg)]"];
                           return (
                             <div key={day} className="flex flex-col items-center gap-1.5 flex-1">
                               <motion.div
@@ -1541,9 +1541,9 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                           </div>
                         );
                         if (activeDays >= 5) return (
-                          <div className="mt-3 flex items-center gap-2 p-3 bg-emerald-50 border border-emerald-200 rounded-xl">
+                          <div className="mt-3 flex items-center gap-2 p-3 bg-[var(--ds-brand-subtle)] border border-[var(--ds-border-brand)] rounded-xl">
                             <span className="text-xl">🏆</span>
-                            <p className="text-emerald-700 text-xs font-semibold">{activeDays}/7 days active · {totalSessions} total sessions — incredible week!</p>
+                            <p className="text-[var(--ds-text-brand)] text-xs font-semibold">{activeDays}/7 days active · {totalSessions} total sessions — incredible week!</p>
                           </div>
                         );
                         return (
@@ -1697,7 +1697,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                       const dailyGoal = (goalPrefs.dailyGoal as number) || 2;
                       let tip: { emoji: string; title: string; desc: string; cta: string; href: string; bg: string; border: string; text: string };
                       if (todaySessions >= dailyGoal) {
-                        tip = { emoji: "🎉", title: "Daily goal reached!", desc: `${active.child.name} completed all ${dailyGoal} sessions today. Celebrate this win!`, cta: "See achievements →", href: "#", bg: "bg-emerald-50", border: "border-emerald-200", text: "text-emerald-700" };
+                        tip = { emoji: "🎉", title: "Daily goal reached!", desc: `${active.child.name} completed all ${dailyGoal} sessions today. Celebrate this win!`, cta: "See achievements →", href: "#", bg: "bg-[var(--ds-brand-subtle)]", border: "border-[var(--ds-border-brand)]", text: "text-[var(--ds-text-brand)]" };
                       } else if (todaySessions === 0) {
                         tip = { emoji: "⏰", title: "Start today's learning", desc: `${active.child.name} hasn't practiced yet. Even 10 minutes makes a big difference.`, cta: "Open Stories →", href: "/stories", bg: "bg-blue-50", border: "border-blue-200", text: "text-blue-700" };
                       } else if (active.streak === 0) {
@@ -1880,7 +1880,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                               </div>
                             )}
                             {pct >= 1 && (
-                              <p className="mt-1 text-xs font-black text-emerald-600">👑 Curriculum complete!</p>
+                              <p className="mt-1 text-xs font-black text-[var(--ds-text-brand)]">👑 Curriculum complete!</p>
                             )}
                           </div>
                         </div>
@@ -1906,7 +1906,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                           style={{ borderRadius: "var(--leaf-r)" }}
                         >
                           <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-base font-black shadow-sm shrink-0 ${
-                            story.complete ? "bg-[var(--nimi-green)] text-white" : story.unlocked ? "bg-yellow-500 text-white" : "bg-[var(--ds-border-primary)] text-[var(--ds-text-tertiary)]"
+                            story.complete ? "bg-[var(--ds-brand-primary)] text-white" : story.unlocked ? "bg-yellow-500 text-white" : "bg-[var(--ds-border-primary)] text-[var(--ds-text-tertiary)]"
                           }`}>
                             {story.sort_order}
                           </div>
@@ -1923,7 +1923,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                               </div>
                             )}
                           </div>
-                          {story.complete && <span className="text-emerald-600 text-2xs font-black shrink-0">✅ Done</span>}
+                          {story.complete && <span className="text-[var(--ds-text-brand)] text-2xs font-black shrink-0">✅ Done</span>}
                           {!story.unlocked && <Lock className="w-3.5 h-3.5 text-[var(--ds-text-tertiary)] shrink-0" />}
                         </motion.div>
                       );
@@ -1945,7 +1945,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                             </Section>
                           )}
                           {completed.length > 0 && (
-                            <Section label={`Completed · ${completed.length}`} emoji="✅" color="text-emerald-700">
+                            <Section label={`Completed · ${completed.length}`} emoji="✅" color="text-[var(--ds-text-brand)]">
                               {completed.map((s, i) => <StoryRow key={s.sid} story={s} i={i} />)}
                             </Section>
                           )}
@@ -2010,7 +2010,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                                   className="w-16 h-16 rounded-full flex items-center justify-center bg-gradient-to-b from-amber-300 to-yellow-500 ring-[3px] ring-amber-400 shadow-[0_6px_20px_rgba(251,191,36,0.45)] relative"
                                 >
                                   <span className="text-3xl leading-none select-none">{meta.emoji}</span>
-                                  <div className="absolute -top-1 -right-1 w-5 h-5 bg-emerald-500 rounded-full flex items-center justify-center shadow-sm">
+                                  <div className="absolute -top-1 -right-1 w-5 h-5 bg-[var(--ds-brand-primary)] rounded-full flex items-center justify-center shadow-sm">
                                     <span className="text-5xs text-white font-black">✓</span>
                                   </div>
                                 </motion.div>
@@ -2228,8 +2228,8 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                         desc:   `${storiesComplete > 0 ? storiesComplete : "0"} spread${storiesComplete !== 1 ? "s" : ""} · stamp collection inside`,
                         href:   `/api/airways/passport?childId=${active.child.id}`,
                         accent: "#1A7A3E",
-                        bg:     "from-emerald-500/10 to-teal-500/5",
-                        border: "border-emerald-200/70",
+                        bg:     "from-[var(--ds-brand-primary)]/10 to-teal-500/5",
+                        border: "border-[var(--ds-border-brand)]/70",
                         slow:   true,
                       },
                       {
@@ -2359,7 +2359,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                         <p className="font-black text-ds-text text-sml leading-none">Journey Progress</p>
                         <p className="text-[var(--ds-text-secondary)] text-4xs mt-0.5">{storiesComplete} of {totalStories} stories complete</p>
                         <div className="mt-2 h-1.5 bg-[var(--ds-surface-card-active)] rounded-full overflow-hidden">
-                          <div className="h-full rounded-full bg-[var(--nimi-green)] transition-all"
+                          <div className="h-full rounded-full bg-[var(--ds-brand-primary)] transition-all"
                             style={{ width: `${totalStories > 0 ? (storiesComplete / totalStories) * 100 : 0}%` }} />
                         </div>
                       </div>

@@ -71,6 +71,20 @@ export async function completeCurriculumMission(
     console.error("[completeCurriculumMission]", error.message);
     return null;
   }
+
+  // Invalidate the server-side passport PDF cache — the completed mission may
+  // have finished a story, making the cached passport stale for up to 1 hour.
+  // Fire-and-forget: a failed cache bust is non-fatal; TTL handles it eventually.
+  if (typeof window !== 'undefined') {
+    const token = (await supabase.auth.getSession()).data.session?.access_token
+    if (token) {
+      void fetch(`/api/airways/invalidate-passport-cache?childId=${childId}`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      }).catch(() => null)
+    }
+  }
+
   // Bust per-child progress caches so AppShell + home page see fresh data.
   qinvalidate(`progressRows:${childId}`);  lsinvalidate(`progressRows:${childId}`);
   qinvalidate(`bonusStars:${childId}`);    lsinvalidate(`bonusStars:${childId}`);

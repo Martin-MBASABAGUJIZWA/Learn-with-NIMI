@@ -151,6 +151,7 @@ export interface PassportSpreadData {
   coverDataUri:          string | null
   nextStory:             AirwaysStory | null
   nextCoverDataUri:      string | null
+  isPersonalized?:       boolean
   layout?:               PassportSpreadLayout | null
 }
 
@@ -158,8 +159,9 @@ export async function buildPassportSpread(data: PassportSpreadData): Promise<Buf
   const L = { ...DEFAULTS, ...(data.layout ?? {}) }
 
   // Fetch template (cached after first call) — use its ACTUAL pixel dimensions
-  const templateBuf = await fetchTemplate('passport-interior')
-  const dims = getTemplateDimensions('passport-interior')
+  const spreadTemplateKey = data.isPersonalized === false ? 'passport-interior-free' : 'passport-interior'
+  const templateBuf = await fetchTemplate(spreadTemplateKey)
+  const dims = getTemplateDimensions(spreadTemplateKey)
   const TW = dims?.width  ?? SPREAD_W
   const TH = dims?.height ?? SPREAD_H
 

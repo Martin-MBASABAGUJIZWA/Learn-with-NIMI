@@ -30,7 +30,7 @@ export default function ParentGateModal({ isOpen, onConfirm, onCancel, childName
               <X className="w-4 h-4" />
             </button>
 
-            <div className="w-14 h-14 flex items-center justify-center mx-auto mb-4 shadow-lg" style={{ backgroundColor: 'var(--nimi-green)', borderRadius: 'var(--leaf-r)' }}>
+            <div className="w-14 h-14 flex items-center justify-center mx-auto mb-4 shadow-lg" style={{ backgroundColor: 'var(--ds-brand-primary)', borderRadius: 'var(--leaf-r)' }}>
               <ShieldCheck className="w-7 h-7 text-white" />
             </div>
 

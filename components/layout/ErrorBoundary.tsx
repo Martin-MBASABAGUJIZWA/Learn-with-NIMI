@@ -29,7 +29,7 @@ export default class ErrorBoundary extends Component<Props, State> {
           <button
             onClick={() => this.setState({ hasError: false })}
             className="mt-4 px-6 py-3 font-bold text-white shadow-md transition"
-            style={{ backgroundColor: "var(--nimi-green)", borderRadius: "var(--leaf-r)" }}
+            style={{ backgroundColor: "var(--ds-brand-primary)", borderRadius: "var(--leaf-r)" }}
           >
             Try again
           </button>

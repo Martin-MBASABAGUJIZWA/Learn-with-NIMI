@@ -41,8 +41,8 @@ const STATUS_CONFIG: Record<HealthStatus, {
 }> = {
   healthy: {
     label: "Healthy",        emoji: "✓",
-    bg: "bg-emerald-50",    border: "border-emerald-200", text: "text-emerald-700",
-    barColor: "bg-emerald-500",
+    bg: "bg-[var(--ds-brand-subtle)]", border: "border-[var(--ds-border-brand)]", text: "text-[var(--ds-text-brand)]",
+    barColor: "bg-[var(--ds-brand-primary)]",
   },
   approaching: {
     label: "Near limit",    emoji: "⚠",

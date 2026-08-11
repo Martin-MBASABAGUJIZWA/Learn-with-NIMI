@@ -53,20 +53,21 @@ export async function fetchAirwaysData(
     .single();
   if (childErr || !child) return null;
 
-  // ── Sibling rank (for champion number) ──────────────────────
-  const { count } = await supabase
-    .from("children")
-    .select("id", { count: "exact", head: true })
-    .eq("parent_id", child.parent_id)
-    .lte("created_at", child.created_at);
+  // ── Sibling rank + stories — parallel (stories are child-independent) ──────
+  const [{ count }, { data: storiesRaw }] = await Promise.all([
+    supabase
+      .from("children")
+      .select("id", { count: "exact", head: true })
+      .eq("parent_id", child.parent_id)
+      .lte("created_at", child.created_at),
+    supabase
+      .from("stories")
+      .select("id, title, slug, cover_url, sort_order, attitude")
+      .eq("is_active", true)
+      .order("sort_order"),
+  ]);
   const sibling_rank = count ?? 1;
 
-  // ── All active stories ordered ───────────────────────────────
-  const { data: storiesRaw } = await supabase
-    .from("stories")
-    .select("id, title, slug, cover_url, sort_order, attitude")
-    .eq("is_active", true)
-    .order("sort_order");
   if (!storiesRaw?.length) {
     return { ...child, sibling_rank, stories: [], current_story: null };
   }

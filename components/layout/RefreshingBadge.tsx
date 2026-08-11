@@ -6,7 +6,7 @@ export function RefreshingBadge({ show }: { show: boolean }) {
     <div className="fixed top-0 left-0 right-0 z-[9999] h-[3px] overflow-hidden pointer-events-none">
       <div
         className="h-full animate-progress-bar"
-        style={{ background: "var(--nimi-green)" }}
+        style={{ background: "var(--ds-brand-primary)" }}
       />
       <style>{`
         @keyframes progress-bar {

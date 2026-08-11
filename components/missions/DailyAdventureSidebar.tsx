@@ -84,10 +84,10 @@ export default function DailyAdventureSidebar({ activitiesCompleted }: Props) {
         <img
           src={assets.nimiCircle}
           alt="Nimi"
-          className="w-12 h-12 rounded-full object-cover border-2 shadow shrink-0" style={{ borderColor: 'var(--nimi-green)' }}
+          className="w-12 h-12 rounded-full object-cover border-2 shadow shrink-0" style={{ borderColor: 'var(--ds-brand-primary)' }}
          loading="lazy" />
-        <div className="bg-emerald-50 rounded-xl rounded-tl-none px-3 py-2">
-          <p className="text-emerald-800 text-xs font-semibold">{t("pikoEncouragement")}</p>
+        <div className="bg-[var(--ds-brand-subtle)] rounded-xl rounded-tl-none px-3 py-2">
+          <p className="text-[var(--ds-text-brand)] text-xs font-semibold">{t("pikoEncouragement")}</p>
         </div>
       </div>
     </div>

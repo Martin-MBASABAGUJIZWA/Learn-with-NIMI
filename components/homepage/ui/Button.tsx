@@ -13,7 +13,7 @@ interface ButtonProps {
 }
 
 const VARIANT: Record<Variant, string> = {
-  primary: "bg-nimi-green text-white shadow-lg hover:brightness-105",
+  primary: "bg-[var(--ds-brand-primary)] text-white shadow-lg hover:brightness-105",
   secondary: "bg-[var(--ds-surface-card)] text-[var(--ds-text-primary)] border border-[var(--ds-border-primary)] hover:bg-[var(--ds-surface-card)]",
   outline: "bg-transparent text-[var(--ds-text-primary)] border border-[var(--ds-border-strong)] hover:bg-[var(--ds-surface-card)]",
 };

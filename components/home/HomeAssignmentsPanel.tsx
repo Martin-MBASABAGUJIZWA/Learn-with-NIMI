@@ -125,14 +125,14 @@ function MissionAdventureCard({
     return (
       <div
         className="px-4 py-3 flex items-center gap-3"
-        style={{ background: "var(--ds-brand-soft)", borderRadius: "14px 14px 14px 4px", border: "1px solid #bbf7d0" }}
+        style={{ background: "var(--ds-brand-soft)", borderRadius: "14px 14px 14px 4px", border: "1px solid var(--ds-border-brand)" }}
       >
-        <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-500" />
+        <CheckCircle2 className="w-4 h-4 shrink-0 text-[var(--ds-brand-primary)]" />
         <div className="flex-1 min-w-0">
-          <p className="font-nunito font-bold text-xs text-emerald-700 line-through truncate">
+          <p className="font-nunito font-bold text-xs text-[var(--ds-text-brand)] line-through truncate">
             {card.story_title ?? card.title}
           </p>
-          <p className="font-nunito text-3xs text-emerald-600">Adventure complete!</p>
+          <p className="font-nunito text-3xs text-[var(--ds-text-secondary)]">Adventure complete!</p>
         </div>
         <span className="text-lg">⭐</span>
       </div>
@@ -142,13 +142,13 @@ function MissionAdventureCard({
   return (
     <div
       className="overflow-hidden"
-      style={{ borderRadius: "18px 18px 18px 5px", border: "1.5px solid #bbf7d0", background: "var(--ds-surface-card)" }}
+      style={{ borderRadius: "18px 18px 18px 5px", border: "1.5px solid var(--ds-border-brand)", background: "var(--ds-surface-card)" }}
     >
       {/* Header — always visible, tap to collapse */}
       <button
         onClick={() => setOpen(o => !o)}
         className="w-full text-left"
-        style={{ background: "linear-gradient(135deg, #15803d 0%, #166534 100%)" }}
+        style={{ background: "linear-gradient(135deg, var(--ds-brand-primary), var(--ds-brand-hover))" }}
       >
         <div className="px-4 pt-4 pb-3">
 
@@ -251,18 +251,18 @@ function MissionAdventureCard({
                       transition={{ delay: i * 0.04, duration: 0.2 }}
                       className="flex items-center gap-3 px-3 py-2.5 rounded-xl"
                       style={{
-                        background: sl.completed ? "#f0fdf4" : isNext ? "#fefce8" : "transparent",
+                        background: sl.completed ? "var(--ds-brand-subtle)" : isNext ? "#fefce8" : "transparent",
                       }}
                     >
                       {sl.completed
-                        ? <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-500" />
+                        ? <CheckCircle2 className="w-4 h-4 shrink-0 text-[var(--ds-brand-primary)]" />
                         : <Circle className={`w-4 h-4 shrink-0 ${isNext ? "text-amber-400" : "text-gray-200"}`} />}
 
                       <span className="text-mbase">{meta.emoji}</span>
 
                       <span
                         className={`font-nunito font-bold text-sml flex-1 ${
-                          sl.completed ? "text-emerald-700 line-through" : isNext ? "text-amber-700" : "text-[var(--ds-text-tertiary)]"
+                          sl.completed ? "text-[var(--ds-text-brand)] line-through" : isNext ? "text-amber-700" : "text-[var(--ds-text-tertiary)]"
                         }`}
                       >
                         {meta.label}
@@ -313,8 +313,8 @@ function MissionAdventureCard({
               ) : card.story_slug ? (
                 <Link
                   href={`/stories/${card.story_slug}`}
-                  className="flex items-center justify-center gap-2 w-full font-nunito font-bold text-sml text-white py-3 transition-all hover:opacity-90 active:scale-[0.98]"
-                  style={{ background: "#15803d", borderRadius: "12px 12px 12px 3px" }}
+                  className="flex items-center justify-center gap-2 w-full font-nunito font-bold text-sml text-[var(--ds-nav-bg)] py-3 transition-all hover:opacity-90 active:scale-[0.98]"
+                  style={{ background: "var(--ds-brand-primary)", borderRadius: "12px 12px 12px 3px" }}
                 >
                   <span>{SLOT_META[nextSlot?.slot_key ?? ""]?.emoji ?? "▶"}</span>
                   Continue Adventure →
@@ -345,7 +345,7 @@ function SimpleTaskCard({
         className="px-4 py-3 flex items-center gap-3"
         style={{ background: "var(--ds-surface-card)", borderRadius: "14px 14px 14px 4px", border: "1px solid var(--ds-border-primary)" }}
       >
-        <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-500" />
+        <CheckCircle2 className="w-4 h-4 shrink-0 text-[var(--ds-brand-primary)]" />
         <p className="font-nunito text-xs flex-1 line-through text-[var(--ds-text-tertiary)]">{card.title}</p>
       </div>
     );
@@ -368,7 +368,7 @@ function SimpleTaskCard({
     >
       <div className="flex items-start justify-between gap-2 mb-1.5">
         <p className="font-nunito font-bold text-sml flex-1 text-[var(--ds-text-primary)]">{card.title}</p>
-        {due && <span className="font-nunito text-3xs text-emerald-600 shrink-0">{due}</span>}
+        {due && <span className="font-nunito text-3xs text-[var(--ds-text-brand)] shrink-0">{due}</span>}
       </div>
       {card.instructions && (
         <p className="font-nunito text-xs text-[var(--ds-text-secondary)] mb-2.5">{card.instructions}</p>
@@ -415,7 +415,7 @@ function NoMissionsCard() {
   return (
     <div
       className="px-5 py-5 flex flex-col items-center text-center gap-3"
-      style={{ background: "linear-gradient(135deg,#f0fdf4,#dcfce7)", borderRadius: "18px 18px 18px 5px", border: "1px solid #bbf7d0" }}
+      style={{ background: "var(--ds-brand-subtle)", borderRadius: "18px 18px 18px 5px", border: "1px solid var(--ds-border-brand)" }}
     >
       <motion.span
         className="text-5xl leading-none"
@@ -425,14 +425,14 @@ function NoMissionsCard() {
         🌱
       </motion.span>
       <div>
-        <p className="font-baloo font-black text-mbase text-emerald-800 leading-tight">Adventures on their way!</p>
-        <p className="font-nunito text-xs text-emerald-700/70 mt-1 max-w-[200px] leading-relaxed">
+        <p className="font-baloo font-black text-mbase text-[var(--ds-text-brand)] leading-tight">Adventures on their way!</p>
+        <p className="font-nunito text-xs text-[var(--ds-text-secondary)] mt-1 max-w-[200px] leading-relaxed">
           Your teacher will send class missions here. Check back soon!
         </p>
       </div>
-      <div className="flex items-center gap-1.5 bg-emerald-100/60 px-3 py-1.5 rounded-full">
+      <div className="flex items-center gap-1.5 bg-[var(--ds-brand-soft)] px-3 py-1.5 rounded-full">
         <span className="text-2xs">✉️</span>
-        <span className="font-nunito font-bold text-2xs text-emerald-700">Waiting for a mission…</span>
+        <span className="font-nunito font-bold text-2xs text-[var(--ds-text-brand)]">Waiting for a mission…</span>
       </div>
     </div>
   );
@@ -514,11 +514,11 @@ export default function HomeAssignmentsPanel({ childId, language }: Props) {
         className="w-full flex items-center justify-between px-4 pt-4 pb-3 hover:bg-[var(--ds-surface-card-hover)]/60 transition-colors"
       >
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center text-lg shadow-sm shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-[var(--ds-brand-soft)] flex items-center justify-center text-lg shadow-sm shrink-0">
             🌟
           </div>
           <div className="text-left">
-            <p className="font-nunito text-emerald-500 text-3xs uppercase tracking-widest leading-none mb-0.5">Class</p>
+            <p className="font-nunito text-[var(--ds-text-brand)] text-3xs uppercase tracking-widest leading-none mb-0.5">Class</p>
             <p className="font-baloo font-black text-[var(--ds-text-primary)] text-mlg leading-tight">Adventures</p>
             <p className="font-nunito text-2xs mt-0.5 text-[var(--ds-text-tertiary)]">
               {pending.length > 0
@@ -581,7 +581,7 @@ export default function HomeAssignmentsPanel({ childId, language }: Props) {
                   className="text-center py-5"
                 >
                   <p className="text-3xl mb-1">🏆</p>
-                  <p className="font-baloo font-black text-sm text-emerald-700">Hero of the class!</p>
+                  <p className="font-baloo font-black text-sm text-[var(--ds-text-brand)]">Hero of the class!</p>
                   <p className="font-nunito text-2xs text-[var(--ds-text-tertiary)] mt-0.5">All missions complete.</p>
                 </motion.div>
               )}

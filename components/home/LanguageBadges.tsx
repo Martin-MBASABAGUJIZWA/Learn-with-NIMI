@@ -8,7 +8,7 @@ import type { Child } from "@/lib/queries";
 import LanguageSwitchDialog from "@/components/LanguageSwitchDialog";
 
 const LANG_BADGES: { code: Language; line1: string; line2: string; flag: string; border: string }[] = [
-  { code: "fr", line1: "FRENCH",      line2: "EXPLORER", flag: "/flags/fr.svg", border: "border-green-500" },
+  { code: "fr", line1: "FRENCH",      line2: "EXPLORER", flag: "/flags/fr.svg", border: "border-[var(--ds-border-brand)]" },
   { code: "en", line1: "ENGLISH",     line2: "EXPLORER", flag: "/flags/us.svg", border: "border-blue-500"  },
   { code: "rw", line1: "KINYARWANDA", line2: "EXPLORER", flag: "/flags/rw.svg", border: "border-orange-400"},
 ];
@@ -50,7 +50,7 @@ export default function LanguageBadges({ activeChild, earnedLanguages, onLanguag
                 key={badge.code}
                 type="button"
                 onClick={() => { if (badge.code !== language) setPendingLanguage(badge.code) }}
-                className={`flex flex-col items-center bg-[var(--ds-surface-card)] border-[3px] ${earned ? badge.border : "border-[var(--ds-border-primary)]"} rounded-[50%] shadow-md overflow-hidden hover:scale-105 transition-transform cursor-pointer ${badge.code === language ? "ring-2 ring-[var(--nimi-green)]" : ""}`}
+                className={`flex flex-col items-center bg-[var(--ds-surface-card)] border-[3px] ${earned ? badge.border : "border-[var(--ds-border-primary)]"} rounded-[50%] shadow-md overflow-hidden hover:scale-105 transition-transform cursor-pointer ${badge.code === language ? "ring-2 ring-[var(--ds-brand-primary)]" : ""}`}
                 style={{ width: 68, height: 92 }}>
                 <div className="w-full flex-1 overflow-hidden">
                   <Image src={badge.flag} alt={badge.line1} width={68} height={80} className="w-full h-full object-cover" />

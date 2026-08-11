@@ -52,7 +52,7 @@ export default function WelcomeBackOverlay({ childName, daysAway, onDismiss }: P
           >
             {/* Illustrated top band */}
             <div className="h-32 flex items-center justify-center relative"
-              style={{ background: "linear-gradient(135deg, #d1fae5 0%, #a7f3d0 50%, #6ee7b7 100%)" }}>
+              style={{ background: "linear-gradient(135deg, var(--ds-brand-subtle) 0%, var(--ds-brand-soft) 50%, var(--ds-brand-primary) 100%)" }}>
               <motion.span
                 className="text-7xl leading-none select-none"
                 animate={{ rotate: [0, -8, 8, -4, 0], scale: [1, 1.1, 1.05, 1.1, 1] }}
@@ -73,16 +73,17 @@ export default function WelcomeBackOverlay({ childName, daysAway, onDismiss }: P
               </p>
 
               {/* Progress nudge */}
-              <div className="bg-emerald-50 rounded-2xl px-4 py-3 mb-5 flex items-center gap-3">
+              <div className="bg-[var(--ds-brand-subtle)] rounded-2xl px-4 py-3 mb-5 flex items-center gap-3">
                 <span className="text-2.5xl">🔥</span>
-                <p className="font-nunito text-emerald-700 text-sml text-left leading-snug">
+                <p className="font-nunito text-[var(--ds-text-brand)] text-sml text-left leading-snug">
                   Start today's adventure to <strong>light a new streak</strong> — every journey begins with one step!
                 </p>
               </div>
 
               <button
                 onClick={dismiss}
-                className="w-full bg-[var(--nimi-green)] text-white font-baloo font-black text-base py-3.5 rounded-2xl hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-green-200/50"
+                className="w-full text-[var(--ds-nav-bg)] font-baloo font-black text-base py-3.5 rounded-2xl hover:opacity-90 active:scale-95 transition-all shadow-lg"
+                style={{ background: "linear-gradient(135deg, var(--ds-brand-primary), var(--ds-brand-hover))" }}
               >
                 Let's go! 🚀
               </button>

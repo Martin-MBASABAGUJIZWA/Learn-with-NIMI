@@ -28,11 +28,11 @@ export default function HomeStoryJourneyPanel({ curStory, slots, pct, hasSubscri
       {/* Header */}
       <div className="flex items-center justify-between px-4 pt-4 pb-3">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center text-xl shadow-sm shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-[var(--ds-brand-subtle)] flex items-center justify-center text-xl shadow-sm shrink-0">
             📖
           </div>
           <div>
-            <p className="font-nunito text-emerald-500 text-3xs uppercase tracking-widest leading-none mb-0.5">
+            <p className="font-nunito text-[var(--ds-text-brand)] text-3xs uppercase tracking-widest leading-none mb-0.5">
               {t("journeyEyebrow")}
             </p>
             <h3 className="font-baloo font-black text-[var(--ds-text-primary)] text-mlg leading-tight">
@@ -55,7 +55,7 @@ export default function HomeStoryJourneyPanel({ curStory, slots, pct, hasSubscri
                   <Image src={getStorageUrl(curStory.cover_url)} alt={curStory.title} fill className="object-cover" />
                 </div>
               ) : (
-                <div className="w-14 h-14 rounded-xl flex items-center justify-center text-2xl shrink-0 bg-emerald-50 border border-emerald-100">
+                <div className="w-14 h-14 rounded-xl flex items-center justify-center text-2xl shrink-0 bg-[var(--ds-brand-subtle)] border border-[var(--ds-border-brand)]/30">
                   {curStory.theme_emoji ?? "📖"}
                 </div>
               )}
@@ -63,7 +63,7 @@ export default function HomeStoryJourneyPanel({ curStory, slots, pct, hasSubscri
                 <p className="font-baloo font-black text-[var(--ds-text-primary)] text-sm leading-tight line-clamp-2">
                   {curStory.title}
                 </p>
-                <p className="font-nunito text-emerald-500 text-2xs mt-0.5">
+                <p className="font-nunito text-[var(--ds-text-brand)] text-2xs mt-0.5">
                   {curStory.complete
                     ? "✓ " + t("journeyCompleted")
                     : t("journeyMissionsOf").replace("{done}", String(done)).replace("{total}", String(total || 6))}
@@ -79,7 +79,7 @@ export default function HomeStoryJourneyPanel({ curStory, slots, pct, hasSubscri
                     initial={{ scaleX: 0 }} animate={{ scaleX: 1 }}
                     transition={{ delay: i * 0.06, ease: "easeOut" }}
                     className={`flex-1 h-2 rounded-full origin-left ${
-                      slot.completed ? "bg-emerald-400" : "bg-[var(--ds-surface-card-hover)]"
+                      slot.completed ? "bg-[var(--ds-brand-primary)]" : "bg-[var(--ds-surface-card-hover)]"
                     }`} />
                 ))}
               </div>
@@ -106,14 +106,16 @@ export default function HomeStoryJourneyPanel({ curStory, slots, pct, hasSubscri
           </Link>
         ) : curStory && !curStory.complete ? (
           <Link href={`/stories/${curStory.slug}`}
-            className="flex items-center justify-center gap-2 w-full font-baloo font-black text-white text-sml py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 transition-all hover:-translate-y-0.5 active:scale-95 shadow-sm shadow-emerald-200">
+            className="flex items-center justify-center gap-2 w-full font-baloo font-black text-sml py-2.5 rounded-xl transition-all hover:-translate-y-0.5 active:scale-95"
+            style={{ background: "linear-gradient(135deg,var(--ds-brand-primary),var(--ds-brand-hover))", color: "var(--ds-nav-bg)", boxShadow: "var(--ds-shadow-cta)" }}>
             <Play className="w-3.5 h-3.5 fill-current" />
             {t("storyStatusContinue")}
           </Link>
         ) : !curStory ? (
           <Link href="/stories"
-            className="flex items-center justify-center gap-2 w-full font-baloo font-black text-white text-sml py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 transition-all hover:-translate-y-0.5 active:scale-95 shadow-sm shadow-emerald-200">
-            <Play className="w-3.5 h-3.5 fill-white" />
+            className="flex items-center justify-center gap-2 w-full font-baloo font-black text-sml py-2.5 rounded-xl transition-all hover:-translate-y-0.5 active:scale-95"
+            style={{ background: "linear-gradient(135deg,var(--ds-brand-primary),var(--ds-brand-hover))", color: "var(--ds-nav-bg)", boxShadow: "var(--ds-shadow-cta)" }}>
+            <Play className="w-3.5 h-3.5 fill-current" />
             {t("homeAdventureStartJourney")}
           </Link>
         ) : null}

@@ -155,7 +155,7 @@ function CertificateModal({
           </button>
           <button
             onClick={onClose}
-            className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-[var(--nimi-green)] to-[var(--ds-brand-hover)] text-white font-baloo font-black text-sm py-2.5 rounded-2xl shadow-sm transition"
+            className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-[var(--ds-brand-primary)] to-[var(--ds-brand-hover)] text-[var(--ds-nav-bg)] font-baloo font-black text-sm py-2.5 rounded-2xl shadow-sm transition"
           >
             ✅ Done
           </button>
@@ -646,11 +646,11 @@ export default function StoryDetailPage() {
                     <div className="flex items-end justify-center mb-4">
                       <motion.img src={assets.nimiCircle} alt="Nimi" animate={{ y: [0, -8, 0] }}
                         transition={{ duration: DURATION.loopBase, repeat: Infinity }}
-                        className="w-20 h-20 rounded-full border-4 shadow-xl" style={{ borderColor: 'var(--nimi-green)' }} />
+                        className="w-20 h-20 rounded-full border-4 shadow-xl" style={{ borderColor: 'var(--ds-brand-primary)' }} />
                     </div>
 
                     <div className="flex items-center justify-center mb-3">
-                      <span className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-2xs font-black uppercase tracking-[0.24em] text-emerald-700">
+                      <span className="rounded-full border border-[var(--ds-border-brand)] bg-[var(--ds-brand-subtle)] px-3 py-1 text-2xs font-black uppercase tracking-[0.24em] text-[var(--ds-text-brand)]">
                         Story guide
                       </span>
                     </div>
@@ -714,7 +714,7 @@ export default function StoryDetailPage() {
                           initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55, ...SPRING.gentle }}
                           whileTap={m.buttonPress}
                           onClick={() => { playTap(); setPhase("missions"); }}
-                          className="w-full font-baloo font-black text-mbase py-3 rounded-full border-2 border-[var(--nimi-green)] text-[var(--ds-brand-primary)] bg-[var(--ds-surface-card)] flex items-center justify-center gap-2 transition hover:bg-emerald-50">
+                          className="w-full font-baloo font-black text-mbase py-3 rounded-full border-2 border-[var(--ds-border-brand)] text-[var(--ds-brand-primary)] bg-[var(--ds-surface-card)] flex items-center justify-center gap-2 transition hover:bg-[var(--ds-brand-subtle)]">
                           {t("playAgainBtn")}
                         </motion.button>
                       </div>
@@ -723,7 +723,7 @@ export default function StoryDetailPage() {
                         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: DURATION.loopBounce, ...SPRING.gentle }}
                         whileHover={m.buttonHover} whileTap={m.buttonPress}
                         onClick={() => { playTap(); setPhase(allIntrosDone ? "missions" : "intro"); }}
-                        className="mt-8 w-full text-white font-baloo font-black text-xl px-10 py-4 shadow-2xl flex items-center justify-center gap-3" style={{ background: 'linear-gradient(to right, var(--nimi-green), #0e9d60)', borderRadius: 'var(--leaf-r-lg)', boxShadow: '0 8px 24px rgba(26,168,106,0.35)' }}>
+                        className="mt-8 w-full text-white font-baloo font-black text-xl px-10 py-4 shadow-2xl flex items-center justify-center gap-3" style={{ background: 'linear-gradient(135deg, var(--ds-brand-primary), var(--ds-brand-hover))', borderRadius: 'var(--leaf-r-lg)', boxShadow: '0 8px 24px rgba(26,168,106,0.35)' }}>
                         <Play className="w-6 h-6 fill-white" />
                         {doneCount > 0 ? t("storyContinueBtn") : t("storyBeginMyAdventure")}
                       </motion.button>
@@ -746,8 +746,8 @@ export default function StoryDetailPage() {
 
                 <h2 className="font-baloo font-black text-[var(--ds-brand-primary)] text-1.5xl text-center mb-2">{t("storyAdventureBegins")}</h2>
 
-                <div className="mb-5 leaf border border-emerald-100 bg-gradient-to-r from-emerald-50 to-white p-4 shadow-sm">
-                  <p className="font-baloo font-black text-base text-emerald-800">First, meet the story helpers</p>
+                <div className="mb-5 leaf border border-[var(--ds-border-brand)] bg-[var(--ds-brand-subtle)] p-4 shadow-sm">
+                  <p className="font-baloo font-black text-base text-[var(--ds-text-primary)]">First, meet the story helpers</p>
                   <p className="text-sml text-[var(--ds-text-secondary)] mt-1">Each card opens a tiny adventure. Complete them in order and the path ahead will light up.</p>
                 </div>
 
@@ -758,7 +758,7 @@ export default function StoryDetailPage() {
                     return (
                       <motion.div key={item.key}
                         animate={done ? { scale: [1, 1.3, 1] } : {}} transition={{ duration: DURATION.slow }}
-                        className={`w-3 h-3 rounded-full ${done ? "bg-green-500" : "bg-green-200"}`} />
+                        className={`w-3 h-3 rounded-full ${done ? "bg-[var(--ds-brand-primary)]" : "bg-[var(--ds-brand-soft)]"}`} />
                     );
                   })}
                 </div>
@@ -787,10 +787,10 @@ export default function StoryDetailPage() {
                           <motion.span className="text-4xl" animate={isNext ? { rotate: [0, -10, 10, 0] } : {}}
                             transition={{ duration: DURATION.loopBase, repeat: Infinity }}>{item.emoji}</motion.span>
                           <div className="flex-1 text-left">
-                            <p className={`font-baloo font-black text-mlg ${done ? "text-green-800" : isNext ? "text-white" : "text-[var(--ds-text-secondary)]"}`}>{t(item.tKey)}</p>
+                            <p className={`font-baloo font-black text-mlg ${done ? "text-[var(--ds-text-primary)]" : isNext ? "text-white" : "text-[var(--ds-text-secondary)]"}`}>{t(item.tKey)}</p>
                           </div>
                           {done ? (
-                            <CheckCircle2 className="w-7 h-7 text-green-400 shrink-0" />
+                            <CheckCircle2 className="w-7 h-7 text-[var(--ds-text-brand)] shrink-0" />
                           ) : isNext && (hasUrl || item.key === "meet_characters") ? (
                             <motion.div animate={{ scale: [1, 1.15, 1] }} transition={{ duration: DURATION.loopShimmer, repeat: Infinity }}
                               className="w-12 h-12 rounded-full bg-[var(--ds-surface-card)]/20 flex items-center justify-center shrink-0">
@@ -825,7 +825,7 @@ export default function StoryDetailPage() {
                   <motion.button initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ ...SPRING.gentle }}
                     whileHover={m.buttonHover} whileTap={m.buttonPress}
                     onClick={() => { playUnlock(); setPhase("missions"); }}
-                    className="mt-6 w-full text-white font-baloo font-black text-xl py-4 flex items-center justify-center gap-3" style={{ background: 'linear-gradient(to right, var(--nimi-green), #0e9d60)', borderRadius: 'var(--leaf-r-lg)', boxShadow: '0 8px 24px rgba(26,168,106,0.35)' }}>
+                    className="mt-6 w-full text-white font-baloo font-black text-xl py-4 flex items-center justify-center gap-3" style={{ background: 'linear-gradient(135deg, var(--ds-brand-primary), var(--ds-brand-hover))', borderRadius: 'var(--leaf-r-lg)', boxShadow: '0 8px 24px rgba(26,168,106,0.35)' }}>
                     {t("storyBeginMyAdventure")}
                   </motion.button>
                 )}
@@ -878,11 +878,11 @@ export default function StoryDetailPage() {
                       <p className="text-xs text-[var(--ds-text-secondary)] mt-0.5">{doneCount} / {totalCount} · {totalStars} ⭐</p>
                     </div>
                     {(() => {
-                      const nb = nextMission ? (SLOT_BADGE[nextMission.slot_key] ?? { bg: "bg-emerald-50", text: "text-emerald-700", border: "border-emerald-200" }) : null;
+                      const nb = nextMission ? (SLOT_BADGE[nextMission.slot_key] ?? { bg: "bg-[var(--ds-brand-subtle)]", text: "text-[var(--ds-text-brand)]", border: "border-[var(--ds-border-brand)]" }) : null;
                       const ne = nextMission ? (MISSION_META[nextMission.slot_key]?.emoji ?? "⭐") : null;
                       return (
                         <div className={`rounded-full border px-3 py-1.5 text-2xs font-black whitespace-nowrap ${
-                          nb ? `${nb.bg} ${nb.text} ${nb.border}` : "bg-emerald-50 text-emerald-700 border-emerald-200"
+                          nb ? `${nb.bg} ${nb.text} ${nb.border}` : "bg-[var(--ds-brand-subtle)] text-[var(--ds-text-brand)] border-[var(--ds-border-brand)]"
                         }`}>
                           {nextMission
                             ? `${ne} Next: ${nextMission.title || t(MISSION_META[nextMission.slot_key]?.tKey ?? "storyMissionGo")}`
@@ -988,12 +988,12 @@ export default function StoryDetailPage() {
                               whileTap={!isLocked ? m.dangerPress : {}}
                               className={`relative flex flex-col items-center gap-2 w-[128px] leaf border p-3 transition-all ${
                                 slot.completed
-                                  ? "border-emerald-200 bg-emerald-50/80 shadow-[0_10px_24px_rgba(16,185,129,0.12)]"
+                                  ? "border-[var(--ds-border-brand)] bg-[var(--ds-brand-subtle)]/80 shadow-[0_10px_24px_rgba(16,185,129,0.12)]"
                                   : isNext
                                     ? "border-amber-200 bg-[var(--ds-surface-card)]/90 shadow-[0_12px_28px_rgba(250,204,21,0.16)]"
                                     : "border-white/70 bg-[var(--ds-surface-card)]/70 shadow-sm"
                               }`}>
-                              <div className={`absolute inset-x-3 top-2 h-1 rounded-full ${slot.completed ? "bg-emerald-400" : isNext ? "bg-amber-400" : "bg-slate-200"}`} />
+                              <div className={`absolute inset-x-3 top-2 h-1 rounded-full ${slot.completed ? "bg-[var(--ds-brand-primary)]" : isNext ? "bg-amber-400" : "bg-slate-200"}`} />
 
                               {/* The big circle */}
                               <motion.div
@@ -1003,7 +1003,7 @@ export default function StoryDetailPage() {
                                 transition={{ duration: DURATION.loopBase, repeat: Infinity }}
                                 className={`relative w-[88px] h-[88px] rounded-full flex items-center justify-center transition-all ${
                                   slot.completed
-                                    ? `bg-gradient-to-br ${meta.color} shadow-xl ring-4 ring-green-400/40`
+                                    ? `bg-gradient-to-br ${meta.color} shadow-xl ring-4 ring-[var(--ds-brand-primary)]/40`
                                     : isNext
                                       ? `bg-gradient-to-br ${meta.color} shadow-2xl ring-4 ring-yellow-400/50`
                                       : "bg-[var(--ds-surface-card)] border-2 border-ds-border"
@@ -1020,8 +1020,8 @@ export default function StoryDetailPage() {
                                 {/* Green check on completed */}
                                 {slot.completed && (
                                   <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ ...SPRING.card, delay: DURATION.base }}
-                                    className="absolute -bottom-1 -right-1 w-8 h-8 bg-[var(--nimi-green)] rounded-full flex items-center justify-center border-3 border-ds-border shadow-lg">
-                                    <CheckCircle2 className="w-5 h-5 text-white" />
+                                    className="absolute -bottom-1 -right-1 w-8 h-8 bg-[var(--ds-brand-primary)] rounded-full flex items-center justify-center border-3 border-ds-border shadow-lg">
+                                    <CheckCircle2 className="w-5 h-5 text-[var(--ds-nav-bg)]" />
                                   </motion.div>
                                 )}
 
@@ -1051,7 +1051,7 @@ export default function StoryDetailPage() {
                               </p>
 
                               <div className={`text-3xs font-black uppercase tracking-[0.2em] ${
-                                slot.completed ? "text-emerald-600" : isNext ? "text-amber-600" : "text-slate-400"
+                                slot.completed ? "text-[var(--ds-text-brand)]" : isNext ? "text-amber-600" : "text-slate-400"
                               }`}>
                                 {slot.completed && doneCount >= totalCount ? t("masteredLabel") : slot.completed ? "Done ✓" : isNext ? "Ready" : "Soon"}
                               </div>
@@ -1207,7 +1207,7 @@ export default function StoryDetailPage() {
                     transition={{ duration: DURATION.loopBase, repeat: Infinity }}
                     whileHover={m.buttonHover}
                     whileTap={m.buttonPress}
-                    className="w-full relative overflow-hidden bg-gradient-to-r from-yellow-400 via-amber-400 to-green-400 text-white font-baloo font-black text-xl leaf py-5 shadow-2xl flex items-center justify-center gap-3">
+                    className="w-full relative overflow-hidden bg-gradient-to-r from-yellow-400 via-amber-400 to-[var(--ds-brand-primary)] text-white font-baloo font-black text-xl leaf py-5 shadow-2xl flex items-center justify-center gap-3">
 
                     {/* Sparkle particles inside button */}
                     {[0, 1, 2, 3, 4].map(i => (
@@ -1261,7 +1261,7 @@ export default function StoryDetailPage() {
 
                   <motion.button whileTap={m.buttonPress}
                     onClick={() => setPhase("challenge")}
-                    className="w-full bg-gradient-to-r from-[var(--nimi-green)] to-[var(--ds-brand-hover)] text-white font-baloo font-black text-base rounded-full py-3.5 shadow-lg flex items-center justify-center gap-2">
+                    className="w-full bg-gradient-to-r from-[var(--ds-brand-primary)] to-[var(--ds-brand-hover)] text-[var(--ds-nav-bg)] font-baloo font-black text-base rounded-full py-3.5 shadow-lg flex items-center justify-center gap-2">
                     {t("storyBonusChallenge")}
                   </motion.button>
                 </div>
@@ -1372,15 +1372,15 @@ export default function StoryDetailPage() {
                               </div>
                               {/* Badge row */}
                               {earnedBadgeImageUrl && (
-                                <div className="bg-gradient-to-r from-green-50 via-emerald-50 to-green-50 border border-green-200/70 rounded-2xl p-3.5 flex items-center gap-3">
+                                <div className="bg-[var(--ds-brand-subtle)] border border-[var(--ds-border-brand)]/70 rounded-2xl p-3.5 flex items-center gap-3">
                                   <div className="w-11 h-11 flex items-center justify-center flex-shrink-0">
                                     <BadgeCircle slug={earnedBadgeSlug} size="sm" imageUrl={earnedBadgeImageUrl} />
                                   </div>
                                   <div className="flex-1 min-w-0 text-left">
-                                    <p className="font-baloo font-black text-green-800 text-sml leading-tight">
+                                    <p className="font-baloo font-black text-[var(--ds-text-primary)] text-sml leading-tight">
                                       {earnedBadgeSlug ? badgeDisplayName(earnedBadgeSlug) : "Story Badge"}
                                     </p>
-                                    <p className="font-nunito text-green-600/80 text-2xs truncate">Earned by {childName}</p>
+                                    <p className="font-nunito text-[var(--ds-text-secondary)]/80 text-2xs truncate">Earned by {childName}</p>
                                   </div>
                                   <button
                                     onClick={() => {
@@ -1390,7 +1390,7 @@ export default function StoryDetailPage() {
                                       a.target = "_blank";
                                       a.click();
                                     }}
-                                    className="flex-shrink-0 bg-green-100 hover:bg-green-200 text-green-700 font-black text-2xs rounded-xl px-3 py-1.5 transition">
+                                    className="flex-shrink-0 bg-[var(--ds-brand-soft)] hover:bg-[var(--ds-brand-primary)] text-[var(--ds-text-brand)] hover:text-[var(--ds-nav-bg)] font-black text-2xs rounded-xl px-3 py-1.5 transition">
                                     🖼️ PNG
                                   </button>
                                 </div>

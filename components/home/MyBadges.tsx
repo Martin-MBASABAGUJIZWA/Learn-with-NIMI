@@ -70,7 +70,7 @@ export default function MyBadges({ completedSteps }: Props) {
       )}
       <Link
         href="/certificates"
-        className="block text-center text-3xs font-black text-nimi-green mt-2 pt-2 border-t border-ds-border hover:underline"
+        className="block text-center text-3xs font-black text-[var(--ds-text-brand)] mt-2 pt-2 border-t border-ds-border hover:underline"
       >
         {t("viewAllAchievements")} →
       </Link>

@@ -9,6 +9,7 @@ import sharp from 'sharp'
 import { createCanvas, registerFont, loadImage } from 'canvas'
 import type { CanvasRenderingContext2D } from 'canvas'
 import path from 'path'
+import { fmtDate } from './airwaysData'
 import type { AirwaysStory } from './airwaysData'
 
 try {
@@ -42,12 +43,6 @@ function txt(
   if (opts.maxWidth) ctx.fillText(str, x, y, opts.maxWidth)
   else               ctx.fillText(str, x, y)
   ctx.restore()
-}
-
-function fmtDate(iso: string | null): string {
-  if (!iso) return '__/__/____'
-  const d = new Date(iso)
-  return `${String(d.getDate()).padStart(2, '0')} / ${String(d.getMonth() + 1).padStart(2, '0')} / ${d.getFullYear()}`
 }
 
 async function drawCirclePhoto(
@@ -150,7 +145,7 @@ async function buildCeremonyPage(data: GrandChampionData): Promise<Buffer> {
     ctx.arc(PHOTO_CX, PHOTO_CY, PHOTO_R, 0, Math.PI * 2)
     ctx.fill()
     ctx.restore()
-    txt(ctx, '✈', PHOTO_CX - 70, PHOTO_CY - 80, { size: 140, color: '#C9A84C', align: 'center' })
+    txt(ctx, '✈', PHOTO_CX, PHOTO_CY - 80, { size: 140, color: '#C9A84C', align: 'center' })
   }
 
   // Name tag below photo
@@ -295,7 +290,7 @@ async function buildCertificatePage(data: GrandChampionData): Promise<Buffer> {
 
   // ── Stats row ──
   const stats = [
-    { label: 'Livres complétés', value: String(data.stories.filter(s => s.is_complete).length) },
+    { label: 'Livres complétés', value: String(completedCount) },
     { label: 'Numéro Champion',  value: data.championNumber },
     { label: 'Date d\'obtention', value: fmtDate(data.completedAt) },
   ]

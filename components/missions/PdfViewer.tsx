@@ -271,7 +271,7 @@ export default function PdfViewer({ url, title, onClose, onLastPage }: PdfViewer
                     aria-label={`Page ${i + 1}`}
                     className={`rounded-full transition-all duration-200 ${
                       i + 1 === page
-                        ? "w-5 h-2.5 bg-[var(--nimi-green)] rounded-full"
+                        ? "w-5 h-2.5 bg-[var(--ds-brand-primary)] rounded-full"
                         : i + 1 < page
                         ? "w-2 h-2 bg-[var(--ds-surface-input)]"
                         : "w-2 h-2 bg-[var(--ds-border-primary)] hover:bg-[var(--ds-surface-input)]"
@@ -302,7 +302,7 @@ export default function PdfViewer({ url, title, onClose, onLastPage }: PdfViewer
             disabled={page >= numPages || numPages === 0}
             whileTap={{ scale: 0.95 }}
             className="flex-1 h-12 flex items-center justify-center gap-1.5
-              rounded-2xl bg-[var(--nimi-green)] text-white
+              rounded-2xl bg-[var(--ds-brand-primary)] text-white
               font-baloo font-black text-mbase
               shadow-[0_4px_14px_rgba(0,150,80,0.28)]
               hover:opacity-90

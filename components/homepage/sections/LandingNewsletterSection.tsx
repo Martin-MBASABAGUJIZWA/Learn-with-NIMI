@@ -29,7 +29,7 @@ export default function LandingNewsletterSection() {
   }
 
   return (
-    <section className="relative overflow-hidden px-5 sm:px-10 lg:px-14 py-20 sm:py-28 border-t border-green-900/40"
+    <section className="relative overflow-hidden px-5 sm:px-10 lg:px-14 py-20 sm:py-28 border-t border-white/10"
       style={{ background: "linear-gradient(135deg, #052e16 0%, #14532d 45%, #15803d 100%)" }}>
 
       <div className="absolute inset-0 pointer-events-none"
@@ -45,17 +45,17 @@ export default function LandingNewsletterSection() {
           <div>
             <div className="inline-flex items-center gap-2 border px-4 py-1.5 rounded-full mb-7"
               style={{ background: "rgba(74,222,128,0.12)", borderColor: "rgba(74,222,128,0.28)" }}>
-              <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse shrink-0" />
-              <span className="font-nunito font-bold text-green-300 text-[12px] tracking-wide">
+              <span className="w-2 h-2 rounded-full bg-white/60 animate-pulse shrink-0" />
+              <span className="font-nunito font-bold text-white/70 text-[12px] tracking-wide">
                 Early access — founding families only
               </span>
             </div>
 
             <h3 className="font-baloo font-black text-white text-[28px] sm:text-[36px] leading-[1.15] mb-4">
               New stories every month —{" "}
-              <span className="text-green-300">be the first to know.</span>
+              <span className="text-white/80">be the first to know.</span>
             </h3>
-            <p className="font-nunito text-green-100/65 text-[15px] leading-relaxed mb-8 max-w-md">
+            <p className="font-nunito text-white/65 text-[15px] leading-relaxed mb-8 max-w-md">
               Be among the first families on NIMIPIKO. Get new story alerts, learning tips and founding-member updates — straight to your inbox.
             </p>
 
@@ -66,7 +66,7 @@ export default function LandingNewsletterSection() {
                     style={{ background: "rgba(74,222,128,0.12)", border: "1px solid rgba(74,222,128,0.22)" }}>
                     {b.icon}
                   </div>
-                  <span className="font-nunito text-green-100/75 text-[14px]">{b.text}</span>
+                  <span className="font-nunito text-white/75 text-[14px]">{b.text}</span>
                 </div>
               ))}
             </div>
@@ -83,7 +83,7 @@ export default function LandingNewsletterSection() {
                   🎉
                 </div>
                 <p className="font-baloo font-black text-white text-[22px] mb-2">You&apos;re on the list!</p>
-                <p className="font-nunito text-green-200/65 text-[14px] leading-relaxed">
+                <p className="font-nunito text-white/65 text-[14px] leading-relaxed">
                   Watch your inbox for NIMIPIKO updates.<br />No spam, ever. Unsubscribe any time.
                 </p>
               </motion.div>
@@ -91,13 +91,13 @@ export default function LandingNewsletterSection() {
               <>
                 <div className="mb-6">
                   <p className="font-baloo font-black text-white text-[20px] leading-tight mb-1">Subscribe — it&apos;s free</p>
-                  <p className="font-nunito text-green-200/55 text-[13px]">No spam. Unsubscribe any time.</p>
+                  <p className="font-nunito text-white/55 text-[13px]">No spam. Unsubscribe any time.</p>
                 </div>
 
                 <form onSubmit={submit} className="space-y-4">
                   <div>
-                    <label className="block font-nunito font-bold text-green-200/75 text-[11px] tracking-widest uppercase mb-1.5">
-                      Your name <span className="text-green-400/45 font-normal normal-case tracking-normal">— optional</span>
+                    <label className="block font-nunito font-bold text-white/75 text-[11px] tracking-widest uppercase mb-1.5">
+                      Your name <span className="text-white/45 font-normal normal-case tracking-normal">— optional</span>
                     </label>
                     <input
                       type="text"
@@ -110,7 +110,7 @@ export default function LandingNewsletterSection() {
                   </div>
 
                   <div>
-                    <label className="block font-nunito font-bold text-green-200/75 text-[11px] tracking-widest uppercase mb-1.5">
+                    <label className="block font-nunito font-bold text-white/75 text-[11px] tracking-widest uppercase mb-1.5">
                       Email address <span className="text-red-400/60">*</span>
                     </label>
                     <input
@@ -131,20 +131,20 @@ export default function LandingNewsletterSection() {
                   )}
 
                   <button type="submit" disabled={status === "loading"}
-                    className="w-full bg-[var(--ds-surface-card)] hover:bg-green-50 active:scale-[0.98] disabled:opacity-60 text-[var(--nimi-green)] font-baloo font-black text-[15px] py-3.5 rounded-xl transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 mt-2">
+                    className="w-full bg-[var(--ds-surface-card)] hover:bg-[var(--ds-brand-subtle)] active:scale-[0.98] disabled:opacity-60 text-[var(--ds-brand-primary)] font-baloo font-black text-[15px] py-3.5 rounded-xl transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 mt-2">
                     {status === "loading" ? (
                       <>
-                        <span className="w-4 h-4 border-2 border-green-700/25 border-t-green-700 rounded-full animate-spin shrink-0" />
+                        <span className="w-4 h-4 border-2 border-[var(--ds-brand-primary)]/25 border-t-[var(--ds-brand-primary)] rounded-full animate-spin shrink-0" />
                         Subscribing…
                       </>
                     ) : "Subscribe for free →"}
                   </button>
 
                   <div className="flex items-center gap-1.5 justify-center pt-0.5">
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-green-400/50 shrink-0" aria-hidden>
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-white/50 shrink-0" aria-hidden>
                       <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
                     </svg>
-                    <span className="font-nunito text-green-300/45 text-[11px]">Your data is safe &amp; never shared.</span>
+                    <span className="font-nunito text-white/45 text-[11px]">Your data is safe &amp; never shared.</span>
                   </div>
                 </form>
               </>

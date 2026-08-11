@@ -2,11 +2,11 @@ import { Bone } from "@/components/ui/Bone";
 
 export default function InviteLoading() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-teal-50">
+    <div className="min-h-screen bg-[var(--ds-brand-subtle)]">
       {/* Header */}
       <header className="w-full px-5 py-4 flex items-center justify-between max-w-4xl mx-auto">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-xl bg-emerald-100" />
+          <div className="w-8 h-8 rounded-xl bg-[var(--ds-brand-soft)]" />
           <Bone className="h-5 w-24" />
         </div>
         <Bone className="h-4 w-36" />
@@ -24,7 +24,7 @@ export default function InviteLoading() {
         </div>
 
         {/* Reward callout */}
-        <div className="bg-emerald-100 leaf-lg p-6 space-y-3">
+        <div className="bg-[var(--ds-brand-soft)] leaf-lg p-6 space-y-3">
           <Bone className="h-7 w-44 mx-auto" />
           <Bone className="h-4 w-full" />
           <Bone className="h-4 w-3/4 mx-auto" />

@@ -28,12 +28,12 @@ export default function LandingDemoSection() {
           className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
 
           <motion.div variants={fadeUp} className="flex-1 text-center lg:text-left">
-            <span className="eyebrow inline-block text-green-800 mb-5 bg-green-200 px-4 py-1.5 rounded-full">
+            <span className="eyebrow inline-block text-[var(--ds-text-brand)] mb-5 bg-[var(--ds-brand-soft)] px-4 py-1.5 rounded-full">
               🎬 See it in action
             </span>
             <h2 className="font-baloo font-black text-[var(--ds-text-primary)] text-[30px] sm:text-[42px] leading-tight mb-5">
               One minute.<br />
-              <span className="text-nimi-green">A world of learning.</span>
+              <span className="text-[var(--ds-brand-primary)]">A world of learning.</span>
             </h2>
             <p className="font-nunito text-[var(--ds-text-secondary)] text-[15px] leading-relaxed mb-8 max-w-md mx-auto lg:mx-0">
               Watch how NIMIPIKO turns screen time into story time — with hands-on missions, songs, drawing and certificates your child can print and keep.

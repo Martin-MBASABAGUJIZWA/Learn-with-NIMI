@@ -32,6 +32,7 @@ export interface AttitudeBadgeData {
   childPhotoDataUri:  string | null
   /** Pre-cleaned photo (background already removed). When provided, skips the slow ML step. */
   cleanPhotoDataUri?: string | null
+  isPersonalized?:    boolean
   layout?:            AttitudeBadgeLayout | null
 }
 
@@ -191,13 +192,47 @@ async function buildArcComposites(
   return composites
 }
 
+// ── Piko defringe cache ────────────────────────────────────────────────────────
+// The defringe pass (alpha-threshold) is deterministic and expensive relative to
+// its input. Cache keyed by source buffer reference: invalidates automatically
+// when fetchTemplate returns a new buffer after its 10-min TTL expires.
+// Inflight dedup: concurrent calls with the same source share one computation
+// (prevents N parallel badge builds from each running their own defringe).
+let pikoCache:    { source: Buffer; clean: Buffer } | null = null
+let pikoInflight: { source: Buffer; promise: Promise<Buffer> } | null = null
+
+async function getCleanPiko(pikoBuf: Buffer): Promise<Buffer> {
+  if (pikoCache?.source === pikoBuf) return pikoCache.clean
+  if (pikoInflight?.source === pikoBuf) return pikoInflight.promise
+
+  const promise = (async (): Promise<Buffer> => {
+    try {
+      const { data, info } = await sharp(pikoBuf).ensureAlpha().raw().toBuffer({ resolveWithObject: true })
+      const px = new Uint8Array(data)
+      for (let i = 0; i < px.length; i += 4) {
+        if (px[i + 3] < 200) px[i] = px[i + 1] = px[i + 2] = px[i + 3] = 0
+      }
+      const clean = await sharp(Buffer.from(px.buffer), {
+        raw: { width: info.width, height: info.height, channels: 4 },
+      }).png().toBuffer()
+      pikoCache = { source: pikoBuf, clean }
+      return clean
+    } catch { return pikoBuf }
+    finally { if (pikoInflight?.source === pikoBuf) pikoInflight = null }
+  })()
+
+  pikoInflight = { source: pikoBuf, promise }
+  return promise
+}
+
 // ── Main builder ──────────────────────────────────────────────────────────────
 
 export async function buildAttitudeBadge(data: AttitudeBadgeData): Promise<Buffer> {
   const L = data.layout ?? {}
 
+  const badgeTemplateKey = data.isPersonalized === false ? 'badge-template-free' : 'badge-template'
   const [templateBuf, pikoBuf] = await Promise.all([
-    fetchTemplate('badge-template'),
+    fetchTemplate(badgeTemplateKey),
     fetchTemplate('piko-character'),
   ])
 
@@ -212,20 +247,7 @@ export async function buildAttitudeBadge(data: AttitudeBadgeData): Promise<Buffe
   ctx.clearRect(0, 0, BADGE_W, BADGE_H)  // ensure fully transparent — no white fill
 
   if (pikoBuf) {
-    // Apply the same alpha-threshold defringe to Piko so no white background bleeds through
-    const pikoClean = await (async () => {
-      try {
-        const { data, info } = await sharp(pikoBuf).ensureAlpha().raw().toBuffer({ resolveWithObject: true })
-        const px = new Uint8Array(data)
-        for (let i = 0; i < px.length; i += 4) {
-          if (px[i + 3] < 200) px[i] = px[i + 1] = px[i + 2] = px[i + 3] = 0
-        }
-        return sharp(Buffer.from(px.buffer), {
-          raw: { width: info.width, height: info.height, channels: 4 },
-        }).png().toBuffer()
-      } catch { return pikoBuf }
-    })()
-    const img = await tryLoadBuf(pikoClean)
+    const img = await tryLoadBuf(await getCleanPiko(pikoBuf))
     if (img) {
       const p = L.piko
       drawContain(ctx, img,
@@ -263,7 +285,7 @@ export async function buildAttitudeBadge(data: AttitudeBadgeData): Promise<Buffe
   const attCx     = attL?.x         ?? 630
   const attWL     = Math.max(50, attL?.w || 1500)
   const attKL     =  1 / (2 * attWL)
-  const attKR     =  1 / (2 * Math.max(50, attL?.h  || attWL))
+  const attKR     = attKL  // symmetric arc — w controls both sides
   const attStroke = Math.max(6, attFontSz * 0.12)
   const attFill   = attL?.color ?? '#FDFEFD'
 
@@ -273,8 +295,11 @@ export async function buildAttitudeBadge(data: AttitudeBadgeData): Promise<Buffe
   const botCx     = botL?.x         ?? 637
   const botWL     = Math.max(50, botL?.w || 1800)
   const botKL     = -1 / (2 * botWL)
-  const botKR     = -1 / (2 * Math.max(50, botL?.h  || botWL))
-  const botText   = `* ${data.storyTitle.toUpperCase()} * CHAMPION DU LIVRE ${data.bookNumber} *`
+  const botKR     = botKL  // symmetric arc — w controls both sides
+  const titleSlug = data.storyTitle.length > 22
+    ? data.storyTitle.slice(0, 20).toUpperCase() + '…'
+    : data.storyTitle.toUpperCase()
+  const botText   = `* ${titleSlug} * CHAMPION DU LIVRE ${data.bookNumber} *`
   const botStroke = Math.max(4, botFontSz * 0.14)
   const botFill   = botL?.color ?? '#C9A227'
 

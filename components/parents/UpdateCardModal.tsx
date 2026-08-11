@@ -146,7 +146,7 @@ export default function UpdateCardModal({ onClose, onSuccess }: Props) {
           {/* Success */}
           {step === "success" && (
             <div className="flex flex-col items-center gap-3 py-8">
-              <CheckCircle2 className="w-12 h-12 text-green-500" />
+              <CheckCircle2 className="w-12 h-12 text-[var(--ds-brand-primary)]" />
               <p className="text-base font-black text-ds-text">Card updated!</p>
               <p className="text-sm text-ds-muted text-center">Your new card will be used for future renewals. Your subscription is now active.</p>
             </div>
@@ -167,7 +167,7 @@ export default function UpdateCardModal({ onClose, onSuccess }: Props) {
               <a
                 href="/pricing"
                 className="flex items-center justify-center gap-2 w-full py-3 bg-ds-brand-primary text-white font-black text-sm rounded-xl hover:opacity-90 transition"
-                style={{ backgroundColor: "var(--nimi-green)" }}
+                style={{ backgroundColor: "var(--ds-brand-primary)" }}
               >
                 Resubscribe now <ExternalLink className="w-3.5 h-3.5" />
               </a>
@@ -189,8 +189,8 @@ export default function UpdateCardModal({ onClose, onSuccess }: Props) {
               </div>
               <a
                 href="/pricing"
-                className="flex items-center justify-center gap-2 w-full py-3 font-black text-sm rounded-xl border-2 border-ds-brand-primary hover:bg-green-50 transition text-ds-brand-primary"
-                style={{ borderColor: "var(--nimi-green)", color: "var(--nimi-green)" }}
+                className="flex items-center justify-center gap-2 w-full py-3 font-black text-sm rounded-xl border-2 border-ds-brand-primary hover:bg-[var(--ds-brand-subtle)] transition text-ds-brand-primary"
+                style={{ borderColor: "var(--ds-brand-primary)", color: "var(--ds-brand-primary)" }}
               >
                 Resubscribe instead
               </a>

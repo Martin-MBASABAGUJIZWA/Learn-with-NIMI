@@ -288,7 +288,7 @@ export default function PricingPaymentModal({ product, currency, effectiveAmount
           {step === "loading" && (
             <div className="text-center py-8">
               <motion.div animate={{ scale: [1, 1.1, 1] }} transition={{ duration: DURATION.loopFast, repeat: Infinity }}
-                className="w-16 h-16 mx-auto mb-4 rounded-full bg-[var(--nimi-green)] flex items-center justify-center text-3xl shadow-xl">
+                className="w-16 h-16 mx-auto mb-4 rounded-full bg-[var(--ds-brand-primary)] flex items-center justify-center text-3xl shadow-xl">
                 💳
               </motion.div>
               <p className="font-baloo font-black text-ds-text text-[16px]">Secure Card Checkout</p>
@@ -312,7 +312,7 @@ export default function PricingPaymentModal({ product, currency, effectiveAmount
                   {priceDisplay}
                   {product.product_type === "subscription" ? <span className="text-[14px] text-[var(--ds-text-tertiary)]">/mo</span> : ""}
                 </p>
-                {hasDiscount && <span className="bg-green-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full">PROMO</span>}
+                {hasDiscount && <span className="bg-[var(--ds-brand-primary)] text-[var(--ds-nav-bg)] text-[9px] font-black px-2 py-0.5 rounded-full">PROMO</span>}
               </div>
               <div id="cs-payment-list" className="mb-3" />
               <div id="cs-payment-form" className="min-h-[200px] leaf overflow-hidden" />
@@ -340,7 +340,7 @@ export default function PricingPaymentModal({ product, currency, effectiveAmount
                   {priceDisplay}
                   {product.product_type === "subscription" ? <span className="text-[14px] text-[var(--ds-text-tertiary)]">/mo</span> : ""}
                 </p>
-                {hasDiscount && <span className="bg-green-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full">PROMO</span>}
+                {hasDiscount && <span className="bg-[var(--ds-brand-primary)] text-[var(--ds-nav-bg)] text-[9px] font-black px-2 py-0.5 rounded-full">PROMO</span>}
               </div>
               <div className="space-y-3">
                 <div>
@@ -355,7 +355,7 @@ export default function PricingPaymentModal({ product, currency, effectiveAmount
               <div className="flex gap-3 mt-5">
                 <button onClick={onClose} className="flex-1 py-3 leaf border border-ds-border text-[var(--ds-text-tertiary)] font-bold text-[13px] hover:bg-[var(--ds-surface-card-hover)] transition">Cancel</button>
                 <motion.button whileTap={m.buttonPress} onClick={handleMomoSubmit}
-                  className="flex-1 py-3 leaf bg-[var(--nimi-green)] hover:bg-[var(--ds-brand-hover)] text-white font-black text-[14px] shadow-md transition">
+                  className="flex-1 py-3 leaf bg-[var(--ds-brand-primary)] hover:bg-[var(--ds-brand-hover)] text-white font-black text-[14px] shadow-md transition">
                   Pay Now
                 </motion.button>
               </div>

@@ -25,12 +25,12 @@ export default function ContactPage() {
             href="mailto:hello@nimipiko.com"
             className="flex items-center gap-4 p-5 bg-ds-card border border-ds-border rounded-2xl hover:border-[var(--ds-brand-primary)] transition-colors group"
           >
-            <div className="w-11 h-11 rounded-xl bg-green-100 dark:bg-green-900/30 flex items-center justify-center flex-shrink-0">
-              <Mail className="w-5 h-5 text-[var(--nimi-green)]" />
+            <div className="w-11 h-11 rounded-xl bg-[var(--ds-brand-soft)] flex items-center justify-center flex-shrink-0">
+              <Mail className="w-5 h-5 text-[var(--ds-brand-primary)]" />
             </div>
             <div>
               <p className="font-bold text-ds-text text-[14px]">Email</p>
-              <p className="text-gray-500 text-[13px] group-hover:text-[var(--nimi-green)] transition-colors">
+              <p className="text-gray-500 text-[13px] group-hover:text-[var(--ds-brand-primary)] transition-colors">
                 hello@nimipiko.com
               </p>
             </div>
@@ -42,12 +42,12 @@ export default function ContactPage() {
             rel="noopener noreferrer"
             className="flex items-center gap-4 p-5 bg-ds-card border border-ds-border rounded-2xl hover:border-[var(--ds-brand-primary)] transition-colors group"
           >
-            <div className="w-11 h-11 rounded-xl bg-green-100 dark:bg-green-900/30 flex items-center justify-center flex-shrink-0">
-              <Phone className="w-5 h-5 text-[var(--nimi-green)]" />
+            <div className="w-11 h-11 rounded-xl bg-[var(--ds-brand-soft)] flex items-center justify-center flex-shrink-0">
+              <Phone className="w-5 h-5 text-[var(--ds-brand-primary)]" />
             </div>
             <div>
               <p className="font-bold text-ds-text text-[14px]">WhatsApp</p>
-              <p className="text-gray-500 text-[13px] group-hover:text-[var(--nimi-green)] transition-colors">
+              <p className="text-gray-500 text-[13px] group-hover:text-[var(--ds-brand-primary)] transition-colors">
                 +250 780 000 000
               </p>
             </div>
@@ -77,7 +77,7 @@ export default function ContactPage() {
 
         <Link
           href="/"
-          className="inline-block mt-6 text-[13px] font-bold text-[var(--nimi-green)] hover:underline"
+          className="inline-block mt-6 text-[13px] font-bold text-[var(--ds-brand-primary)] hover:underline"
         >
           ← Back to home
         </Link>

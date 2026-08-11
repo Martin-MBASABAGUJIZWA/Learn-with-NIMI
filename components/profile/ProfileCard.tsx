@@ -24,7 +24,7 @@ export default function ProfileCard({ avatar, childName, level, categoriesComple
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: "spring", stiffness: 260, damping: 18 }}
       >
-        <div className="w-24 h-24 rounded-full border-4 shadow-lg overflow-hidden flex items-center justify-center bg-[var(--ds-surface-card-active)]" style={{ borderColor: 'var(--nimi-green)' }}>
+        <div className="w-24 h-24 rounded-full border-4 shadow-lg overflow-hidden flex items-center justify-center bg-[var(--ds-surface-card-active)]" style={{ borderColor: 'var(--ds-brand-primary)' }}>
           <ChildAvatar avatarUrl={avatar} name={childName} size={96} />
         </div>
       </motion.div>

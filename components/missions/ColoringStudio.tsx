@@ -540,7 +540,7 @@ export default function ColoringStudio({ pages, childId, onClose, t }: ColoringS
       {!isMobile && (
         <div className="w-[240px] flex-shrink-0 bg-[var(--ds-surface-card)] border-r border-ds-border flex flex-col overflow-hidden">
           {/* Header */}
-          <div className="flex items-center gap-2 px-4 py-3 bg-[var(--nimi-green)] flex-shrink-0">
+          <div className="flex items-center gap-2 px-4 py-3 bg-[var(--ds-brand-primary)] flex-shrink-0">
             <span className="text-lg">🎨</span>
             <span className="text-white font-baloo font-bold text-sm flex-1">Coloring Studio</span>
             <motion.button whileTap={themeM.buttonPress} onClick={() => { saveToDb(pageIdx); onClose(); }}
@@ -638,7 +638,7 @@ export default function ColoringStudio({ pages, childId, onClose, t }: ColoringS
                 <Trash2 className="h-4 w-4" /> Clear
               </button>
               <button onClick={() => { savePage(); playSuccess(); }}
-                className="flex items-center justify-center gap-1.5 py-2.5 leaf bg-green-500/10 text-green-400 text-xs font-bold hover:bg-green-500/20 transition">
+                className="flex items-center justify-center gap-1.5 py-2.5 leaf bg-[var(--ds-brand-subtle)] text-[var(--ds-text-brand)] text-xs font-bold hover:bg-[var(--ds-brand-soft)] transition">
                 <Save className="h-4 w-4" /> Save
               </button>
             </div>
@@ -738,7 +738,7 @@ export default function ColoringStudio({ pages, childId, onClose, t }: ColoringS
               {[{ s: 6, l: 'S' }, { s: 16, l: 'M' }, { s: 32, l: 'L' }].map(({ s, l }) => (
                 <button key={s} onClick={() => setBrushSize(s)}
                   className={`w-10 h-12 rounded-2xl flex flex-col items-center justify-center border-2 transition-all ${
-                    brushSize === s ? 'border-sky-400 bg-sky-400/10' : 'border-ds-border'
+                    brushSize === s ? 'border-[var(--ds-border-brand)] bg-[var(--ds-brand-subtle)]' : 'border-ds-border'
                   }`}>
                   <div className="rounded-full bg-gray-600" style={{ width: Math.max(4, s / 3), height: Math.max(4, s / 3) }} />
                   <span className="text-5xs font-bold text-[var(--ds-text-tertiary)] mt-0.5">{l}</span>

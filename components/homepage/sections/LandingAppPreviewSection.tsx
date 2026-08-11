@@ -30,7 +30,7 @@ function AppMockup({ screen }: { screen: number }) {
   if (screen === 1) return (
     <div className="absolute inset-0 overflow-hidden flex flex-col" style={{ background: "#1b3d27" }}>
       <div className="flex items-center justify-between px-4 pt-10 pb-2 shrink-0">
-        <span className="text-[8px] font-bold text-green-200">9:41</span>
+        <span className="text-[8px] font-bold text-white/70">9:41</span>
         <div className="flex items-center gap-1.5">
           <img loading="lazy" src="/nimi-logo.png" alt="" className="w-4 h-4 object-contain" draggable={false} />
           <span className="text-[8px] font-black text-yellow-300">⭐ 245</span>
@@ -40,7 +40,7 @@ function AppMockup({ screen }: { screen: number }) {
         <div className="w-8 h-8 rounded-full bg-amber-400 flex items-center justify-center text-base shrink-0 shadow-md">🦁</div>
         <div className="flex-1 min-w-0">
           <p className="text-white font-black text-[9.5px] leading-tight truncate">The Brave Lion</p>
-          <p className="text-green-300 text-[7px]">Chapter 2 · Page 4 of 12</p>
+          <p className="text-white/60 text-[7px]">Chapter 2 · Page 4 of 12</p>
         </div>
         <img loading="lazy" src="/current-story.png" alt="" className="h-4 object-contain shrink-0" draggable={false} />
       </div>
@@ -127,31 +127,31 @@ export default function LandingAppPreviewSection({ authed }: { authed: boolean }
               {PREVIEW_SCREENS.map((s, i) => (
                 <button key={s.label} onClick={() => setActive(i)}
                   className={`flex items-start gap-4 p-5 rounded-2xl text-left transition-all duration-200 group ${
-                    active === i ? "bg-green-50 border-2 border-green-200 shadow-sm" : "border-2 border-transparent hover:bg-[var(--ds-surface-card-hover)]"
+                    active === i ? "bg-[var(--ds-brand-subtle)] border-2 border-[var(--ds-border-brand)] shadow-sm" : "border-2 border-transparent hover:bg-[var(--ds-surface-card-hover)]"
                   }`}>
                   <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-[20px] shrink-0 transition-colors ${
-                    active === i ? "bg-green-600" : "bg-[var(--ds-surface-card-active)] group-hover:bg-[var(--ds-border-primary)]"
+                    active === i ? "bg-[var(--ds-brand-primary)]" : "bg-[var(--ds-surface-card-active)] group-hover:bg-[var(--ds-border-primary)]"
                   }`}>
                     {s.icon}
                   </div>
                   <div className="flex-1">
                     <p className={`font-baloo font-black text-[16px] leading-snug transition-colors ${
-                      active === i ? "text-green-700" : "text-[var(--ds-text-primary)]"
+                      active === i ? "text-[var(--ds-text-brand)]" : "text-[var(--ds-text-primary)]"
                     }`}>{s.label}</p>
                     <p className="font-nunito text-[var(--ds-text-secondary)] text-[13px] leading-relaxed mt-0.5">{s.desc}</p>
                   </div>
-                  {active === i && <div className="w-1 self-stretch rounded-full bg-green-400 shrink-0" />}
+                  {active === i && <div className="w-1 self-stretch rounded-full bg-[var(--ds-brand-primary)] shrink-0" />}
                 </button>
               ))}
 
               <div className="flex gap-3 mt-2">
                 <Link href={authed ? "/home" : "/signuppage"}
                   className="flex-1 text-center text-white font-baloo font-black text-[14px] py-3.5 rounded-2xl transition-all hover:-translate-y-0.5"
-                  style={{ background: "linear-gradient(135deg, var(--nimi-green) 0%, #166534 100%)", boxShadow: "0 4px 16px rgba(21,128,61,0.35)" }}>
+                  style={{ background: "linear-gradient(135deg, var(--ds-brand-primary) 0%, #166534 100%)", boxShadow: "0 4px 16px rgba(21,128,61,0.35)" }}>
                   Try It Free →
                 </Link>
                 <Link href="/stories"
-                  className="flex-1 text-center text-[var(--ds-text-secondary)] font-baloo font-black text-[14px] py-3.5 rounded-2xl border-2 border-[var(--ds-border-primary)] hover:border-green-300 hover:text-green-700 transition-all">
+                  className="flex-1 text-center text-[var(--ds-text-secondary)] font-baloo font-black text-[14px] py-3.5 rounded-2xl border-2 border-[var(--ds-border-primary)] hover:border-[var(--ds-border-brand)] hover:text-[var(--ds-text-brand)] transition-all">
                   Browse Stories
                 </Link>
               </div>
@@ -160,7 +160,7 @@ export default function LandingAppPreviewSection({ authed }: { authed: boolean }
             <motion.div variants={fadeUp} className="flex justify-center order-1 lg:order-2">
               <div className="relative">
                 <div className="absolute inset-[-20%] blur-3xl opacity-15 rounded-full"
-                  style={{ background: "radial-gradient(ellipse, var(--nimi-green) 0%, transparent 70%)" }} />
+                  style={{ background: "radial-gradient(ellipse, var(--ds-brand-primary) 0%, transparent 70%)" }} />
 
                 <div className="relative w-[240px] h-[490px] rounded-[3rem] overflow-hidden"
                   style={{ background: "#111827", boxShadow: "0 0 0 6px #1f2937, 0 0 0 7px #374151, 0 40px 80px rgba(0,0,0,0.40)" }}>

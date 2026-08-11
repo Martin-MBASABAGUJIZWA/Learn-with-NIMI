@@ -125,7 +125,7 @@ export default function CreationCard({
               e.stopPropagation();
               handleLike();
             }}
-            className="bg-[var(--nimi-green)] hover:bg-[var(--ds-brand-hover)] text-white rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--ds-state-focus)]"
+            className="bg-[var(--ds-brand-primary)] hover:bg-[var(--ds-brand-hover)] text-white rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--ds-state-focus)]"
           >
             <motion.span
               animate={likeAnimating ? {

@@ -81,13 +81,13 @@ export default function StoryMissionGrid({ storySlug, slots }: Props) {
 
                   {/* Background gradient */}
                   <div className={`absolute inset-0 bg-gradient-to-b ${mission.gradient}`} />
-                  {completed && <div className="absolute inset-0 bg-[var(--nimi-green)]/20" />}
+                  {completed && <div className="absolute inset-0 bg-[var(--ds-brand-primary)]/20" />}
 
                   {/* Content */}
                   <div className="relative z-10 p-3 flex flex-col h-full">
 
                     {/* Number badge */}
-                    <div className={`w-7 h-7 ${completed ? "bg-[var(--nimi-green)]" : "bg-[var(--ds-surface-card-active)]"} rounded-lg flex items-center justify-center font-black text-white text-xs shadow-md`}>
+                    <div className={`w-7 h-7 ${completed ? "bg-[var(--ds-brand-primary)]" : "bg-[var(--ds-surface-card-active)]"} rounded-lg flex items-center justify-center font-black text-[var(--ds-nav-bg)] text-xs shadow-md`}>
                       {mission.num}
                     </div>
 
@@ -118,9 +118,9 @@ export default function StoryMissionGrid({ storySlug, slots }: Props) {
                     {/* Status button */}
                     <div className="mt-2">
                       {completed ? (
-                        <div className="flex items-center justify-center gap-1.5 bg-[var(--nimi-green)] rounded-full py-1.5 shadow-lg">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-white" />
-                          <span className="text-white text-3xs font-black tracking-wide">COMPLETED</span>
+                        <div className="flex items-center justify-center gap-1.5 bg-[var(--ds-brand-primary)] rounded-full py-1.5 shadow-lg">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-[var(--ds-nav-bg)]" />
+                          <span className="text-[var(--ds-nav-bg)] text-3xs font-black tracking-wide">COMPLETED</span>
                         </div>
                       ) : isLocked ? (
                         <div className="flex items-center justify-center gap-1.5 bg-gray-400/60 rounded-full py-1.5">
@@ -128,7 +128,7 @@ export default function StoryMissionGrid({ storySlug, slots }: Props) {
                           <span className="text-white text-3xs font-black tracking-wide">LOCKED</span>
                         </div>
                       ) : (
-                        <div className="flex items-center justify-center gap-1.5 bg-[var(--nimi-green)] text-white rounded-full py-1.5 shadow-md group-hover:bg-[var(--ds-brand-hover)] transition">
+                        <div className="flex items-center justify-center gap-1.5 bg-[var(--ds-brand-primary)] text-[var(--ds-nav-bg)] rounded-full py-1.5 shadow-md group-hover:bg-[var(--ds-brand-hover)] transition">
                           <Play className="w-3.5 h-3.5 text-white fill-white" />
                           <span className="text-white text-3xs font-black tracking-wide">START</span>
                         </div>

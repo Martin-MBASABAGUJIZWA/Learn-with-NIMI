@@ -25,7 +25,7 @@ export default function NimiCommunity() {
         {COMMUNITY_POSTS.map(post => (
           <div key={post.name} className="flex-1 flex flex-col">
             <div className="flex items-center gap-1.5 mb-1.5">
-              <div className="w-7 h-7 bg-[var(--nimi-green)] rounded-full flex items-center justify-center text-white text-4xs font-black flex-shrink-0 shadow">
+              <div className="w-7 h-7 bg-[var(--ds-brand-primary)] rounded-full flex items-center justify-center text-white text-4xs font-black flex-shrink-0 shadow">
                 {post.name[0]}
               </div>
               <div className="min-w-0">

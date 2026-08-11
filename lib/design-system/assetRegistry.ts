@@ -440,6 +440,10 @@ const assetRegistry: Record<string, ThemeAssets> = {
   },
 };
 
+// Airways reuses the same artwork assets as default — visual identity comes from
+// the token/colour layer (theme.ts), not from theme-specific image files.
+assetRegistry.airways = assetRegistry.default;
+
 export function getThemeAssets(themeId: string): ThemeAssets {
   return assetRegistry[themeId] ?? assetRegistry.default;
 }

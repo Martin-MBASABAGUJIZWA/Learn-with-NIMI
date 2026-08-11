@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import { getCachedAdmin } from './adminAuth'
 import { Layers, Menu, Save, RefreshCw, CheckCircle2, AlertCircle } from 'lucide-react'
 import { useToast } from './Toast'
+import supabase from '@/lib/supabaseClient'
 
 interface Props {
   onNavigate: (t: string) => void
@@ -94,6 +95,131 @@ const COLORS_BP: Record<string, string> = {
   embarquement: '#16a34a',
 }
 
+// ── Passport Interior (Free) ─────────────────────────────────────────────────
+// Same right-page as personalized. Left page: no photo, no QR — only text fields.
+const FIELDS_PASSPORT_FREE: FieldDef[] = [
+  { key: 'name',          label: 'Nom (PETIT CHAMPION)', type: 'text', sample: 'PETIT CHAMPION' },
+  { key: 'champion',      label: 'N° Champion',          type: 'text', sample: 'STD-001' },
+  { key: 'date',          label: 'Date de création',     type: 'text', sample: '01 / 01 / 2025' },
+  { key: 'dest_num',      label: 'Destination N°',       type: 'text', sample: '1' },
+  { key: 'title',         label: 'Titre histoire',        type: 'text', sample: "NIMI À L'ÉCOLE" },
+  { key: 'book_icon',     label: 'Icône livre (sac)',     type: 'area', sample: '', clip: 'oval' },
+  { key: 'livre_num',     label: 'LIVRE N°',              type: 'text', sample: 'LIVRE 1' },
+  { key: 'book_cover',    label: 'Couverture livre',      type: 'area', sample: '', clip: 'oval' },
+  { key: 'cover_name',    label: 'Titre (sous oval)',     type: 'text', sample: "NIMI À L'ÉCOLE" },
+  { key: 'date_val',      label: 'Date validation',       type: 'text', sample: '01 / 01 / 2025' },
+  { key: 'next_cover',    label: 'Couverture suivante',   type: 'area', sample: '' },
+  { key: 'next_title',    label: 'Titre suivant',         type: 'text', sample: 'HISTOIRE 2' },
+  { key: 'attitude_badge',label: 'Attitude Badge',        type: 'area', sample: '' },
+]
+
+const INIT_PASSPORT_FREE: Record<string, Pos> = {
+  name:           { x: 200, y: 335, w: 600, h: 40,  size: 36 },
+  champion:       { x: 200, y: 410, w: 300, h: 30,  size: 26 },
+  date:           { x: 200, y: 478, w: 300, h: 26,  size: 22 },
+  attitude_badge: { x: 1595, y: 210, w: 455, h: 230, size: 0 },
+  dest_num:       { x: 1800, y: 68,  w: 150, h: 26,  size: 22 },
+  title:          { x: 1145, y: 132, w: 950, h: 48,  size: 40 },
+  book_icon:      { x: 1260, y: 15,  w: 100, h: 100, size: 0  },
+  livre_num:      { x: 1145, y: 220, w: 225, h: 36,  size: 28 },
+  book_cover:     { x: 1145, y: 262, w: 225, h: 315, size: 0  },
+  cover_name:     { x: 1145, y: 592, w: 225, h: 40,  size: 22 },
+  date_val:       { x: 1145, y: 628, w: 300, h: 34,  size: 28 },
+  next_cover:     { x: 1148, y: 758, w: 100, h: 125, size: 0  },
+  next_title:     { x: 1270, y: 776, w: 450, h: 26,  size: 22 },
+}
+
+const COLORS_PASSPORT_FREE: Record<string, string> = {
+  name: '#0D1B30', champion: '#0D1B30', date: '#0D1B30',
+  dest_num: '#1A7A3E', title: '#0D1B30', date_val: '#0D1B30', next_title: '#0D1B30',
+}
+
+// ── Badge (Free) — no child photo ─────────────────────────────────────────────
+const FIELDS_BADGE_FREE: FieldDef[] = [
+  { key: 'piko',        label: 'Piko',               type: 'area', sample: '' },
+  { key: 'attitude',    label: 'Attitude (arc haut)', type: 'text', sample: 'SUPER CURIEUX' },
+  { key: 'bottom_text', label: 'Titre (arc bas)',     type: 'text', sample: "NIMI À L'ÉCOLE • CHAMPION DU LIVRE 1" },
+]
+
+const INIT_BADGE_FREE: Record<string, Pos> = {
+  piko:        { x: 400, y: 350, w: 280, h: 380, size: 0   },
+  attitude:    { x: 630, y: 362, w: 1500, h: 1500, size: 85 },
+  bottom_text: { x: 637, y: 1178, w: 1800, h: 1800, size: 36 },
+}
+
+const COLORS_BADGE_FREE: Record<string, string> = {
+  attitude:    '#7A5100',
+  bottom_text: '#C9A227',
+}
+
+// ── Boarding Pass (Free) — no photo, no barcode, QR instead ──────────────────
+const FIELDS_BP_FREE: FieldDef[] = [
+  { key: 'name',         label: 'Nom',          type: 'text', sample: 'PETIT CHAMPION' },
+  { key: 'age',          label: 'Âge',          type: 'text', sample: '7 ANS' },
+  { key: 'statut',       label: 'Statut',       type: 'text', sample: 'PETIT CHAMPION' },
+  { key: 'vol',          label: 'Vol',          type: 'text', sample: 'NMP101' },
+  { key: 'destination',  label: 'Destination',  type: 'text', sample: 'LE LION ET LA FORÊT' },
+  { key: 'livre',        label: 'Livre',        type: 'text', sample: '1' },
+  { key: 'siege',        label: 'Siège',        type: 'text', sample: '7A' },
+  { key: 'porte',        label: 'Porte',        type: 'text', sample: 'G1' },
+  { key: 'embarquement', label: 'Embarquement', type: 'text', sample: 'OUVERT' },
+  { key: 'qr',           label: 'QR Code',      type: 'area', sample: '' },
+]
+
+const INIT_BP_FREE: Record<string, Pos> = {
+  name:         { x: 390, y: 293, w: 600, h: 52,  size: 52 },
+  age:          { x: 280, y: 373, w: 350, h: 28,  size: 28 },
+  statut:       { x: 320, y: 434, w: 350, h: 28,  size: 28 },
+  vol:          { x: 322, y: 491, w: 350, h: 28,  size: 28 },
+  destination:  { x: 431, y: 549, w: 350, h: 28,  size: 28 },
+  livre:        { x: 349, y: 603, w: 350, h: 28,  size: 28 },
+  siege:        { x: 675, y: 491, w: 350, h: 28,  size: 28 },
+  porte:        { x: 688, y: 549, w: 350, h: 28,  size: 28 },
+  embarquement: { x: 751, y: 603, w: 350, h: 28,  size: 28 },
+  qr:           { x: 390, y: 700, w: 200, h: 200, size: 0  },
+}
+
+const COLORS_BP_FREE: Record<string, string> = {
+  name: '#1a1a2e', age: '#1a1a2e', statut: '#16a34a', vol: '#1a1a2e',
+  destination: '#1a1a2e', livre: '#1a1a2e', siege: '#1a1a2e', porte: '#1a1a2e',
+  embarquement: '#16a34a',
+}
+
+// ── Champion Kit (Free) — no photo slots ─────────────────────────────────────
+const FIELDS_KIT_FREE: FieldDef[] = [
+  { key: 'champion',     label: 'Champion',     type: 'text', sample: 'PETIT CHAMPION' },
+  { key: 'age',          label: 'Âge',          type: 'text', sample: '7 ANS' },
+  { key: 'statut',       label: 'Statut',       type: 'text', sample: 'PETIT CHAMPION' },
+  { key: 'vol',          label: 'Vol',          type: 'text', sample: 'NMP101' },
+  { key: 'destination',  label: 'Destination',  type: 'text', sample: 'LE LION ET LA FORÊT' },
+  { key: 'livre',        label: 'Livre',        type: 'text', sample: '1' },
+  { key: 'siege',        label: 'Siège',        type: 'text', sample: '7A' },
+  { key: 'porte',        label: 'Porte',        type: 'text', sample: 'G1' },
+  { key: 'embarquement', label: 'Embarquement', type: 'text', sample: 'OUVERT' },
+  { key: 'barcode',      label: 'Barcode',      type: 'area', sample: '' },
+  { key: 'qr',           label: 'QR Code',      type: 'area', sample: '' },
+]
+
+const INIT_KIT_FREE: Record<string, Pos> = {
+  champion:     { x: 887,  y: 507, w: 150, h: 33,  size: 24 },
+  age:          { x: 836,  y: 537, w: 150, h: 33,  size: 20 },
+  statut:       { x: 858,  y: 564, w: 150, h: 33,  size: 20 },
+  vol:          { x: 846,  y: 599, w: 150, h: 33,  size: 20 },
+  destination:  { x: 895,  y: 625, w: 150, h: 33,  size: 18 },
+  livre:        { x: 856,  y: 646, w: 150, h: 33,  size: 20 },
+  siege:        { x: 856,  y: 667, w: 150, h: 33,  size: 20 },
+  porte:        { x: 863,  y: 690, w: 150, h: 33,  size: 20 },
+  embarquement: { x: 906,  y: 712, w: 150, h: 33,  size: 20 },
+  barcode:      { x: 613,  y: 751, w: 382, h: 40,  size: 0  },
+  qr:           { x: 1016, y: 958, w: 148, h: 148, size: 0  },
+}
+
+const COLORS_KIT_FREE: Record<string, string> = {
+  champion: '#1a1a2e', age: '#1a1a2e', statut: '#16a34a', vol: '#1a1a2e',
+  destination: '#1a1a2e', livre: '#1a1a2e', siege: '#1a1a2e', porte: '#1a1a2e',
+  embarquement: '#16a34a',
+}
+
 // ── Template registry — add new templates here ────────────────────────────────
 // slug  = storage filename (e.g. "passport-cover") + DB template key
 // To add a new template: upload <slug>.png via Airways Templates,
@@ -179,26 +305,130 @@ const COLORS_BADGE: Record<string, string> = {
   bottom_text: '#C9A227',
 }
 
+// ── Certificate ───────────────────────────────────────────────────────────────
+const FIELDS_CERT: FieldDef[] = [
+  { key: 'photo',    label: 'Photo',            type: 'area', sample: '' },
+  { key: 'name',     label: 'Nom du Champion',  type: 'text', sample: 'KETSIA' },
+  { key: 'champion', label: 'N° Champion',      type: 'text', sample: 'KET-A-001' },
+  { key: 'title',    label: 'Titre histoire',   type: 'text', sample: "NIMI À L'ÉCOLE" },
+  { key: 'number',   label: 'Livre N°',         type: 'text', sample: 'LIVRE 1' },
+  { key: 'date',     label: 'Date validation',  type: 'text', sample: '20 / 07 / 2026' },
+]
+
+const INIT_CERT: Record<string, Pos> = {
+  photo:    { x: 80,   y: 200, w: 200, h: 250, size: 0  },
+  name:     { x: 420,  y: 260, w: 680, h: 60,  size: 52 },
+  champion: { x: 420,  y: 340, w: 400, h: 36,  size: 28 },
+  title:    { x: 420,  y: 400, w: 680, h: 44,  size: 36 },
+  number:   { x: 420,  y: 460, w: 300, h: 30,  size: 24 },
+  date:     { x: 420,  y: 510, w: 400, h: 30,  size: 24 },
+}
+
+const COLORS_CERT: Record<string, string> = {
+  name: '#1a1a2e', champion: '#16a34a', title: '#1a1a2e',
+  number: '#1a1a2e', date: '#1a1a2e',
+}
+
+const FIELDS_CERT_FREE: FieldDef[] = [
+  { key: 'name',   label: 'Nom (PETIT CHAMPION)', type: 'text', sample: 'PETIT CHAMPION' },
+  { key: 'title',  label: 'Titre histoire',        type: 'text', sample: "NIMI À L'ÉCOLE" },
+  { key: 'number', label: 'Livre N°',              type: 'text', sample: 'LIVRE 1' },
+  { key: 'date',   label: 'Date validation',       type: 'text', sample: '20 / 07 / 2026' },
+]
+
+const INIT_CERT_FREE: Record<string, Pos> = {
+  name:   { x: 200, y: 280, w: 900, h: 60,  size: 52 },
+  title:  { x: 200, y: 370, w: 900, h: 44,  size: 36 },
+  number: { x: 200, y: 432, w: 400, h: 30,  size: 24 },
+  date:   { x: 200, y: 480, w: 400, h: 30,  size: 24 },
+}
+
+const COLORS_CERT_FREE: Record<string, string> = {
+  name: '#1a1a2e', title: '#1a1a2e', number: '#1a1a2e', date: '#1a1a2e',
+}
+
+// ── Personalized Story Page (A4 portrait at 150 dpi; designer uploads blank pages) ──
+// photo: where the child's photo is composited (replaces the main character slot)
+// name:  where the child's name text is drawn
+const FIELDS_STORY_PAGE: FieldDef[] = [
+  { key: 'photo', label: 'Photo enfant', type: 'area', sample: '' },
+  { key: 'name',  label: 'Prénom enfant', type: 'text', sample: 'KETSIA' },
+]
+
+const INIT_STORY_PAGE: Record<string, Pos> = {
+  photo: { x: 60,  y: 120, w: 220, h: 280, size: 0  },
+  name:  { x: 60,  y: 420, w: 400, h: 60,  size: 48 },
+}
+
+const COLORS_STORY_PAGE: Record<string, string> = {
+  name: '#1a1a2e',
+}
+
 const TEMPLATE_REGISTRY: TemplateConfig[] = [
   {
-    slug: 'champion-kit', label: 'Champion Kit',
+    slug: 'carry-on-day', label: 'Kit Jour (Personnalisé)',
     W: 1254, H: 1254,
     fields: FIELDS_KIT, init: INIT_KIT, colors: COLORS_KIT,
   },
   {
-    slug: 'boarding-pass', label: 'Boarding Pass',
+    slug: 'carry-on-night', label: 'Kit Nuit (Personnalisé)',
+    W: 1254, H: 1254,
+    fields: FIELDS_KIT, init: INIT_KIT, colors: COLORS_KIT,
+  },
+  {
+    slug: 'carry-on-day-free', label: 'Kit Jour (Gratuit)',
+    W: 1254, H: 1254,
+    fields: FIELDS_KIT_FREE, init: INIT_KIT_FREE, colors: COLORS_KIT_FREE,
+  },
+  {
+    slug: 'carry-on-night-free', label: 'Kit Nuit (Gratuit)',
+    W: 1254, H: 1254,
+    fields: FIELDS_KIT_FREE, init: INIT_KIT_FREE, colors: COLORS_KIT_FREE,
+  },
+  {
+    slug: 'boarding-pass', label: 'Carte d\'emb. (Personnalisé)',
     W: 1080, H: 1080,
     fields: FIELDS_BP, init: INIT_BP, colors: COLORS_BP,
   },
   {
-    slug: 'passport-interior', label: 'Passport (spread)',
+    slug: 'boarding-pass-free', label: 'Carte d\'emb. (Gratuit)',
+    W: 1080, H: 1080,
+    fields: FIELDS_BP_FREE, init: INIT_BP_FREE, colors: COLORS_BP_FREE,
+  },
+  {
+    slug: 'passport-interior', label: 'Passeport (Personnalisé)',
     W: 2200, H: 1100,
     fields: FIELDS_PASSPORT, init: INIT_PASSPORT, colors: COLORS_PASSPORT,
   },
   {
-    slug: 'badge-template', label: 'Champion Attitude Badge',
+    slug: 'passport-interior-free', label: 'Passeport (Gratuit)',
+    W: 2200, H: 1100,
+    fields: FIELDS_PASSPORT_FREE, init: INIT_PASSPORT_FREE, colors: COLORS_PASSPORT_FREE,
+  },
+  {
+    slug: 'badge-template', label: 'Badge (Personnalisé)',
     W: 1080, H: 1080,
     fields: FIELDS_BADGE, init: INIT_BADGE, colors: COLORS_BADGE,
+  },
+  {
+    slug: 'badge-template-free', label: 'Badge (Gratuit)',
+    W: 1080, H: 1080,
+    fields: FIELDS_BADGE_FREE, init: INIT_BADGE_FREE, colors: COLORS_BADGE_FREE,
+  },
+  {
+    slug: 'certificate', label: 'Certificat (Personnalisé)',
+    W: 1400, H: 990,
+    fields: FIELDS_CERT, init: INIT_CERT, colors: COLORS_CERT,
+  },
+  {
+    slug: 'certificate-free', label: 'Certificat (Gratuit)',
+    W: 1400, H: 990,
+    fields: FIELDS_CERT_FREE, init: INIT_CERT_FREE, colors: COLORS_CERT_FREE,
+  },
+  {
+    slug: 'story-page', label: 'Histoire (Page personnalisée)',
+    W: 1240, H: 1754,
+    fields: FIELDS_STORY_PAGE, init: INIT_STORY_PAGE, colors: COLORS_STORY_PAGE,
   },
 ]
 
@@ -220,6 +450,8 @@ export default function KitLayoutEditor({ onNavigate, onOpenSidebar }: Props) {
   // Actual pixel dimensions of the loaded template image
   const [imgNatW, setImgNatW] = useState(0)
   const [imgNatH, setImgNatH] = useState(0)
+  // Slugs that have a template image uploaded in airways-templates bucket
+  const [uploadedSlugs, setUploadedSlugs] = useState<Set<string>>(new Set())
 
   const cfg = TEMPLATE_REGISTRY.find(t => t.slug === template) ?? TEMPLATE_REGISTRY[0]
 
@@ -327,7 +559,7 @@ export default function KitLayoutEditor({ onNavigate, onOpenSidebar }: Props) {
         }
       })
     } else {
-      const isBadgeArc = cfg.slug === 'badge-template' &&
+      const isBadgeArc = (cfg.slug === 'badge-template' || cfg.slug === 'badge-template-free') &&
         (k === 'attitude' || k === 'bottom_text')
       if (isBadgeArc) {
         setPos(prev => ({ ...prev, [k]: { ...prev[k], y: y - grabOffset.current.y } }))
@@ -415,6 +647,20 @@ export default function KitLayoutEditor({ onNavigate, onOpenSidebar }: Props) {
     getCachedAdmin().then(a => { if (a) setAdmin(a) }).catch(() => {})
   }, [])
 
+  useEffect(() => {
+    supabase.storage.from('airways-templates').list('', { limit: 100 })
+      .then(({ data }: { data: Array<{ id: string | null; name: string }> | null }) => {
+        if (!data) return
+        const slugSet = new Set<string>(
+          data
+            .filter((f: { id: string | null }) => f.id !== null)
+            .map((f: { name: string }) => f.name.replace(/\.[^.]+$/, ''))
+        )
+        setUploadedSlugs(slugSet)
+      })
+      .catch(() => {})
+  }, [])
+
   // ── Ensure selected field exists in new template ──────────────────
   useEffect(() => {
     if (!cfg.fields.find(f => f.key === sel)) setSel(cfg.fields[0].key)
@@ -439,7 +685,7 @@ export default function KitLayoutEditor({ onNavigate, onOpenSidebar }: Props) {
           x:          p.x,
           y:          p.y,
           w:          p.w ?? null,
-          h:          (f.type === 'area' || (cfg.slug === 'badge-template' && (f.key === 'attitude' || f.key === 'bottom_text')))
+          h:          (f.type === 'area' || ((cfg.slug === 'badge-template' || cfg.slug === 'badge-template-free') && (f.key === 'attitude' || f.key === 'bottom_text')))
                         ? p.h : null,
           font_size:  f.type === 'text' ? p.size : null,
           color:      f.type === 'text' ? (p.color ?? cfg.colors[f.key] ?? null) : null,
@@ -521,20 +767,40 @@ export default function KitLayoutEditor({ onNavigate, onOpenSidebar }: Props) {
 
         {/* Template tabs */}
         <div className="mt-4 flex flex-wrap gap-2">
-          {TEMPLATE_REGISTRY.map(t => (
-            <button
-              key={t.slug}
-              onClick={() => setTemplate(t.slug)}
-              className={`px-4 py-2 rounded-xl text-sm font-bold transition border ${
-                template === t.slug
-                  ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
-                  : 'bg-white text-gray-600 border-gray-200 hover:border-blue-300 hover:text-blue-600'
-              }`}
-            >
-              {t.label}
-            </button>
-          ))}
+          {TEMPLATE_REGISTRY.map(t => {
+            const isActive = template === t.slug
+            const hasImage = uploadedSlugs.size > 0 && uploadedSlugs.has(t.slug)
+            const missing  = uploadedSlugs.size > 0 && !uploadedSlugs.has(t.slug)
+            return (
+              <button
+                key={t.slug}
+                onClick={() => setTemplate(t.slug)}
+                className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold transition border ${
+                  isActive
+                    ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
+                    : 'bg-white text-gray-600 border-gray-200 hover:border-blue-300 hover:text-blue-600'
+                }`}
+              >
+                {t.label}
+                {hasImage && (
+                  <span className={`w-2 h-2 rounded-full flex-shrink-0 ${isActive ? 'bg-green-300' : 'bg-emerald-500'}`} title="Template uploadé" />
+                )}
+                {missing && (
+                  <span className={`w-2 h-2 rounded-full flex-shrink-0 ${isActive ? 'bg-amber-300' : 'bg-amber-500'}`} title="Pas de template" />
+                )}
+              </button>
+            )
+          })}
         </div>
+        {uploadedSlugs.size > 0 && (
+          <p className="mt-2 text-[10px] text-gray-400">
+            <span className="inline-flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" /> Template uploadé</span>
+            {' · '}
+            <span className="inline-flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-amber-500 inline-block" /> Image manquante</span>
+            {' · '}
+            {uploadedSlugs.size < 14 ? `${uploadedSlugs.size}/14 templates prêts` : 'Tous les templates sont prêts ✓'}
+          </p>
+        )}
       </header>
 
       <div className="p-4 lg:p-6 max-w-screen-2xl mx-auto w-full space-y-4">
@@ -699,7 +965,7 @@ export default function KitLayoutEditor({ onNavigate, onOpenSidebar }: Props) {
                       const dotR  = hot ? u * 0.7 : u * 0.42
 
                       // Live arc-text preview for badge text fields
-                      const isBadgeArc = cfg.slug === 'badge-template' &&
+                      const isBadgeArc = (cfg.slug === 'badge-template' || cfg.slug === 'badge-template-free') &&
                         (f.key === 'attitude' || f.key === 'bottom_text')
 
                       if (isBadgeArc) {
@@ -885,7 +1151,7 @@ export default function KitLayoutEditor({ onNavigate, onOpenSidebar }: Props) {
                       onChange={e => setPos(p => ({ ...p, [sel]: { ...p[sel], size: +e.target.value } }))}
                       className="w-full border border-blue-300 bg-white rounded-lg px-2 py-1.5 text-sm font-mono focus:outline-none focus:border-blue-500 mt-1" />
                   </div>
-                  {cfg.slug === 'badge-template' ? (
+                  {(cfg.slug === 'badge-template' || cfg.slug === 'badge-template-free') ? (
                     <div>
                       {(() => {
                         // strength 0=flat … 100=very curved, mapped exponentially to w

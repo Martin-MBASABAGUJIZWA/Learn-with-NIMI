@@ -72,7 +72,7 @@ export default function TalkToNimi({ childName }: Props) {
     <div className="bg-[var(--ds-surface-card)] border border-ds-border shadow-ds-card overflow-hidden flex flex-col h-full" style={{ borderRadius: 'var(--leaf-r)' }}>
 
       {/* Header */}
-      <div className="px-3 py-2.5 flex items-center gap-2 flex-shrink-0" style={{ backgroundColor: 'var(--nimi-green)' }}>
+      <div className="px-3 py-2.5 flex items-center gap-2 flex-shrink-0" style={{ backgroundColor: 'var(--ds-brand-primary)' }}>
         <motion.button whileTap={m.buttonPress}
           className="w-7 h-7 bg-[var(--ds-surface-card-hover)] hover:bg-[var(--ds-surface-card-active)] text-[var(--ds-text-secondary)] rounded-full flex items-center justify-center flex-shrink-0 transition">
           <ChevronRight className="w-4 h-4 rotate-180" />
@@ -104,12 +104,12 @@ export default function TalkToNimi({ childName }: Props) {
                     ? "bg-[var(--ds-surface-card-hover)] border border-ds-border text-ds-text rounded-2xl rounded-bl-sm"
                     : "text-white rounded-2xl rounded-br-sm"
                 }`}
-                style={msg.from === "user" ? { backgroundColor: 'var(--nimi-green)' } : undefined}>
+                style={msg.from === "user" ? { backgroundColor: 'var(--ds-brand-primary)' } : undefined}>
                   {showTyping ? (
                     <span className="flex items-center gap-1 py-1" aria-label={t("nimiThinking")}>
                       {[0, 0.15, 0.3].map(delay => (
                         <motion.span key={delay}
-                          className="w-1.5 h-1.5 bg-green-400 rounded-full"
+                          className="w-1.5 h-1.5 bg-[var(--ds-brand-primary)] rounded-full"
                           animate={{ y: [0, -3, 0] }}
                           transition={{ duration: 0.6, repeat: Infinity, delay }} />
                       ))}
@@ -178,7 +178,7 @@ export default function TalkToNimi({ childName }: Props) {
               transition={listening ? { duration: 0.8, repeat: Infinity } : {}}
               disabled={isTyping || dailyLimitReached}
               className={`w-7 h-7 rounded-full flex items-center justify-center text-white flex-shrink-0 transition shadow disabled:opacity-50 ${
-                listening ? "bg-red-500 hover:bg-red-600" : "bg-green-300 hover:bg-green-400"
+                listening ? "bg-red-500 hover:bg-red-600" : "bg-[var(--ds-brand-soft)] hover:bg-[var(--ds-brand-primary)]"
               }`}>
               <Mic className="w-3 h-3" />
             </motion.button>
@@ -186,7 +186,7 @@ export default function TalkToNimi({ childName }: Props) {
           <motion.button onClick={() => sendChat()} whileTap={m.buttonPress}
             disabled={isTyping || !chatInput.trim() || dailyLimitReached}
             className="w-7 h-7 disabled:bg-[var(--ds-surface-card-active)] flex items-center justify-center text-white flex-shrink-0 transition shadow"
-            style={{ backgroundColor: 'var(--nimi-green)', borderRadius: 'var(--leaf-r-sm)' }}>
+            style={{ backgroundColor: 'var(--ds-brand-primary)', borderRadius: 'var(--leaf-r-sm)' }}>
             <Send className="w-3 h-3" />
           </motion.button>
         </div>

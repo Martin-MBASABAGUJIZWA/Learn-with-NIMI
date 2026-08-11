@@ -91,7 +91,7 @@ export default function ThemePreviewModal({ meta, onClose }: Props) {
             {/* Live badge */}
             <div className="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full
                             bg-black/30 backdrop-blur-sm text-white text-xs font-semibold">
-              <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[var(--ds-brand-primary)] animate-pulse" />
               Live Preview
             </div>
 

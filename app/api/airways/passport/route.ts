@@ -75,6 +75,9 @@ export async function GET(req: NextRequest) {
   if (!adminRow && child?.parent_id !== user.id) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
+  // Personalized = subscribed or admin. Free users get the same document but
+  // without personal identity: name → "PETIT CHAMPION", photo → none.
+  let isPersonalized = !!adminRow
   if (!adminRow) {
     const { data: sub } = await supabase
       .from("nimipiko_subscriptions")
@@ -82,22 +85,19 @@ export async function GET(req: NextRequest) {
       .eq("parent_id", user.id)
       .in("status", ["active", "trial"])
       .maybeSingle();
-    if (!sub) return NextResponse.json({ error: "Subscription required" }, { status: 402 });
+    isPersonalized = !!sub
   }
 
-  const [data, { data: allLayoutRows }, passportCoverBuf] = await Promise.all([
+  const [data, passportCoverBuf] = await Promise.all([
     fetchAirwaysData(supabase, childId),
-    supabase
-      .from("template_layout")
-      .select("field,x,y,w,h,font_size,color,template")
-      .in("template", ["passport-interior", "badge-template"]),
     fetchTemplate("passport-cover"),
   ]);
   if (!data) return NextResponse.json({ error: "Child not found" }, { status: 404 });
 
   // ── Cache check ────────────────────────────────────────────────────────────
-  // Skip for admins (they may be previewing layout changes that need fresh output)
-  if (!adminRow) {
+  // Only cache personalized versions — free users get a faster but non-cached build.
+  // Skip cache for admins (they preview layout changes that need fresh output).
+  if (!adminRow && isPersonalized) {
     const cached = await getCachedPassport(supabase, childId);
     if (cached) {
       const safeName = safeFilename(data.name);
@@ -112,10 +112,18 @@ export async function GET(req: NextRequest) {
     }
   }
 
+  const spreadKey = isPersonalized ? "passport-interior" : "passport-interior-free"
+  const badgeKey  = isPersonalized ? "badge-template"    : "badge-template-free"
+
+  const { data: allLayoutRows } = await supabase
+    .from("template_layout")
+    .select("field,x,y,w,h,font_size,color,template")
+    .in("template", [spreadKey, badgeKey]);
+
   const layout: PassportSpreadLayout = {};
   const badgeLayout: AttitudeBadgeLayout = {};
   for (const row of allLayoutRows ?? []) {
-    const target = row.template === "badge-template" ? badgeLayout : layout;
+    const target = row.template === badgeKey ? badgeLayout : layout;
     (target as Record<string, unknown>)[row.field] = {
       x: row.x, y: row.y, w: row.w, h: row.h,
       font_size: row.font_size, color: row.color ?? undefined,
@@ -126,9 +134,9 @@ export async function GET(req: NextRequest) {
   const supaUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
 
   // ── Fetch all assets in parallel ───────────────────────────────────────────
-  // Avatar may be a custom avatar config ("ava:{…}") rather than a real image URL.
+  // Photo is only fetched for personalized (subscribed) users.
   const avatarPhotoPromise: Promise<string | null> = (async () => {
-    if (!data.avatar_url) return null
+    if (!isPersonalized || !data.avatar_url) return null
     if (isAvatarConfig(data.avatar_url)) {
       const buf = await avatarUrlToBuffer(data.avatar_url, 210)
       return buf ? `data:image/png;base64,${buf.toString("base64")}` : null
@@ -171,9 +179,11 @@ export async function GET(req: NextRequest) {
 
   const t0 = Date.now()
   try {
-    // ── Run background removal on child photo ONCE ─────────────────────────
+    const displayName = isPersonalized ? data.name : 'PETIT CHAMPION'
+
+    // ── Run background removal on child photo ONCE (personalized only) ─────
     let cleanPhotoDataUri: string | null = null;
-    if (photoUri) {
+    if (photoUri && isPersonalized) {
       cleanPhotoDataUri = await removeBg(photoUri).catch(() => null);
     }
     console.log(`[passport] removeBg ${Date.now() - t0}ms | bgOk=${cleanPhotoDataUri !== null}`);
@@ -198,6 +208,7 @@ export async function GET(req: NextRequest) {
             bookNumber:        story.sort_order,
             childPhotoDataUri: photoUri ?? null,
             cleanPhotoDataUri,
+            isPersonalized,
             layout:            badgeLayout,
           });
           return `data:image/png;base64,${buf.toString("base64")}`;
@@ -221,17 +232,18 @@ export async function GET(req: NextRequest) {
         const champNum = championNumber(data.name, bookNum, data.sibling_rank);
 
         return buildPassportSpread({
-          childName:           data.name,
-          championNumber:      champNum,
-          createdAt:           data.created_at,
+          childName:           displayName,
+          championNumber:      isPersonalized ? champNum : '',
+          createdAt:           isPersonalized ? data.created_at : '',
           photoDataUri:        photoUri ?? null,
           attitudeBadgeDataUri: badgeUris[i],
-          qrDataUri:           qr,
+          qrDataUri:           isPersonalized ? qr : null,
           story,
           bookNum,
           coverDataUri:        coverUriByIndex.get(coverIdx) ?? null,
           nextStory,
           nextCoverDataUri:    nextIdx >= 0 ? (coverUriByIndex.get(nextIdx) ?? null) : null,
+          isPersonalized,
           layout,
         });
       })
@@ -246,7 +258,7 @@ export async function GET(req: NextRequest) {
     const totalPages    = stampsPageNum + (allComplete ? 2 : 0);
 
     const stampsSvg = buildStampsSvg({
-      childName:  data.name,
+      childName:  displayName,
       stories:    data.stories,
       coverUris:  coverUriMap,
       pageNum:    stampsPageNum,
@@ -276,22 +288,22 @@ export async function GET(req: NextRequest) {
     if (allComplete) {
       const lastStory = data.stories.at(-1);
       const grandChampPages = await buildGrandChampionPages({
-        childName:      data.name,
-        championNumber: championNumber(data.name, lastStory?.sort_order ?? data.stories.length, data.sibling_rank),
-        completedAt:    lastStory?.completed_at ?? null,
-        photoDataUri:   cleanPhotoDataUri ?? photoUri ?? null,
+        childName:      displayName,
+        championNumber: isPersonalized ? championNumber(data.name, lastStory?.sort_order ?? data.stories.length, data.sibling_rank) : '',
+        completedAt:    isPersonalized ? (lastStory?.completed_at ?? null) : null,
+        photoDataUri:   isPersonalized ? (cleanPhotoDataUri ?? photoUri ?? null) : null,
         stories:        data.stories,
       });
       for (const pg of grandChampPages) await addImagePage(doc, pg);
     }
 
     const pdfBytes = await doc.save();
-    const safeName = safeFilename(data.name)
+    const safeName = safeFilename(displayName)
     console.log(`[passport] total ${Date.now() - t0}ms | pages=${doc.getPageCount()} | size=${(pdfBytes.length / 1024).toFixed(0)}kb | child=${childId}`);
 
-    // Cache write is fire-and-forget — a slow upload must not delay the response
-    if (!adminRow) {
-      setCachedPassport(supabase, childId, pdfBytes)  // intentionally not awaited
+    // Cache write is fire-and-forget — only cache personalized versions
+    if (!adminRow && isPersonalized) {
+      void setCachedPassport(supabase, childId, pdfBytes)
     }
 
     return new NextResponse(new Uint8Array(pdfBytes), {

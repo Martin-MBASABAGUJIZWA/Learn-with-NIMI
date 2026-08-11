@@ -56,7 +56,7 @@ export default function NimiRecommendationsPanel({ childId, language = "en" }: P
     return (
       <div className="overflow-hidden leaf-lg border border-[var(--ds-border-primary)] bg-[var(--ds-surface-card)] shadow-card-md">
         <div className="flex items-center gap-3 px-4 pt-4 pb-3">
-          <div className="w-10 h-10 rounded-xl bg-violet-100 animate-pulse shrink-0" />
+          <div className="w-10 h-10 rounded-xl bg-[var(--ds-brand-subtle)] animate-pulse shrink-0" />
           <div className="space-y-1.5 flex-1">
             <div className="h-2 w-16 rounded-full bg-[var(--ds-surface-card-active)] animate-pulse" />
             <div className="h-3.5 w-28 rounded bg-[var(--ds-surface-card-active)] animate-pulse" />
@@ -81,11 +81,11 @@ export default function NimiRecommendationsPanel({ childId, language = "en" }: P
       {/* Header — matches every other sidebar panel */}
       <div className="flex items-center justify-between px-4 pt-4 pb-3">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-violet-100 flex items-center justify-center shadow-sm shrink-0">
-            <Sparkles className="w-5 h-5 text-violet-500" />
+          <div className="w-10 h-10 rounded-xl bg-[var(--ds-brand-subtle)] flex items-center justify-center shadow-sm shrink-0">
+            <Sparkles className="w-5 h-5 text-[var(--ds-text-brand)]" />
           </div>
           <div>
-            <p className="font-nunito text-violet-500 text-3xs uppercase tracking-widest leading-none mb-0.5">AI Picks</p>
+            <p className="font-nunito text-[var(--ds-text-brand)] text-3xs uppercase tracking-widest leading-none mb-0.5">AI Picks</p>
             <h3 className="font-baloo font-black text-[var(--ds-text-primary)] text-mlg leading-tight">Nimi Recommends</h3>
           </div>
         </div>
@@ -102,18 +102,18 @@ export default function NimiRecommendationsPanel({ childId, language = "en" }: P
           >
             <Link
               href={rec.href}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-violet-50 border border-transparent hover:border-violet-100 transition-all group"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-[var(--ds-brand-subtle)] border border-transparent hover:border-[var(--ds-border-brand)] transition-all group"
             >
               <span className="text-xl leading-none shrink-0">{rec.emoji}</span>
               <div className="flex-1 min-w-0">
-                <p className="font-baloo font-black text-[var(--ds-text-primary)] text-sml truncate leading-snug group-hover:text-violet-700 transition-colors">
+                <p className="font-baloo font-black text-[var(--ds-text-primary)] text-sml truncate leading-snug group-hover:text-[var(--ds-text-brand)] transition-colors">
                   {rec.title}
                 </p>
                 <p className="font-nunito text-[var(--ds-text-tertiary)] text-2xs truncate">
                   {REASON_LABEL[rec.reason] ?? rec.reasonLabel}
                 </p>
               </div>
-              <ChevronRight className="w-3.5 h-3.5 text-[var(--ds-text-tertiary)] group-hover:text-violet-400 transition-colors shrink-0" />
+              <ChevronRight className="w-3.5 h-3.5 text-[var(--ds-text-tertiary)] group-hover:text-[var(--ds-text-brand)] transition-colors shrink-0" />
             </Link>
           </motion.div>
         ))}

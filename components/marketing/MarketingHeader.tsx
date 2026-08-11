@@ -48,7 +48,7 @@ export default function MarketingHeader() {
             Log In
           </Link>
           <Link href="/signuppage"
-            className="font-baloo font-black text-white text-sml px-4 py-2 rounded-full bg-nimi-green shadow-md hover:brightness-105 transition">
+            className="font-baloo font-black text-white text-sml px-4 py-2 rounded-full bg-[var(--ds-brand-primary)] shadow-md hover:brightness-105 transition">
             Get Started
           </Link>
         </div>
@@ -81,7 +81,7 @@ export default function MarketingHeader() {
               Log In
             </Link>
             <Link href="/signuppage" onClick={() => setMenuOpen(false)}
-              className="font-baloo font-black text-white text-sm text-center px-4 py-2.5 rounded-full bg-nimi-green shadow-md">
+              className="font-baloo font-black text-white text-sm text-center px-4 py-2.5 rounded-full bg-[var(--ds-brand-primary)] shadow-md">
               Get Started
             </Link>
           </div>

@@ -47,10 +47,10 @@ const LEVEL_DESC: Record<ReadingLevel, string> = {
 };
 
 const LEVEL_COLOR: Record<ReadingLevel, { bg: string; text: string; border: string }> = {
-  emerging:   { bg: "bg-sky-100",    text: "text-sky-700",    border: "border-sky-300" },
+  emerging:   { bg: "bg-[var(--ds-brand-subtle)]", text: "text-[var(--ds-text-brand)]", border: "border-[var(--ds-border-brand)]" },
   beginning:  { bg: "bg-violet-100", text: "text-violet-700", border: "border-violet-300" },
   developing: { bg: "bg-amber-100",  text: "text-amber-700",  border: "border-amber-300" },
-  expanding:  { bg: "bg-emerald-100",text: "text-emerald-700",border: "border-emerald-300" },
+  expanding:  { bg: "bg-[var(--ds-brand-soft)]", text: "text-[var(--ds-text-brand)]", border: "border-[var(--ds-border-brand)]" },
   fluent:     { bg: "bg-rose-100",   text: "text-rose-700",   border: "border-rose-300" },
 };
 
@@ -278,20 +278,20 @@ export default function LearningBrainTab({ childId, language, childName }: Props
                       isCurrent
                         ? `${levelStyle.bg} ${levelStyle.text} ring-2 ring-offset-2 ring-current shadow-md`
                         : isPast
-                        ? "bg-[var(--nimi-green)] text-white shadow-sm"
+                        ? "bg-[var(--ds-brand-primary)] text-white shadow-sm"
                         : "bg-[var(--ds-surface-card-active)] text-[var(--ds-text-tertiary)]"
                     }`}
                   >
                     {isPast ? "✓" : isCurrent ? (levelIdx + 1) : <span className="text-4xs">{i + 1}</span>}
                   </motion.div>
                   <p className={`mt-1.5 text-5xs sm:text-4xs font-bold text-center leading-tight ${
-                    isCurrent ? levelStyle.text : isPast ? "text-[var(--nimi-green)]" : "text-[var(--ds-text-tertiary)]"
+                    isCurrent ? levelStyle.text : isPast ? "text-[var(--ds-brand-primary)]" : "text-[var(--ds-text-tertiary)]"
                   }`}>
                     {LEVEL_LABELS[level]}
                   </p>
                 </div>
                 {i < LEVEL_STEPS.length - 1 && (
-                  <div className={`h-0.5 w-full mx-0.5 rounded-full -mt-4 ${isPast || isCurrent ? "bg-[var(--nimi-green)]" : "bg-[var(--ds-surface-card-active)]"}`} />
+                  <div className={`h-0.5 w-full mx-0.5 rounded-full -mt-4 ${isPast || isCurrent ? "bg-[var(--ds-brand-primary)]" : "bg-[var(--ds-surface-card-active)]"}`} />
                 )}
               </div>
             );
@@ -330,9 +330,9 @@ export default function LearningBrainTab({ childId, language, childName }: Props
             {/* Three stat chips */}
             <div className="grid grid-cols-3 gap-3 mb-5">
               {[
-                { label: "Encountered", value: vocab!.encountered, emoji: "👀", bg: "bg-sky-50",    border: "border-sky-200",    text: "text-sky-700"    },
+                { label: "Encountered", value: vocab!.encountered, emoji: "👀", bg: "bg-[var(--ds-brand-subtle)]", border: "border-[var(--ds-border-brand)]", text: "text-[var(--ds-text-brand)]" },
                 { label: "Practiced",   value: vocab!.practiced,   emoji: "✏️", bg: "bg-amber-50",  border: "border-amber-200",  text: "text-amber-700"  },
-                { label: "Mastered",    value: vocab!.mastered,    emoji: "⭐", bg: "bg-emerald-50",border: "border-emerald-200",text: "text-emerald-700"},
+                { label: "Mastered",    value: vocab!.mastered,    emoji: "⭐", bg: "bg-[var(--ds-brand-soft)]", border: "border-[var(--ds-border-brand)]", text: "text-[var(--ds-text-brand)]" },
               ].map((stat, i) => (
                 <motion.div
                   key={stat.label}
@@ -351,7 +351,7 @@ export default function LearningBrainTab({ childId, language, childName }: Props
             <div className="mb-1.5">
               <div className="h-4 rounded-full overflow-hidden bg-[var(--ds-surface-card-active)] flex">
                 <motion.div
-                  className="h-full bg-emerald-500"
+                  className="h-full bg-[var(--ds-brand-primary)]"
                   initial={{ width: 0 }}
                   animate={{ width: `${vocab!.totalWords > 0 ? (vocab!.mastered / vocab!.totalWords) * 100 : 0}%` }}
                   transition={{ duration: 0.8, ease: "easeOut" }}
@@ -363,7 +363,7 @@ export default function LearningBrainTab({ childId, language, childName }: Props
                   transition={{ duration: 0.8, ease: "easeOut", delay: 0.1 }}
                 />
                 <motion.div
-                  className="h-full bg-sky-300"
+                  className="h-full bg-[var(--ds-brand-soft)]"
                   initial={{ width: 0 }}
                   animate={{ width: `${vocab!.totalWords > 0 ? (vocab!.encountered / vocab!.totalWords) * 100 : 0}%` }}
                   transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
@@ -378,9 +378,9 @@ export default function LearningBrainTab({ childId, language, childName }: Props
             {/* Legend */}
             <div className="flex gap-3 flex-wrap mt-3">
               {[
-                { color: "bg-emerald-500", label: "Mastered" },
+                { color: "bg-[var(--ds-brand-primary)]", label: "Mastered" },
                 { color: "bg-amber-400",   label: "Practiced" },
-                { color: "bg-sky-300",     label: "Encountered" },
+                { color: "bg-[var(--ds-brand-soft)]", label: "Encountered" },
               ].map(l => (
                 <div key={l.label} className="flex items-center gap-1.5">
                   <div className={`w-2.5 h-2.5 rounded-full ${l.color}`} />
@@ -508,7 +508,7 @@ export default function LearningBrainTab({ childId, language, childName }: Props
               <p className="text-2xs font-black text-ds-muted uppercase tracking-widest mb-2">Strengths</p>
               <div className="flex flex-wrap gap-2">
                 {profile!.strengths.map(s => (
-                  <span key={s} className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold rounded-full">
+                  <span key={s} className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--ds-brand-subtle)] border border-[var(--ds-border-brand)] text-[var(--ds-text-brand)] text-xs font-bold rounded-full">
                     ✅ {qtLabel(s)}
                   </span>
                 ))}
@@ -561,7 +561,7 @@ function GoalRow({ goal, index }: { goal: LearningGoal; index: number }) {
       transition={{ delay: index * 0.06 }}
       className={`p-3.5 border-2 transition-all ${
         done
-          ? "bg-emerald-50 border-emerald-200"
+          ? "bg-[var(--ds-brand-subtle)] border-[var(--ds-border-brand)]"
           : "bg-[var(--ds-surface-card-hover)] border-ds-border"
       }`}
       style={{ borderRadius: "var(--leaf-r)" }}
@@ -569,14 +569,14 @@ function GoalRow({ goal, index }: { goal: LearningGoal; index: number }) {
       <div className="flex items-center gap-3 mb-2">
         <span className="text-xl shrink-0">{GOAL_TYPE_EMOJI[goal.goalType]}</span>
         <div className="flex-1 min-w-0">
-          <p className={`font-black text-sml leading-tight ${done ? "text-emerald-700" : "text-ds-text"}`}>
+          <p className={`font-black text-sml leading-tight ${done ? "text-[var(--ds-text-brand)]" : "text-ds-text"}`}>
             {goal.title || GOAL_TYPE_LABEL[goal.goalType] || goal.goalType.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase())}
           </p>
           <p className="text-3xs text-ds-muted font-semibold">{GOAL_TYPE_LABEL[goal.goalType] ?? goal.goalType}</p>
         </div>
         <div className="shrink-0 flex items-center gap-1.5">
           {done ? (
-            <span className="text-emerald-600 font-black text-xs">✅ Done!</span>
+            <span className="text-[var(--ds-text-brand)] font-black text-xs">✅ Done!</span>
           ) : (
             <span className="font-black text-ds-text text-sml">{goal.currentValue}/{goal.targetValue}</span>
           )}
@@ -588,7 +588,7 @@ function GoalRow({ goal, index }: { goal: LearningGoal; index: number }) {
       </div>
       <div className="h-2 rounded-full overflow-hidden bg-[var(--ds-border-primary)]">
         <motion.div
-          className={`h-full rounded-full ${done ? "bg-emerald-500" : "bg-[var(--nimi-green)]"}`}
+          className="h-full rounded-full bg-[var(--ds-brand-primary)]"
           initial={{ width: 0 }}
           animate={{ width: `${pct}%` }}
           transition={{ duration: 0.7, ease: "easeOut", delay: index * 0.06 }}

@@ -54,7 +54,7 @@ export default async function InvitePage({ params }: { params: Promise<{ code: s
   // Invalid code — show a generic landing with CTA to sign up anyway
   if (!referrer) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-teal-50 flex flex-col items-center justify-center px-4 py-16">
+      <div className="min-h-screen bg-[var(--ds-brand-subtle)] flex flex-col items-center justify-center px-4 py-16">
         <img src="/nimi-logo-circle.png" alt="NIMI" className="w-20 h-20 rounded-full mb-6" />
         <h1 className="font-baloo font-black text-3xl text-[var(--ds-text-primary)] text-center mb-3">
           This invite link has expired
@@ -64,7 +64,7 @@ export default async function InvitePage({ params }: { params: Promise<{ code: s
         </p>
         <Link
           href="/signuppage"
-          className="bg-emerald-600 text-white font-black text-base px-8 py-4 rounded-2xl shadow-lg hover:bg-emerald-700 active:scale-95 transition"
+          className="text-[var(--ds-nav-bg)] font-black text-base px-8 py-4 rounded-2xl shadow-lg active:scale-95 transition" style={{backgroundColor:"var(--ds-brand-primary)"}}
         >
           🚀 Start free trial
         </Link>
@@ -79,12 +79,12 @@ export default async function InvitePage({ params }: { params: Promise<{ code: s
   const firstName = referrer.name.split(" ")[0];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-teal-50">
+    <div className="min-h-screen bg-[var(--ds-brand-subtle)]">
 
       {/* Top bar */}
       <header className="w-full px-5 py-4 flex items-center justify-between max-w-4xl mx-auto">
         <Link href="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-xl bg-emerald-600 flex items-center justify-center text-white text-lg font-black">🌿</div>
+          <div className="w-8 h-8 rounded-xl bg-[var(--ds-brand-primary)] flex items-center justify-center text-[var(--ds-nav-bg)] text-lg font-black">🌿</div>
           <span className="font-baloo font-black text-lg text-[var(--ds-text-primary)]">NIMIPIKO</span>
         </Link>
         <Link href="/loginpage" className="font-nunito font-bold text-sml text-[var(--ds-text-secondary)] hover:text-[var(--ds-text-primary)] transition">
@@ -103,19 +103,19 @@ export default async function InvitePage({ params }: { params: Promise<{ code: s
               alt="NIMI"
               className="w-24 h-24 rounded-full border-4 border-white shadow-xl object-cover"
             />
-            <div className="absolute -bottom-2 -right-2 bg-emerald-500 text-white text-xs font-black px-2.5 py-1 rounded-full shadow">
+            <div className="absolute -bottom-2 -right-2 bg-[var(--ds-brand-primary)] text-[var(--ds-nav-bg)] text-xs font-black px-2.5 py-1 rounded-full shadow">
               🎁 Invite
             </div>
           </div>
 
-          <div className="inline-flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-full px-4 py-1.5 mb-4">
-            <span className="w-2 h-2 bg-emerald-500 rounded-full" />
-            <span className="font-nunito font-bold text-emerald-700 text-sm">{referrer.name} sent you an invite</span>
+          <div className="inline-flex items-center gap-2 bg-[var(--ds-brand-subtle)] border border-[var(--ds-border-brand)] rounded-full px-4 py-1.5 mb-4">
+            <span className="w-2 h-2 bg-[var(--ds-brand-primary)] rounded-full" />
+            <span className="font-nunito font-bold text-[var(--ds-text-brand)] text-sm">{referrer.name} sent you an invite</span>
           </div>
 
           <h1 className="font-baloo font-black text-4xl sm:text-5xl text-[var(--ds-text-primary)] leading-tight mb-4">
             {firstName} thinks your<br />
-            <span className="text-emerald-600">child will love this</span>
+            <span className="text-[var(--ds-text-brand)]">child will love this</span>
           </h1>
 
           <p className="font-nunito text-[var(--ds-text-secondary)] text-base max-w-md mx-auto leading-relaxed">
@@ -124,7 +124,7 @@ export default async function InvitePage({ params }: { params: Promise<{ code: s
         </div>
 
         {/* Reward callout */}
-        <div className="bg-gradient-to-r from-emerald-500 to-teal-500 leaf-lg p-6 text-white text-center mb-8 shadow-lg">
+        <div className="leaf-lg p-6 text-[var(--ds-nav-bg)] text-center mb-8 shadow-lg" style={{background:"linear-gradient(135deg,var(--ds-brand-primary),var(--ds-brand-hover))"}}>
           <p className="font-baloo font-black text-3.5xl leading-tight mb-1">🎁 Referral reward</p>
           <p className="font-nunito text-white/90 text-mbase">
             Sign up, subscribe to Club, and you <strong>both</strong> automatically receive <strong>1 free month</strong> — no coupon needed.
@@ -147,7 +147,7 @@ export default async function InvitePage({ params }: { params: Promise<{ code: s
         {/* CTA */}
         <Link
           href={signupUrl}
-          className="block w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black text-lg text-center py-5 rounded-2xl shadow-xl transition active:scale-[0.98] mb-4"
+          className="block w-full font-black text-lg text-center py-5 rounded-2xl shadow-xl transition active:scale-[0.98] mb-4" style={{backgroundColor:"var(--ds-brand-primary)",color:"var(--ds-nav-bg)"}}
         >
           🚀 Accept {firstName}&apos;s invite
         </Link>
@@ -166,7 +166,7 @@ export default async function InvitePage({ params }: { params: Promise<{ code: s
                 key={b.title}
                 className="bg-[var(--ds-surface-card)] border border-[var(--ds-border-primary)] leaf p-5 flex items-start gap-4 shadow-sm"
               >
-                <div className="w-11 h-11 bg-emerald-50 rounded-xl flex items-center justify-center text-2xl shrink-0">
+                <div className="w-11 h-11 bg-[var(--ds-brand-subtle)] rounded-xl flex items-center justify-center text-2xl shrink-0">
                   {b.emoji}
                 </div>
                 <div>
@@ -192,7 +192,7 @@ export default async function InvitePage({ params }: { params: Promise<{ code: s
         {/* Bottom CTA */}
         <Link
           href={signupUrl}
-          className="block w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black text-base text-center py-4 rounded-2xl shadow-lg transition active:scale-[0.98]"
+          className="block w-full font-black text-base text-center py-4 rounded-2xl shadow-lg transition active:scale-[0.98]" style={{backgroundColor:"var(--ds-brand-primary)",color:"var(--ds-nav-bg)"}}
         >
           🌿 Join {firstName} on NIMIPIKO
         </Link>

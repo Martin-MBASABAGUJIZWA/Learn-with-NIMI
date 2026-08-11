@@ -176,7 +176,7 @@ export const UploadModal: React.FC<UploadModalProps> = ({ onClose, onSuccess, ch
 
                 <div className="flex space-x-3 pt-2">
                   <Button onClick={() => { if (!isUploading) { resetForm(); onClose(); } }} variant="outline" className="flex-1" disabled={isUploading}>Cancel</Button>
-                  <Button onClick={handleSubmit} className="flex-1 bg-[var(--nimi-green)] hover:bg-[var(--ds-brand-hover)] text-white" disabled={!file || isUploading}>
+                  <Button onClick={handleSubmit} className="flex-1 bg-[var(--ds-brand-primary)] hover:bg-[var(--ds-brand-hover)] text-white" disabled={!file || isUploading}>
                     {isUploading ? 'Uploading...' : 'Share Artwork'}
                   </Button>
                 </div>

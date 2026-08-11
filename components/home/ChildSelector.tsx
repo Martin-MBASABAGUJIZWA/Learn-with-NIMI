@@ -32,7 +32,7 @@ export default function ChildSelector({ children, activeChild, onSelect }: Props
                 : "bg-[var(--ds-surface-card-hover)] text-[var(--ds-text-primary)] hover:bg-[var(--ds-surface-card-active)] border border-ds-border"
             }`}
             style={child.id === activeChild.id
-              ? { backgroundColor: 'var(--nimi-green)', borderRadius: 'var(--leaf-r-sm)' }
+              ? { backgroundColor: 'var(--ds-brand-primary)', borderRadius: 'var(--leaf-r-sm)' }
               : { borderRadius: 'var(--leaf-r-sm)' }
             }
           >

@@ -109,7 +109,7 @@ function CheerBurst({ onDone }: { onDone: () => void }) {
 // ── Creation card ────────────────────────────────────────────────
 const STATUS_BADGE: Record<string, { label: string; cls: string }> = {
   pending:  { label: "Pending review", cls: "bg-amber-100 text-amber-700 border-amber-200" },
-  approved: { label: "Live",           cls: "bg-emerald-100 text-emerald-700 border-emerald-200" },
+  approved: { label: "Live",           cls: "bg-[var(--ds-brand-soft)] text-[var(--ds-text-brand)] border-[var(--ds-border-brand)]" },
   rejected: { label: "Rejected",       cls: "bg-red-100 text-red-600 border-red-200" },
   reported: { label: "Under review",   cls: "bg-orange-100 text-orange-600 border-orange-200" },
 };
@@ -142,7 +142,7 @@ function CreationCard({
 
   const AVATAR_GRADIENTS = [
     "from-violet-500 to-purple-600", "from-pink-500 to-rose-600",
-    "from-blue-500 to-indigo-600",   "from-emerald-500 to-teal-600",
+    "from-blue-500 to-indigo-600",   "from-[var(--ds-brand-primary)] to-[var(--ds-brand-hover)]",
     "from-amber-500 to-orange-600",  "from-teal-500 to-cyan-600",
   ];
   const avatarGrad = AVATAR_GRADIENTS[(creation.childName?.charCodeAt(0) ?? 0) % AVATAR_GRADIENTS.length];
@@ -207,7 +207,7 @@ function CreationCard({
       <div className="relative w-full overflow-hidden bg-ds-border" style={{ aspectRatio:"4/3" }}>
         {isProgress ? (
           /* Story-progress: horizontal layout for 4:3 landscape frame */
-          <div className="absolute inset-0 bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center gap-6 px-6">
+          <div className="absolute inset-0 bg-gradient-to-br from-[var(--ds-brand-primary)] to-[var(--ds-brand-hover)] flex items-center justify-center gap-6 px-6">
             {/* Cover thumbnail */}
             <div className="shrink-0">
               {hasImg ? (
@@ -289,10 +289,10 @@ function CreationCard({
             onClick={handleCheer}
             className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sml font-black transition-all duration-200 ${
               creation.likedByUser
-                ? "text-white shadow-md shadow-emerald-500/20"
-                : "bg-ds-page border border-ds-border text-ds-muted hover:border-[var(--nimi-green)] hover:text-[var(--nimi-green)]"
+                ? "text-[var(--ds-nav-bg)] shadow-md shadow-[var(--ds-brand-primary)]/20"
+                : "bg-ds-page border border-ds-border text-ds-muted hover:border-[var(--ds-border-brand)] hover:text-[var(--ds-text-brand)]"
             }`}
-            style={creation.likedByUser ? { background:"var(--nimi-green)" } : {}}
+            style={creation.likedByUser ? { background:"var(--ds-brand-primary)" } : {}}
           >
             <motion.span
               className="text-mbase leading-none"
@@ -525,7 +525,7 @@ function SharePickerSheet({
                       >
                         <div className="flex items-center gap-3 px-3 py-2.5">
                           {/* Cover */}
-                          <div className={`w-11 h-11 rounded-xl overflow-hidden shrink-0 flex items-center justify-center text-xl shadow-sm bg-gradient-to-br ${done ? "from-emerald-200 to-teal-300" : "from-amber-200 to-yellow-300"}`}>
+                          <div className={`w-11 h-11 rounded-xl overflow-hidden shrink-0 flex items-center justify-center text-xl shadow-sm bg-gradient-to-br ${done ? "from-[var(--ds-brand-soft)] to-[var(--ds-brand-primary)]" : "from-amber-200 to-yellow-300"}`}>
                             {coverSrc
                               ? <img src={coverSrc} alt={item.storyTitle} className="w-full h-full object-cover" />
                               : <span>{item.themeEmoji ?? "📖"}</span>
@@ -540,13 +540,13 @@ function SharePickerSheet({
                                 <ChildAvatar avatarUrl={item.childAvatar} name={item.childName} size={16} className="w-full h-full" />
                               </div>
                               <span className="text-ds-muted text-2xs font-semibold truncate">{item.childName}</span>
-                              <span className={`text-3xs font-black px-1.5 py-0.5 rounded-full ${done ? "bg-amber-50 text-amber-600" : "bg-sky-50 text-sky-600"}`}>
+                              <span className={`text-3xs font-black px-1.5 py-0.5 rounded-full ${done ? "bg-amber-50 text-amber-600" : "bg-[var(--ds-brand-subtle)] text-[var(--ds-text-brand)]"}`}>
                                 {done ? "🏆" : `${pct}%`}
                               </span>
                             </div>
                             {!done && (
                               <div className="mt-1 h-1 bg-ds-border rounded-full overflow-hidden">
-                                <div className="h-full bg-gradient-to-r from-sky-400 to-blue-500 rounded-full" style={{ width: `${pct}%` }} />
+                                <div className="h-full rounded-full" style={{ width: `${pct}%`, background: "var(--ds-brand-primary)" }} />
                               </div>
                             )}
                           </div>
@@ -633,7 +633,7 @@ function CaptionSheet({
 
             {/* Story preview */}
             <div className="mx-5 mb-4 rounded-2xl overflow-hidden border border-ds-border flex" style={{ background: "var(--ds-surface-card)" }}>
-              <div className={`w-20 h-24 shrink-0 relative overflow-hidden flex items-center justify-center text-3xl bg-gradient-to-br ${item.complete ? "from-emerald-400 to-teal-500" : "from-amber-400 to-orange-500"}`}>
+              <div className={`w-20 h-24 shrink-0 relative overflow-hidden flex items-center justify-center text-3xl bg-gradient-to-br ${item.complete ? "from-[var(--ds-brand-primary)] to-[var(--ds-brand-hover)]" : "from-amber-400 to-orange-500"}`}>
                 {coverSrc
                   ? <img src={coverSrc} alt={item.storyTitle} className="w-full h-full object-cover" />
                   : <span className="drop-shadow">{item.themeEmoji ?? "📖"}</span>
@@ -644,7 +644,7 @@ function CaptionSheet({
                   <p className="font-black text-ds-text text-sm leading-snug truncate">{item.storyTitle}</p>
                   <p className="text-ds-muted text-xs font-medium mt-0.5">{item.childName}</p>
                 </div>
-                <span className={`self-start inline-flex items-center gap-1 text-3xs font-black px-2.5 py-1 rounded-full ${item.complete ? "bg-amber-100 text-amber-700" : "bg-sky-100 text-sky-700"}`}>
+                <span className={`self-start inline-flex items-center gap-1 text-3xs font-black px-2.5 py-1 rounded-full ${item.complete ? "bg-amber-100 text-amber-700" : "bg-[var(--ds-brand-subtle)] text-[var(--ds-text-brand)]"}`}>
                   {item.complete ? t("communityCompleted") : `📖 ${Math.round(item.progress * 100)}${t("communityThrough")}`}
                 </span>
               </div>
@@ -657,7 +657,7 @@ function CaptionSheet({
                 onChange={e => onCaptionChange(e.target.value.slice(0, CAPTION_MAX))}
                 rows={3}
                 placeholder={t("communityCaptionPlaceholder")}
-                className="w-full bg-ds-page border border-ds-border rounded-2xl px-4 py-3 pb-8 text-ds-text text-sm leading-relaxed resize-none focus:outline-none focus:border-[var(--nimi-green)] transition-colors placeholder:text-ds-muted"
+                className="w-full bg-ds-page border border-ds-border rounded-2xl px-4 py-3 pb-8 text-ds-text text-sm leading-relaxed resize-none focus:outline-none focus:border-[var(--ds-border-brand)] transition-colors placeholder:text-ds-muted"
               />
               <span className={`absolute bottom-3 right-4 text-2xs font-semibold pointer-events-none ${remaining < 30 ? "text-orange-500" : "text-ds-muted"}`}>
                 {remaining}
@@ -671,11 +671,11 @@ function CaptionSheet({
                 type="checkbox"
                 checked={consentChecked}
                 onChange={e => setConsentChecked(e.target.checked)}
-                className="mt-0.5 w-4 h-4 shrink-0 accent-[var(--nimi-green)] cursor-pointer"
+                className="mt-0.5 w-4 h-4 shrink-0 accent-[var(--ds-brand-primary)] cursor-pointer"
               />
               <label htmlFor="community-consent" className="text-ds-muted text-xs leading-relaxed cursor-pointer select-none">
                 I agree to the{" "}
-                <a href="/terms" target="_blank" rel="noopener noreferrer" className="underline text-[var(--nimi-green)]">
+                <a href="/terms" target="_blank" rel="noopener noreferrer" className="underline text-[var(--ds-text-brand)]">
                   Terms of Use
                 </a>{" "}
                 and confirm I have the right to share this content on Nimipiko.
@@ -1121,7 +1121,7 @@ export default function CommunityClient({ initialUserId, initialHasSubscription 
                   {friends.slice(0, 7).map((f, i) => {
                     const FRIEND_GRADS = [
                       "from-violet-400 to-purple-500","from-pink-400 to-rose-500",
-                      "from-blue-400 to-indigo-500","from-emerald-400 to-teal-500",
+                      "from-blue-400 to-indigo-500","from-[var(--ds-brand-primary)] to-[var(--ds-brand-hover)]",
                       "from-amber-400 to-orange-500","from-cyan-400 to-sky-500",
                     ];
                     const grad = FRIEND_GRADS[f.name.charCodeAt(0) % FRIEND_GRADS.length];
@@ -1162,15 +1162,15 @@ export default function CommunityClient({ initialUserId, initialHasSubscription 
                 placeholder="Search posts…"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                className="w-full pl-9 pr-4 py-2.5 bg-ds-card border border-ds-border rounded-2xl text-sml text-ds-text placeholder:text-ds-muted focus:outline-none focus:border-[var(--nimi-green)] transition-colors"
+                className="w-full pl-9 pr-4 py-2.5 bg-ds-card border border-ds-border rounded-2xl text-sml text-ds-text placeholder:text-ds-muted focus:outline-none focus:border-[var(--ds-border-brand)] transition-colors"
               />
             </div>
             <button
               onClick={() => { setMyPostsOnly(p => !p); setSearch(""); setTypeFilter("all"); }}
               className={`shrink-0 flex items-center gap-1.5 px-4 py-2.5 rounded-2xl text-xs font-black border transition-all ${
                 myPostsOnly
-                  ? "bg-[var(--nimi-green)] text-white border-[var(--nimi-green)]"
-                  : "bg-ds-card border-ds-border text-ds-muted hover:border-[var(--nimi-green)] hover:text-[var(--nimi-green)]"
+                  ? "bg-[var(--ds-brand-primary)] text-[var(--ds-nav-bg)] border-[var(--ds-border-brand)]"
+                  : "bg-ds-card border-ds-border text-ds-muted hover:border-[var(--ds-border-brand)] hover:text-[var(--ds-text-brand)]"
               }`}
             >
               <span className="text-sml">👤</span> My Posts
@@ -1193,8 +1193,8 @@ export default function CommunityClient({ initialUserId, initialHasSubscription 
                 onClick={() => setTypeFilter(f.key)}
                 className={`shrink-0 px-3 py-1.5 rounded-full text-2xs font-black border transition-all whitespace-nowrap ${
                   typeFilter === f.key
-                    ? "bg-[var(--nimi-green)] text-white border-[var(--nimi-green)]"
-                    : "bg-ds-card border-ds-border text-ds-muted hover:border-[var(--nimi-green)]"
+                    ? "bg-[var(--ds-brand-primary)] text-[var(--ds-nav-bg)] border-[var(--ds-border-brand)]"
+                    : "bg-ds-card border-ds-border text-ds-muted hover:border-[var(--ds-border-brand)]"
                 }`}
               >{f.label}</button>
             ))}
@@ -1247,7 +1247,7 @@ export default function CommunityClient({ initialUserId, initialHasSubscription 
                 whileTap={{ scale:0.95 }}
                 onClick={openPicker}
                 className="inline-flex items-center gap-2 font-baloo font-black text-white text-sml px-5 py-2.5 rounded-2xl shadow-md"
-                style={{ background:"var(--nimi-green)" }}
+                style={{ background:"var(--ds-brand-primary)" }}
               >
                 <Plus className="w-4 h-4" strokeWidth={3} /> Share your first post ⭐
               </motion.button>
@@ -1265,7 +1265,7 @@ export default function CommunityClient({ initialUserId, initialHasSubscription 
                   whileTap={{ scale:0.95 }}
                   onClick={() => router.push("/stories")}
                   className="inline-flex items-center gap-2 font-baloo font-black text-white text-sml px-5 py-2.5 rounded-2xl shadow-md"
-                  style={{ background:"var(--nimi-green)" }}
+                  style={{ background:"var(--ds-brand-primary)" }}
                 >
                   {t("communityStartStory")} <span className="text-mbase">📖</span>
                 </motion.button>
@@ -1387,8 +1387,8 @@ export default function CommunityClient({ initialUserId, initialHasSubscription 
             animate={{ opacity: 1, y: 0,  scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
             transition={{ type: "spring", stiffness: 380, damping: 28 }}
-            className="fixed bottom-[140px] left-1/2 -translate-x-1/2 z-popover flex items-center gap-2.5 px-5 py-3 rounded-2xl text-white text-sml font-black shadow-[0_8px_32px_rgba(5,150,105,0.4)] whitespace-nowrap"
-            style={{ background: "var(--nimi-green)" }}
+            className="fixed bottom-[140px] left-1/2 -translate-x-1/2 z-popover flex items-center gap-2.5 px-5 py-3 rounded-2xl text-[var(--ds-nav-bg)] text-sml font-black shadow-ds-cta whitespace-nowrap"
+            style={{ background: "var(--ds-brand-primary)" }}
           >
             {toast}
           </motion.div>

@@ -228,8 +228,8 @@ function PricingInner() {
           {/* Paid Club — already subscribed */}
           {isPaidClub && (
             <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
-              className="mb-6 flex items-center gap-3 bg-green-50 border border-green-200 rounded-2xl px-4 py-3.5">
-              <CheckCircle2 className="w-6 h-6 text-green-600 shrink-0" />
+              className="mb-6 flex items-center gap-3 bg-[var(--ds-brand-subtle)] border border-[var(--ds-border-brand)] rounded-2xl px-4 py-3.5">
+              <CheckCircle2 className="w-6 h-6 text-[var(--ds-text-brand)] shrink-0" />
               <div className="flex-1 min-w-0">
                 <p className="font-black text-ds-text text-[14px]">You&apos;re a Club Member ✓</p>
                 <p className="text-gray-500 text-[13px] mt-0.5">
@@ -271,20 +271,20 @@ function PricingInner() {
               <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                 {/* Left: label + description */}
                 <div className="flex items-start gap-3 flex-1">
-                  <div className="w-11 h-11 rounded-xl bg-emerald-200 flex items-center justify-center text-2xl shrink-0 shadow-sm">🎁</div>
+                  <div className="w-11 h-11 rounded-xl bg-[var(--ds-brand-soft)] flex items-center justify-center text-2xl shrink-0 shadow-sm">🎁</div>
                   <div>
                     <div className="flex items-center gap-2 flex-wrap mb-0.5">
-                      <span className="font-baloo font-black text-emerald-800 text-[18px]">7-Day Free Trial</span>
-                      <span className="bg-emerald-600 text-white text-[9px] font-black px-2 py-0.5 rounded-full">NO CARD NEEDED</span>
+                      <span className="font-baloo font-black text-[var(--ds-text-primary)] text-[18px]">7-Day Free Trial</span>
+                      <span className="bg-[var(--ds-brand-primary)] text-[var(--ds-nav-bg)] text-[9px] font-black px-2 py-0.5 rounded-full">NO CARD NEEDED</span>
                     </div>
-                    <p className="text-emerald-800/80 text-[13px]">
+                    <p className="text-[var(--ds-text-secondary)] text-[13px]">
                       New accounts get full Club access free for 7 days — every story, every language, Nimi AI unlimited. No credit card required.
                     </p>
                   </div>
                 </div>
                 {/* Right: CTA */}
                 <a href="/signup"
-                  className="shrink-0 px-6 py-3 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-black text-[14px] transition flex items-center gap-2 justify-center shadow-sm">
+                  className="shrink-0 px-6 py-3 rounded-full bg-[var(--ds-brand-primary)] hover:bg-[var(--ds-brand-hover)] text-[var(--ds-nav-bg)] font-black text-[14px] transition flex items-center gap-2 justify-center shadow-sm">
                   Start Free Trial →
                 </a>
               </div>
@@ -296,7 +296,7 @@ function PricingInner() {
                   { icon: "🎓", label: "Certificates", sub: "Download when you complete" },
                   { icon: "🏆", label: "All challenges", sub: "Badges & rewards unlocked" },
                 ].map(({ icon, label, sub }) => (
-                  <div key={label} className="flex items-center gap-2 bg-white/70 rounded-xl px-3 py-2 border border-emerald-200/60">
+                  <div key={label} className="flex items-center gap-2 bg-white/70 rounded-xl px-3 py-2 border border-[var(--ds-border-brand)]/60">
                     <span className="text-lg shrink-0">{icon}</span>
                     <div>
                       <p className="font-bold text-[12px] text-gray-800">{label}</p>
@@ -427,7 +427,7 @@ function PricingInner() {
                       const perMonthFmt = `${formatAmount(perMonth, currency)}/month`;
                       const savedFmt = formatAmount(saved, currency);
                       return (
-                        <p className="text-green-600 text-[12px] font-bold mt-0.5">
+                        <p className="text-[var(--ds-text-brand)] text-[12px] font-bold mt-0.5">
                           ≈ {perMonthFmt} · saves {savedFmt}
                         </p>
                       );
@@ -475,7 +475,7 @@ function PricingInner() {
                   {/* CTA */}
                   <div className="px-6 pb-6">
                     {isPaidClub ? (
-                      <div className="w-full py-3.5 leaf bg-green-50 border-2 border-green-200 flex items-center justify-center gap-2 text-green-700 font-black text-[15px]">
+                      <div className="w-full py-3.5 leaf bg-[var(--ds-brand-subtle)] border-2 border-[var(--ds-border-brand)] flex items-center justify-center gap-2 text-[var(--ds-text-brand)] font-black text-[15px]">
                         <CheckCircle2 className="w-5 h-5" />
                         {activeSub?.cancel_at_period_end ? "Cancels at period end" : "You're a Club Member ✓"}
                       </div>
@@ -492,16 +492,16 @@ function PricingInner() {
                         {/* Promo code input */}
                         <div className="mb-4">
                           {discountInfo ? (
-                            <div className="flex items-center justify-between bg-green-50 border border-green-200 rounded-xl px-3 py-2">
+                            <div className="flex items-center justify-between bg-[var(--ds-brand-subtle)] border border-[var(--ds-border-brand)] rounded-xl px-3 py-2">
                               <div className="flex items-center gap-2">
-                                <Tag className="w-4 h-4 text-green-600" />
-                                <span className="text-green-700 font-black text-[12px]">{discountInfo.code} applied!</span>
+                                <Tag className="w-4 h-4 text-[var(--ds-text-brand)]" />
+                                <span className="text-[var(--ds-text-brand)] font-black text-[12px]">{discountInfo.code} applied!</span>
                                 {discountInfo.description && (
-                                  <span className="text-green-600 text-[11px]">· {discountInfo.description}</span>
+                                  <span className="text-[var(--ds-text-secondary)] text-[11px]">· {discountInfo.description}</span>
                                 )}
                               </div>
                               <button onClick={() => { setDiscountInfo(null); setDiscountInput(""); setDiscountStatus("idle"); }}
-                                className="text-green-500 hover:text-red-400 text-[10px] font-bold transition">Remove</button>
+                                className="text-[var(--ds-text-brand)] hover:text-red-400 text-[10px] font-bold transition">Remove</button>
                             </div>
                           ) : (
                             <div className="flex gap-2">
@@ -532,8 +532,8 @@ function PricingInner() {
                           return (
                             <div className="flex items-center gap-2 mb-3 justify-center">
                               <span className="line-through text-gray-400 text-[15px] font-bold">{price.formatted}</span>
-                              <span className="text-green-700 font-black text-[22px]">{formatAmount(discounted, currency)}</span>
-                              <span className="bg-green-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full">
+                              <span className="text-[var(--ds-text-brand)] font-black text-[22px]">{formatAmount(discounted, currency)}</span>
+                              <span className="bg-[var(--ds-brand-primary)] text-[var(--ds-nav-bg)] text-[9px] font-black px-2 py-0.5 rounded-full">
                                 {discountInfo.discount_type === "percent"
                                   ? `${discountInfo.discount_value}% OFF`
                                   : `${formatAmount(discountInfo.discount_value, currency)} OFF`}
@@ -611,7 +611,7 @@ function PricingInner() {
                   <div className="px-6 pb-6">
                     <motion.button whileHover={{ scale: 1.02 }} whileTap={m.buttonPress}
                       onClick={() => handlePurchase(masterpiece, undefined, undefined, "/masterpiece")}
-                      className="w-full py-4 leaf bg-[var(--nimi-green)] hover:bg-[var(--ds-brand-hover)] text-white font-black text-[16px] shadow-md transition flex items-center justify-center gap-2">
+                      className="w-full py-4 leaf bg-[var(--ds-brand-primary)] hover:bg-[var(--ds-brand-hover)] text-[var(--ds-nav-bg)] font-black text-[16px] shadow-md transition flex items-center justify-center gap-2">
                       {provider === "mtn_momo" ? <><Phone className="w-5 h-5" /> Choose Payment Method</>
                         : <><CreditCard className="w-5 h-5" /> Buy Masterpiece</>}
                     </motion.button>

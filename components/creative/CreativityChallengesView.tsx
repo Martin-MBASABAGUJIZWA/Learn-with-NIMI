@@ -334,7 +334,7 @@ export default function CreativityChallengesView({
             <p className="font-black text-white text-lg mb-1">
               All challenges complete!
             </p>
-            <p className="text-green-200 text-sml font-nunito">
+            <p className="text-white/80 text-sml font-nunito">
               {bonusEarned
                 ? `+${BONUS_STARS} bonus stars earned! Creative Explorer badge unlocked! 🎖️`
                 : "Amazing work today, " + childName + "!"}

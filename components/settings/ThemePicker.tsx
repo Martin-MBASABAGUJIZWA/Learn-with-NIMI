@@ -32,7 +32,7 @@ export default function ThemePicker() {
         </div>
         <div className="flex items-center gap-1.5 bg-[var(--ds-surface-card)]/80 border border-[var(--ds-border-brand)]/20 rounded-full px-2.5 py-1 shadow-sm">
           <motion.div
-            className="w-2 h-2 bg-green-500 rounded-full"
+            className="w-2 h-2 bg-[var(--ds-brand-primary)] rounded-full"
             animate={{ opacity: [1, 0.4, 1] }}
             transition={{ duration: 1.8, repeat: Infinity }} />
           <span className="text-[var(--ds-brand-primary)] font-baloo font-bold text-2xs">{currentTheme.name}</span>
@@ -104,7 +104,7 @@ export default function ThemePicker() {
                       exit={{ scale: 0.5, opacity: 0 }}
                       transition={SPRING.modal}
                       className="absolute top-2 left-2 flex items-center gap-1 bg-[var(--ds-surface-card)] rounded-full px-2 py-0.5 shadow-md">
-                      <CheckCircle2 className="w-3 h-3 text-green-500" />
+                      <CheckCircle2 className="w-3 h-3 text-[var(--ds-brand-primary)]" />
                       <span className="text-[var(--ds-brand-primary)] font-baloo font-bold text-3xs">Active</span>
                     </motion.div>
                   )}

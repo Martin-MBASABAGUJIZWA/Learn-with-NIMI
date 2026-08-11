@@ -23,7 +23,7 @@ export default function NotificationSettingsModal({ onClose }: Props) {
           transition={{ type: "spring", stiffness: 300, damping: 25 }}
           className="bg-[var(--ds-surface-card)] border border-ds-border shadow-2xl w-full max-w-sm overflow-hidden" style={{ borderRadius: 'var(--leaf-r-lg)' }}
         >
-          <div className="px-5 py-4 flex items-center justify-between" style={{ backgroundColor: 'var(--nimi-green)' }}>
+          <div className="px-5 py-4 flex items-center justify-between" style={{ backgroundColor: 'var(--ds-brand-primary)' }}>
             <p className="text-white font-black text-lg tracking-wide">{t("notificationSettingsModalTitle")}</p>
             <button onClick={onClose}
               aria-label="Close"
@@ -54,7 +54,7 @@ export default function NotificationSettingsModal({ onClose }: Props) {
                       ? "border border-ds-border text-ds-text hover:bg-[var(--ds-surface-card)]"
                       : "text-white"
                   }`}
-                  style={{ borderRadius: 'var(--leaf-r-sm)', ...(!isSubscribed ? { backgroundColor: 'var(--nimi-green)' } : {}) }}
+                  style={{ borderRadius: 'var(--leaf-r-sm)', ...(!isSubscribed ? { backgroundColor: 'var(--ds-brand-primary)' } : {}) }}
                 >
                   {loading ? t("savingLabel") : isSubscribed ? t("disablePushBtn") : t("enablePushBtn")}
                 </button>

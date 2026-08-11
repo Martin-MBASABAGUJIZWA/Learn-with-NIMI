@@ -6,7 +6,7 @@ import Container from "@/components/homepage/ui/Container";
 import Button from "@/components/homepage/ui/Button";
 
 const CREATIONS = [
-  { name: "Amara, 7",  emoji: "🎨", title: "My elephant story", likes: 24, bg: "bg-emerald-100" },
+  { name: "Amara, 7",  emoji: "🎨", title: "My elephant story", likes: 24, bg: "bg-[var(--ds-brand-soft)]" },
   { name: "Theo, 5",   emoji: "🖍️", title: "Coloring: The Baobab", likes: 18, bg: "bg-amber-100"  },
   { name: "Issa, 8",   emoji: "📖", title: "Le Petit Baobab fan art", likes: 31, bg: "bg-blue-100"   },
   { name: "Cleo, 6",   emoji: "⭐", title: "Star map mission", likes: 15, bg: "bg-purple-100" },
@@ -28,7 +28,7 @@ export default function Community() {
             <Users className="w-3.5 h-3.5" /> Families Learning Together
           </span>
           <h2 className="font-baloo font-black text-[var(--ds-text-primary)] text-3xl sm:text-4xl leading-tight" style={{textWrap:"balance"}}>
-            A gallery of <span className="text-nimi-green">young creators</span>
+            A gallery of <span className="text-[var(--ds-brand-primary)]">young creators</span>
           </h2>
           <p className="font-nunito text-[var(--ds-text-secondary)] mt-3 max-w-md mx-auto text-sm sm:text-base">
             Kids share their stories, colorings, and artwork. Families cheer each other on.
@@ -55,7 +55,7 @@ export default function Community() {
             <div key={t.name} className="bg-[var(--ds-surface-card)] border border-[var(--ds-border-primary)] rounded-2xl p-6">
               <p className="font-nunito text-[var(--ds-text-primary)] text-sm leading-relaxed italic">"{t.quote}"</p>
               <div className="mt-4 flex items-center gap-3">
-                <div className="w-8 h-8 bg-nimi-green rounded-full flex items-center justify-center text-white font-baloo font-black text-sm">{t.name[0]}</div>
+                <div className="w-8 h-8 bg-[var(--ds-brand-primary)] rounded-full flex items-center justify-center text-white font-baloo font-black text-sm">{t.name[0]}</div>
                 <div>
                   <p className="font-baloo font-black text-[var(--ds-text-primary)] text-sm">{t.name}</p>
                   <p className="font-nunito text-xs text-[var(--ds-text-secondary)]">{t.role}</p>

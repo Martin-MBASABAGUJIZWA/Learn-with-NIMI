@@ -46,7 +46,7 @@ export default function GalleryHeader({ search, onSearchChange, filter, onFilter
               onClick={() => onFilterChange(tab.id)}
               className={`px-4 py-2 rounded-full text-xs sm:text-sm font-black transition-colors ${
                 filter === tab.id
-                  ? "bg-[var(--nimi-green)] text-white shadow"
+                  ? "bg-[var(--ds-brand-primary)] text-white shadow"
                   : "border border-ds-border text-ds-text bg-[var(--ds-surface-card)] hover:bg-[var(--ds-surface-card)]"
               }`}
             >

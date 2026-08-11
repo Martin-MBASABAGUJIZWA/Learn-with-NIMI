@@ -59,7 +59,7 @@ function ConfidenceStars({ confidence }: { confidence: number }) {
 function OutcomeStatement({ text }: { text: string }) {
   return (
     <div className="flex items-start gap-2">
-      <span className="text-emerald-500 font-black text-sml shrink-0 mt-px">✓</span>
+      <span className="text-[var(--ds-brand-primary)] font-black text-sml shrink-0 mt-px">✓</span>
       <span className="text-xs text-ds-text font-nunito leading-relaxed">{text}</span>
     </div>
   );
@@ -99,14 +99,14 @@ function BreakdownBar({ item }: { item: OutcomeBreakdownItem }) {
   const actualPct = Math.round(item.actual * 100);
   const predPct   = Math.round(item.predicted * 100);
   const exceeded  = item.improvement >= 0;
-  const colour    = exceeded ? 'bg-emerald-400' : 'bg-rose-400';
+  const colour    = exceeded ? 'bg-[var(--ds-brand-primary)]' : 'bg-rose-400';
   const barWidth  = Math.min(100, Math.round(item.actual / Math.max(item.predicted, 0.001) * 100));
 
   return (
     <div className="space-y-1">
       <div className="flex items-center justify-between text-2xs">
         <span className="text-ds-muted font-nunito truncate flex-1 mr-2">{item.label}</span>
-        <span className={`font-black shrink-0 ${exceeded ? 'text-emerald-600' : 'text-rose-600'}`}>
+        <span className={`font-black shrink-0 ${exceeded ? 'text-[var(--ds-text-brand)]' : 'text-rose-600'}`}>
           {actualPct}% {exceeded ? '↑' : '↓'} (predicted {predPct}%)
         </span>
       </div>
@@ -264,15 +264,15 @@ export default function LearningOutcomeCard({ storyTitle, prediction, outcome, r
           {/* Prediction accuracy */}
           <div className="flex items-center justify-between bg-[var(--ds-surface-card)] rounded-lg px-3 py-2 border border-ds-border">
             <span className="text-2xs text-ds-muted font-nunito">Nimi&apos;s prediction accuracy</span>
-            <span className={`text-xs font-black ${outcome.predictionAccuracy >= 0.7 ? 'text-emerald-600' : 'text-amber-600'}`}>
+            <span className={`text-xs font-black ${outcome.predictionAccuracy >= 0.7 ? 'text-[var(--ds-text-brand)]' : 'text-amber-600'}`}>
               {Math.round(outcome.predictionAccuracy * 100)}%
             </span>
           </div>
 
           {outcome.beatPrediction && (
-            <div className="flex items-center gap-2 px-3 py-2 bg-emerald-50 border border-emerald-200 rounded-lg">
-              <span className="text-emerald-500 text-sm">✓</span>
-              <p className="text-2xs font-bold text-emerald-700">
+            <div className="flex items-center gap-2 px-3 py-2 bg-[var(--ds-brand-subtle)] border border-[var(--ds-border-brand)] rounded-lg">
+              <span className="text-[var(--ds-brand-primary)] text-sm">✓</span>
+              <p className="text-2xs font-bold text-[var(--ds-text-brand)]">
                 Results exceeded prediction — recommendation engine is learning correctly.
               </p>
             </div>

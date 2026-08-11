@@ -239,11 +239,11 @@ export default function StoryMissionPage() {
   const isPreview = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('preview') === 'true';
 
   const missionStyle = MISSION_STYLES[mission?.type ?? ""] ?? {
-    headerBg: "bg-gradient-to-r from-white via-emerald-50/60 to-white",
-    headerBorder: "border-emerald-100",
-    badgeBg: "bg-emerald-50", badgeText: "text-emerald-700", badgeBorder: "border-emerald-200",
+    headerBg: "bg-[var(--ds-brand-subtle)]",
+    headerBorder: "border-[var(--ds-border-brand)]",
+    badgeBg: "bg-[var(--ds-brand-subtle)]", badgeText: "text-[var(--ds-text-brand)]", badgeBorder: "border-[var(--ds-border-brand)]",
     emoji: "⭐", label: "Tiny Mission",
-    resultBg: "bg-gradient-to-br from-white via-emerald-50/70 to-amber-50/60",
+    resultBg: "bg-[var(--ds-brand-subtle)]",
   };
 
   const handleComplete = useCallback(async () => {
@@ -333,8 +333,8 @@ export default function StoryMissionPage() {
                 </p>
               </div>
               {completed ? (
-                <div className="rounded-full bg-emerald-50 p-2.5 border border-emerald-200">
-                  <CheckCircle2 className="w-6 h-6 text-green-500 shrink-0" />
+                <div className="rounded-full bg-[var(--ds-brand-subtle)] p-2.5 border border-[var(--ds-border-brand)]">
+                  <CheckCircle2 className="w-6 h-6 text-[var(--ds-brand-primary)] shrink-0" />
                 </div>
               ) : (
                 <div className="rounded-full bg-amber-50 p-2.5 border border-amber-200">
@@ -363,7 +363,7 @@ export default function StoryMissionPage() {
                       initial={{ scaleX: 0 }}
                       animate={{ scaleX: ratio }}
                       transition={{ duration: 0.55, ease: "easeOut" }}
-                      className="absolute inset-x-5 top-1/2 -translate-y-1/2 h-[2px] bg-gradient-to-r from-[var(--nimi-green)] to-emerald-400 rounded-full origin-left"
+                      className="absolute inset-x-5 top-1/2 -translate-y-1/2 h-[2px] rounded-full origin-left" style={{ background: "linear-gradient(to right, var(--ds-brand-primary), var(--ds-brand-hover))" }}
                     />
                   );
                 })()}
@@ -380,7 +380,7 @@ export default function StoryMissionPage() {
                         transition={{ type: "spring", stiffness: 300, damping: 22, delay: (s.slot_order ?? 0) * 0.06 }}
                         className={`flex items-center justify-center rounded-full transition-all ${
                           isDone
-                            ? "w-8 h-8 bg-[var(--nimi-green)] shadow-[0_2px_8px_rgba(16,185,129,0.35)] text-white text-sml font-black"
+                            ? "w-8 h-8 bg-[var(--ds-brand-primary)] shadow-[0_2px_8px_rgba(16,185,129,0.35)] text-[var(--ds-nav-bg)] text-sml font-black"
                             : isCurrent
                               ? `w-9 h-9 border-2 ${missionStyle.badgeBorder} ${missionStyle.badgeBg} text-lg shadow-md`
                               : "w-7 h-7 bg-[var(--ds-surface-card)] border border-[var(--ds-border-primary)] text-sm opacity-40"
@@ -512,7 +512,7 @@ export default function StoryMissionPage() {
                   {res?.story_complete && (
                     <motion.div initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.5 }}
                       className="mb-3">
-                      <p className="font-baloo font-black text-emerald-700 text-1.5xl">{t("storyCompleteResult")}</p>
+                      <p className="font-baloo font-black text-[var(--ds-text-brand)] text-1.5xl">{t("storyCompleteResult")}</p>
                       <p className="font-nunito text-ds-text text-sm">{t("storyEarnedCert")}</p>
                     </motion.div>
                   )}

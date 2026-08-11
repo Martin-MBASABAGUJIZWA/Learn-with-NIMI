@@ -256,7 +256,7 @@ export default function EditProfileSheet({
                           <motion.div
                             initial={{ scale: 0 }}
                             animate={{ scale: 1 }}
-                            className="absolute -bottom-1 -right-1 w-9 h-9 rounded-full bg-green-500 text-white flex items-center justify-center text-lg shadow-md border-2 border-white"
+                            className="absolute -bottom-1 -right-1 w-9 h-9 rounded-full bg-[var(--ds-brand-primary)] text-[var(--ds-nav-bg)] flex items-center justify-center text-lg shadow-md border-2 border-white"
                           >
                             ✓
                           </motion.div>

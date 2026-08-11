@@ -136,13 +136,13 @@ export default function OnboardingPage() {
         <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-2">
             <span className="text-1.5xl">📚</span>
-            <span className="font-baloo font-black text-emerald-700 text-lg">NIMIPIKO</span>
+            <span className="font-baloo font-black text-[var(--ds-text-brand)] text-lg">NIMIPIKO</span>
           </div>
           {!done && (
             <div className="flex items-center gap-1.5">
               {STEPS.map((_, i) => (
                 <div key={i} className={`h-1.5 rounded-full transition-all duration-500 ${
-                  i < step ? "bg-emerald-500 w-5" : i === step ? "bg-emerald-400 w-10" : "bg-emerald-100 w-5"
+                  i < step ? "bg-[var(--ds-brand-primary)] w-5" : i === step ? "bg-[var(--ds-brand-primary)]/60 w-10" : "bg-[var(--ds-brand-soft)] w-5"
                 }`} />
               ))}
             </div>
@@ -157,11 +157,11 @@ export default function OnboardingPage() {
           {/* ── STEP 0: Avatar designer ─────────────────────────────────── */}
           {step === 0 && !done && (
             <motion.div key="s0" variants={fadeSlide} initial="hidden" animate="visible" exit="exit"
-              className="w-full bg-[var(--ds-surface-card)]/90 backdrop-blur-sm border border-emerald-100 shadow-brand-glow-md overflow-hidden"
+              className="w-full bg-[var(--ds-surface-card)]/90 backdrop-blur-sm border border-[var(--ds-border-brand)] shadow-brand-glow-md overflow-hidden"
               style={{ borderRadius: "28px" }}>
 
               <div className="relative px-6 pt-6 pb-5 text-center overflow-hidden"
-                style={{ background:"linear-gradient(135deg,#059669 0%,#10b981 60%,#34d399 100%)" }}>
+                style={{ background:"linear-gradient(135deg, var(--ds-brand-primary), var(--ds-brand-hover))" }}>
                 <div className="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-[var(--ds-surface-card)]/10" />
                 <p className="text-white/70 text-2xs font-nunito font-bold uppercase tracking-[0.18em] mb-1">Step 1 of 2</p>
                 <h2 className="font-baloo font-black text-white text-2xl leading-tight">
@@ -176,8 +176,8 @@ export default function OnboardingPage() {
 
               <div className="px-4 pb-4">
                 <motion.button whileTap={{ scale:0.97 }} onClick={() => setStep(1)}
-                  className="w-full text-white font-baloo font-black text-base py-3.5 flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/25 transition hover:opacity-90"
-                  style={{ background:"linear-gradient(to right,#059669,#10b981)", borderRadius:"14px" }}>
+                  className="w-full text-white font-baloo font-black text-base py-3.5 flex items-center justify-center gap-2 shadow-lg shadow-[var(--ds-brand-primary)]/25 transition hover:opacity-90"
+                  style={{ background:"linear-gradient(135deg, var(--ds-brand-primary), var(--ds-brand-hover))", color:"var(--ds-nav-bg)", borderRadius:"14px" }}>
                   Next: Name your Explorer
                   <ArrowRight className="w-5 h-5" />
                 </motion.button>
@@ -188,11 +188,11 @@ export default function OnboardingPage() {
           {/* ── STEP 1: Name + age + language + create ──────────────────── */}
           {step === 1 && !done && (
             <motion.div key="s1" variants={fadeSlide} initial="hidden" animate="visible" exit="exit"
-              className="w-full bg-[var(--ds-surface-card)]/90 backdrop-blur-sm border border-emerald-100 shadow-brand-glow-md overflow-hidden"
+              className="w-full bg-[var(--ds-surface-card)]/90 backdrop-blur-sm border border-[var(--ds-border-brand)] shadow-brand-glow-md overflow-hidden"
               style={{ borderRadius:"28px" }}>
 
               <div className="relative px-6 pt-6 pb-5 text-center overflow-hidden"
-                style={{ background:"linear-gradient(135deg,#059669 0%,#10b981 60%,#34d399 100%)" }}>
+                style={{ background:"linear-gradient(135deg, var(--ds-brand-primary), var(--ds-brand-hover))" }}>
                 <div className="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-[var(--ds-surface-card)]/10" />
                 {/* Avatar preview in header */}
                 <div className="flex justify-center mb-2">
@@ -213,7 +213,7 @@ export default function OnboardingPage() {
                   <input type="text" value={childName} onChange={e => { setChildName(e.target.value); setError(""); }}
                     onKeyDown={e => e.key === "Enter" && childName.trim() && handleCreate()}
                     placeholder="Enter name…" maxLength={30} autoFocus
-                    className="w-full border-2 border-[var(--ds-border-primary)] focus:border-emerald-400 bg-[var(--ds-surface-card-hover)] px-4 py-3 text-mbase font-semibold text-[var(--ds-text-primary)] focus:outline-none transition placeholder:text-[var(--ds-text-tertiary)]"
+                    className="w-full border-2 border-[var(--ds-border-primary)] focus:border-[var(--ds-border-brand)] bg-[var(--ds-surface-card-hover)] px-4 py-3 text-mbase font-semibold text-[var(--ds-text-primary)] focus:outline-none transition placeholder:text-[var(--ds-text-tertiary)]"
                     style={{ borderRadius:"12px" }} />
                 </div>
 
@@ -224,7 +224,7 @@ export default function OnboardingPage() {
                     {AGE_GROUPS.map((g, i) => (
                       <motion.button key={g.label} whileTap={{ scale:0.95 }} onClick={() => setAgeGroup(i)}
                         className={`py-3 px-3 flex items-center gap-2.5 border-2 transition text-left ${
-                          ageGroup === i ? "border-emerald-400 bg-emerald-50" : "border-[var(--ds-border-primary)] bg-[var(--ds-surface-card-hover)] hover:border-[var(--ds-border-strong)]"
+                          ageGroup === i ? "border-[var(--ds-border-brand)] bg-[var(--ds-brand-subtle)]" : "border-[var(--ds-border-primary)] bg-[var(--ds-surface-card-hover)] hover:border-[var(--ds-border-strong)]"
                         }`} style={{ borderRadius:"12px" }}>
                         <span className="text-1.5xl">{g.emoji}</span>
                         <div>
@@ -243,7 +243,7 @@ export default function OnboardingPage() {
                     {LANGUAGES.map(l => (
                       <motion.button key={l.code} whileTap={{ scale:0.95 }} onClick={() => setLanguage(l.code)}
                         className={`py-3 flex flex-col items-center gap-1 border-2 transition ${
-                          language === l.code ? "border-emerald-400 bg-emerald-50" : "border-[var(--ds-border-primary)] bg-[var(--ds-surface-card-hover)] hover:border-[var(--ds-border-strong)]"
+                          language === l.code ? "border-[var(--ds-border-brand)] bg-[var(--ds-brand-subtle)]" : "border-[var(--ds-border-primary)] bg-[var(--ds-surface-card-hover)] hover:border-[var(--ds-border-strong)]"
                         }`} style={{ borderRadius:"12px" }}>
                         <span className="text-2xl">{l.flag}</span>
                         <span className="font-baloo font-black text-[var(--ds-text-primary)] text-2xs">{l.native}</span>
@@ -271,8 +271,8 @@ export default function OnboardingPage() {
                   <motion.button whileTap={{ scale:0.97 }}
                     onClick={handleCreate}
                     disabled={saving || !childName.trim()}
-                    className="flex-1 text-white font-baloo font-black text-base py-3.5 flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/25 disabled:opacity-40 transition hover:opacity-90"
-                    style={{ background:"linear-gradient(to right,#059669,#10b981)", borderRadius:"14px" }}>
+                    className="flex-1 text-white font-baloo font-black text-base py-3.5 flex items-center justify-center gap-2 shadow-lg shadow-[var(--ds-brand-primary)]/25 disabled:opacity-40 transition hover:opacity-90"
+                    style={{ background:"linear-gradient(135deg, var(--ds-brand-primary), var(--ds-brand-hover))", color:"var(--ds-nav-bg)", borderRadius:"14px" }}>
                     {saving ? (
                       <motion.span animate={{ rotate:[0,360] }} transition={{ duration:1, repeat:Infinity, ease:"linear" }}>⭐</motion.span>
                     ) : (
@@ -416,7 +416,7 @@ export default function OnboardingPage() {
       </div>
 
       <div className="relative z-10 py-4 text-center">
-        <p className="text-emerald-600/60 font-nunito text-2xs">
+        <p className="text-[var(--ds-text-brand)]/60 font-nunito text-2xs">
           © {new Date().getFullYear()} Nimipiko Studio LTD · Secure & Kid-Safe
         </p>
       </div>

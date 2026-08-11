@@ -39,7 +39,7 @@ const PILLARS = [
   },
   {
     icon: Trophy,
-    color: "bg-green-50 text-green-600",
+    color: "bg-[var(--ds-brand-subtle)] text-[var(--ds-text-brand)]",
     title: "Champion Certificates & Treasure Gallery",
     body: "Every milestone earns a real, printable achievement certificate. Children collect them in their Champion Treasure Gallery — a growing showcase of proof that learning happened, something parents can frame.",
   },
@@ -94,18 +94,18 @@ export default function AboutPage() {
           <motion.div initial="hidden" animate="visible" variants={noMotion ? {} : stagger}
             className="relative overflow-hidden px-6 py-14 sm:py-20 text-center"
             style={{ borderRadius: "var(--leaf-r-lg)", background: "linear-gradient(135deg, #fdf3e0 0%, #fff 50%, #f0fdf4 100%)" }}>
-            <div className="absolute -top-20 -right-20 w-72 h-72 bg-green-200/30 rounded-full blur-3xl pointer-events-none" aria-hidden />
+            <div className="absolute -top-20 -right-20 w-72 h-72 bg-[var(--ds-brand-soft)]/30 rounded-full blur-3xl pointer-events-none" aria-hidden />
             <div className="absolute -bottom-12 -left-12 w-56 h-56 bg-amber-200/30 rounded-full blur-3xl pointer-events-none" aria-hidden />
             <div className="relative z-10 max-w-2xl mx-auto">
               <motion.span variants={noMotion ? {} : fadeUp}
-                className="inline-block bg-green-100 text-green-800 text-[11px] font-black px-3 py-1 rounded-full uppercase tracking-widest mb-5">
+                className="inline-block bg-[var(--ds-brand-soft)] text-[var(--ds-text-primary)] text-[11px] font-black px-3 py-1 rounded-full uppercase tracking-widest mb-5">
                 Our Story
               </motion.span>
               <motion.h1 variants={noMotion ? {} : fadeUp}
                 className="font-baloo font-black text-ds-text text-[34px] sm:text-[48px] leading-tight mb-5"
                 style={{ textWrap: "balance" }}>
                 We are not selling<br />
-                <span className="text-[var(--nimi-green)]">digital books.</span>
+                <span className="text-[var(--ds-brand-primary)]">digital books.</span>
               </motion.h1>
               <motion.p variants={noMotion ? {} : fadeUp}
                 className="text-ds-text text-[16px] sm:text-[18px] leading-relaxed mb-3 font-semibold"
@@ -122,7 +122,7 @@ export default function AboutPage() {
           {/* ── Origin ───────────────────────────────────────────── */}
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }} variants={noMotion ? {} : stagger}>
             <motion.span variants={noMotion ? {} : fadeUp}
-              className="inline-block text-[11px] font-black uppercase tracking-widest text-[var(--nimi-green)] mb-4">
+              className="inline-block text-[11px] font-black uppercase tracking-widest text-[var(--ds-brand-primary)] mb-4">
               Why we exist
             </motion.span>
             <motion.h2 variants={noMotion ? {} : fadeUp}
@@ -148,7 +148,7 @@ export default function AboutPage() {
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }} variants={noMotion ? {} : stagger}
               className="text-center mb-8">
               <motion.span variants={noMotion ? {} : fadeUp}
-                className="inline-block text-[11px] font-black uppercase tracking-widest text-[var(--nimi-green)] mb-4">
+                className="inline-block text-[11px] font-black uppercase tracking-widest text-[var(--ds-brand-primary)] mb-4">
                 What we built
               </motion.span>
               <motion.h2 variants={noMotion ? {} : fadeUp}
@@ -180,7 +180,7 @@ export default function AboutPage() {
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }} variants={noMotion ? {} : stagger}
               className="text-center mb-8">
               <motion.span variants={noMotion ? {} : fadeUp}
-                className="inline-block text-[11px] font-black uppercase tracking-widest text-[var(--nimi-green)] mb-4">
+                className="inline-block text-[11px] font-black uppercase tracking-widest text-[var(--ds-brand-primary)] mb-4">
                 Our products
               </motion.span>
               <motion.h2 variants={noMotion ? {} : fadeUp}
@@ -198,10 +198,10 @@ export default function AboutPage() {
               variants={noMotion ? {} : stagger}
               className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <motion.div variants={noMotion ? {} : fadeUp}
-                className="border-2 border-[var(--nimi-green)] bg-green-50/60 p-8 flex flex-col"
+                className="border-2 border-[var(--ds-brand-primary)] bg-[var(--ds-brand-subtle)]/60 p-8 flex flex-col"
                 style={{ borderRadius: "var(--leaf-r-lg)" }}>
                 <div className="text-4xl mb-4">🌟</div>
-                <span className="inline-block bg-green-100 text-green-800 text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wide mb-3 w-fit">
+                <span className="inline-block bg-[var(--ds-brand-soft)] text-[var(--ds-text-primary)] text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wide mb-3 w-fit">
                   Pillar 1
                 </span>
                 <h3 className="font-baloo font-black text-ds-text text-[22px] mb-1">Nimipiko Club</h3>
@@ -209,7 +209,7 @@ export default function AboutPage() {
                   Full unlimited access to every story, song, activity, coloring book, and Champion Challenge — for up to 5 children under one family subscription.
                 </p>
                 <div className="mt-auto">
-                  <p className="font-baloo font-black text-[var(--nimi-green)] text-[30px] leading-none">$14.99<span className="text-ds-muted text-[15px] font-normal">/month</span></p>
+                  <p className="font-baloo font-black text-[var(--ds-brand-primary)] text-[30px] leading-none">$14.99<span className="text-ds-muted text-[15px] font-normal">/month</span></p>
                   <p className="text-ds-muted text-[11px] mt-0.5">or 9,900 RWF · €13.99 · save 33% annually</p>
                 </div>
               </motion.div>
@@ -238,7 +238,7 @@ export default function AboutPage() {
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }} variants={noMotion ? {} : stagger}
               className="text-center mb-8">
               <motion.span variants={noMotion ? {} : fadeUp}
-                className="inline-block text-[11px] font-black uppercase tracking-widest text-[var(--nimi-green)] mb-4">
+                className="inline-block text-[11px] font-black uppercase tracking-widest text-[var(--ds-brand-primary)] mb-4">
                 Our audience
               </motion.span>
               <motion.h2 variants={noMotion ? {} : fadeUp}
@@ -275,7 +275,7 @@ export default function AboutPage() {
                 className="bg-ds-card border border-ds-border shadow-ds-card flex flex-col items-center py-6 px-4 text-center"
                 style={{ borderRadius: "var(--leaf-r)" }}>
                 <span className="text-3xl mb-2">{icon}</span>
-                <span className="font-baloo font-black text-[var(--nimi-green)] text-[34px] leading-none" style={{ fontVariantNumeric: "tabular-nums" }}>{value}</span>
+                <span className="font-baloo font-black text-[var(--ds-brand-primary)] text-[34px] leading-none" style={{ fontVariantNumeric: "tabular-nums" }}>{value}</span>
                 <span className="text-ds-muted text-[11px] font-bold uppercase tracking-wide mt-1">{label}</span>
               </motion.div>
             ))}
@@ -286,7 +286,7 @@ export default function AboutPage() {
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }} variants={noMotion ? {} : stagger}
               className="text-center mb-8">
               <motion.span variants={noMotion ? {} : fadeUp}
-                className="inline-block text-[11px] font-black uppercase tracking-widest text-[var(--nimi-green)] mb-4">
+                className="inline-block text-[11px] font-black uppercase tracking-widest text-[var(--ds-brand-primary)] mb-4">
                 The experience
               </motion.span>
               <motion.h2 variants={noMotion ? {} : fadeUp}
@@ -304,7 +304,7 @@ export default function AboutPage() {
               initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }}
               variants={noMotion ? {} : stagger}
               className="relative">
-              <div className="hidden sm:block absolute top-8 left-[10%] right-[10%] h-0.5 bg-gradient-to-r from-[var(--nimi-green)] to-amber-400 opacity-30" aria-hidden />
+              <div className="hidden sm:block absolute top-8 left-[10%] right-[10%] h-0.5 bg-gradient-to-r from-[var(--ds-brand-primary)] to-amber-400 opacity-30" aria-hidden />
               <div className="grid grid-cols-2 sm:grid-cols-5 gap-5 relative z-10">
                 {[
                   { step: "1", icon: "🎬", label: "Start",  sub: 'Click "Stories"' },
@@ -315,11 +315,11 @@ export default function AboutPage() {
                 ].map(({ step, icon, label, sub }) => (
                   <motion.div key={step} variants={noMotion ? {} : fadeUp}
                     className="flex flex-col items-center text-center">
-                    <div className="w-16 h-16 bg-ds-card border-2 border-[var(--nimi-green)]/30 shadow-ds-card flex items-center justify-center text-3xl mb-3"
+                    <div className="w-16 h-16 bg-ds-card border-2 border-[var(--ds-brand-primary)]/30 shadow-ds-card flex items-center justify-center text-3xl mb-3"
                       style={{ borderRadius: "var(--leaf-r)" }}>
                       {icon}
                     </div>
-                    <span className="font-baloo font-black text-[var(--nimi-green)] text-[17px] leading-none">{label}</span>
+                    <span className="font-baloo font-black text-[var(--ds-brand-primary)] text-[17px] leading-none">{label}</span>
                     <span className="text-ds-muted text-[11px] mt-1 leading-snug">{sub}</span>
                   </motion.div>
                 ))}
@@ -334,7 +334,7 @@ export default function AboutPage() {
             className="bg-ds-card border border-ds-border shadow-ds-card px-6 py-10 text-center"
             style={{ borderRadius: "var(--leaf-r-lg)" }}>
             <motion.span variants={noMotion ? {} : fadeUp}
-              className="inline-block text-[11px] font-black uppercase tracking-widest text-[var(--nimi-green)] mb-4">
+              className="inline-block text-[11px] font-black uppercase tracking-widest text-[var(--ds-brand-primary)] mb-4">
               Free to start
             </motion.span>
             <motion.h2 variants={noMotion ? {} : fadeUp}
@@ -365,7 +365,7 @@ export default function AboutPage() {
             </motion.div>
             <motion.div variants={noMotion ? {} : fadeUp}>
               <Link href="/signuppage"
-                className="inline-flex items-center gap-2 bg-[var(--nimi-green)] text-white font-baloo font-black text-[15px] px-8 py-4 rounded-full shadow-ds-cta hover:brightness-105 transition">
+                className="inline-flex items-center gap-2 bg-[var(--ds-brand-primary)] text-white font-baloo font-black text-[15px] px-8 py-4 rounded-full shadow-ds-cta hover:brightness-105 transition">
                 Start Free — No Card Required
                 <ArrowRight className="w-4 h-4" />
               </Link>
@@ -378,7 +378,7 @@ export default function AboutPage() {
               initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }}
               variants={noMotion ? {} : stagger}>
               <motion.span variants={noMotion ? {} : fadeUp}
-                className="inline-block text-[11px] font-black uppercase tracking-widest text-[var(--nimi-green)] mb-4">
+                className="inline-block text-[11px] font-black uppercase tracking-widest text-[var(--ds-brand-primary)] mb-4">
                 The Studio
               </motion.span>
               <motion.h2 variants={noMotion ? {} : fadeUp}
@@ -407,7 +407,7 @@ export default function AboutPage() {
                 ].map(({ icon: Icon, label }) => (
                   <span key={label}
                     className="inline-flex items-center gap-1.5 bg-ds-page border border-ds-border text-ds-text text-[12px] font-bold px-3 py-1.5 rounded-full">
-                    <Icon className="w-3.5 h-3.5 text-[var(--nimi-green)]" />
+                    <Icon className="w-3.5 h-3.5 text-[var(--ds-brand-primary)]" />
                     {label}
                   </span>
                 ))}
@@ -420,7 +420,7 @@ export default function AboutPage() {
             initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }}
             variants={noMotion ? {} : fadeUp}
             className="relative overflow-hidden p-10 sm:p-14 text-center text-white shadow-ds-cta"
-            style={{ borderRadius: "var(--leaf-r-lg)", background: "linear-gradient(135deg, var(--nimi-green) 0%, #166534 100%)" }}>
+            style={{ borderRadius: "var(--leaf-r-lg)", background: "linear-gradient(135deg, var(--ds-brand-primary) 0%, #166534 100%)" }}>
             <div className="absolute inset-0 bg-[url('/themes/default/hero/hero-background.png')] bg-cover bg-center opacity-10 pointer-events-none" aria-hidden />
             <div className="relative z-10">
               <p className="font-baloo font-black text-[28px] sm:text-[36px] leading-tight mb-2" style={{ textWrap: "balance" }}>
@@ -429,12 +429,12 @@ export default function AboutPage() {
               <p className="font-baloo font-black text-amber-300 text-[22px] sm:text-[28px] leading-tight mb-4">
                 It&apos;s a Digital Universe.
               </p>
-              <p className="text-green-100 text-[14px] mb-8 max-w-md mx-auto leading-relaxed">
+              <p className="text-white/80 text-[14px] mb-8 max-w-md mx-auto leading-relaxed">
                 Join families around the world building a love of reading, language, and learning — one adventure at a time.
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                 <Link href="/signuppage"
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white text-[var(--nimi-green)] font-baloo font-black text-[15px] px-8 py-4 rounded-full shadow-lg hover:brightness-105 transition">
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white text-[var(--ds-brand-primary)] font-baloo font-black text-[15px] px-8 py-4 rounded-full shadow-lg hover:brightness-105 transition">
                   Start Free Today
                   <ArrowRight className="w-4 h-4" />
                 </Link>

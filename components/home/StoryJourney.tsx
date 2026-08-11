@@ -40,15 +40,15 @@ const STORY_STEPS = [
   {
     number: 5, title: "SING ALONG", subtitle: "WITH NIMI",
     description: "Sing along and practice the story words through music.",
-    emoji: "🎤", numBg: "bg-[var(--nimi-green)]", border: "border-[var(--ds-border-brand)]/30",
-    titleColor: "text-[var(--ds-brand-primary)]", btnColor: "bg-[var(--nimi-green)] hover:bg-[var(--ds-brand-hover)]",
+    emoji: "🎤", numBg: "bg-[var(--ds-brand-primary)]", border: "border-[var(--ds-border-brand)]/30",
+    titleColor: "text-[var(--ds-brand-primary)]", btnColor: "bg-[var(--ds-brand-primary)] hover:bg-[var(--ds-brand-hover)]",
     href: "/missions/sing-along", isPiko: false,
   },
   {
     number: 6, title: "JOURNEY", subtitle: "WITH NIMI",
     description: "Watch the animated story and enjoy the adventure!",
-    emoji: "▶️", numBg: "bg-[var(--nimi-green)]", border: "border-[var(--ds-border-brand)]/30",
-    titleColor: "text-[var(--ds-brand-primary)]", btnColor: "bg-[var(--nimi-green)] hover:bg-[var(--ds-brand-hover)]",
+    emoji: "▶️", numBg: "bg-[var(--ds-brand-primary)]", border: "border-[var(--ds-border-brand)]/30",
+    titleColor: "text-[var(--ds-brand-primary)]", btnColor: "bg-[var(--ds-brand-primary)] hover:bg-[var(--ds-brand-hover)]",
     href: "/missions/journey", isPiko: true,
   },
 ];

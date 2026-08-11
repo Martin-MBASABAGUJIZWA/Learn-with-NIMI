@@ -11,7 +11,7 @@ export default function SupportBanner() {
   const assets = getThemeAssets(themeId);
 
   return (
-    <div className="shadow-md p-5 text-white flex items-center justify-between gap-4 flex-wrap" style={{ backgroundColor: 'var(--nimi-green)', borderRadius: 'var(--leaf-r)' }}>
+    <div className="shadow-md p-5 text-white flex items-center justify-between gap-4 flex-wrap" style={{ backgroundColor: 'var(--ds-brand-primary)', borderRadius: 'var(--leaf-r)' }}>
       <div className="flex items-center gap-4">
         <img
           src={assets.nimiCircle}

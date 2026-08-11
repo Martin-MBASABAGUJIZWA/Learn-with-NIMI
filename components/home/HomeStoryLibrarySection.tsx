@@ -83,19 +83,19 @@ export default function HomeStoryLibrarySection({ stories, curStory, hasSubscrip
 
   return (
     <motion.section initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-40px" }} variants={stagger} className="relative">
-      <div className="leaf-lg border border-white/80 bg-gradient-to-br from-sky-50/80 via-white to-indigo-50/60 p-4 shadow-[0_16px_36px_rgba(15,23,42,0.06)] sm:p-5">
+      <div className="leaf-lg border border-[var(--ds-border-primary)] bg-[var(--ds-surface-card)] p-4 shadow-[0_16px_36px_rgba(15,23,42,0.06)] sm:p-5">
         <ZoneDecorations zone="library" />
 
         {/* Section header */}
         <motion.div variants={up} className="flex items-center justify-between gap-3 mb-5">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-sky-100 flex items-center justify-center text-1.5xl shrink-0 shadow-sm">📚</div>
+            <div className="w-10 h-10 rounded-2xl bg-[var(--ds-brand-subtle)] flex items-center justify-center text-1.5xl shrink-0 shadow-sm">📚</div>
             <div>
-              <p className="font-nunito text-4xs uppercase tracking-widest text-sky-400 leading-none mb-0.5">The Library</p>
+              <p className="font-nunito text-4xs uppercase tracking-widest text-[var(--ds-text-brand)] leading-none mb-0.5">The Library</p>
               <h2 className="font-baloo font-black text-1.5xl sm:text-2xl text-[var(--ds-text-primary)] leading-tight">Story Library</h2>
             </div>
           </div>
-          <Link href="/stories" className="flex items-center gap-1 font-nunito font-bold text-sky-500 text-sml hover:underline">
+          <Link href="/stories" className="flex items-center gap-1 font-nunito font-bold text-[var(--ds-text-brand)] text-sml hover:underline">
             See all <ChevronRight className="w-4 h-4" />
           </Link>
         </motion.div>
@@ -119,7 +119,7 @@ export default function HomeStoryLibrarySection({ stories, curStory, hasSubscrip
                   <div className="rounded-2xl overflow-hidden bg-[var(--ds-surface-card)] transition-all hover:-translate-y-1"
                     style={{
                       boxShadow: isActive
-                        ? "0 8px 28px rgba(5,150,105,0.25), 0 0 0 2px rgba(5,150,105,0.4)"
+                        ? "0 8px 28px rgba(201,168,76,0.30), 0 0 0 2px rgba(201,168,76,0.50)"
                         : "0 4px 16px rgba(15,23,42,0.08)",
                     }}>
                     <Link href={`/stories/${story.slug}`}
@@ -132,7 +132,7 @@ export default function HomeStoryLibrarySection({ stories, curStory, hasSubscrip
                           ? <Image src={getStorageUrl(story.cover_url)} alt={story.title} fill
                               className="object-cover group-hover:scale-105 transition-transform duration-500" />
                           : <div className="absolute inset-0 flex flex-col items-center justify-center gap-2"
-                              style={{ background: "linear-gradient(135deg,#d1fae5,#a7f3d0)" }}>
+                              style={{ background: "linear-gradient(135deg,var(--ds-nav-bg),var(--ds-surface-nav))" }}>
                               <span className="text-5xl">{story.theme_emoji ?? "📖"}</span>
                             </div>
                         }
@@ -144,15 +144,15 @@ export default function HomeStoryLibrarySection({ stories, curStory, hasSubscrip
                         {/* Top-left status chip */}
                         <div className="absolute top-2.5 left-2.5">
                           {story.complete ? (
-                            <span className="flex items-center gap-1 font-baloo font-black text-4xs bg-emerald-500 text-white px-2 py-0.5 rounded-full shadow-md">
-                              <Star className="w-2.5 h-2.5 fill-white" /> Done
+                            <span className="flex items-center gap-1 font-baloo font-black text-4xs bg-[var(--ds-brand-primary)] text-[var(--ds-nav-bg)] px-2 py-0.5 rounded-full shadow-md">
+                              <Star className="w-2.5 h-2.5 fill-current" /> Done
                             </span>
                           ) : isActive ? (
-                            <span className="flex items-center gap-1 font-baloo font-black text-4xs bg-[var(--ds-surface-card)]/90 text-emerald-700 px-2 py-0.5 rounded-full shadow-md backdrop-blur-sm">
-                              <Play className="w-2 h-2 fill-emerald-600" /> Reading
+                            <span className="flex items-center gap-1 font-baloo font-black text-4xs bg-[var(--ds-nav-bg)]/90 text-[var(--ds-text-brand)] px-2 py-0.5 rounded-full shadow-md backdrop-blur-sm">
+                              <Play className="w-2 h-2 fill-current" /> Reading
                             </span>
                           ) : story.is_free ? (
-                            <span className="font-baloo font-black text-4xs bg-sky-500 text-white px-2 py-0.5 rounded-full shadow-md">
+                            <span className="font-baloo font-black text-4xs bg-[var(--ds-brand-primary)] text-[var(--ds-nav-bg)] px-2 py-0.5 rounded-full shadow-md">
                               Free
                             </span>
                           ) : null}
@@ -165,7 +165,7 @@ export default function HomeStoryLibrarySection({ stories, curStory, hasSubscrip
                           </p>
                           {pctDone > 0 && !story.complete && (
                             <div className="h-1.5 bg-[var(--ds-surface-card)]/30 rounded-full overflow-hidden">
-                              <div className="h-full rounded-full" style={{ width: `${pctDone}%`, background: "#34d399" }} />
+                              <div className="h-full rounded-full" style={{ width: `${pctDone}%`, background: "var(--ds-brand-primary)" }} />
                             </div>
                           )}
                         </div>
@@ -174,25 +174,25 @@ export default function HomeStoryLibrarySection({ stories, curStory, hasSubscrip
                       {/* Bottom pill row */}
                       <div className="flex items-center justify-between px-2.5 py-2 bg-[var(--ds-surface-card)] border-t border-gray-50">
                         {story.category ? (
-                          <span className="font-nunito font-bold text-4xs text-sky-600 bg-sky-50 px-2 py-0.5 rounded-full capitalize truncate max-w-[75px]">
+                          <span className="font-nunito font-bold text-4xs text-[var(--ds-text-brand)] bg-[var(--ds-brand-subtle)] px-2 py-0.5 rounded-full capitalize truncate max-w-[75px]">
                             {story.category}
                           </span>
                         ) : (
                           <span className="font-nunito font-bold text-4xs text-[var(--ds-text-tertiary)]">Story</span>
                         )}
                         {story.complete ? (
-                          <span className="font-nunito font-bold text-4xs text-emerald-600">✓ All done</span>
+                          <span className="font-nunito font-bold text-4xs text-[var(--ds-text-brand)]">✓ All done</span>
                         ) : pctDone > 0 ? (
                           <span className="font-nunito font-bold text-4xs text-[var(--ds-text-tertiary)]">{pctDone}%</span>
                         ) : (
-                          <span className="font-nunito font-bold text-4xs text-sky-500">Start →</span>
+                          <span className="font-nunito font-bold text-4xs text-[var(--ds-text-brand)]">Start →</span>
                         )}
                       </div>
                     </Link>
 
                     {/* Practice reading strip — separate link so it doesn't nest inside the story link */}
                     <Link href="/talk-to-nimi?mode=practice"
-                      className="flex items-center justify-center gap-1 py-1.5 text-4xs font-black transition border-t border-sky-100 bg-sky-50 hover:bg-sky-100 text-sky-600">
+                      className="flex items-center justify-center gap-1 py-1.5 text-4xs font-black transition border-t border-[var(--ds-border-primary)] bg-[var(--ds-brand-subtle)] hover:bg-[var(--ds-brand-soft)] text-[var(--ds-text-brand)]">
                       🎤 Practice Reading
                     </Link>
                   </div>
@@ -254,7 +254,7 @@ export default function HomeStoryLibrarySection({ stories, curStory, hasSubscrip
           {stories.length === 1 && (
             <motion.div variants={pop} className="shrink-0 w-[148px] sm:w-[164px]">
               <Link href="/stories">
-                <div className="rounded-2xl overflow-hidden h-full group cursor-pointer border-2 border-dashed border-sky-200 bg-gradient-to-br from-sky-50 to-indigo-50 hover:border-sky-400 transition-all">
+                <div className="rounded-2xl overflow-hidden h-full group cursor-pointer border-2 border-dashed border-[var(--ds-border-brand)] bg-[var(--ds-brand-subtle)] hover:border-[var(--ds-border-brand)] transition-all">
                   <div className="flex flex-col items-center justify-center gap-2 px-3 pt-5 pb-3" style={{ aspectRatio: "3/4" }}>
                     <motion.span className="text-4.5xl leading-none"
                       animate={{ y: [0, -6, 0] }}
@@ -262,12 +262,12 @@ export default function HomeStoryLibrarySection({ stories, curStory, hasSubscrip
                       🔭
                     </motion.span>
                     <div className="text-center">
-                      <p className="font-baloo font-black text-sky-700 text-sml leading-tight">What&apos;s next?</p>
-                      <p className="font-nunito text-sky-500 text-3xs mt-1 leading-snug">More adventures are waiting for you!</p>
+                      <p className="font-baloo font-black text-[var(--ds-text-brand)] text-sml leading-tight">What&apos;s next?</p>
+                      <p className="font-nunito text-[var(--ds-text-secondary)] text-3xs mt-1 leading-snug">More adventures are waiting for you!</p>
                     </div>
                   </div>
-                  <div className="px-2.5 py-2 bg-sky-100/60 border-t border-sky-100 group-hover:bg-sky-200/60 transition">
-                    <p className="font-baloo font-black text-sky-600 text-2xs text-center">Explore Stories →</p>
+                  <div className="px-2.5 py-2 bg-[var(--ds-brand-soft)] border-t border-[var(--ds-border-brand)] group-hover:bg-[var(--ds-brand-soft)] transition">
+                    <p className="font-baloo font-black text-[var(--ds-text-brand)] text-2xs text-center">Explore Stories →</p>
                   </div>
                 </div>
               </Link>

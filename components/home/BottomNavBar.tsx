@@ -50,32 +50,42 @@ export default function BottomNavBar() {
     <nav
       aria-label="Main navigation"
       className="fixed bottom-0 inset-x-0 z-50 lg:hidden pointer-events-none"
-      style={{ transform: `translateY(${offset}px)`, transition: "transform 0.18s cubic-bezier(0.25, 0.1, 0.25, 1)" }}
+      style={{ transform: `translateY(${offset}px)`, transition: "transform 0.18s cubic-bezier(0.25,0.1,0.25,1)" }}
     >
-      {/* Outer wrapper is the containing block for the floating FAB */}
       <div className="pointer-events-auto mx-0 relative">
 
-        {/* NIMI floating center — sits ABOVE the bar, outside overflow-hidden */}
+        {/* ── NIMI floating FAB — brand-primary ring ─────────────── */}
         <div className="absolute left-1/2 -translate-x-1/2 -top-7 z-20">
           <Link href="/talk-to-nimi" aria-label="Talk to Nimi">
-            <div className={`w-[64px] h-[64px] rounded-full p-[3px] ${cv.navigationStyle.fabGradient} ${cv.navigationStyle.fabShadow} active:scale-90 transition-transform duration-100`}>
-              <div className="w-full h-full rounded-full bg-[var(--ds-surface-card)] flex items-center justify-center border-2 border-ds-border">
-                <Image src={assets.nimiCircle} alt="" aria-hidden="true" width={40} height={40} className="rounded-full object-cover" />
+            <div
+              className={`w-[64px] h-[64px] rounded-full p-[3px] ${cv.navigationStyle.fabGradient} ${cv.navigationStyle.fabShadow} active:scale-90 transition-transform duration-100`}
+            >
+              {/* Inner circle uses nav-bg so it matches the bar */}
+              <div className="w-full h-full rounded-full flex items-center justify-center"
+                style={{ background: "var(--ds-nav-bg)", border: "2px solid var(--ds-nav-border)" }}>
+                <Image src={assets.nimiCircle} alt="" aria-hidden="true"
+                  width={40} height={40} className="rounded-full object-cover" />
               </div>
             </div>
           </Link>
         </div>
 
-        {/* Bar — overflow-hidden only clips the texture, not the FAB */}
+        {/* ── Bar ───────────────────────────────────────────────── */}
         <div
-          className={`relative ${cv.navigationStyle.background} rounded-t-[22px] shadow-[0_-4px_20px_rgba(0,0,0,0.08)] border-t border-x border-ds-border overflow-hidden`}
-          style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
+          className={`relative rounded-t-[22px] overflow-hidden ${cv.navigationStyle.background}`}
+          style={{
+            borderTop:   "1px solid var(--ds-nav-border)",
+            borderLeft:  "1px solid var(--ds-nav-border)",
+            borderRight: "1px solid var(--ds-nav-border)",
+            boxShadow:   "var(--ds-shadow-nav)",
+            paddingBottom: "env(safe-area-inset-bottom,0px)",
+          }}
         >
-          {/* World bottom bar texture */}
+          {/* World-texture layer (very low opacity) */}
           <Image src={assets.navigation.bottomBar} alt="" aria-hidden="true" fill
-            className="object-cover pointer-events-none opacity-[0.07]" />
+            className="object-cover pointer-events-none opacity-[0.06]" />
 
-          {/* Icons + labels row — 68 px tall to accommodate labels */}
+          {/* Icons + labels row */}
           <div className="relative z-10 flex items-stretch h-[68px] px-1">
             {NAV_ITEMS.map((item) => {
               if (item.key === "nimi") {
@@ -94,19 +104,12 @@ export default function BottomNavBar() {
                   aria-current={active ? "page" : undefined}
                   className="flex-1 flex flex-col items-center justify-center gap-[3px] py-2 active:scale-95 transition-transform duration-75"
                 >
-                  {/* Pill highlight around icon — only visible when active */}
+                  {/* Active pill */}
                   <div
-                    className={`px-3 py-[7px] transition-all duration-200 ${
-                      active ? `${cv.navigationStyle.activeIconBg} scale-[1.1]` : ""
-                    }`}
-                    style={{ borderRadius: "999px" }}
+                    className={`px-3 py-[7px] transition-all duration-200 rounded-full ${active ? `${cv.navigationStyle.activeIconBg} scale-[1.1]` : ""}`}
                   >
                     <Icon
-                      className={`w-[20px] h-[20px] ${
-                        active
-                          ? cv.navigationStyle.activeIconColor
-                          : cv.navigationStyle.inactiveIconColor
-                      }`}
+                      className={`w-[20px] h-[20px] ${active ? cv.navigationStyle.activeIconColor : cv.navigationStyle.inactiveIconColor}`}
                       strokeWidth={active ? 2.5 : 1.7}
                       aria-hidden="true"
                     />
@@ -114,11 +117,7 @@ export default function BottomNavBar() {
 
                   {/* Label */}
                   <span
-                    className={`text-5xs font-black uppercase tracking-[0.05em] leading-none transition-colors duration-200 ${
-                      active
-                        ? cv.navigationStyle.activeIconColor
-                        : cv.navigationStyle.inactiveIconColor
-                    }`}
+                    className={`text-5xs font-black uppercase tracking-[0.05em] leading-none transition-colors duration-200 ${active ? cv.navigationStyle.activeIconColor : cv.navigationStyle.inactiveIconColor}`}
                   >
                     {label}
                   </span>

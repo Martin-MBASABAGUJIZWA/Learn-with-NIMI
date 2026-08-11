@@ -62,7 +62,7 @@ export default function ChildIdentityCard({
               src={nimiSrc}
               alt="NIMI"
               className={`rounded-full object-cover border-2 shadow shrink-0 ${compact ? "w-12 h-12" : "w-16 h-16"}`}
-              style={{ borderColor: nimiOutfit ? undefined : 'var(--nimi-green)' }}
+              style={{ borderColor: nimiOutfit ? undefined : 'var(--ds-brand-primary)' }}
               animate={{ y: [0, -6, 0] }}
               transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
             />
@@ -87,7 +87,7 @@ export default function ChildIdentityCard({
             transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut", delay: 0.4 }}
           >
             <Image src={nimiSrc} alt="NIMI" width={36} height={36} className="w-9 h-9 rounded-full object-cover border-2 shadow opacity-90"
-              style={{ borderColor: nimiOutfit ? undefined : 'var(--nimi-green)' }} />
+              style={{ borderColor: nimiOutfit ? undefined : 'var(--ds-brand-primary)' }} />
             {nimiOutfit && (
               <span className="absolute -bottom-1 -right-1 text-base leading-none drop-shadow-lg">{nimiOutfit.emoji}</span>
             )}

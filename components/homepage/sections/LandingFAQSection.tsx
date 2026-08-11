@@ -77,7 +77,7 @@ export default function LandingFAQSection() {
                     transition={{ duration: 0.22, ease: "easeInOut" }}
                     className="w-7 h-7 rounded-full flex items-center justify-center text-[18px] font-light shrink-0 transition-colors"
                     style={{
-                      background: open === i ? "var(--nimi-green)" : "var(--ds-brand-subtle)",
+                      background: open === i ? "var(--ds-brand-primary)" : "var(--ds-brand-subtle)",
                       color: open === i ? "white" : "var(--ds-brand-primary)",
                     }}>
                     +

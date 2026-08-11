@@ -60,13 +60,13 @@ export default function AdventureJourney({ storySlug, slots }: Props) {
                 <div className={`absolute inset-0 bg-gradient-to-b ${m.bg} opacity-5`} />
               )}
               {slot.completed && (
-                <div className="absolute inset-0 bg-green-500/5" />
+                <div className="absolute inset-0 bg-[var(--ds-brand-primary)]/5" />
               )}
 
               {/* Number badge */}
               <div className="relative z-10 p-3 pb-0 flex items-center justify-between">
                 <div className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-black shadow ${
-                  slot.completed ? "bg-[var(--nimi-green)] text-white"
+                  slot.completed ? "bg-[var(--ds-brand-primary)] text-[var(--ds-nav-bg)]"
                     : isNext ? "bg-gradient-to-br from-yellow-400 to-orange-500 text-white"
                     : "bg-[var(--ds-surface-card-hover)] text-[var(--ds-text-tertiary)]"
                 }`}>
@@ -112,7 +112,7 @@ export default function AdventureJourney({ storySlug, slots }: Props) {
               {/* Status button */}
               <div className="relative z-10 px-3 pb-3">
                 {slot.completed ? (
-                  <div className="bg-[var(--nimi-green)] text-white text-4xs font-black py-1.5 rounded-lg text-center shadow-lg">
+                  <div className="bg-[var(--ds-brand-primary)] text-[var(--ds-nav-bg)] text-4xs font-black py-1.5 rounded-lg text-center shadow-lg">
                     ✓ COMPLETED
                   </div>
                 ) : isNext ? (
@@ -145,7 +145,7 @@ export default function AdventureJourney({ storySlug, slots }: Props) {
           i < slots.length - 1 && (
             <div key={i} className="flex items-center">
               <div className="w-12" />
-              <ChevronRight className={`w-4 h-4 ${slot.completed ? "text-green-400/50" : "text-gray-200"}`} />
+              <ChevronRight className={`w-4 h-4 ${slot.completed ? "text-[var(--ds-brand-primary)]/50" : "text-gray-200"}`} />
               <div className="w-12" />
             </div>
           )

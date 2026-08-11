@@ -30,16 +30,30 @@ const SLOTS: TemplateSlot[] = [
   },
   {
     key: 'passport-interior',
-    label: 'Passport Interior',
+    label: 'Passport Interior (Personalized)',
     description: 'Cream spread: left = identity page (photo + name + champion number + date + QR), right = destination page.',
-    note: 'Overlays: child photo, name, champion number, creation date, QR code (left); story title, book cover, badge, validation date (right).',
+    note: 'Subscribed users. Overlays: child photo, name, champion number, creation date, QR code (left); story title, book cover, badge, validation date (right).',
+    required: true,
+  },
+  {
+    key: 'passport-interior-free',
+    label: 'Passport Interior (Free)',
+    description: 'Cream spread without the child photo box — identity fields show PETIT CHAMPION placeholder data.',
+    note: 'Free users. Overlays: name (PETIT CHAMPION), champion number (STD-001), date (left); story title, book cover, badge, validation date (right).',
     required: true,
   },
   {
     key: 'badge-template',
-    label: 'Champion Attitude Badge',
-    description: 'Holographic badge frame with [ATTITUDE] and [TITRE] • CHAMPION DU LIVRE placeholders.',
-    note: 'Overlay: attitude text, story title, child photo (center circle).',
+    label: 'Champion Attitude Badge (Personalized)',
+    description: 'Holographic badge frame with child photo composited in the center circle alongside Piko.',
+    note: 'Subscribed users. Overlay: attitude text, story title, child photo (center circle).',
+    required: true,
+  },
+  {
+    key: 'badge-template-free',
+    label: 'Champion Attitude Badge (Free)',
+    description: 'Holographic badge frame showing Nimi + Piko only in the center circle — no child photo slot.',
+    note: 'Free users. Overlay: attitude text, story title. No child photo composited.',
     required: true,
   },
   {
@@ -51,38 +65,66 @@ const SLOTS: TemplateSlot[] = [
   },
   {
     key: 'boarding-pass',
-    label: 'Boarding Pass',
-    description: 'White/gold boarding pass layout with photo box and field placeholders.',
-    note: 'Overlay: photo, name, age, status, flight number, destination, seat, gate, QR code.',
+    label: 'Boarding Pass (Personalized)',
+    description: 'White/gold boarding pass layout with photo box on the left and text fields on the right.',
+    note: 'Subscribed users only. Overlay: photo, name, age, status, flight number, destination, seat, gate, barcode.',
+    required: true,
+  },
+  {
+    key: 'boarding-pass-free',
+    label: 'Boarding Pass (Free)',
+    description: 'White/gold boarding pass layout without a photo box — text fields spread across the full width.',
+    note: 'Free users. Overlay: name (PETIT CHAMPION), age, status, flight number, destination, seat, gate, QR code.',
     required: true,
   },
   {
     key: 'stamps',
     label: 'Stamp Collection (Page 13)',
-    description: 'Cream 4×3 grid with ILLUSTRATION, BADGE and TAMPON OFFICIEL placeholders per slot.',
-    note: 'Overlay: story covers, badge images, validation dates per completed story.',
-    required: true,
-  },
-  {
-    key: 'champion-kit',
-    label: 'Champion Kit',
-    description: 'Blue suitcase kit template (1254×1254px). Contains the boarding pass panel on the right and the passport cover on the left — both already baked into the template.',
-    note: 'Overlay: child photo (handle area), boarding pass values (name, age, status, flight, destination, livre, siège, porte, embarquement), real barcode, QR code.',
-    required: true,
+    description: 'Optional background for the stamp collection page. Not currently used — stamps are generated programmatically as SVG.',
+    note: 'Reserved for a future design override. Uploading this has no effect on generated documents today.',
+    required: false,
   },
   {
     key: 'carry-on-day',
-    label: 'Carry-On (Day)',
-    description: 'Blue carry-on suitcase with passport + boarding pass visible (daytime variant).',
-    note: 'Reference / marketing asset.',
-    required: false,
+    label: 'Champion Kit — Jour (Personnalisé)',
+    description: 'Blue suitcase kit, daytime background (1254×1254px). Photo slots in handle oval and boarding pass window.',
+    note: 'Subscribed users, daytime download. Overlay: child photo (handle + window), boarding pass values, barcode, QR.',
+    required: true,
   },
   {
     key: 'carry-on-night',
-    label: 'Carry-On (Night)',
-    description: 'Blue carry-on suitcase with LED lights glowing (night variant).',
-    note: 'Reference / marketing asset.',
-    required: false,
+    label: 'Champion Kit — Nuit (Personnalisé)',
+    description: 'Blue suitcase kit, nighttime background with warm LED glow (1254×1254px). Same layout as daytime.',
+    note: 'Subscribed users, night-time download. Same overlays as daytime variant.',
+    required: true,
+  },
+  {
+    key: 'carry-on-day-free',
+    label: 'Champion Kit — Jour (Gratuit)',
+    description: 'Blue suitcase kit, daytime background — no child photo slots. Handle and window show generic design.',
+    note: 'Free users, daytime download. Overlay: PETIT CHAMPION name, boarding pass values, barcode, QR. No photo.',
+    required: true,
+  },
+  {
+    key: 'carry-on-night-free',
+    label: 'Champion Kit — Nuit (Gratuit)',
+    description: 'Blue suitcase kit, nighttime background — no child photo slots.',
+    note: 'Free users, night-time download. Same overlays as daytime free variant.',
+    required: true,
+  },
+  {
+    key: 'certificate',
+    label: 'Champion Certificate (Personnalisé)',
+    description: 'Landscape certificate awarded after completing all 6 missions of a story. Child photo, name, champion number, story title, date.',
+    note: 'Subscribed users. Overlay: child photo, name, champion number, story title, story number, completion date.',
+    required: true,
+  },
+  {
+    key: 'certificate-free',
+    label: 'Champion Certificate (Gratuit)',
+    description: 'Landscape certificate without child photo — name shows PETIT CHAMPION.',
+    note: 'Free users. Overlay: PETIT CHAMPION, story title, story number, completion date. No photo or champion number.',
+    required: true,
   },
 ]
 
@@ -115,7 +157,9 @@ export default function AirwaysTemplatesManager({ onNavigate, onOpenSidebar }: A
   // ── Test download ─────────────────────────────────────────────
   const [children, setChildren] = useState<Child[]>([])
   const [selectedChild, setSelectedChild] = useState<string>('')
-  const [testDoc, setTestDoc] = useState<'kit' | 'boarding-pass' | 'passport' | 'badge'>('kit')
+  const [testDoc, setTestDoc] = useState<'kit' | 'boarding-pass' | 'passport' | 'stamps' | 'badge' | 'certificate' | 'song' | 'story-pdf'>('kit')
+  const [testStories, setTestStories]   = useState<{ slug: string; title: string; sort_order: number }[]>([])
+  const [testStorySlug, setTestStorySlug] = useState<string>('')
   const [downloading, setDownloading] = useState(false)
   const [dlError, setDlError] = useState<string | null>(null)
 
@@ -130,22 +174,52 @@ export default function AirwaysTemplatesManager({ onNavigate, onOpenSidebar }: A
       .catch(() => {})
   }, [])
 
+  // Load stories when child changes (for story-pdf test)
+  useEffect(() => {
+    if (!selectedChild) { setTestStories([]); setTestStorySlug(''); return }
+    fetch(`/api/airways/stories?childId=${selectedChild}`)
+      .then(r => r.json())
+      .then((d: { stories?: { slug: string; title: string; sort_order: number; is_complete: boolean }[] }) => {
+        const list = (d.stories ?? []).filter(s => s.slug)
+        setTestStories(list)
+        setTestStorySlug(list[0]?.slug ?? '')
+      })
+      .catch(() => {})
+  }, [selectedChild])
+
   const handleTestDownload = async () => {
     if (!selectedChild) return
     setDownloading(true)
     setDlError(null)
     try {
-      // passport → PDF (no format param); badge → PNG (no format param);
-      // boarding-pass / kit / stamps → PNG (need &format=png)
-      const needsFormatParam = testDoc !== 'passport' && testDoc !== 'badge'
-      const url = needsFormatParam
-        ? `/api/airways/${testDoc}?childId=${selectedChild}&format=png`
-        : `/api/airways/${testDoc}?childId=${selectedChild}`
-      const ext = testDoc === 'passport' ? 'pdf' : 'png'
-      const res = await fetch(url)
+      let url: string
+      let ext: string
+
+      if (testDoc === 'badge') {
+        url = `/api/airways/badge?childId=${selectedChild}`
+        ext = 'png'
+      } else if (testDoc === 'passport' || testDoc === 'stamps') {
+        url = `/api/airways/${testDoc}?childId=${selectedChild}`
+        ext = 'pdf'
+      } else if (testDoc === 'certificate') {
+        url = `/api/airways/certificate?childId=${selectedChild}&format=pdf`
+        ext = 'pdf'
+      } else if (testDoc === 'song') {
+        url = `/api/airways/song?childId=${selectedChild}`
+        ext = 'mp3'
+      } else if (testDoc === 'story-pdf') {
+        if (!testStorySlug) throw new Error('Select a story first.')
+        url = `/api/airways/story-pdf?childId=${selectedChild}&storySlug=${encodeURIComponent(testStorySlug)}`
+        ext = 'pdf'
+      } else {
+        url = `/api/airways/${testDoc}?childId=${selectedChild}&format=pdf`
+        ext = 'pdf'
+      }
+
+      const res = await fetch(url, { signal: AbortSignal.timeout(120_000) })
       if (!res.ok) {
         const j = await res.json().catch(() => ({}))
-        throw new Error(j.error ?? `HTTP ${res.status}`)
+        throw new Error((j as { error?: string }).error ?? `HTTP ${res.status}`)
       }
       const blob = await res.blob()
       const objUrl = URL.createObjectURL(blob)
@@ -205,9 +279,16 @@ export default function AirwaysTemplatesManager({ onNavigate, onOpenSidebar }: A
     const fileName = `${key}.${ext}`
     updateSlot(key, { uploading: true, error: null })
     try {
+      // Delete old file if it has a different extension (avoids orphan + stale probe)
+      const existingUrl = slotStates[key]?.url
+      if (existingUrl) {
+        const rawName = existingUrl.split('/').pop()?.split('?')[0]
+        if (rawName && rawName !== fileName) {
+          await supabase.storage.from(BUCKET).remove([rawName]).catch(() => {})
+        }
+      }
       const { error } = await supabase.storage.from(BUCKET).upload(fileName, file, { upsert: true })
       if (error) throw error
-      // After upload, get the public URL directly
       const { data } = supabase.storage.from(BUCKET).getPublicUrl(fileName)
       updateSlot(key, { uploading: false, url: `${data.publicUrl}?t=${Date.now()}` })
       void invalidateServerCache(key)
@@ -266,7 +347,7 @@ export default function AirwaysTemplatesManager({ onNavigate, onOpenSidebar }: A
                 Airways Templates <span className="text-lg">✈️</span>
               </h1>
               <p className="text-sm text-gray-500 font-medium mt-0.5">
-                Upload the 8 Nimipiko Airways document templates
+                Upload the {totalRequired} required Nimipiko Airways templates
               </p>
               <p className="text-xs text-gray-400 mt-1.5">
                 <button onClick={() => onNavigate('Dashboard')} className={`font-bold hover:underline ${accent.text}`}>Dashboard</button>
@@ -315,6 +396,27 @@ export default function AirwaysTemplatesManager({ onNavigate, onOpenSidebar }: A
           </div>
         )}
 
+        {/* Phase 2 awaiting-designer banner — only when 0 templates uploaded */}
+        {uploadedRequired === 0 && (
+          <div className="bg-amber-50 border-2 border-amber-300 rounded-2xl px-5 py-4">
+            <div className="flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="font-bold text-amber-900 text-sm">Phase 2 — Awaiting designer assets</p>
+                <p className="text-amber-800 text-xs mt-1 leading-relaxed">
+                  No template images have been uploaded yet. Airways PDF generation is fully wired but <strong>non-functional</strong> until
+                  the designer delivers the {totalRequired} required PNG files. Once received, upload each template to its slot below.
+                  The layout editor (Kit Layout) is ready and can be calibrated before images arrive.
+                </p>
+                <div className="mt-2.5 flex flex-wrap gap-2">
+                  <button onClick={() => onNavigate('kit_layout')} className="text-xs font-bold text-amber-700 underline">Open Layout Editor →</button>
+                  <button onClick={() => onNavigate('airways_hub')} className="text-xs font-bold text-amber-700 underline">Open Airways Hub →</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Info banner */}
         <div className="bg-blue-50 border border-blue-100 rounded-2xl px-5 py-4 text-sm text-blue-800">
           <p className="font-bold mb-1">How this works</p>
@@ -349,15 +451,47 @@ export default function AirwaysTemplatesManager({ onNavigate, onOpenSidebar }: A
               <label className="text-xs font-semibold text-gray-500 mb-1 block">Document</label>
               <select
                 value={testDoc}
-                onChange={e => setTestDoc(e.target.value as 'kit' | 'boarding-pass' | 'passport' | 'badge')}
+                onChange={e => setTestDoc(e.target.value as typeof testDoc)}
                 className="text-sm border border-gray-200 rounded-xl px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-200"
               >
-                <option value="kit">Champion Kit</option>
-                <option value="boarding-pass">Boarding Pass</option>
-                <option value="passport">Passport</option>
-                <option value="badge">Attitude Badge</option>
+                <optgroup label="Classic">
+                  <option value="kit">Champion Kit</option>
+                  <option value="boarding-pass">Boarding Pass</option>
+                  <option value="passport">Passport</option>
+                  <option value="stamps">Stamp Collection</option>
+                  <option value="badge">Attitude Badge</option>
+                </optgroup>
+                <optgroup label="Premium">
+                  <option value="certificate">Certificat Champion</option>
+                  <option value="song">Chanson personnalisée</option>
+                  <option value="story-pdf">Histoire PDF</option>
+                </optgroup>
               </select>
             </div>
+
+            {/* Story picker — only visible for story-pdf */}
+            {testDoc === 'story-pdf' && (
+              <div className="flex-1 min-w-[180px]">
+                <label className="text-xs font-semibold text-gray-500 mb-1 block">Histoire</label>
+                {testStories.length > 0 ? (
+                  <select
+                    value={testStorySlug}
+                    onChange={e => setTestStorySlug(e.target.value)}
+                    className="w-full text-sm border border-gray-200 rounded-xl px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-200"
+                  >
+                    {testStories.map(s => (
+                      <option key={s.slug} value={s.slug}>
+                        Livre {s.sort_order} — {s.title}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <p className="text-xs text-gray-400 italic py-2">
+                    {selectedChild ? 'Aucune histoire trouvée pour cet enfant.' : 'Sélectionner un enfant d\'abord.'}
+                  </p>
+                )}
+              </div>
+            )}
             <button
               onClick={handleTestDownload}
               disabled={!selectedChild || downloading}
@@ -366,7 +500,10 @@ export default function AirwaysTemplatesManager({ onNavigate, onOpenSidebar }: A
               {downloading
                 ? <RefreshCw className="w-4 h-4 animate-spin" />
                 : <Download className="w-4 h-4" />}
-              {downloading ? 'Generating…' : testDoc === 'passport' ? 'Download PDF' : 'Download PNG'}
+              {downloading ? 'Generating…'
+                : testDoc === 'badge'   ? 'Download PNG'
+                : testDoc === 'song'    ? 'Download Audio'
+                : 'Download PDF'}
             </button>
           </div>
           {dlError && (
@@ -502,25 +639,30 @@ export default function AirwaysTemplatesManager({ onNavigate, onOpenSidebar }: A
           })}
         </div>
 
-        {/* Usage guide */}
+        {/* API reference */}
         <div className="bg-gray-50 rounded-2xl border border-gray-100 p-5 space-y-3">
-          <p className="font-bold text-gray-700 text-sm">API Endpoints</p>
+          <p className="font-bold text-gray-700 text-sm">Tous les endpoints Airways</p>
           <div className="space-y-1.5">
             {[
-              { method: 'GET', path: '/api/airways/boarding-pass?childId=UUID', desc: 'Personalized boarding pass (PDF/PNG)' },
-              { method: 'GET', path: '/api/airways/boarding-pass?generic=true', desc: 'Generic boarding pass template' },
-              { method: 'GET', path: '/api/airways/passport?childId=UUID', desc: 'Full passport (multi-page PDF)' },
-              { method: 'GET', path: '/api/airways/stamps?childId=UUID', desc: 'Stamp collection page (PDF/PNG)' },
+              { path: '/api/airways/passport?childId=UUID',            desc: 'Passport multi-page (PDF)' },
+              { path: '/api/airways/boarding-pass?childId=UUID&format=pdf', desc: 'Boarding pass (PDF/PNG)' },
+              { path: '/api/airways/stamps?childId=UUID',              desc: 'Stamp collection (PDF)' },
+              { path: '/api/airways/badge?childId=UUID',               desc: 'Attitude badge (PNG)' },
+              { path: '/api/airways/kit?childId=UUID&format=pdf',      desc: 'Champion kit, day/night auto (PDF/PNG)' },
+              { path: '/api/airways/certificate?childId=UUID&format=pdf', desc: 'Champion certificate — last story ★ Premium' },
+              { path: '/api/airways/story-pdf?childId=UUID&storySlug=X', desc: 'Histoire PDF personnalisé ★ Premium' },
+              { path: '/api/airways/song?childId=UUID',                desc: 'Chanson personnalisée (audio) ★ Premium' },
+              { path: '/api/airways/stories?childId=UUID',             desc: 'Liste des histoires de l\'enfant (JSON)' },
             ].map(e => (
               <div key={e.path} className="flex items-start gap-2 text-xs">
-                <span className="bg-green-100 text-green-700 font-bold px-1.5 py-0.5 rounded shrink-0">{e.method}</span>
-                <code className="text-gray-600 font-mono break-all">{e.path}</code>
-                <span className="text-gray-400 shrink-0 hidden sm:block">— {e.desc}</span>
+                <span className="bg-green-100 text-green-700 font-bold px-1.5 py-0.5 rounded shrink-0 mt-px">GET</span>
+                <code className="text-gray-600 font-mono break-all flex-1">{e.path}</code>
+                <span className="text-gray-400 shrink-0 hidden sm:block text-right max-w-[200px]">— {e.desc}</span>
               </div>
             ))}
           </div>
-          <p className="text-xs text-gray-400 mt-2">
-            All personalized endpoints require authentication. Add <code className="bg-gray-100 px-1 rounded">&amp;format=png</code> for image output.
+          <p className="text-xs text-gray-400">
+            All endpoints require <code className="bg-gray-100 px-1 rounded">Authorization: Bearer TOKEN</code>. ★ Premium = subscription required.
           </p>
         </div>
       </div>

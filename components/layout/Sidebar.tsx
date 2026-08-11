@@ -24,8 +24,8 @@ interface SidebarProps {
 }
 
 const NAV_ITEMS = [
-  { label: "Home",         href: "/home",          match: (p: string) => p === "/home",                  emoji: "🏠", activeBg: "bg-emerald-50",  activeText: "text-emerald-700", activeBorder: "border-emerald-200/60", activeBar: "bg-emerald-500" },
-  { label: "Stories",      href: "/stories",       match: (p: string) => p.startsWith("/stories"),       emoji: "📚", activeBg: "bg-sky-50",      activeText: "text-sky-700",     activeBorder: "border-sky-200/60",     activeBar: "bg-sky-500"     },
+  { label: "Home",         href: "/home",          match: (p: string) => p === "/home",                  emoji: "🏠", activeBg: "bg-[var(--ds-brand-subtle)]",  activeText: "text-[var(--ds-text-brand)]", activeBorder: "border-[var(--ds-border-brand)]/60", activeBar: "bg-[var(--ds-brand-primary)]" },
+  { label: "Stories",      href: "/stories",       match: (p: string) => p.startsWith("/stories"),       emoji: "📚", activeBg: "bg-[var(--ds-brand-subtle)]",  activeText: "text-[var(--ds-text-brand)]", activeBorder: "border-[var(--ds-border-brand)]/60", activeBar: "bg-[var(--ds-brand-primary)]" },
   { label: "Challenges",   href: "/treasure",      match: (p: string) => p.startsWith("/treasure"),      emoji: "🏆", activeBg: "bg-amber-50",    activeText: "text-amber-700",   activeBorder: "border-amber-200/60",   activeBar: "bg-amber-500"   },
   { label: "Community",    href: "/community",     match: (p: string) => p.startsWith("/community"),     emoji: "👥", activeBg: "bg-cyan-50",     activeText: "text-cyan-700",    activeBorder: "border-cyan-200/60",    activeBar: "bg-cyan-500"    },
   { label: "Talk to Nimi", href: "/talk-to-nimi",  match: (p: string) => p.startsWith("/talk-to-nimi"),  emoji: "🤖", activeBg: "bg-violet-50",   activeText: "text-violet-700",  activeBorder: "border-violet-200/60",  activeBar: "bg-violet-500"  },
@@ -140,10 +140,10 @@ export default function Sidebar({ activeChild, isOpen, onClose, onLogoutClick }:
       )}
 
       {isClub === true && (
-        <div className="mt-10 border border-green-200 bg-gradient-to-br from-green-50 to-emerald-50 leaf p-3 text-center shadow-sm">
-          <Crown className="w-5 h-5 text-green-600 mx-auto mb-1" />
-          <p className="font-baloo font-black text-green-700 text-xs">Club Member 👑</p>
-          <p className="font-nunito text-green-600/80 text-4xs mt-0.5">All features unlocked</p>
+        <div className="mt-10 border border-[var(--ds-border-brand)] bg-[var(--ds-brand-subtle)] leaf p-3 text-center shadow-sm">
+          <Crown className="w-5 h-5 text-[var(--ds-text-brand)] mx-auto mb-1" />
+          <p className="font-baloo font-black text-[var(--ds-text-brand)] text-xs">Club Member 👑</p>
+          <p className="font-nunito text-[var(--ds-text-secondary)] text-4xs mt-0.5">All features unlocked</p>
         </div>
       )}
 

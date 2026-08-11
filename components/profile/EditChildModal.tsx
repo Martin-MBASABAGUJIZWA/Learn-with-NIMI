@@ -45,7 +45,7 @@ export default function EditChildModal({ childId, initialName, initialAvatar, on
           style={{ borderRadius: 'var(--leaf-r-lg)' }}
         >
           {/* Header */}
-          <div className="px-5 py-4 flex items-center justify-between" style={{ backgroundColor: 'var(--nimi-green)' }}>
+          <div className="px-5 py-4 flex items-center justify-between" style={{ backgroundColor: 'var(--ds-brand-primary)' }}>
             <div>
               <p className="text-white font-black text-lg tracking-wide">{t("editProfileModalTitle")}</p>
               <p className="text-white/75 text-xs">Design your explorer!</p>
@@ -85,7 +85,7 @@ export default function EditChildModal({ childId, initialName, initialAvatar, on
                 onClick={handleSave}
                 disabled={saving || !name.trim()}
                 className="flex-1 text-white font-black py-3 text-sm transition disabled:opacity-60 rounded-xl"
-                style={{ backgroundColor: 'var(--nimi-green)' }}
+                style={{ backgroundColor: 'var(--ds-brand-primary)' }}
               >
                 {saving ? t("savingLabel") : t("saveBtn")}
               </button>

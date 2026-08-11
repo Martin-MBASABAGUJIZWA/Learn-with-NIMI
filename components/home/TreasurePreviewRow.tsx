@@ -82,7 +82,7 @@ export default function TreasurePreviewRow({ badgeCount }: Props) {
         <Link href="/treasure">
           <motion.button whileHover={{ scale: 1.02 }} whileTap={m.buttonPress}
             className="w-full text-white font-black text-sml py-3 shadow-lg flex items-center justify-center gap-2 transition-colors"
-            style={{ backgroundColor: 'var(--nimi-green)', borderRadius: 'var(--leaf-r-sm)' }}>
+            style={{ backgroundColor: 'var(--ds-brand-primary)', borderRadius: 'var(--leaf-r-sm)' }}>
             {t("treasureOpenChest")} <ChevronRight className="w-4 h-4" />
           </motion.button>
         </Link>

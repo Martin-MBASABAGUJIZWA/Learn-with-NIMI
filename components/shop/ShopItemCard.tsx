@@ -37,7 +37,7 @@ export default function ShopItemCard({
       style={{
         borderRadius: "var(--leaf-r)",
         border: equipped
-          ? "2px solid var(--nimi-green)"
+          ? "2px solid var(--ds-brand-primary)"
           : "1.5px solid var(--ds-border-primary)",
         background: "white",
         boxShadow: equipped
@@ -76,7 +76,7 @@ export default function ShopItemCard({
               exit={{ scale: 0, opacity: 0 }}
               transition={{ type: "spring", stiffness: 400, damping: 22 }}
               className="absolute top-2 right-2 flex items-center gap-1 text-white text-4xs font-black uppercase px-2 py-1 rounded-full shadow-lg"
-              style={{ background: "var(--nimi-green)" }}
+              style={{ background: "var(--ds-brand-primary)" }}
             >
               <Zap className="w-2.5 h-2.5" />
               {t("shopEquippedLabel")}
@@ -133,7 +133,7 @@ export default function ShopItemCard({
               whileTap={{ scale: 0.95 }}
               className="w-full inline-flex items-center justify-center gap-1.5 font-black text-xs px-3 py-2 rounded-lg transition-colors duration-200"
               style={{
-                background: equipped ? "#f3f4f6" : "var(--nimi-green)",
+                background: equipped ? "#f3f4f6" : "var(--ds-brand-primary)",
                 color: equipped ? "#6b7280" : "white",
               }}
             >
@@ -180,7 +180,7 @@ export default function ShopItemCard({
                 whileTap={affordable ? { scale: 0.95 } : {}}
                 className="w-full inline-flex items-center justify-center gap-1.5 font-black text-xs px-3 py-2 rounded-lg transition-all duration-200 disabled:cursor-not-allowed"
                 style={{
-                  background: affordable ? "var(--nimi-green)" : "#e5e7eb",
+                  background: affordable ? "var(--ds-brand-primary)" : "#e5e7eb",
                   color: affordable ? "white" : "#9ca3af",
                   opacity: purchasing ? 0.7 : 1,
                 }}

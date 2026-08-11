@@ -187,7 +187,7 @@ export default function VocabClient({ initialChildren }: Props = {}) {
               </p>
               <Link href="/stories"
                 className="mt-2 font-baloo font-black text-white px-6 py-2.5 rounded-full shadow-md text-sm transition"
-                style={{ backgroundColor: "var(--nimi-green)" }}>
+                style={{ backgroundColor: "var(--ds-brand-primary)" }}>
                 Start a Story →
               </Link>
             </motion.div>

@@ -20,7 +20,7 @@ export default function BookControls({ onPrev, onNext, bookRef }: Props) {
   const isLast = currentPage >= totalPages - 1;
 
   return (
-    <div className="mt-3 flex items-center justify-center gap-3 sm:gap-4 leaf border border-emerald-100 bg-[var(--ds-surface-card)]/80 px-3 py-3 shadow-sm">
+    <div className="mt-3 flex items-center justify-center gap-3 sm:gap-4 leaf border border-[var(--ds-border-brand)] bg-[var(--ds-surface-card)]/80 px-3 py-3 shadow-sm">
       <motion.button whileTap={m.buttonPress} onClick={onPrev} disabled={isFirst}
         className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[var(--ds-surface-card)] border border-ds-border flex items-center justify-center text-[var(--ds-text-primary)] disabled:opacity-20 transition shadow-sm hover:border-[var(--ds-brand-primary)]/30">
         <ChevronLeft size={22} />

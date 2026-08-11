@@ -4,6 +4,14 @@ import supabase from '@/lib/supabaseClient'
 import { smartUpload } from '@/lib/uploadWithProgress'
 import { Upload, CheckCircle2, AlertCircle, FileArchive, Image as ImageIcon, Music, X } from 'lucide-react'
 
+async function deleteStorageFile(storagePath: string): Promise<void> {
+  const slash = storagePath.indexOf('/')
+  if (slash === -1) return
+  const bucket = storagePath.substring(0, slash)
+  const path   = storagePath.substring(slash + 1)
+  await supabase.storage.from(bucket).remove([path])
+}
+
 interface Props {
   storyId: string
   storyTitle: string
@@ -84,6 +92,20 @@ export default function FlipFlopImporter({ storyId, storyTitle, language, onDone
         .upsert({ story_id: storyId, page_number: pageNum }, { onConflict: 'story_id,page_number' })
         .select('id').single()
       if (pageErr) throw new Error(`Failed to upsert page ${pageNum}: ${pageErr.message}`)
+
+      // Delete old storage files for this language version before overwriting
+      const { data: existingVer } = await supabase
+        .from('story_page_versions')
+        .select('image_url, audio_url')
+        .eq('story_page_id', page.id)
+        .eq('language', language)
+        .maybeSingle()
+      if (existingVer) {
+        await Promise.all([
+          existingVer.image_url ? deleteStorageFile(existingVer.image_url).catch(() => {}) : null,
+          existingVer.audio_url ? deleteStorageFile(existingVer.audio_url).catch(() => {}) : null,
+        ])
+      }
 
       // Image is per-language — stored on story_page_versions, not story_pages
       const { error: versionErr } = await supabase.from('story_page_versions').upsert({

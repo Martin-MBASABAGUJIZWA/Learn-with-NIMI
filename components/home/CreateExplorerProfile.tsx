@@ -145,7 +145,7 @@ export default function CreateExplorerProfile({ onCreated }: Props) {
               {/* Step 1: name */}
               <div>
                 <label className="flex items-center gap-2 font-bold text-ds-text text-sm mb-2">
-                  <span className="w-6 h-6 rounded-full bg-[var(--nimi-green)] text-white text-xs flex items-center justify-center flex-shrink-0">1</span>
+                  <span className="w-6 h-6 rounded-full bg-[var(--ds-brand-primary)] text-white text-xs flex items-center justify-center flex-shrink-0">1</span>
                   {t("whatShouldWeCallYou")}
                 </label>
                 <input
@@ -160,7 +160,7 @@ export default function CreateExplorerProfile({ onCreated }: Props) {
               {/* Step 2: age group */}
               <div className="pt-5 border-t border-ds-border">
                 <label className="flex items-center gap-2 font-bold text-ds-text text-sm mb-2">
-                  <span className="w-6 h-6 rounded-full bg-[var(--nimi-green)] text-white text-xs flex items-center justify-center flex-shrink-0">2</span>
+                  <span className="w-6 h-6 rounded-full bg-[var(--ds-brand-primary)] text-white text-xs flex items-center justify-center flex-shrink-0">2</span>
                   {t("chooseAgeGroup")}
                 </label>
                 <div ref={ageRef} className="relative">
@@ -194,7 +194,7 @@ export default function CreateExplorerProfile({ onCreated }: Props) {
               {/* Step 3: favorite adventure */}
               <div className="pt-5 border-t border-ds-border">
                 <label className="flex items-center gap-2 font-bold text-ds-text text-sm mb-2">
-                  <span className="w-6 h-6 rounded-full bg-[var(--nimi-green)] text-white text-xs flex items-center justify-center flex-shrink-0">3</span>
+                  <span className="w-6 h-6 rounded-full bg-[var(--ds-brand-primary)] text-white text-xs flex items-center justify-center flex-shrink-0">3</span>
                   {t("pickFavoriteAdventure")}
                 </label>
                 <div ref={favRef} className="relative">
@@ -228,7 +228,7 @@ export default function CreateExplorerProfile({ onCreated }: Props) {
               {/* Step 4: avatar */}
               <div className="pt-5 border-t border-ds-border">
                 <label className="flex items-center gap-2 font-bold text-ds-text text-sm mb-2">
-                  <span className="w-6 h-6 rounded-full bg-[var(--nimi-green)] text-white text-xs flex items-center justify-center flex-shrink-0">4</span>
+                  <span className="w-6 h-6 rounded-full bg-[var(--ds-brand-primary)] text-white text-xs flex items-center justify-center flex-shrink-0">4</span>
                   {t("chooseYourAvatar")}
                 </label>
                 <div className="flex gap-2 flex-wrap">
@@ -258,7 +258,7 @@ export default function CreateExplorerProfile({ onCreated }: Props) {
               disabled={saving}
               whileTap={m.buttonPress}
               className="w-full mt-6 text-white font-black py-3.5 flex items-center justify-center gap-2 shadow-md transition disabled:opacity-60"
-              style={{ backgroundColor: 'var(--nimi-green)', borderRadius: 'var(--leaf-r)' }}
+              style={{ backgroundColor: 'var(--ds-brand-primary)', borderRadius: 'var(--leaf-r)' }}
             >
               {saving ? (
                 <span>{t("creatingProfileLabel")}</span>

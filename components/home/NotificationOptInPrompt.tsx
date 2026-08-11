@@ -64,11 +64,11 @@ export default function NotificationOptInPrompt({ childId, childName }: Props) {
         >
           <div className="bg-[var(--ds-surface-card)] rounded-2xl shadow-2xl border border-[var(--ds-border-primary)] overflow-hidden">
             {/* Accent strip */}
-            <div className="h-1 w-full bg-gradient-to-r from-[var(--nimi-green)] to-emerald-400" />
+            <div className="h-1 w-full" style={{ background: "linear-gradient(to right, var(--ds-brand-primary), var(--ds-brand-hover))" }} />
 
             <div className="p-4 flex gap-3 items-start">
-              <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center shrink-0 mt-0.5">
-                <Bell className="w-5 h-5 text-emerald-600 fill-emerald-200" />
+              <div className="w-10 h-10 rounded-xl bg-[var(--ds-brand-soft)] flex items-center justify-center shrink-0 mt-0.5">
+                <Bell className="w-5 h-5 text-[var(--ds-text-brand)]" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="font-baloo font-black text-[var(--ds-text-primary)] text-mbase leading-snug">
@@ -87,7 +87,7 @@ export default function NotificationOptInPrompt({ childId, childName }: Props) {
               <button
                 onClick={enable}
                 disabled={push.loading}
-                className="flex-1 bg-[var(--nimi-green)] text-white font-baloo font-black text-sml py-2.5 rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50"
+                className="flex-1 bg-[var(--ds-brand-primary)] text-white font-baloo font-black text-sml py-2.5 rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50"
               >
                 {push.loading ? "Enabling…" : "Enable reminders"}
               </button>

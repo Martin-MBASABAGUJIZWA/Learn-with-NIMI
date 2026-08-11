@@ -42,7 +42,7 @@ export default function AchievementCenterCard({ achievements, maxLevel, childNam
 
       <TrilingualChampionBanner status={trilingual} childName={childName} />
 
-      <Link href="/certificates" className="block text-center text-nimi-green font-black text-sm hover:underline">
+      <Link href="/certificates" className="block text-center text-[var(--ds-text-brand)] font-black text-sm hover:underline">
         {t("viewFullAchievementDashboard")}
       </Link>
     </div>

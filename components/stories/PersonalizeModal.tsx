@@ -41,7 +41,7 @@ export default function PersonalizeModal({ isOpen, onClose, storyTitle, childNam
             </button>
 
             <div className="text-center mb-6">
-              <div className="w-14 h-14 flex items-center justify-center mx-auto mb-3 shadow-lg" style={{ backgroundColor: 'var(--nimi-green)', borderRadius: 'var(--leaf-r)' }}>
+              <div className="w-14 h-14 flex items-center justify-center mx-auto mb-3 shadow-lg" style={{ backgroundColor: 'var(--ds-brand-primary)', borderRadius: 'var(--leaf-r)' }}>
                 <Sparkles className="w-7 h-7 text-white" />
               </div>
               <h2 className="font-black text-ds-text text-xl">Personalize Story</h2>
@@ -89,7 +89,7 @@ export default function PersonalizeModal({ isOpen, onClose, storyTitle, childNam
               <button
                 onClick={() => { onApply(name.trim() || childName); onClose(); }}
                 className="flex-1 text-white font-black py-3 text-sml shadow-lg transition"
-                style={{ backgroundColor: 'var(--nimi-green)', borderRadius: 'var(--leaf-r-sm)' }}
+                style={{ backgroundColor: 'var(--ds-brand-primary)', borderRadius: 'var(--leaf-r-sm)' }}
               >
                 ✨ Apply Personalization
               </button>

@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-green-50 to-white flex flex-col items-center justify-center px-4 text-center">
+    <div className="min-h-screen bg-gradient-to-b from-[var(--ds-brand-subtle)] to-[var(--ds-surface-card)] flex flex-col items-center justify-center px-4 text-center">
       <div className="max-w-md w-full">
         <p className="text-8xl mb-4 select-none">🌿</p>
         <h1 className="font-baloo font-black text-4.5xl text-[var(--ds-text-primary)] leading-tight">
@@ -20,7 +20,7 @@ export default function NotFound() {
           <Link
             href="/stories"
             className="text-white font-black px-7 py-3.5 shadow-md transition text-mbase"
-            style={{ backgroundColor: 'var(--nimi-green)', borderRadius: 'var(--leaf-r)' }}
+            style={{ backgroundColor: 'var(--ds-brand-primary)', borderRadius: 'var(--leaf-r)' }}
           >
             📖 Back to Stories
           </Link>

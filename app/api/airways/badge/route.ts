@@ -46,6 +46,7 @@ export async function GET(req: NextRequest) {
   ])
   if (!adminRow && child?.parent_id !== user.id)
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  let isPersonalized = !!adminRow
   if (!adminRow) {
     const { data: sub } = await supabase
       .from('nimipiko_subscriptions')
@@ -53,38 +54,29 @@ export async function GET(req: NextRequest) {
       .eq('parent_id', user.id)
       .in('status', ['active', 'trial'])
       .maybeSingle()
-    if (!sub) return NextResponse.json({ error: 'Subscription required' }, { status: 402 })
+    isPersonalized = !!sub
   }
 
-  const [data, story1Row] = await Promise.all([
-    fetchAirwaysData(supabase, childId),
-    supabase
-      .from('stories')
-      .select('id, title, sort_order, attitude')
-      .eq('sort_order', 1)
-      .maybeSingle()
-      .then(r => r.data),
-  ])
+  const data = await fetchAirwaysData(supabase, childId)
 
   if (!data) return NextResponse.json({ error: 'Child not found' }, { status: 404 })
 
-  const attitude = data.attitude
-    ?? story1Row?.attitude
-    ?? data.stories.find(s => s.sort_order === 1)?.attitude
-    ?? null
+  const story1 = data.stories.find(s => s.sort_order === 1) ?? null
+  const attitude = data.attitude ?? story1?.attitude ?? null
 
   if (!attitude)
     return NextResponse.json({
       error: 'No attitude found — set attitude on Story 1 via Admin → Curriculum → Stories',
     }, { status: 422 })
 
-  const book1Title = story1Row?.title      ?? data.stories.find(s => s.sort_order === 1)?.title ?? ''
-  const book1Order = story1Row?.sort_order ?? 1
+  const book1Title = story1?.title      ?? ''
+  const book1Order = story1?.sort_order ?? 1
 
+  const badgeLayoutKey = isPersonalized ? 'badge-template' : 'badge-template-free'
   const { data: layoutRows } = await supabase
     .from('template_layout')
     .select('field,x,y,w,h,font_size,color')
-    .eq('template', 'badge-template')
+    .eq('template', badgeLayoutKey)
 
   const layout: AttitudeBadgeLayout = {}
   for (const row of layoutRows ?? []) {
@@ -94,9 +86,9 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  // Avatar stored as "ava:{…json…}" → render to PNG data URI; real URLs → fetch normally
+  // Photo only fetched for personalized (subscribed) users
   let photoUri: string | null = null
-  if (data.avatar_url) {
+  if (isPersonalized && data.avatar_url) {
     if (isAvatarConfig(data.avatar_url)) {
       const buf = await avatarUrlToBuffer(data.avatar_url, 320)
       if (buf) photoUri = `data:image/png;base64,${buf.toString('base64')}`
@@ -112,6 +104,7 @@ export async function GET(req: NextRequest) {
       storyTitle:        book1Title,
       bookNumber:        book1Order,
       childPhotoDataUri: photoUri,
+      isPersonalized,
       layout,
     })
 

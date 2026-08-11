@@ -20,7 +20,7 @@ const STATUS_KEY: Record<OverviewSummary["status"], string> = {
 const STATUS_STYLE: Record<OverviewSummary["status"], string> = {
   complete: "bg-yellow-50 text-yellow-700 border-yellow-200",
   onTrack: "bg-blue-50 text-blue-700 border-blue-200",
-  justStarting: "bg-green-50 text-green-700 border-green-200",
+  justStarting: "bg-[var(--ds-brand-subtle)] text-[var(--ds-text-brand)] border-[var(--ds-border-brand)]",
 };
 
 export default function ParentOverviewCard({ overview, childName, avatarUrl }: Props) {

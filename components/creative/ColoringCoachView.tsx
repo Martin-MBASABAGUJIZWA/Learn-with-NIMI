@@ -19,7 +19,7 @@ import { getStorageUrl } from "@/lib/queries";
 import type { ColoringCoachResponse, ColoringFeedbackResponse } from "@/lib/coloringCoach";
 import supabase from "@/lib/supabaseClient";
 
-const G = "var(--nimi-green,#15803D)";
+const G = "var(--ds-brand-primary)";
 const STARS_AWARD = 5;
 
 interface ColoringPage {
@@ -216,7 +216,7 @@ export default function ColoringCoachView({
                   <motion.button key={page.id}
                     whileTap={{ scale: 0.97 }}
                     onClick={() => void handleSelect(page)}
-                    className="rounded-2xl overflow-hidden bg-[var(--ds-surface-card)] border-2 hover:border-green-400 transition-colors text-left shadow-sm"
+                    className="rounded-2xl overflow-hidden bg-[var(--ds-surface-card)] border-2 hover:border-[var(--ds-border-brand)] transition-colors text-left shadow-sm"
                     style={{ borderColor: "var(--ds-border-primary)" }}>
                     <div className="relative aspect-[3/4] w-full bg-[var(--ds-surface-card)]">
                       {page.template_image_url ? (
@@ -283,7 +283,7 @@ export default function ColoringCoachView({
                     ✨ {coaching.encouragement}
                   </p>
                   {coaching.palette_story && (
-                    <p className="text-2xs font-bold mt-2 italic" style={{ color: "var(--nimi-green)" }}>
+                    <p className="text-2xs font-bold mt-2 italic" style={{ color: "var(--ds-brand-primary)" }}>
                       {coaching.palette_story}
                     </p>
                   )}
@@ -366,7 +366,7 @@ export default function ColoringCoachView({
 
             {/* Stars earned */}
             <div className="p-5 leaf-lg text-center" style={{ background: G }}>
-              <p className="text-green-200 text-3xs font-black uppercase tracking-widest mb-2">Stars Earned</p>
+              <p className="text-white/80 text-3xs font-black uppercase tracking-widest mb-2">Stars Earned</p>
               <p className="font-baloo font-black text-5.5xl text-white leading-none">+{STARS_AWARD}</p>
               <div className="flex justify-center gap-1 mt-2">
                 {Array.from({ length: STARS_AWARD }).map((_, i) => (
@@ -380,8 +380,8 @@ export default function ColoringCoachView({
             </div>
 
             {/* Nimi feedback */}
-            <div className="p-4 rounded-2xl" style={{ background: "var(--ds-brand-soft)", border: "1px solid #BBF7D0" }}>
-              <p className="text-sm font-nunito leading-relaxed" style={{ color: "#166534" }}>
+            <div className="p-4 rounded-2xl" style={{ background: "var(--ds-brand-soft)", border: "1px solid var(--ds-border-brand)" }}>
+              <p className="text-sm font-nunito leading-relaxed" style={{ color: "var(--ds-text-brand)" }}>
                 💬 {feedback.praise}
               </p>
               {feedback.color_fact && (
@@ -391,7 +391,7 @@ export default function ColoringCoachView({
                   </p>
                 </div>
               )}
-              <p className="text-xs font-bold mt-2" style={{ color: "var(--nimi-green)" }}>
+              <p className="text-xs font-bold mt-2" style={{ color: "var(--ds-brand-primary)" }}>
                 {feedback.invite_more}
               </p>
             </div>

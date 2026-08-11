@@ -25,7 +25,7 @@ const ACTIVE_CHILD_KEY = "nimipiko_active_child";
 const PAGE_SIZE = 8;
 
 const CATEGORY_META: Record<string, { emoji: string; key: string; activeClass: string; inactiveClass: string }> = {
-  animals:    { emoji: "🐾", key: "storyCatAnimals",    activeClass: "bg-emerald-500 text-white border-emerald-500",   inactiveClass: "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100" },
+  animals:    { emoji: "🐾", key: "storyCatAnimals",    activeClass: "bg-[var(--ds-brand-primary)] text-white border-[var(--ds-border-brand)]",   inactiveClass: "bg-[var(--ds-brand-subtle)] text-[var(--ds-text-brand)] border-[var(--ds-border-brand)] hover:bg-[var(--ds-brand-soft)]" },
   friendship: { emoji: "❤️", key: "storyCatFriendship", activeClass: "bg-pink-500 text-white border-pink-500",         inactiveClass: "bg-pink-50 text-pink-700 border-pink-200 hover:bg-pink-100" },
   bedtime:    { emoji: "🌙", key: "storyCatBedtime",    activeClass: "bg-indigo-500 text-white border-indigo-500",     inactiveClass: "bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100" },
   adventure:  { emoji: "🚀", key: "storyCatAdventure",  activeClass: "bg-orange-500 text-white border-orange-500",    inactiveClass: "bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-100" },

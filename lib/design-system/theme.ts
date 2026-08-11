@@ -333,13 +333,109 @@ export const defaultTheme: Theme = {
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Airways theme — boarding-pass / aviation aesthetic
+// Page bg: dark navy.  Brand: gold.  Nav: dark navy with gold active state.
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const airwaysTheme: Theme = {
+  id:   "airways",
+  name: "Nimipiko Airways",
+
+  surface: {
+    page:       "#06101F",          // dark navy page background
+    card:       "#FFFFFF",          // white boarding-pass card
+    cardHover:  "#f7f4ef",          // warm parchment on hover / card body
+    cardActive: "#f0ece4",
+    input:      "#FFFFFF",          // white input field
+    nav:        "#1A3558",          // mid-navy (secondary surface, sidebar)
+    overlay:    "rgba(0,0,0,0.65)",
+    tooltip:    "#1A3558",
+  },
+
+  text: {
+    primary:   "#111827",           // dark text on white card surfaces
+    secondary: "#6B7280",
+    tertiary:  "rgba(107,114,128,0.45)",
+    inverse:   "#FFFFFF",           // white text on dark surfaces
+    brand:     "#C9A84C",           // gold
+  },
+
+  border: {
+    primary: "#E5E7EB",
+    strong:  "#d1c4a8",             // warm tan — boarding-pass perforation feel
+    brand:   "#C9A84C",             // gold border / active ring
+  },
+
+  brand: {
+    primary: "#C9A84C",             // gold — CTA buttons, active states
+    hover:   "#D4A830",
+    pressed: "#b89640",
+    soft:    "rgba(201,168,76,0.18)",
+    subtle:  "#fdf8ed",             // very light gold tint (tile selected bg)
+  },
+
+  nav: {
+    bg:           "#06101F",        // dark navy nav bar
+    activeBg:     "rgba(201,168,76,0.18)",
+    activeText:   "#C9A84C",        // gold active icon + label
+    inactiveText: "rgba(255,255,255,0.50)",
+    inactiveIcon: "rgba(255,255,255,0.45)",
+    border:       "rgba(201,168,76,0.20)",
+  },
+
+  shadow: {
+    card:  "0 4px 16px rgba(0,0,0,0.10)",
+    nav:   "0 -4px 24px rgba(0,0,0,0.35)",
+    hover: "0 8px 28px rgba(0,0,0,0.15)",
+    cta:   "0 4px 20px rgba(201,168,76,0.40)",
+  },
+
+  progress: {
+    track: "#E5E7EB",
+    fill:  "#C9A84C",
+  },
+
+  state: {
+    success: "#16A34A",
+    error:   "#DC2626",
+    warning: "#D97706",
+    focus:   "#C9A84C",             // gold focus ring
+  },
+
+  gradients: {
+    hero:              "from-[#06101F] to-[#1A3558]",
+    progress:          "from-yellow-400 via-amber-400 to-yellow-500",
+    badge:             "from-yellow-400 to-amber-500",
+    card:              "from-[#fdf8ed] to-[#f7f4ef]",
+    pageBg:            "from-[#06101F] via-[#1A3558] to-[#0d2244]",
+    chatBg:            "from-[#06101F] to-[#1A3558]",
+    storyReader:       "from-[#06101F] via-gray-900 to-gray-950",
+    storyReaderHeader: "from-[#06101F]/70 via-gray-900/60 to-[#1A3558]/70",
+    storyHeader:       "from-transparent to-transparent",
+  },
+
+  motion: {
+    transitionFast:   "transition-all duration-150 ease-out",
+    transitionNormal: "transition-all duration-200 ease-in-out",
+    transitionSlow:   "transition-all duration-300 ease-in-out",
+    hoverScale:       1.03,
+    hoverLift:        -3,
+    tapScale:         0.97,
+    springStiffness:  240,
+    springDamping:    20,
+    glowIntensity:    0.40,
+  },
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
 // App-level theme registry
 // ─────────────────────────────────────────────────────────────────────────────
 
-export type AppThemeId = "default";
+export type AppThemeId = "default" | "airways";
 
 export const APP_THEMES: Record<AppThemeId, Theme> = {
   default: defaultTheme,
+  airways: airwaysTheme,
 };
 
 export function getAppTheme(id: AppThemeId): Theme {

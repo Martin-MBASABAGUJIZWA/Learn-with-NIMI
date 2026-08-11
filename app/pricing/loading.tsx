@@ -12,7 +12,7 @@ export default function PricingLoading() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className={`bg-white rounded-3xl border p-8 space-y-5 ${i === 1 ? "border-green-200 shadow-lg" : "border-gray-100"}`}>
+            <div key={i} className={`bg-white rounded-3xl border p-8 space-y-5 ${i === 1 ? "border-[var(--ds-border-brand)] shadow-lg" : "border-gray-100"}`}>
               <Bone className="h-6 w-24" />
               <Bone className="h-12 w-32" />
               <div className="space-y-3">

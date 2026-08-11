@@ -21,7 +21,7 @@ export default function PrivacySettingsModal({ onClose }: Props) {
           transition={{ type: "spring", stiffness: 300, damping: 25 }}
           className="bg-[var(--ds-surface-card)] border border-ds-border shadow-2xl w-full max-w-sm overflow-hidden" style={{ borderRadius: 'var(--leaf-r-lg)' }}
         >
-          <div className="px-5 py-4 flex items-center justify-between" style={{ backgroundColor: 'var(--nimi-green)' }}>
+          <div className="px-5 py-4 flex items-center justify-between" style={{ backgroundColor: 'var(--ds-brand-primary)' }}>
             <p className="text-white font-black text-lg tracking-wide">{t("privacySettingsModalTitle")}</p>
             <button onClick={onClose}
               aria-label="Close"
@@ -37,7 +37,7 @@ export default function PrivacySettingsModal({ onClose }: Props) {
             <button
               onClick={onClose}
               className="w-full text-white font-black py-2.5 text-sm transition mt-2"
-              style={{ backgroundColor: 'var(--nimi-green)', borderRadius: 'var(--leaf-r-sm)' }}
+              style={{ backgroundColor: 'var(--ds-brand-primary)', borderRadius: 'var(--leaf-r-sm)' }}
             >
               {t("gotItBtn")}
             </button>

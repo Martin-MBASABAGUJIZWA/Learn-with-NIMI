@@ -4,7 +4,7 @@ import supabase from "@/lib/supabaseClient"
 import {
   BookOpen, CheckCircle2, AlertTriangle, Users, Award, Trophy,
   Plus, Upload, Rocket, Bell, ArrowRight, DollarSign, CreditCard, TrendingUp,
-  AlertCircle, RefreshCw,
+  AlertCircle, RefreshCw, Plane, Music, Activity,
 } from 'lucide-react'
 import { computeReadiness, type ReadinessResult } from '@/lib/storyReadiness'
 import ReadinessRing from '@/components/admin/story-readiness/ReadinessRing'
@@ -32,6 +32,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
   const [revenue, setRevenue] = useState<RevenueStats>({ activeSubscriptions: 0, mrr: 0, totalRevenue: 0, newThisMonth: 0 })
   const [stories, setStories] = useState<StoryRow[]>([])
   const [storyReadiness, setStoryReadiness] = useState<{ title: string; slug: string; result: ReadinessResult }[]>([])
+  const [airways, setAirways] = useState<{ templates: number; songs: number; storyPages: number } | null>(null)
 
   useEffect(() => {
     void (async () => {
@@ -71,9 +72,9 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
         const certs = allAchievements.filter(a => a.type === 'certificate').length
         setStats({ published, ready, missing, children: (childrenData ?? []).length, certs, challenges: challengeCount ?? 0 })
 
-        // Revenue stats — convert all to USD equivalent (RWF ÷ 1350)
+        // Revenue stats — convert all to USD equivalent (RWF ÷ 1300, matches RWF_PER_USD env default)
         // Annual subs contribute amount/12 to MRR (not the full annual amount).
-        const toUSD = (amt: number, currency: string) => currency === 'RWF' ? amt / 1350 : amt
+        const toUSD = (amt: number, currency: string) => currency === 'RWF' ? amt / 1300 : amt
         const activeSubs = subsData ?? []
         const orders = (ordersData ?? []).filter(o => o.payment_status === 'completed')
         const mrr = activeSubs.reduce((sum, s: { amount: number; currency: string; billing_interval?: string }) => {
@@ -140,6 +141,28 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
       .subscribe()
 
     return () => { void supabase.removeChannel(channel) }
+  }, [])
+
+  useEffect(() => {
+    void (async () => {
+      try {
+        const [
+          { data: templateFiles },
+          { data: songFolders },
+          { data: pagesFolders },
+        ] = await Promise.all([
+          supabase.storage.from('airways-templates').list('', { limit: 100 }),
+          supabase.storage.from('child-songs').list('', { limit: 200 }),
+          supabase.storage.from('story-pages').list('', { limit: 200 }),
+        ])
+        const templates = (templateFiles ?? []).filter(f => f.id !== null).length
+        const songs = (songFolders ?? []).filter(f => f.id === null).length
+        const storyPages = (pagesFolders ?? []).filter(f => f.id === null).length
+        setAirways({ templates, songs, storyPages })
+      } catch {
+        // non-critical; airways card just won't show
+      }
+    })()
   }, [])
 
   if (loading) {
@@ -220,25 +243,30 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
       </div>
 
       {/* Revenue strip */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-        {[
-          { icon: CreditCard,  label: 'Active Subs',     value: revenue.activeSubscriptions, suffix: '', color: 'text-violet-600 bg-violet-50' },
-          { icon: DollarSign,  label: 'MRR (est.)',       value: `$${revenue.mrr.toFixed(0)}`, suffix: '/mo', color: 'text-green-600 bg-green-50' },
-          { icon: TrendingUp,  label: 'Total Revenue',    value: `$${revenue.totalRevenue.toFixed(0)}`, suffix: '', color: 'text-emerald-600 bg-emerald-50' },
-          { icon: Users,       label: 'New This Month',   value: revenue.newThisMonth, suffix: '', color: 'text-blue-600 bg-blue-50' },
-        ].map(s => (
-          <div key={s.label} className="bg-white rounded-xl border border-gray-100 p-3.5 flex items-center gap-3">
-            <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${s.color}`}>
-              <s.icon size={16} />
+      <div>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+          {[
+            { icon: CreditCard,  label: 'Active Subs',     value: revenue.activeSubscriptions, suffix: '', color: 'text-violet-600 bg-violet-50' },
+            { icon: DollarSign,  label: 'MRR',              value: `$${revenue.mrr.toFixed(0)}`, suffix: '/mo', color: 'text-green-600 bg-green-50' },
+            { icon: TrendingUp,  label: 'Total Revenue',    value: `$${revenue.totalRevenue.toFixed(0)}`, suffix: '', color: 'text-emerald-600 bg-emerald-50' },
+            { icon: Users,       label: 'New This Month',   value: revenue.newThisMonth, suffix: '', color: 'text-blue-600 bg-blue-50' },
+          ].map(s => (
+            <div key={s.label} className="bg-white rounded-xl border border-gray-100 p-3.5 flex items-center gap-3">
+              <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${s.color}`}>
+                <s.icon size={16} />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[19px] font-extrabold text-gray-900 leading-none tabular-nums">
+                  {s.value}<span className="text-[11px] font-medium text-gray-400">{s.suffix}</span>
+                </p>
+                <p className="text-[11px] font-medium text-gray-400 mt-0.5">{s.label}</p>
+              </div>
             </div>
-            <div className="min-w-0">
-              <p className="text-[19px] font-extrabold text-gray-900 leading-none tabular-nums">
-                {s.value}<span className="text-[11px] font-medium text-gray-400">{s.suffix}</span>
-              </p>
-              <p className="text-[11px] font-medium text-gray-400 mt-0.5">{s.label}</p>
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
+        <p className="mt-1.5 text-[10px] text-gray-400 text-right">
+          MTN MoMo + CyberSource · RWF displayed as USD at ÷1300
+        </p>
       </div>
 
       {/* Stories + Readiness */}
@@ -327,6 +355,58 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
           )}
         </div>
       </div>
+
+      {/* Airways Readiness */}
+      {airways !== null && (
+        <div className="bg-white rounded-xl border border-gray-100 p-4 sm:p-5">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-sky-50 flex items-center justify-center text-sky-600">
+                <Plane size={16} />
+              </div>
+              <span className="text-[13px] font-extrabold text-gray-800">Airways</span>
+            </div>
+            <button onClick={() => onNavigate?.('airways_hub')} className="text-[12px] font-semibold text-sky-600 hover:text-sky-700 flex items-center gap-1 transition">
+              Voir le hub <ArrowRight size={13} />
+            </button>
+          </div>
+          <div className="grid grid-cols-3 gap-2.5">
+            {[
+              {
+                icon: Activity,
+                label: 'Templates',
+                value: `${airways.templates}/14`,
+                ok: airways.templates >= 14,
+                table: 'airways_templates',
+              },
+              {
+                icon: Music,
+                label: 'Songs',
+                value: String(airways.songs),
+                ok: airways.songs > 0,
+                table: 'song_manager',
+              },
+              {
+                icon: BookOpen,
+                label: 'Histoires',
+                value: String(airways.storyPages),
+                ok: airways.storyPages > 0,
+                table: 'story_pages',
+              },
+            ].map(item => (
+              <button
+                key={item.label}
+                onClick={() => onNavigate?.(item.table)}
+                className="bg-gray-50 rounded-xl p-3 text-left hover:bg-gray-100 transition"
+              >
+                <item.icon size={14} className={item.ok ? 'text-emerald-500 mb-1' : 'text-amber-500 mb-1'} />
+                <p className="text-[11px] text-gray-500 font-semibold">{item.label}</p>
+                <p className={`text-[15px] font-extrabold ${item.ok ? 'text-emerald-600' : 'text-amber-600'}`}>{item.value}</p>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Quick Actions */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">

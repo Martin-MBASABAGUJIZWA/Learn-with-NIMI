@@ -141,13 +141,13 @@ export default function NimiChat({
         />
         <button
           onClick={() => sendToAI(input)}
-          className="p-2 rounded-full text-white" style={{ backgroundColor: 'var(--nimi-green)' }}
+          className="p-2 rounded-full text-white" style={{ backgroundColor: 'var(--ds-brand-primary)' }}
         >
           <SendHorizontal />
         </button>
         <button
           onClick={handleVoiceInput}
-          className={`p-2 rounded-full ${isListening ? "bg-[var(--nimi-green)]" : "bg-[var(--ds-surface-input)]"}`}
+          className={`p-2 rounded-full ${isListening ? "bg-[var(--ds-brand-primary)]" : "bg-[var(--ds-surface-input)]"}`}
         >
           <Mic />
         </button>

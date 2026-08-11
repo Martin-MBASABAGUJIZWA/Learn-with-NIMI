@@ -127,7 +127,7 @@ export default function SingAlongContent({ mission, onComplete, completed, savin
 
               <button onClick={togglePlay}
                 className={`w-16 h-16 rounded-full flex items-center justify-center shadow-xl transition-all ${
-                  playing ? "bg-[var(--nimi-green)] hover:bg-[var(--ds-brand-hover)] scale-105" : "bg-[var(--nimi-green)] hover:bg-[var(--ds-brand-hover)] hover:scale-105"
+                  playing ? "bg-[var(--ds-brand-primary)] hover:bg-[var(--ds-brand-hover)] scale-105" : "bg-[var(--ds-brand-primary)] hover:bg-[var(--ds-brand-hover)] hover:scale-105"
                 }`}
                 aria-label={playing ? t("pauseLabel") : t("playSongLabel")}>
                 {playing
@@ -147,7 +147,7 @@ export default function SingAlongContent({ mission, onComplete, completed, savin
         ) : language !== "rw" && lyrics.length > 0 ? (
           <div className="mt-4 flex flex-col items-center gap-2">
             <button onClick={readAlong}
-              className="w-16 h-16 rounded-full bg-[var(--nimi-green)] hover:bg-[var(--ds-brand-hover)] hover:scale-105 flex items-center justify-center shadow-xl transition-all"
+              className="w-16 h-16 rounded-full bg-[var(--ds-brand-primary)] hover:bg-[var(--ds-brand-hover)] hover:scale-105 flex items-center justify-center shadow-xl transition-all"
               aria-label={t("readToMeLabel")}>
               <Mic className="w-7 h-7 text-white" />
             </button>
@@ -207,7 +207,7 @@ export default function SingAlongContent({ mission, onComplete, completed, savin
             initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
             transition={{ type: "spring", stiffness: 300, damping: 22, delay: 0.1 }}
             whileTap={{ scale: 0.96 }}
-            className="w-full bg-[var(--nimi-green)] hover:bg-[var(--ds-brand-hover)] text-white font-black text-lg rounded-full py-4 shadow-lg flex items-center justify-center gap-2 disabled:opacity-70 transition">
+            className="w-full bg-[var(--ds-brand-primary)] hover:bg-[var(--ds-brand-hover)] text-white font-black text-lg rounded-full py-4 shadow-lg flex items-center justify-center gap-2 disabled:opacity-70 transition">
             {saving ? t("saving") : <><Check className="w-5 h-5" /> {t("markCompleteBtn")}</>}
           </motion.button>
         ) : (

@@ -28,12 +28,12 @@ interface Props {
 const CONFIG = {
   break_suggested: {
     emoji: "🌿",
-    bg:    "bg-emerald-50",
-    border:"border-emerald-200",
-    text:  "text-emerald-800",
-    badgeBg: "bg-emerald-100",
-    badgeText: "text-emerald-700",
-    badgeBorder: "border-emerald-200",
+    bg:    "bg-[var(--ds-brand-subtle)]",
+    border:"border-[var(--ds-border-brand)]",
+    text:  "text-[var(--ds-text-brand)]",
+    badgeBg: "bg-[var(--ds-brand-soft)]",
+    badgeText: "text-[var(--ds-text-brand)]",
+    badgeBorder: "border-[var(--ds-border-brand)]",
     headline: "Great job! Time for a quick breather.",
     breakLabel: "Take a break 🌿",
     keepLabel:  "Keep going",

@@ -147,7 +147,7 @@ export default function ParentControls({ childId, parentId, childName, childLang
           {saved && (
             <motion.span key="saved"
               initial={{ opacity: 0, scale: 0.8, x: -4 }} animate={{ opacity: 1, scale: 1, x: 0 }} exit={{ opacity: 0, scale: 0.8 }}
-              className="ml-auto flex items-center gap-1 text-2xs font-black text-emerald-600 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full">
+              className="ml-auto flex items-center gap-1 text-2xs font-black text-[var(--ds-text-brand)] bg-[var(--ds-brand-subtle)] border border-[var(--ds-border-brand)] px-2.5 py-1 rounded-full">
               ✓ Saved
             </motion.span>
           )}
@@ -233,13 +233,13 @@ export default function ParentControls({ childId, parentId, childName, childLang
 
         {/* Community Sharing */}
         <div className="flex items-center gap-3 p-3 bg-[var(--ds-surface-card-hover)] border border-ds-border" style={{ borderRadius: "var(--leaf-r)" }}>
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg shadow-md shrink-0" style={{ backgroundColor: "var(--nimi-green)" }}>👁️</div>
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg shadow-md shrink-0" style={{ backgroundColor: "var(--ds-brand-primary)" }}>👁️</div>
           <div className="flex-1 min-w-0">
             <p className="text-ds-text text-sml font-black">Community Sharing</p>
             <p className="text-[var(--ds-text-secondary)] text-3xs">Share {childName}&apos;s achievements publicly</p>
           </div>
           <button onClick={toggleSharing}
-            className={`w-12 h-7 rounded-full flex items-center px-0.5 transition-colors ${sharing ? "bg-[var(--nimi-green)]" : "bg-[var(--ds-surface-input)]"}`}>
+            className={`w-12 h-7 rounded-full flex items-center px-0.5 transition-colors ${sharing ? "bg-[var(--ds-brand-primary)]" : "bg-[var(--ds-surface-input)]"}`}>
             <motion.div animate={{ x: sharing ? 20 : 0 }} transition={{ type: "spring", stiffness: 500, damping: 30 }}
               className="w-6 h-6 bg-[var(--ds-surface-card)] rounded-full shadow" />
           </button>

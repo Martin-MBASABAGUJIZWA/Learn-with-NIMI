@@ -9,6 +9,7 @@ import sharp from "sharp";
 import { fetchAirwaysData } from "@/lib/airways/airwaysData";
 import { buildStampsSvg } from "@/lib/airways/buildStampsSvg";
 import { safeFilename } from "@/lib/airways/safeFilename";
+import { checkRateLimit } from "@/lib/airways/rateLimiter";
 
 async function fetchCoverUri(url: string): Promise<string | null> {
   try {
@@ -46,6 +47,9 @@ export async function GET(req: NextRequest) {
   const user = await getAuthUser(req);
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  if (!(await checkRateLimit(`stamps:${user.id}`, 5)))
+    return NextResponse.json({ error: "Too many requests — please wait a minute." }, { status: 429 });
+
   const { searchParams } = new URL(req.url);
   const childId = searchParams.get("childId");
   const format = searchParams.get("format") === "png" ? "png" : "pdf";
@@ -59,6 +63,7 @@ export async function GET(req: NextRequest) {
   if (!adminRow && child?.parent_id !== user.id) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
+  let isPersonalized = !!adminRow
   if (!adminRow) {
     const { data: sub } = await supabase
       .from("nimipiko_subscriptions")
@@ -66,7 +71,7 @@ export async function GET(req: NextRequest) {
       .eq("parent_id", user.id)
       .in("status", ["active", "trial"])
       .maybeSingle();
-    if (!sub) return NextResponse.json({ error: "Subscription required" }, { status: 402 });
+    isPersonalized = !!sub
   }
 
   const data = await fetchAirwaysData(supabase, childId);
@@ -86,10 +91,11 @@ export async function GET(req: NextRequest) {
     })
   );
 
-  const svg = buildStampsSvg({ childName: data.name, stories: data.stories, coverUris });
+  const displayName = isPersonalized ? data.name : 'PETIT CHAMPION'
+  const svg = buildStampsSvg({ childName: displayName, stories: data.stories, coverUris });
   const png = await svgToPng(svg);
 
-  const safeName = safeFilename(data.name)
+  const safeName = safeFilename(displayName)
 
   if (format === "png") {
     return new NextResponse(new Uint8Array(png), {

@@ -76,19 +76,19 @@ function StepBar({ step }: { step: number }) {
                 animate={current ? { scale:[1,1.12,1] } : {}}
                 transition={{ duration:1.4, repeat:Infinity }}
                 className={`w-8 h-8 rounded-full flex items-center justify-center text-sml font-black border-2 transition-all ${
-                  done    ? "bg-nimi-green border-nimi-green text-white" :
+                  done    ? "bg-[var(--ds-brand-primary)] border-[var(--ds-brand-primary)] text-white" :
                   current ? "bg-amber-400 border-amber-400 text-white shadow-lg shadow-amber-200" :
                             "bg-ds-surface border-ds-border text-ds-muted"
                 }`}
               >
                 {done ? <CheckCircle2 className="w-4 h-4" /> : i + 1}
               </motion.div>
-              <p className={`text-3xs font-bold hidden sm:block ${current ? "text-amber-600" : done ? "text-nimi-green" : "text-ds-muted"}`}>
+              <p className={`text-3xs font-bold hidden sm:block ${current ? "text-amber-600" : done ? "text-[var(--ds-text-brand)]" : "text-ds-muted"}`}>
                 {label}
               </p>
             </div>
             {i < STEP_LABELS.length - 1 && (
-              <div className={`w-10 sm:w-16 h-0.5 mx-1 mb-4 transition-colors ${i < step ? "bg-nimi-green" : "bg-ds-border"}`} />
+              <div className={`w-10 sm:w-16 h-0.5 mx-1 mb-4 transition-colors ${i < step ? "bg-[var(--ds-brand-primary)]" : "bg-ds-border"}`} />
             )}
           </div>
         );
@@ -413,7 +413,7 @@ export default function MasterpieceClient({ initialChildren }: Props = {}) {
                           style={{ borderRadius:"var(--leaf-r)" }}
                         >
                           <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shrink-0 ${
-                            order.status === "completed" ? "bg-emerald-100" :
+                            order.status === "completed" ? "bg-[var(--ds-brand-soft)]" :
                             order.status === "processing" ? "bg-amber-100" : "bg-[var(--ds-surface-card-active)]"
                           }`}>
                             {order.status === "completed" ? "✅" : order.status === "processing" ? "⏳" : "📖"}
@@ -432,7 +432,7 @@ export default function MasterpieceClient({ initialChildren }: Props = {}) {
                                 if (data.downloadUrl) window.open(data.downloadUrl, "_blank");
                               }}
                               className="flex items-center gap-1.5 text-white font-bold text-xs px-3.5 py-2 rounded-full shadow-sm"
-                              style={{ backgroundColor:"var(--nimi-green)" }}>
+                              style={{ backgroundColor:"var(--ds-brand-primary)" }}>
                               <Download className="w-3.5 h-3.5" /> Download
                             </motion.button>
                           )}
@@ -512,7 +512,7 @@ export default function MasterpieceClient({ initialChildren }: Props = {}) {
 
                 {/* COPPA consent */}
                 <label className={`flex items-start gap-3 cursor-pointer p-4 leaf border-2 transition ${
-                  consentChecked ? "border-emerald-200 bg-emerald-50" : "border-amber-200 bg-amber-50/60"
+                  consentChecked ? "border-[var(--ds-border-brand)] bg-[var(--ds-brand-subtle)]" : "border-amber-200 bg-amber-50/60"
                 }`}>
                   <input type="checkbox" checked={consentChecked}
                     onChange={e => setConsentChecked(e.target.checked)}
@@ -520,7 +520,7 @@ export default function MasterpieceClient({ initialChildren }: Props = {}) {
                   <span className="font-nunito text-xs text-[var(--ds-text-primary)] leading-relaxed">
                     I agree to the{" "}
                     <a href="/terms" target="_blank" rel="noopener noreferrer"
-                      className="text-nimi-green underline font-bold">Terms of Use</a>
+                      className="text-[var(--ds-text-brand)] underline font-bold">Terms of Use</a>
                     {" "}and confirm I have the right to share this photo on Nimipiko.
                   </span>
                 </label>

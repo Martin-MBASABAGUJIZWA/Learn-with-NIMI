@@ -48,9 +48,9 @@ export default function SentGiftsCard() {
       <div className="space-y-2.5">
         {gifts.map(g => (
           <div key={g.id} className="flex items-center gap-3 bg-[var(--ds-surface-card)] rounded-xl p-3">
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${g.redeemed_at ? "bg-green-100" : "bg-amber-100"}`}>
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${g.redeemed_at ? "bg-[var(--ds-brand-soft)]" : "bg-amber-100"}`}>
               {g.redeemed_at
-                ? <CheckCircle className="w-4 h-4 text-green-600" />
+                ? <CheckCircle className="w-4 h-4 text-[var(--ds-text-brand)]" />
                 : <Clock className="w-4 h-4 text-amber-500" />}
             </div>
             <div className="flex-1 min-w-0">

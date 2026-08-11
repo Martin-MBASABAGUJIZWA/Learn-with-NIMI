@@ -19,7 +19,7 @@ const CAT_BADGE_DISPLAY: Record<string, BadgeDisplay> = {
   movement:  { emoji: "🤸", label: "Move Champion",  bg: "bg-red-100",    text: "text-red-500",    ring: "border-red-200" },
   artistic:  { emoji: "🎨", label: "Art Star",       bg: "bg-amber-100",  text: "text-amber-600",  ring: "border-amber-200" },
   histoire:  { emoji: "📖", label: "Story Master",   bg: "bg-sky-100",    text: "text-sky-600",    ring: "border-sky-200" },
-  zoom:      { emoji: "🔍", label: "Zoom Explorer",  bg: "bg-emerald-100",text: "text-emerald-600",ring: "border-emerald-200" },
+  zoom:      { emoji: "🔍", label: "Zoom Explorer",  bg: "bg-[var(--ds-brand-soft)]",text: "text-[var(--ds-text-brand)]",ring: "border-[var(--ds-border-brand)]" },
   discovery: { emoji: "🌍", label: "Discoverer",     bg: "bg-cyan-100",   text: "text-cyan-600",   ring: "border-cyan-200" },
   flipflop:  { emoji: "🎧", label: "Audio Legend",   bg: "bg-violet-100", text: "text-violet-600", ring: "border-violet-200" },
   coloring:  { emoji: "🦋", label: "Color Expert",   bg: "bg-fuchsia-100",text: "text-fuchsia-600",ring: "border-fuchsia-200" },
@@ -101,7 +101,7 @@ export default function HomeAchievementsPanel({ achievements }: Props) {
 
                   {/* Earned check */}
                   {isEarned && (
-                    <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center text-white text-3xs font-black shadow-md">
+                    <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-[var(--ds-brand-primary)] flex items-center justify-center text-[var(--ds-nav-bg)] text-3xs font-black shadow-md">
                       ✓
                     </div>
                   )}

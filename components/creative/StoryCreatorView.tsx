@@ -386,10 +386,10 @@ export default function StoryCreatorView({
               style={{ background: "var(--ds-brand-soft)", border: "1px solid #BBF7D0" }}>
               <span className="text-2xl shrink-0">✍️</span>
               <div>
-                <p className="font-black text-sml" style={{ color: "#166534" }}>
+                <p className="font-black text-sml" style={{ color: "var(--ds-text-brand)" }}>
                   Now it&apos;s your turn, {childName}!
                 </p>
-                <p className="text-xs font-nunito" style={{ color: "var(--nimi-green)" }}>
+                <p className="text-xs font-nunito" style={{ color: "var(--ds-brand-primary)" }}>
                   Write the 3 most important moments. Nimi will build the story around your words.
                 </p>
               </div>

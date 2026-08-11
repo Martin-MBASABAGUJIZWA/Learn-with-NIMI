@@ -23,7 +23,7 @@ function ToggleSwitch({ on, onClick }: { on: boolean; onClick: () => void }) {
       type="button"
       onClick={onClick}
       aria-pressed={on}
-      className={`relative w-12 h-6 rounded-full transition-colors shrink-0 ${on ? "bg-[var(--nimi-green)]" : "bg-[var(--ds-surface-card-active)]"}`}
+      className={`relative w-12 h-6 rounded-full transition-colors shrink-0 ${on ? "bg-[var(--ds-brand-primary)]" : "bg-[var(--ds-surface-card-active)]"}`}
     >
       <motion.span
         animate={{ x: on ? 24 : 2 }}
@@ -85,9 +85,9 @@ export default function AppPreferencesCard({ activeChild, onLanguageChanged }: P
       <div className="divide-y divide-gray-100">
         {/* Sound / read-aloud */}
         <div className="flex items-center gap-4 px-5 py-4">
-          <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors ${isReaderActive ? "bg-emerald-100" : "bg-[var(--ds-surface-card-hover)]"}`}>
+          <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors ${isReaderActive ? "bg-[var(--ds-brand-soft)]" : "bg-[var(--ds-surface-card-hover)]"}`}>
             {isReaderActive
-              ? <Volume2 size={18} className="text-emerald-600" />
+              ? <Volume2 size={18} className="text-[var(--ds-text-brand)]" />
               : <VolumeX size={18} className="text-[var(--ds-text-tertiary)]" />}
           </div>
           <div className="flex-1 min-w-0">
@@ -115,7 +115,7 @@ export default function AppPreferencesCard({ activeChild, onLanguageChanged }: P
                   onClick={() => { if (lang.code !== language) setPendingLanguage(lang.code); }}
                   className={`flex flex-col items-center gap-1 py-2.5 px-2 rounded-xl border-2 text-center transition-all ${
                     active
-                      ? "border-[var(--nimi-green)] bg-[var(--ds-brand-subtle)] shadow-sm"
+                      ? "border-[var(--ds-brand-primary)] bg-[var(--ds-brand-subtle)] shadow-sm"
                       : "border-ds-border hover:border-[var(--ds-border-strong)] bg-ds-card"
                   }`}
                 >
@@ -124,7 +124,7 @@ export default function AppPreferencesCard({ activeChild, onLanguageChanged }: P
                     {lang.label}
                   </span>
                   {active && (
-                    <span className="text-5xs font-black text-[var(--ds-brand-primary)] bg-[var(--nimi-green)]/10 px-1.5 py-0.5 rounded-full">
+                    <span className="text-5xs font-black text-[var(--ds-brand-primary)] bg-[var(--ds-brand-primary)]/10 px-1.5 py-0.5 rounded-full">
                       Active
                     </span>
                   )}
@@ -136,14 +136,14 @@ export default function AppPreferencesCard({ activeChild, onLanguageChanged }: P
 
         {/* Online status + sync */}
         <div className="flex items-center gap-4 px-5 py-4">
-          <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${isOnline ? "bg-emerald-100" : "bg-orange-100"}`}>
+          <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${isOnline ? "bg-[var(--ds-brand-soft)]" : "bg-orange-100"}`}>
             {isOnline
-              ? <Wifi size={18} className="text-emerald-600" />
+              ? <Wifi size={18} className="text-[var(--ds-text-brand)]" />
               : <WifiOff size={18} className="text-orange-500" />}
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5">
-              <span className={`w-2 h-2 rounded-full shrink-0 ${isOnline ? "bg-emerald-500" : "bg-orange-400"}`} />
+              <span className={`w-2 h-2 rounded-full shrink-0 ${isOnline ? "bg-[var(--ds-brand-primary)]" : "bg-orange-400"}`} />
               <p className="font-bold text-sml text-ds-text">
                 {isOnline ? t("onlineLabel") : t("offlineLabel")}
               </p>

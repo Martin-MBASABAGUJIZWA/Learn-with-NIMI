@@ -136,7 +136,7 @@ function BookInner({ story, onComplete, completed, onExit }: {
       ) : (
         <div className="flex items-center justify-center px-2 sm:px-4">
           <div
-            className="w-full max-w-4xl leaf-lg border border-emerald-100 bg-gradient-to-br from-white/70 via-emerald-50/50 to-amber-50/50 p-2 shadow-card-2xl"
+            className="w-full max-w-4xl leaf-lg border border-[var(--ds-border-brand)] bg-[var(--ds-brand-subtle)]/50 p-2 shadow-card-2xl"
             style={{ aspectRatio: "16/10" }}
           >
             {/* @ts-ignore react-pageflip types */}

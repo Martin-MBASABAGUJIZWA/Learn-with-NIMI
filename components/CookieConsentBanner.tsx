@@ -38,7 +38,7 @@ export default function CookieConsentBanner() {
         <p className="font-nunito text-sml text-gray-200 flex-1 leading-relaxed">
           We use essential cookies to keep NIMIPIKO running smoothly and remember your preferences.
           No ads, no tracking.{" "}
-          <Link href="/privacy" className="text-green-400 underline hover:text-green-300 transition-colors">
+          <Link href="/privacy" className="text-[var(--ds-text-brand)] underline hover:text-[var(--ds-text-primary)] transition-colors">
             Privacy Policy
           </Link>
         </p>

@@ -18,7 +18,7 @@ export default function BookToolbar({ title, onExit }: Props) {
   const progress = totalPages > 1 ? ((currentPage + 1) / totalPages) * 100 : 100;
 
   return (
-    <div className="mb-3 leaf border border-emerald-100 bg-gradient-to-r from-emerald-50 via-white to-amber-50 px-3 py-2.5 shadow-sm">
+    <div className="mb-3 leaf border border-[var(--ds-border-brand)] bg-[var(--ds-brand-subtle)] px-3 py-2.5 shadow-sm">
       <div className="flex items-center gap-3">
         {onExit && (
           <button onClick={onExit}
@@ -29,7 +29,7 @@ export default function BookToolbar({ title, onExit }: Props) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
             <div className="rounded-full bg-[var(--ds-surface-card)] p-1.5 shadow-sm">
-              <BookOpen className="h-3.5 w-3.5 text-emerald-600" />
+              <BookOpen className="h-3.5 w-3.5 text-[var(--ds-text-brand)]" />
             </div>
             <div className="relative flex-1">
               <Image src={assets.reader.chapterHeader} alt="" aria-hidden="true" fill
@@ -38,7 +38,7 @@ export default function BookToolbar({ title, onExit }: Props) {
             </div>
           </div>
           <div className="flex items-center gap-2 mt-0.5">
-            <div className="relative flex-1 bg-[var(--ds-surface-card)]/80 rounded-full h-1.5 overflow-hidden border border-emerald-100">
+            <div className="relative flex-1 bg-[var(--ds-surface-card)]/80 rounded-full h-1.5 overflow-hidden border border-[var(--ds-border-brand)]">
               <Image src={assets.reader.progress} alt="" aria-hidden="true" fill
                 className="object-fill pointer-events-none opacity-[0.45]" />
               <div className={`relative h-full bg-gradient-to-r ${assets.storyCard.progressFill} rounded-full transition-all duration-500`}

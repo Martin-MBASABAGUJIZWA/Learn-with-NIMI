@@ -142,7 +142,7 @@ function RedeemContent() {
                   <div className="text-5xl mb-4">🔓</div>
                   <h2 className="font-baloo font-black text-ds-text text-xl">Already opened!</h2>
                   <p className="text-[var(--ds-text-secondary)] text-sm mt-2 leading-relaxed">This gift has already been claimed. Each gift link can only be used once — lucky recipient!</p>
-                  <a href="/" className="inline-block mt-6 px-8 py-3 rounded-2xl bg-[var(--nimi-green)] text-white font-black text-mbase shadow-md">
+                  <a href="/" className="inline-block mt-6 px-8 py-3 rounded-2xl bg-[var(--ds-brand-primary)] text-white font-black text-mbase shadow-md">
                     Visit Nimipiko
                   </a>
                 </div>
@@ -229,7 +229,7 @@ function RedeemContent() {
                 </p>
               )}
               <a href="/stories"
-                className="inline-block w-full py-4 rounded-2xl bg-[var(--nimi-green)] text-white font-black text-base shadow-lg hover:opacity-90 transition">
+                className="inline-block w-full py-4 rounded-2xl bg-[var(--ds-brand-primary)] text-white font-black text-base shadow-lg hover:opacity-90 transition">
                 📖 Start Exploring
               </a>
               <p className="text-[var(--ds-text-tertiary)] text-2xs mt-4">This subscription won&apos;t auto-renew — enjoy every moment of it!</p>
