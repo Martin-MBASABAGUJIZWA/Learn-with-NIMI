@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServiceClient } from "@/lib/supabase/serviceClient";
-
-// M3: In-memory rate limit — max 5 signups per IP per hour.
-const newsletterRateLimit = new Map<string, number[]>();
-const NEWSLETTER_MAX = 5;
-const NEWSLETTER_WINDOW_MS = 60 * 60 * 1000;
+import { checkRateLimit } from "@/lib/ratelimit";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -12,13 +8,8 @@ export async function POST(req: NextRequest) {
   const supabase = getServiceClient();
 
   const ip = req.headers.get("x-forwarded-for") ?? "unknown";
-  const now = Date.now();
-  const ipTimestamps = (newsletterRateLimit.get(ip) ?? []).filter(t => now - t < NEWSLETTER_WINDOW_MS);
-  if (ipTimestamps.length >= NEWSLETTER_MAX) {
-    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
-  }
-  ipTimestamps.push(now);
-  newsletterRateLimit.set(ip, ipTimestamps);
+  const allowed = await checkRateLimit(ip, "nimipiko:newsletter", 5, 60 * 60);
+  if (!allowed) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   let body: unknown;
   try { body = await req.json(); } catch { return NextResponse.json({ error: "Bad request" }, { status: 400 }); }
 

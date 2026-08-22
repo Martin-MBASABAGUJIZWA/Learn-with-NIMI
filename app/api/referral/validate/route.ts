@@ -2,25 +2,16 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { REFERRAL_CODE_LENGTH } from "@/lib/referralConstants";
 import { getAuthUser } from "@/lib/supabaseRouteAuth";
-
-// S5: In-memory rate limit — max 10 requests per authenticated user per minute.
-const validateRateLimit = new Map<string, number[]>();
-const VALIDATE_MAX = 10;
-const VALIDATE_WINDOW_MS = 60 * 1000;
+import { checkRateLimit } from "@/lib/ratelimit";
 
 export async function GET(req: NextRequest) {
   // S5: Require a valid session.
   const user = await getAuthUser(req);
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  // S5: Per-user rate limit.
-  const now = Date.now();
-  const userTimestamps = (validateRateLimit.get(user.id) ?? []).filter(t => now - t < VALIDATE_WINDOW_MS);
-  if (userTimestamps.length >= VALIDATE_MAX) {
-    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
-  }
-  userTimestamps.push(now);
-  validateRateLimit.set(user.id, userTimestamps);
+  // S5: 10 lookups per user per minute.
+  const allowed = await checkRateLimit(user.id, "nimipiko:referral", 10, 60);
+  if (!allowed) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
 
   const code = req.nextUrl.searchParams.get("code")?.toUpperCase().trim();
   if (!code || code.length !== REFERRAL_CODE_LENGTH) {

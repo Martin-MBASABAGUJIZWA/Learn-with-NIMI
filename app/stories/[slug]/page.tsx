@@ -49,6 +49,9 @@ import BadgeCircle from "@/components/stories/BadgeCircle";
 
 const ACTIVE_CHILD_KEY = "nimipiko_active_child";
 
+const ROMAN = ["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV","XVI","XVII","XVIII","XIX","XX"];
+const toRoman = (n: number) => ROMAN[n - 1] ?? String(n);
+
 /* ─────────────────────────────────────────────────────────────
    Certificate modal — personalized admin template with name
 ───────────────────────────────────────────────────────────── */
@@ -345,10 +348,9 @@ export default function StoryDetailPage() {
       const allIntrosDone = INTRO_ITEMS.every(item => intro.find(p => p.slot_key === item.key)?.consumed);
       const allMissionsDone = doneSlots >= sl.length && sl.length > 0;
 
+      // Always open the book first; certificate/complete are the only auto-exceptions
       if (allMissionsDone && cert) setPhase("complete");
       else if (allMissionsDone) setPhase("certificate");
-      else if (allIntrosDone || doneSlots > 0) setPhase("missions");
-      else if (intro.some(p => p.consumed)) setPhase("intro");
       else setPhase("welcome");
 
       setLoading(false);
@@ -610,126 +612,449 @@ export default function StoryDetailPage() {
     <AppShell>
       <PreviewBanner />
       <PageSurface className={isPreview ? "pt-10" : ""}>
-        <main className="max-w-lg mx-auto w-full min-h-screen flex flex-col">
+        <main className="max-w-3xl mx-auto w-full min-h-screen flex flex-col">
 
           <AnimatePresence mode="wait">
 
             {/* ═══════════════════════════════════════════ */}
-            {/* PHASE 1: WELCOME                           */}
+            {/* PHASE 1: LIVE BOOK                        */}
             {/* ═══════════════════════════════════════════ */}
             {phase === "welcome" && (
-              <motion.div key="welcome" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                className="flex-1 flex flex-col">
+              <motion.div key="welcome"
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                transition={{ duration: 0.4 }}
+                className="flex-1 flex flex-col relative"
+                style={{ background: "linear-gradient(160deg, #04111f 0%, #091829 45%, #100e24 100%)" }}>
 
-                {/* Cover */}
-                <div className="relative h-72">
-                  {details?.cover_url ? (
-                    <Image src={getStorageUrl(details.cover_url)} alt={storyTitle} fill className="object-cover" />
-                  ) : (
-                    <div className="w-full h-72 bg-gradient-to-br from-gray-100 via-gray-200 to-gray-300 flex items-center justify-center">
-                      <motion.span className="text-8xl" animate={{ scale: [1, 1.15, 1] }} transition={{ duration: DURATION.loopBase, repeat: Infinity }}>
-                        {details?.theme_emoji ?? "📚"}
-                      </motion.span>
+                {/* ── Star field ── */}
+                {[
+                  [12,8],[88,5],[34,14],[67,9],[22,20],[78,17],[50,6],[5,30],[95,25],
+                  [40,35],[71,28],[15,42],[83,38],[58,48],[28,55],[90,50],[10,62],
+                  [75,66],[45,72],[62,80],[30,76],[86,84],[18,90],[55,88],[38,95],
+                ].map(([x,y],i) => (
+                  <motion.div key={i} className="absolute rounded-full pointer-events-none select-none"
+                    style={{ left:`${x}%`, top:`${y}%`, width: i%5===0?3:i%3===0?2:1.5, height: i%5===0?3:i%3===0?2:1.5, background:"#fff" }}
+                    animate={{ opacity:[0.15,i%4===0?0.8:0.45,0.15] }}
+                    transition={{ duration:2+i*0.4, repeat:Infinity, delay:i*0.18, ease:"easeInOut" }} />
+                ))}
+
+                {/* ── Top nav ── */}
+                <div className="relative z-10 flex items-center justify-between px-4 pt-5 pb-1">
+                  <button onClick={() => router.push("/stories")}
+                    className="flex items-center gap-1.5 text-white/40 hover:text-white/70 font-nunito font-bold text-sm transition-colors">
+                    <ArrowLeft className="w-4 h-4" /> Library
+                  </button>
+                  {streak > 0 && (
+                    <div className="flex items-center gap-1 rounded-full px-3 py-1 border border-orange-400/25"
+                      style={{ background:"rgba(251,146,60,0.12)" }}>
+                      <motion.span animate={{ scale:[1,1.25,1] }} transition={{ duration:1.4, repeat:Infinity }}>🔥</motion.span>
+                      <span className="font-baloo font-black text-orange-300 text-xs">{streak} day streak</span>
                     </div>
                   )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
-                  <button onClick={() => router.push("/stories")}
-                    className="absolute top-4 left-4 w-10 h-10 bg-black/30 backdrop-blur rounded-full flex items-center justify-center text-white z-10">
-                    <ArrowLeft className="w-5 h-5" />
-                  </button>
                 </div>
 
-                {/* Welcome content */}
-                <div className="flex-1 flex flex-col items-center px-6 -mt-10 relative z-10">
-                  <div className="w-full max-w-md leaf-lg border border-white/30 bg-[var(--ds-surface-card)]/95 px-5 py-6 shadow-[0_20px_48px_rgba(15,23,42,0.14)] backdrop-blur">
-                    {/* Nimi — the Library guide */}
-                    <div className="flex items-end justify-center mb-4">
-                      <motion.img src={assets.nimiCircle} alt="Nimi" animate={{ y: [0, -8, 0] }}
-                        transition={{ duration: DURATION.loopBase, repeat: Infinity }}
-                        className="w-20 h-20 rounded-full border-4 shadow-xl" style={{ borderColor: 'var(--ds-brand-primary)' }} />
-                    </div>
+                {/* ── Collection eyebrow ── */}
+                <motion.p initial={{ opacity:0, y:-6 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.12 }}
+                  className="relative z-10 text-center font-nunito text-xs tracking-[0.28em] uppercase mb-2 mt-1"
+                  style={{ color:"rgba(201,168,76,0.5)" }}>
+                  Nimipiko · Story Collection
+                </motion.p>
 
-                    <div className="flex items-center justify-center mb-3">
-                      <span className="rounded-full border border-[var(--ds-border-brand)] bg-[var(--ds-brand-subtle)] px-3 py-1 text-2xs font-black uppercase tracking-[0.24em] text-[var(--ds-text-brand)]">
-                        Story guide
-                      </span>
-                    </div>
+                {/* ── Book + CTA ── */}
+                <div className="relative z-10 flex-1 px-3 sm:px-5 pb-4">
 
-                    <h1 className="font-baloo font-black text-3.5xl text-ds-text text-center leading-tight">
-                      {storyTitle}
-                    </h1>
+                  {/* Gold ambient glow beneath book */}
+                  <div className="absolute bottom-16 left-1/2 -translate-x-1/2 w-2/3 h-20 pointer-events-none"
+                    style={{ background:"radial-gradient(ellipse, rgba(201,168,76,0.22) 0%, transparent 70%)", filter:"blur(16px)" }} />
 
-                    <motion.p className="text-[var(--ds-text-secondary)] text-mbase font-nunito text-center mt-3"
-                      initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: DURATION.base }}>
-                      {childName}, your story is waiting!<br />
-                      <span className="text-[var(--ds-text-secondary)] text-sml">Nimi will guide you through each little adventure.</span>
-                    </motion.p>
+                  {/* Perspective wrapper */}
+                  <div style={{ perspective:"1400px" }}>
+                    <motion.div
+                      initial={{ rotateY:28, opacity:0, y:18 }}
+                      animate={{ rotateY:0, opacity:1, y:0 }}
+                      transition={{ type:"spring", stiffness:130, damping:20, delay:0.1 }}
+                      className="relative flex flex-col md:flex-row w-full rounded-2xl overflow-hidden"
+                      style={{
+                        transformOrigin:"left center",
+                        minHeight:520,
+                        boxShadow:"0 0 0 1px rgba(201,168,76,0.28), 0 0 48px rgba(201,168,76,0.14), 0 24px 64px rgba(0,0,0,0.75)",
+                      }}>
 
-                    {/* Progress stars */}
-                    <div className="flex items-center justify-center gap-1 mt-5">
-                      {Array.from({ length: totalCount }).map((_, i) => (
-                        <motion.div key={i} initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: DURATION.moderate + i * DURATION.fast, ...SPRING.card }}>
-                          <Star className={`w-6 h-6 ${i < doneCount ? "text-yellow-400 fill-yellow-400" : "text-[var(--ds-text-tertiary)] fill-gray-200"}`} />
-                        </motion.div>
-                      ))}
-                    </div>
-                    <p className="text-[var(--ds-text-secondary)] text-xs font-bold mt-1 text-center">{doneCount} / 6 Missions Completed</p>
+                      {/* ══ LEFT PAGE ══ */}
+                      <div className="md:w-[40%] shrink-0 flex flex-col relative overflow-hidden" style={{ background:"#150d05" }}>
 
-                    {/* Streak badge */}
-                    {streak > 0 && (
-                      <motion.div
-                        initial={{ scale: 0 }} animate={{ scale: 1 }}
-                        transition={{ type: "spring", stiffness: 320, damping: 22, delay: 0.5 }}
-                        className="mt-3 flex items-center justify-center gap-2 bg-orange-50 border border-orange-200 rounded-full px-5 py-2"
-                      >
-                        <motion.span animate={{ scale: [1, 1.3, 1] }} transition={{ duration: 1.2, repeat: Infinity }}>🔥</motion.span>
-                        <span className="font-baloo font-black text-orange-600 text-mbase">{streak} {t("streakDays")}</span>
-                      </motion.div>
-                    )}
+                        {/* Cover image — fixed on mobile, 54% of parent on desktop */}
+                        <div className="relative overflow-hidden shrink-0 h-[200px] md:h-[54%]">
+                          {details?.cover_url ? (
+                            <Image src={getStorageUrl(details.cover_url)} alt={storyTitle} fill className="object-cover" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center"
+                              style={{ background:"linear-gradient(135deg, #7c3a0a, #b45309)" }}>
+                              <motion.span className="text-7xl drop-shadow-xl"
+                                animate={{ scale:[1,1.08,1] }} transition={{ duration:DURATION.loopBase, repeat:Infinity }}>
+                                {details?.theme_emoji ?? "📚"}
+                              </motion.span>
+                            </div>
+                          )}
+                          {/* Gold-tinted fade into page */}
+                          <div className="absolute inset-0 pointer-events-none"
+                            style={{ background:"linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, transparent 38%, #150d05 100%)" }} />
+                          {/* Gold top edge */}
+                          <div className="absolute inset-x-0 top-0 h-[2px] pointer-events-none"
+                            style={{ background:"linear-gradient(to right, transparent, #c9a84c80, transparent)" }} />
+                          {/* Linen texture */}
+                          <div className="absolute inset-0 pointer-events-none opacity-[0.06] mix-blend-overlay"
+                            style={{ backgroundImage:[
+                              "repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(255,255,255,1) 3px,rgba(255,255,255,1) 4px)",
+                              "repeating-linear-gradient(90deg,transparent,transparent 3px,rgba(255,255,255,1) 3px,rgba(255,255,255,1) 4px)",
+                            ].join(",") }} />
+                        </div>
 
-                    {/* Start button */}
-                    {doneCount >= totalCount && totalCount > 0 ? (
-                      /* MASTERY MODE — all missions done */
-                      <div className="mt-8 space-y-3">
-                        {/* Gold mastered badge */}
-                        <motion.div
-                          initial={{ scale: 0 }} animate={{ scale: 1 }}
-                          transition={{ type: "spring", stiffness: 280, damping: 20, delay: 0.3 }}
-                          className="flex items-center justify-center gap-2 bg-gradient-to-r from-yellow-50 to-amber-50 border border-yellow-300 rounded-full px-5 py-2"
-                        >
-                          <motion.span animate={{ rotate: [0, 15, -15, 0] }} transition={{ duration: 2, repeat: Infinity }}>🏆</motion.span>
-                          <span className="font-baloo font-black text-amber-700 text-sm">{t("masteredLabel")} — {storyTitle}</span>
-                        </motion.div>
-                        {/* View certificate */}
-                        <motion.button
-                          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, ...SPRING.gentle }}
-                          whileHover={m.buttonHover} whileTap={m.buttonPress}
-                          onClick={() => { playCelebration(); setPhase("certificate"); }}
-                          className="w-full text-white font-baloo font-black text-lg px-10 py-4 shadow-2xl flex items-center justify-center gap-3"
-                          style={{ background: 'linear-gradient(to right, #f59e0b, #d97706)', borderRadius: 'var(--leaf-r-lg)', boxShadow: '0 8px 24px rgba(245,158,11,0.35)' }}>
-                          🌟 {t("storySeeCertificate")}
-                        </motion.button>
-                        {/* Read again (mastery replay) */}
-                        <motion.button
-                          initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55, ...SPRING.gentle }}
-                          whileTap={m.buttonPress}
-                          onClick={() => { playTap(); setPhase("missions"); }}
-                          className="w-full font-baloo font-black text-mbase py-3 rounded-full border-2 border-[var(--ds-border-brand)] text-[var(--ds-brand-primary)] bg-[var(--ds-surface-card)] flex items-center justify-center gap-2 transition hover:bg-[var(--ds-brand-subtle)]">
-                          {t("playAgainBtn")}
-                        </motion.button>
+                        {/* Story info */}
+                        <div className="flex-1 flex flex-col px-5 pb-4 pt-1 relative z-10">
+                          {/* Gold ornamental divider */}
+                          <div className="flex items-center gap-2 mb-2">
+                            <div className="flex-1 h-px" style={{ background:"linear-gradient(to right, transparent, rgba(201,168,76,0.4))" }} />
+                            <span className="text-xs select-none" style={{ color:"rgba(201,168,76,0.6)" }}>✦</span>
+                            <div className="flex-1 h-px" style={{ background:"linear-gradient(to left, transparent, rgba(201,168,76,0.4))" }} />
+                          </div>
+
+                          {/* Title */}
+                          <h1 className="font-baloo font-black leading-tight text-center mb-0.5"
+                            style={{ fontSize:"clamp(1rem,2.8vw,1.4rem)", color:"#f5e6c8" }}>
+                            {storyTitle}
+                          </h1>
+                          <p className="text-center font-nunito text-2xs tracking-[0.2em] uppercase mb-3"
+                            style={{ color:"rgba(201,168,76,0.45)" }}>
+                            {childName} · {language.toUpperCase()}
+                          </p>
+
+                          {/* Progress bar */}
+                          <div className="mb-3">
+                            <div className="flex justify-between items-center mb-1">
+                              <span className="font-nunito text-2xs" style={{ color:"rgba(201,168,76,0.45)" }}>Progress</span>
+                              <span className="font-nunito font-bold text-2xs" style={{ color:"rgba(201,168,76,0.45)" }}>{doneCount}/{totalCount}</span>
+                            </div>
+                            <div className="h-1 rounded-full overflow-hidden" style={{ background:"rgba(255,255,255,0.08)" }}>
+                              <motion.div className="h-full rounded-full"
+                                style={{ background:"linear-gradient(to right, #c9a84c, #f0d080)" }}
+                                initial={{ width:0 }}
+                                animate={{ width: totalCount > 0 ? `${(doneCount/totalCount)*100}%` : "0%" }}
+                                transition={{ duration:1, delay:0.45, ease:"easeOut" }} />
+                            </div>
+                          </div>
+
+                          {/* Nimi quote */}
+                          <div className="mt-auto flex items-end gap-2">
+                            <motion.img src={assets.nimiCircle} alt="Nimi"
+                              animate={{ y:[0,-4,0] }} transition={{ duration:3, repeat:Infinity }}
+                              className="w-10 h-10 rounded-full shrink-0 border-2"
+                              style={{ borderColor:"rgba(201,168,76,0.45)", boxShadow:"0 0 12px rgba(201,168,76,0.2)" }} />
+                            <div className="flex-1 rounded-2xl rounded-bl-none px-3 py-2"
+                              style={{ background:"rgba(255,255,255,0.06)", border:"1px solid rgba(201,168,76,0.18)" }}>
+                              <p className="font-nunito text-xs leading-snug italic" style={{ color:"rgba(245,230,200,0.65)" }}>
+                                &ldquo;{doneCount === 0
+                                  ? `${childName}, your adventure awaits!`
+                                  : doneCount < totalCount
+                                  ? `Amazing, ${childName}! Keep going!`
+                                  : `You've mastered it, ${childName}! 🏆`}&rdquo;
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* Certificate button if mastered */}
+                          {doneCount >= totalCount && totalCount > 0 && (
+                            <motion.button
+                              initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.4 }}
+                              whileHover={{ scale:1.02 }} whileTap={{ scale:0.96 }}
+                              onClick={() => { playCelebration(); setPhase("certificate"); }}
+                              className="mt-3 w-full font-baloo font-black text-sm py-2.5 rounded-xl flex items-center justify-center gap-2"
+                              style={{ background:"linear-gradient(135deg, #c9a84c, #f0d080)", color:"#0a0603", boxShadow:"0 4px 20px rgba(201,168,76,0.35)" }}>
+                              🌟 {t("storySeeCertificate")}
+                            </motion.button>
+                          )}
+                        </div>
+
+                        {/* Ruled lines */}
+                        {Array.from({ length:5 }).map((_,i) => (
+                          <div key={i} className="absolute inset-x-0 h-px pointer-events-none"
+                            style={{ bottom:`${10+i*8}%`, background:"rgba(201,168,76,0.05)" }} />
+                        ))}
                       </div>
-                    ) : (
-                      <motion.button
-                        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: DURATION.loopBounce, ...SPRING.gentle }}
-                        whileHover={m.buttonHover} whileTap={m.buttonPress}
-                        onClick={() => { playTap(); setPhase(allIntrosDone ? "missions" : "intro"); }}
-                        className="mt-8 w-full text-white font-baloo font-black text-xl px-10 py-4 shadow-2xl flex items-center justify-center gap-3" style={{ background: 'linear-gradient(135deg, var(--ds-brand-primary), var(--ds-brand-hover))', borderRadius: 'var(--leaf-r-lg)', boxShadow: '0 8px 24px rgba(26,168,106,0.35)' }}>
-                        <Play className="w-6 h-6 fill-white" />
-                        {doneCount > 0 ? t("storyContinueBtn") : t("storyBeginMyAdventure")}
-                      </motion.button>
-                    )}
-                  </div>
+
+                      {/* ══ SPINE ══ */}
+                      <div className="hidden md:flex w-7 shrink-0 flex-col items-center justify-between py-5 relative overflow-hidden"
+                        style={{ background:"linear-gradient(to right, #07040200, #130a03, #07040200)" }}>
+                        <div className="w-full h-px" style={{ background:"rgba(201,168,76,0.35)" }} />
+                        <div className="flex flex-col items-center gap-1">
+                          <div className="w-px h-10" style={{ background:"rgba(201,168,76,0.15)" }} />
+                          <span className="font-black text-[5px] tracking-[0.9em] uppercase select-none"
+                            style={{ writingMode:"vertical-rl", color:"rgba(201,168,76,0.4)" }}>NIMIPIKO</span>
+                          <div className="w-px h-10" style={{ background:"rgba(201,168,76,0.15)" }} />
+                        </div>
+                        <div className="w-full h-px" style={{ background:"rgba(201,168,76,0.35)" }} />
+                      </div>
+                      {/* Mobile spine */}
+                      <div className="md:hidden h-5 shrink-0 flex items-center"
+                        style={{ background:"linear-gradient(to bottom, #07040200, #130a03, #07040200)" }}>
+                        <div className="flex-1 h-px mx-6" style={{ background:"rgba(201,168,76,0.35)" }} />
+                      </div>
+
+                      {/* ══ RIGHT PAGE ══ */}
+                      <div className="flex-1 flex flex-col relative overflow-hidden" style={{ background:"#f5f0e5" }}>
+
+                        {/* Binding shadow */}
+                        <div className="absolute inset-y-0 left-0 w-4 pointer-events-none z-10"
+                          style={{ background:"linear-gradient(to right, rgba(0,0,0,0.07), transparent)" }} />
+
+                        {/* Header */}
+                        <div className="px-5 pt-5 pb-2">
+                          <div className="flex items-center gap-2 mb-1">
+                            <div className="flex-1 h-px" style={{ background:"rgba(120,80,20,0.15)" }} />
+                            <span className="font-nunito text-2xs tracking-[0.22em] uppercase" style={{ color:"rgba(120,80,20,0.4)" }}>Your Adventure</span>
+                            <div className="flex-1 h-px" style={{ background:"rgba(120,80,20,0.15)" }} />
+                          </div>
+                          <h2 className="font-baloo font-black text-base text-center leading-none" style={{ color:"#2d1a06" }}>
+                            Mission Chapters
+                          </h2>
+                        </div>
+
+                        {/* Preface — intro not done yet */}
+                        {!allIntrosDone && (
+                          <div className="px-4 pb-2">
+                            <motion.button whileHover={{ scale:1.02 }} whileTap={{ scale:0.97 }}
+                              onClick={() => { playTap(); setPhase("intro"); }}
+                              className="w-full flex items-center gap-3 py-2.5 px-4 rounded-xl cursor-pointer"
+                              style={{ background:"linear-gradient(135deg, #1a3558, #06101f)", border:"1.5px solid rgba(201,168,76,0.35)" }}>
+                              <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
+                                style={{ background:"rgba(201,168,76,0.18)" }}>
+                                <Play className="w-3 h-3 fill-current ml-0.5" style={{ color:"#c9a84c" }} />
+                              </div>
+                              <div className="flex-1 text-left">
+                                <p className="font-nunito font-bold text-white text-sm">Meet the Characters</p>
+                                <p className="font-nunito text-2xs" style={{ color:"rgba(255,255,255,0.45)" }}>Watch before starting</p>
+                              </div>
+                              <span className="font-baloo font-black text-2xs uppercase tracking-wide" style={{ color:"#c9a84c" }}>Begin →</span>
+                            </motion.button>
+                          </div>
+                        )}
+
+                        {/* ─── Chapter list OR The End ─── */}
+                        {doneCount >= totalCount && totalCount > 0 ? (
+
+                          /* THE END */
+                          <div className="flex-1 flex flex-col items-center justify-center px-5 pb-4">
+                            <motion.div
+                              initial={{ scale:0, rotate:-15 }} animate={{ scale:1, rotate:0 }}
+                              transition={{ type:"spring", stiffness:220, damping:16, delay:0.2 }}
+                              className="relative w-20 h-20 rounded-full flex items-center justify-center mb-4"
+                              style={{ background:"radial-gradient(circle at 35% 35%, #fef9c3, #fde68a 60%, #f59e0b)" }}>
+                              <span className="text-3xl">🏆</span>
+                              <div className="absolute inset-0 rounded-full border-4" style={{ borderColor:"rgba(245,158,11,0.4)" }} />
+                            </motion.div>
+                            <div className="flex items-center gap-3 w-full mb-2">
+                              <div className="flex-1 h-px" style={{ background:"rgba(120,80,20,0.15)" }} />
+                              <span className="text-xs select-none" style={{ color:"rgba(120,80,20,0.3)" }}>✦</span>
+                              <div className="flex-1 h-px" style={{ background:"rgba(120,80,20,0.15)" }} />
+                            </div>
+                            <motion.p initial={{ opacity:0, y:6 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.35 }}
+                              className="font-baloo font-black text-2xl mb-1 tracking-wide" style={{ color:"#2d1a06" }}>
+                              The End
+                            </motion.p>
+                            <motion.p initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:0.5 }}
+                              className="font-nunito text-xs text-center mb-4 leading-relaxed" style={{ color:"rgba(120,80,20,0.5)" }}>
+                              All {totalCount} chapters complete!<br />
+                              <span className="md:hidden">Your certificate is above ↑</span>
+                              <span className="hidden md:inline">Your certificate is on the left.</span>
+                            </motion.p>
+                            <div className="flex items-center gap-3 w-full mb-4">
+                              <div className="flex-1 h-px" style={{ background:"rgba(120,80,20,0.15)" }} />
+                              <span className="text-xs select-none" style={{ color:"rgba(120,80,20,0.3)" }}>✦</span>
+                              <div className="flex-1 h-px" style={{ background:"rgba(120,80,20,0.15)" }} />
+                            </div>
+                            <div className="w-full space-y-1.5">
+                              {slots.map((slot, i) => {
+                                const meta  = MISSION_META[slot.slot_key] ?? { emoji:"📌", tKey:slot.slot_key };
+                                const label = slot.title || t(meta.tKey);
+                                return (
+                                  <motion.div key={slot.slot_key}
+                                    initial={{ opacity:0, x:8 }} animate={{ opacity:1, x:0 }}
+                                    transition={{ delay:0.55 + i * 0.04 }}
+                                    className="flex items-center gap-2">
+                                    <CheckCircle2 className="w-3.5 h-3.5 text-green-500 shrink-0" />
+                                    <span className="font-nunito text-xs truncate flex-1" style={{ color:"rgba(120,80,20,0.6)" }}>{label}</span>
+                                    {slot.stars != null && (
+                                      <span className="font-nunito text-2xs font-semibold text-amber-500">⭐ {slot.stars}</span>
+                                    )}
+                                  </motion.div>
+                                );
+                              })}
+                            </div>
+                          </div>
+
+                        ) : (
+
+                          /* ── MISSION ORBS GRID ── */
+                          <div className="flex-1 px-3 pb-2 pt-1 grid grid-cols-2 gap-2.5 content-start overflow-y-auto">
+                            {slots.length === 0 && (
+                              <div className="col-span-2 py-8 text-center">
+                                <Loader2 className="w-5 h-5 animate-spin mx-auto mb-2" style={{ color:"rgba(201,168,76,0.4)" }} />
+                                <p className="font-nunito text-xs" style={{ color:"rgba(120,80,20,0.4)" }}>Loading chapters…</p>
+                              </div>
+                            )}
+                            {slots.map((slot, i) => {
+                              const meta     = MISSION_META[slot.slot_key] ?? { emoji:"📌", tKey:slot.slot_key, actionKey:"storyMissionGo" };
+                              const isNext   = !slot.completed && (i === 0 || slots[i-1]?.completed);
+                              const isLocked = !slot.completed && !isNext;
+                              const label    = slot.title || t(meta.tKey);
+
+                              if (isLocked) {
+                                return (
+                                  <motion.div key={slot.slot_key}
+                                    initial={{ opacity:0, scale:0.88 }} animate={{ opacity:1, scale:1 }}
+                                    transition={{ delay:0.15 + i*0.06 }}
+                                    className="relative flex flex-col items-center justify-center gap-1 py-4 px-2 rounded-2xl select-none"
+                                    style={{ background:"rgba(0,0,0,0.04)", border:"1.5px solid rgba(0,0,0,0.07)" }}>
+                                    <div className="w-11 h-11 rounded-full flex items-center justify-center text-xl opacity-25"
+                                      style={{ background:"rgba(0,0,0,0.06)" }}>
+                                      {meta.emoji}
+                                    </div>
+                                    <p className="font-nunito font-semibold text-2xs text-center leading-tight" style={{ color:"rgba(45,26,6,0.28)" }}>{label}</p>
+                                    <Lock className="w-3 h-3 absolute top-2 right-2" style={{ color:"rgba(45,26,6,0.2)" }} />
+                                    <span className="font-mono font-black" style={{ fontSize:"8px", color:"rgba(45,26,6,0.18)" }}>{toRoman(i+1)}</span>
+                                  </motion.div>
+                                );
+                              }
+
+                              const orbContent = (
+                                <motion.div
+                                  initial={{ opacity:0, scale:0.88 }} animate={{ opacity:1, scale:1 }}
+                                  transition={{ delay:0.15 + i*0.06 }}
+                                  whileHover={{ scale:1.05 }} whileTap={{ scale:0.95 }}
+                                  className="relative flex flex-col items-center justify-center gap-1 py-4 px-2 rounded-2xl cursor-pointer"
+                                  style={slot.completed ? {
+                                    background:"linear-gradient(135deg, #f0fdf4, #dcfce7)",
+                                    border:"1.5px solid #86efac",
+                                    boxShadow:"0 2px 8px rgba(34,197,94,0.15)",
+                                  } : {
+                                    background:"linear-gradient(135deg, #1a3558, #06101f)",
+                                    border:"1.5px solid rgba(201,168,76,0.38)",
+                                    boxShadow:"0 4px 16px rgba(6,16,31,0.3), 0 0 20px rgba(201,168,76,0.07)",
+                                  }}>
+                                  {/* Glow pulse on next-up mission */}
+                                  {isNext && (
+                                    <motion.div className="absolute inset-0 rounded-2xl pointer-events-none"
+                                      animate={{ opacity:[0.4,0.8,0.4] }} transition={{ duration:2, repeat:Infinity }}
+                                      style={{ background:"radial-gradient(circle, rgba(201,168,76,0.12), transparent)", border:"1px solid rgba(201,168,76,0.25)" }} />
+                                  )}
+                                  {/* Icon orb */}
+                                  <div className="w-12 h-12 rounded-full flex items-center justify-center text-2xl shrink-0"
+                                    style={ slot.completed
+                                      ? { background:"rgba(34,197,94,0.15)" }
+                                      : { background:"rgba(255,255,255,0.09)", boxShadow: isNext ? "0 0 16px rgba(201,168,76,0.25)" : "none" }}>
+                                    {slot.completed
+                                      ? <CheckCircle2 className="w-6 h-6 text-green-500" />
+                                      : <span>{meta.emoji}</span>}
+                                  </div>
+                                  <p className="font-nunito font-bold text-2xs text-center leading-tight"
+                                    style={{ color: slot.completed ? "#15803d" : "#f5e6c8" }}>
+                                    {label}
+                                  </p>
+                                  {isNext && (
+                                    <span className="font-baloo font-black text-2xs uppercase tracking-wide" style={{ color:"#c9a84c" }}>
+                                      Start →
+                                    </span>
+                                  )}
+                                  {slot.completed && slot.stars != null && (
+                                    <span className="font-nunito text-2xs font-semibold text-amber-600">⭐ {slot.stars}</span>
+                                  )}
+                                  <span className="font-mono font-black opacity-35"
+                                    style={{ fontSize:"8px", color: slot.completed ? "#15803d" : "#f5e6c8" }}>
+                                    {toRoman(i+1)}
+                                  </span>
+                                </motion.div>
+                              );
+
+                              return (slot.completed || isNext) ? (
+                                <Link key={slot.slot_key} href={`/stories/${slug}/mission/${slot.slot_key}`} onClick={playTap}>
+                                  {orbContent}
+                                </Link>
+                              ) : (
+                                <div key={slot.slot_key}>{orbContent}</div>
+                              );
+                            })}
+                          </div>
+
+                        )}
+
+                        {/* Footer */}
+                        <div className="px-5 py-2 shrink-0 flex items-center justify-between"
+                          style={{ borderTop:"1px solid rgba(120,80,20,0.1)" }}>
+                          <span className="text-2xs font-nunito italic" style={{ color:"rgba(120,80,20,0.3)" }}>nimipiko.com</span>
+                          <span className="text-2xs font-nunito" style={{ color:"rgba(120,80,20,0.3)" }}>— {doneCount} of {totalCount} —</span>
+                        </div>
+
+                        {/* Page-edge depth strips */}
+                        <div className="absolute top-2 bottom-2 -right-1.5 w-1.5 rounded-r pointer-events-none overflow-hidden hidden md:flex flex-col gap-px" style={{ zIndex:-1 }}>
+                          {[["#ddd5c0"],["#e5dcc8"],["#eae2d0"]].map(([bg],i) => (
+                            <div key={i} className="flex-1 rounded-r" style={{ background:bg }} />
+                          ))}
+                        </div>
+
+                        {/* Bookmark ribbon */}
+                        <div className="absolute top-0 right-10 z-20 hidden md:flex flex-col items-center pointer-events-none"
+                          style={{ filter:"drop-shadow(-1px 3px 3px rgba(0,0,0,0.28))" }}>
+                          <div className="w-6 h-20 flex items-center justify-center"
+                            style={{
+                              background:"linear-gradient(to right, #9f1239, #e11d48, #9f1239)",
+                              clipPath:"polygon(0 0, 100% 0, 100% 82%, 50% 100%, 0 82%)",
+                            }}>
+                            <span className="text-white/60 font-black select-none"
+                              style={{ writingMode:"vertical-rl", fontSize:"6px", letterSpacing:"0.18em" }}>
+                              {doneCount >= totalCount && totalCount > 0 ? "✦" : "▶"}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                    </motion.div>
+                  </div>{/* /perspective */}
+
+                  {/* ── CTA below book ── */}
+                  {!allIntrosDone && (
+                    <motion.button
+                      initial={{ opacity:0, y:16 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.55 }}
+                      whileHover={{ scale:1.02 }} whileTap={{ scale:0.97 }}
+                      onClick={() => { playTap(); setPhase("intro"); }}
+                      className="mt-4 w-full font-baloo font-black text-lg py-4 rounded-2xl flex items-center justify-center gap-3"
+                      style={{ background:"linear-gradient(135deg, #c9a84c, #f0d080)", color:"#06101f", boxShadow:"0 8px 32px rgba(201,168,76,0.32)" }}>
+                      ✨ Begin Your Adventure
+                    </motion.button>
+                  )}
+                  {allIntrosDone && doneCount < totalCount && (
+                    <motion.button
+                      initial={{ opacity:0, y:16 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.55 }}
+                      whileHover={{ scale:1.02 }} whileTap={{ scale:0.97 }}
+                      onClick={() => { playTap(); setPhase("missions"); }}
+                      className="mt-4 w-full font-baloo font-black text-lg py-4 rounded-2xl flex items-center justify-center gap-3"
+                      style={{ background:"linear-gradient(135deg, #c9a84c, #f0d080)", color:"#06101f", boxShadow:"0 8px 32px rgba(201,168,76,0.32)" }}>
+                      🚀 Continue Adventure
+                    </motion.button>
+                  )}
                 </div>
+
+                {/* ── République des Champions teaser ── */}
+                <motion.div
+                  initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.8 }}
+                  className="relative z-10 flex items-center justify-center gap-2 pb-6 pt-1">
+                  <div className="flex items-center gap-2 rounded-full px-4 py-1.5"
+                    style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(201,168,76,0.2)" }}>
+                    <span className="text-sm">👑</span>
+                    <span className="font-nunito text-xs tracking-wide" style={{ color:"rgba(201,168,76,0.55)" }}>République des Champions</span>
+                    <span style={{ color:"rgba(201,168,76,0.35)" }}>→</span>
+                  </div>
+                </motion.div>
+
               </motion.div>
             )}
 

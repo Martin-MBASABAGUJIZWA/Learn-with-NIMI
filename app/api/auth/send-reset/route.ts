@@ -3,11 +3,7 @@ export const runtime = "nodejs";
 import { NextRequest, NextResponse } from "next/server";
 import { sendAuthResetPassword } from "@/lib/email";
 import { getServiceClient } from "@/lib/supabase/serviceClient";
-
-// S1: In-memory rate limit — max 3 password-reset requests per email per 15 minutes.
-const resetRateLimit = new Map<string, number[]>();
-const RATE_LIMIT_MAX = 3;
-const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000;
+import { checkRateLimit } from "@/lib/ratelimit";
 
 export async function POST(req: NextRequest) {
   const sb = getServiceClient();
@@ -18,15 +14,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Valid email required" }, { status: 400 });
   }
 
-  // Rate limit check
-  const now = Date.now();
-  const timestamps = (resetRateLimit.get(email) ?? []).filter(t => now - t < RATE_LIMIT_WINDOW_MS);
-  if (timestamps.length >= RATE_LIMIT_MAX) {
-    // Return generic success to avoid revealing rate limiting to an attacker
-    return NextResponse.json({ ok: true });
-  }
-  timestamps.push(now);
-  resetRateLimit.set(email, timestamps);
+  // S1: 3 resets per email per 15 minutes — silent success to avoid enumeration.
+  const allowed = await checkRateLimit(email, "nimipiko:reset", 3, 15 * 60);
+  if (!allowed) return NextResponse.json({ ok: true });
 
   const siteUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://nimipiko.com";
 

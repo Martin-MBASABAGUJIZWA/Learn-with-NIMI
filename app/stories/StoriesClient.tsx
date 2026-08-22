@@ -24,6 +24,17 @@ import StatsSidebar from "@/components/home/StatsSidebar";
 const ACTIVE_CHILD_KEY = "nimipiko_active_child";
 const PAGE_SIZE = 8;
 
+const CATEGORY_SPINE: Record<string, string> = {
+  animals:    "#1a5c3a",
+  friendship: "#8b1a4a",
+  bedtime:    "#1a2d6b",
+  adventure:  "#7a2800",
+  values:     "#7a5500",
+  nature:     "#1a4d1a",
+  family:     "#4a0d6e",
+  creativity: "#0d2d8b",
+};
+
 const CATEGORY_META: Record<string, { emoji: string; key: string; activeClass: string; inactiveClass: string }> = {
   animals:    { emoji: "🐾", key: "storyCatAnimals",    activeClass: "bg-[var(--ds-brand-primary)] text-white border-[var(--ds-border-brand)]",   inactiveClass: "bg-[var(--ds-brand-subtle)] text-[var(--ds-text-brand)] border-[var(--ds-border-brand)] hover:bg-[var(--ds-brand-soft)]" },
   friendship: { emoji: "❤️", key: "storyCatFriendship", activeClass: "bg-pink-500 text-white border-pink-500",         inactiveClass: "bg-pink-50 text-pink-700 border-pink-200 hover:bg-pink-100" },
@@ -34,6 +45,141 @@ const CATEGORY_META: Record<string, { emoji: string; key: string; activeClass: s
   family:     { emoji: "👨‍👩‍👧", key: "storyCatFamily",    activeClass: "bg-violet-500 text-white border-violet-500",   inactiveClass: "bg-violet-50 text-violet-700 border-violet-200 hover:bg-violet-100" },
   creativity: { emoji: "🎨", key: "storyCatCreativity", activeClass: "bg-blue-500 text-white border-blue-500",        inactiveClass: "bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100" },
 };
+
+// BC1: Hoisted to module scope — defining components inside .map() creates a
+// new type each render and causes React to unmount/remount every card on any state change.
+interface BookBodyProps {
+  story: StoryLibraryItem;
+  isCurrent: boolean;
+  hasCover: boolean;
+  spineColor: string;
+  dimmed?: boolean;
+  locked?: "premium" | "sequence";
+}
+
+function BookBody({ story, isCurrent, hasCover, spineColor, dimmed = false, locked }: BookBodyProps) {
+  return (
+    <div className="relative group">
+
+      {/* Golden glow behind the book image */}
+      <motion.div className="absolute -inset-3 -z-10 rounded-2xl pointer-events-none"
+        animate={{ opacity: isCurrent && !story.complete ? [0.5, 1, 0.5] : [0.15, 0.35, 0.15] }}
+        transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut" }}
+        style={{ background: "radial-gradient(ellipse at 50% 60%, rgba(253,224,71,0.5) 0%, rgba(251,191,36,0.2) 45%, transparent 70%)", filter: "blur(12px)" }} />
+
+      {/* Sparkle dots around active book */}
+      {isCurrent && !story.complete && !locked && [
+        { top: "-6px", left: "20%" }, { top: "-4px", right: "15%" },
+        { top: "30%", right: "-6px" }, { bottom: "20%", right: "-4px" },
+      ].map((pos, k) => (
+        <motion.span key={k} className="absolute text-yellow-300 pointer-events-none select-none z-30"
+          style={{ fontSize: "9px", ...pos }}
+          animate={{ opacity: [0, 1, 0], scale: [0.5, 1.3, 0.5], y: [0, -4, 0] }}
+          transition={{ duration: 1.6 + k * 0.35, repeat: Infinity, delay: k * 0.45 }}>
+          ✦
+        </motion.span>
+      ))}
+
+      {/* BC2: cursor-not-allowed for sequence-locked, cursor-pointer otherwise */}
+      <motion.div
+        whileHover={{ scale: locked === "sequence" ? 1 : 1.05, y: locked === "sequence" ? 0 : -4 }}
+        whileTap={{ scale: 0.97 }}
+        transition={{ type: "spring", stiffness: 300, damping: 24 }}
+        className={`relative rounded-xl overflow-hidden ${locked === "sequence" ? "cursor-not-allowed" : "cursor-pointer"}`}
+        style={{
+          height: "clamp(180px, 28vw, 260px)",
+          boxShadow: isCurrent && !story.complete
+            ? "0 8px 32px rgba(0,0,0,0.35), 0 0 24px rgba(251,191,36,0.3)"
+            : "0 6px 24px rgba(0,0,0,0.28)",
+        }}>
+
+        {/* The book image — fills the card */}
+        {hasCover ? (
+          <Image
+            src={getStorageUrl(story.cover_url!)}
+            alt={story.title}
+            fill
+            className={`object-cover transition-transform duration-500 group-hover:scale-105 ${dimmed ? "grayscale opacity-60" : ""}`}
+            draggable={false}
+          />
+        ) : (
+          // BC3: dimmed styling applied to fallback emoji div too
+          <div className={`w-full h-full flex flex-col items-center justify-center gap-2 transition-all ${dimmed ? "grayscale opacity-50" : ""}`}
+            style={{ background: `linear-gradient(135deg, ${spineColor}cc, ${spineColor}88)` }}>
+            <span className="text-5xl drop-shadow-xl">{story.theme_emoji}</span>
+            <p className="font-baloo font-black text-white text-center text-xs px-3 leading-tight drop-shadow">{story.title}</p>
+          </div>
+        )}
+
+        {/* Lock overlay */}
+        {locked === "premium" && (
+          <div className="absolute inset-0 flex items-center justify-center z-20"
+            style={{ background: "rgba(0,0,0,0.35)" }}>
+            <div className="w-12 h-12 bg-white/95 rounded-full flex items-center justify-center shadow-xl">
+              <Crown className="w-6 h-6 text-ds-club" />
+            </div>
+          </div>
+        )}
+        {locked === "sequence" && (
+          <div className="absolute inset-0 flex items-center justify-center z-20"
+            style={{ background: "rgba(0,0,0,0.3)" }}>
+            <div className="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center shadow">
+              <Lock className="w-5 h-5 text-[var(--ds-text-secondary)]" />
+            </div>
+          </div>
+        )}
+
+        {/* Complete badge */}
+        {story.complete && !locked && (
+          <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={SPRING.bounce}
+            className="absolute top-2 right-2 w-7 h-7 bg-ds-action rounded-full flex items-center justify-center shadow-lg z-20">
+            <CheckCircle2 className="w-4 h-4 text-white" />
+          </motion.div>
+        )}
+
+        {/* Current / playing indicator */}
+        {isCurrent && !story.complete && !locked && (
+          <motion.div animate={{ scale: [1, 1.15, 1] }} transition={{ duration: 1.4, repeat: Infinity }}
+            className="absolute top-2 right-2 w-7 h-7 bg-yellow-400 rounded-full flex items-center justify-center shadow-lg z-20">
+            <Play className="w-3.5 h-3.5 text-white fill-white ml-0.5" />
+          </motion.div>
+        )}
+
+        {/* Tap hint on hover */}
+        {!locked && (
+          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20 pointer-events-none">
+            <motion.div animate={{ y: [0, -4, 0] }} transition={{ duration: 0.9, repeat: Infinity }}
+              className="rounded-full px-3 py-1.5 flex items-center gap-1.5"
+              style={{ background: "rgba(0,0,0,0.5)", backdropFilter: "blur(6px)" }}>
+              <span style={{ fontSize: "14px" }}>👆</span>
+            </motion.div>
+          </div>
+        )}
+
+        {/* Progress bar at bottom */}
+        {story.progress > 0 && !locked && (
+          <div className="absolute bottom-0 inset-x-0 px-2 pb-2 z-20">
+            <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.25)" }}>
+              <motion.div className="h-full rounded-full bg-yellow-400"
+                initial={{ width: 0 }} animate={{ width: `${story.progress * 100}%` }}
+                transition={{ duration: DURATION.loopBounce }} />
+            </div>
+          </div>
+        )}
+
+        {/* Club label */}
+        {locked === "premium" && (
+          <div className="absolute bottom-2 inset-x-2 z-20">
+            <div className="bg-ds-club rounded-full px-3 py-1 flex items-center justify-center gap-1">
+              <Crown className="w-3 h-3 text-yellow-300" />
+              <span className="font-baloo font-black text-white text-2xs">Club only</span>
+            </div>
+          </div>
+        )}
+      </motion.div>
+    </div>
+  );
+}
 
 interface Props {
   initialChildren?: Child[];
@@ -340,10 +486,10 @@ export default function StoriesClient({ initialChildren, initialHasSubscription 
           </div>
         )}
 
-        {/* ═══ STORY GRID ═══ */}
+        {/* ═══ BOOK SHELF ═══ */}
         {loading ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 py-2">
-            {Array.from({ length: 8 }).map((_, i) => <Bone key={i} className="h-64 leaf-lg" />)}
+          <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-5 py-2">
+            {Array.from({ length: 10 }).map((_, i) => <Bone key={i} className="h-52 rounded-lg" />)}
           </div>
         ) : paginated.length === 0 ? (
           <div className="page-shell text-center py-16 px-8">
@@ -378,178 +524,33 @@ export default function StoriesClient({ initialChildren, initialHasSubscription 
               </Link>
             )}
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            {/* Book shelf */}
+            <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-5 sm:gap-6">
               <AnimatePresence mode="popLayout">
               {paginated.map((story, i) => {
-                const isCurrent = story.sid === currentId;
-                const hasCover  = !!story.cover_url;
+                const isCurrent      = story.sid === currentId;
+                const hasCover       = !!story.cover_url;
                 const isPremiumLocked = !story.unlocked && !story.is_free && !hasSubscription;
-                const ctaLabel = story.complete ? "Read Again ✨" : isCurrent ? "Continue →" : "Start Reading →";
+                const spineColor     = CATEGORY_SPINE[story.category ?? ""] ?? "#3b2a1a";
 
                 return (
                   <motion.div key={story.sid}
-                    initial={{ opacity: 0, y: 16, scale: 0.96 }}
+                    initial={{ opacity: 0, y: 20, scale: 0.95 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.95 }}
-                    transition={{ delay: i * DURATION.fast, ...SPRING.soft }}>
+                    transition={{ delay: i * DURATION.fast, ...SPRING.soft }}
+                    style={{ perspective: "600px" }}>
 
-                    {/* ── UNLOCKED card ── */}
                     {story.unlocked ? (
                       <Link href={`/stories/${story.slug}`}>
-                        <motion.div
-                          whileHover={{ y: m.hoverLift }}
-                          whileTap={m.buttonPress}
-                          className={`overflow-hidden cursor-pointer group transition-all relative ${
-                            story.complete
-                              ? "ring-2 ring-[var(--ds-brand-primary)]/50 shadow-md"
-                              : isCurrent
-                              ? "ring-2 ring-yellow-400/60 shadow-glow-gold"
-                              : "border border-ds-border hover:border-[var(--ds-border-brand)] hover:shadow-ds-hover"
-                          }`}
-                          style={{ borderRadius: "var(--leaf-r-lg)" }}>
-
-                          {/* Cover image */}
-                          <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200">
-                            {hasCover ? (
-                              <Image src={getStorageUrl(story.cover_url!)} alt={story.title} fill
-                                className="object-cover group-hover:scale-110 transition-transform duration-500" draggable={false} />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center">
-                                <motion.span className="text-5xl drop-shadow"
-                                  animate={isCurrent ? { scale: [1, 1.1, 1] } : {}}
-                                  transition={{ duration: DURATION.loopBase, repeat: Infinity }}>
-                                  {story.theme_emoji}
-                                </motion.span>
-                              </div>
-                            )}
-
-                            {/* Dark gradient at bottom — always present for title legibility */}
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-
-                            {/* Status badge — top right */}
-                            {story.complete ? (
-                              <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={SPRING.bounce}
-                                className="absolute top-2.5 right-2.5 flex items-center gap-1 bg-ds-action text-white text-2xs font-black px-2.5 py-1 rounded-full shadow-lg">
-                                <CheckCircle2 className="w-3 h-3" /> Done!
-                              </motion.div>
-                            ) : isCurrent ? (
-                              <motion.div
-                                animate={{ scale: [1, 1.06, 1] }}
-                                transition={{ duration: DURATION.loopBase, repeat: Infinity }}
-                                className="absolute top-2.5 right-2.5 flex items-center gap-1 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-2xs font-black px-2.5 py-1 rounded-full shadow-lg">
-                                <Play className="w-2.5 h-2.5 fill-white" /> Continue
-                              </motion.div>
-                            ) : null}
-
-                            {/* Hover CTA — slides up from bottom */}
-                            <div className="absolute inset-x-0 bottom-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out px-3 pb-2.5">
-                              <div className="bg-[var(--ds-surface-card)]/95 backdrop-blur-sm text-ds-action font-baloo font-black text-xs py-2 rounded-xl text-center shadow-lg">
-                                {ctaLabel}
-                              </div>
-                            </div>
-
-                            {/* Sparkle on isCurrent */}
-                            {isCurrent && (
-                              <motion.div className="absolute top-2.5 left-2.5 text-yellow-300"
-                                animate={{ opacity: [0.5, 1, 0.5], scale: [0.8, 1.1, 0.8] }}
-                                transition={{ duration: DURATION.loopFast, repeat: Infinity }}>
-                                <Sparkles className="w-4 h-4 drop-shadow" />
-                              </motion.div>
-                            )}
-                          </div>
-
-                          {/* Card footer */}
-                          <div className={`p-3 ${story.complete ? "bg-ds-action-subtle" : "bg-ds-card"}`}>
-                            <h3 className="font-baloo font-black text-ds-text text-sm sm:text-mbase leading-tight truncate">
-                              {story.title}
-                            </h3>
-                            {story.progress > 0 ? (
-                              <div className="mt-1.5 space-y-1.5">
-                                <div className="flex items-center gap-0.5">
-                                  {Array.from({ length: 5 }).map((_, j) => (
-                                    <Star key={j} className={`w-3.5 h-3.5 ${j < story.progress * 5 ? "text-yellow-400 fill-yellow-400" : "text-gray-200 fill-gray-100"}`} />
-                                  ))}
-                                </div>
-                                {!story.complete && (
-                                  <div className="w-full bg-ds-progress-track rounded-full h-1.5 overflow-hidden">
-                                    <motion.div className="h-full rounded-full bg-ds-progress-fill"
-                                      initial={{ width: 0 }} animate={{ width: `${story.progress * 100}%` }}
-                                      transition={{ duration: DURATION.loopBounce }} />
-                                  </div>
-                                )}
-                              </div>
-                            ) : (
-                              <p className="text-2xs text-ds-muted font-nunito mt-1">
-                                {story.age_min != null && story.age_max != null ? `Ages ${story.age_min}–${story.age_max}` : "Ready to read!"}
-                              </p>
-                            )}
-                          </div>
-                        </motion.div>
+                        <BookBody story={story} isCurrent={isCurrent} hasCover={hasCover} spineColor={spineColor} />
                       </Link>
-
-                    /* ── PREMIUM LOCKED card ── */
                     ) : isPremiumLocked ? (
                       <Link href="/pricing">
-                        <motion.div whileHover={{ scale: 1.02, y: -2 }} whileTap={m.buttonPress}
-                          className="overflow-hidden cursor-pointer group border border-ds-club shadow-ds-club"
-                          style={{ borderRadius: "var(--leaf-r-lg)" }}>
-                          <div className="relative aspect-[4/3] overflow-hidden">
-                            {hasCover ? (
-                              <Image src={getStorageUrl(story.cover_url!)} alt={story.title} fill
-                                className="object-cover grayscale group-hover:grayscale-0 transition-all duration-500 opacity-60 group-hover:opacity-90" draggable={false} />
-                            ) : (
-                              <div className="w-full h-full bg-ds-club-subtle flex items-center justify-center">
-                                <span className="text-5xl opacity-40">{story.theme_emoji}</span>
-                              </div>
-                            )}
-                            <div className="absolute inset-0 bg-[var(--ds-club-hover)]/30 group-hover:bg-[var(--ds-club-hover)]/10 transition-colors" />
-                            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
-                              <motion.div whileHover={{ scale: 1.1 }}
-                                className="w-12 h-12 bg-[var(--ds-surface-card)]/95 shadow-md rounded-full flex items-center justify-center group-hover:bg-yellow-300 transition-colors">
-                                <Crown className="w-5 h-5 text-ds-club group-hover:text-ds-club-text" />
-                              </motion.div>
-                              <span className="font-baloo font-black text-white text-2xs group-hover:text-yellow-200 transition-colors drop-shadow">Club Only</span>
-                            </div>
-                          </div>
-                          <div className="p-3 bg-ds-club-subtle group-hover:bg-ds-club-soft transition-colors">
-                            <h3 className="font-baloo font-black text-ds-club-text text-sm sm:text-mbase leading-tight truncate">{story.title}</h3>
-                            <p className="text-ds-club text-2xs font-semibold mt-1.5 flex items-center gap-1">
-                              <Crown className="w-2.5 h-2.5" /> Subscribe to unlock
-                            </p>
-                          </div>
-                        </motion.div>
+                        <BookBody story={story} isCurrent={isCurrent} hasCover={hasCover} spineColor={spineColor} dimmed locked="premium" />
                       </Link>
-
-                    /* ── SEQUENCE LOCKED card ── */
                     ) : (
-                      <motion.div whileHover={{ scale: 1.01 }}
-                        className="overflow-hidden page-card opacity-60 hover:opacity-80 transition-all group"
-                        style={{ borderRadius: "var(--leaf-r-lg)" }}>
-                        <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200">
-                          {hasCover ? (
-                            <Image src={getStorageUrl(story.cover_url!)} alt="" fill
-                              className="object-cover grayscale opacity-25 group-hover:opacity-35 transition-opacity" draggable={false} />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center">
-                              <span className="text-5xl opacity-20">{story.theme_emoji}</span>
-                            </div>
-                          )}
-                          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
-                            <div className="w-12 h-12 bg-[var(--ds-surface-card)]/90 shadow-md rounded-full flex items-center justify-center">
-                              <Lock className="w-5 h-5 text-[var(--ds-text-secondary)]" />
-                            </div>
-                            <div className="bg-gray-800/80 text-white text-2xs font-black px-3 py-1 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm">
-                              🔒 {t("storyUnlockHint")}
-                            </div>
-                          </div>
-                        </div>
-                        <div className="p-3">
-                          <h3 className="font-baloo font-black text-[var(--ds-text-tertiary)] text-sm sm:text-mbase leading-tight truncate">{story.title}</h3>
-                          <p className="text-[var(--ds-text-tertiary)] text-2xs font-semibold mt-1.5 flex items-center gap-1">
-                            <Lock className="w-2.5 h-2.5" /> {t("storyUnlockHint")}
-                          </p>
-                        </div>
-                      </motion.div>
+                      <BookBody story={story} isCurrent={isCurrent} hasCover={hasCover} spineColor={spineColor} dimmed locked="sequence" />
                     )}
                   </motion.div>
                 );

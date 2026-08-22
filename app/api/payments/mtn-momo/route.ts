@@ -7,13 +7,9 @@ type PersonalizationData = { discount_code_id?: string; gift?: boolean; phone?: 
 import { sendPaymentReceipt, sendGiftNotification, sendGiftConfirmation, sendWelcomeToClub } from "@/lib/email";
 import { getServiceClient } from "@/lib/supabase/serviceClient";
 import { addMonths, addYears } from "@/lib/dateUtils";
+import { checkRateLimit } from "@/lib/ratelimit";
 
 
-
-// M2: In-memory rate limit for GET (status poll) — max 20 per user per minute.
-const momoStatusRateLimit = new Map<string, number[]>();
-const MOMO_STATUS_MAX = 20;
-const MOMO_STATUS_WINDOW_MS = 60 * 1000;
 
 const MOMO_TOKEN_URL = process.env.MTN_REQUEST_TOKEN_ENDPOINT!;
 const MOMO_REQUEST_TO_PAY_URL = process.env.MTN_REQUEST_TO_PAY_ENDPOINT!;
@@ -121,14 +117,9 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // M2: Per-user rate limit for status polls.
-    const now = Date.now();
-    const userPolls = (momoStatusRateLimit.get(user.id) ?? []).filter(t => now - t < MOMO_STATUS_WINDOW_MS);
-    if (userPolls.length >= MOMO_STATUS_MAX) {
-      return NextResponse.json({ status: "pending" }, { status: 429 });
-    }
-    userPolls.push(now);
-    momoStatusRateLimit.set(user.id, userPolls);
+    // M2: 20 status polls per user per minute.
+    const allowed = await checkRateLimit(user.id, "nimipiko:momo-poll", 20, 60);
+    if (!allowed) return NextResponse.json({ status: "pending" }, { status: 429 });
 
     const { searchParams } = new URL(req.url);
     const orderId = searchParams.get("orderId");
