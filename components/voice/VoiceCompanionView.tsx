@@ -86,8 +86,15 @@ function WordChip({
 // ── Waveform pulse (listening animation) ─────────────────────────────────────
 
 function WaveformPulse() {
+  // L9: outer element is motion.div so AnimatePresence can apply exit animation
+  // even though inner bars use repeat: Infinity
   return (
-    <div className="flex items-end gap-1 h-10">
+    <motion.div
+      className="flex items-end gap-1 h-10"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
       {[0.4, 0.7, 1, 0.7, 0.4, 0.6, 0.9, 0.6].map((h, i) => (
         <motion.div key={i}
           className="w-1.5 rounded-full"
@@ -95,7 +102,7 @@ function WaveformPulse() {
           animate={{ height: `${h * 100}%` }}
           transition={{ duration: 0.4, repeat: Infinity, repeatType: "reverse", delay: i * 0.05 }} />
       ))}
-    </div>
+    </motion.div>
   );
 }
 
@@ -360,7 +367,10 @@ export default function VoiceCompanionView({
           <motion.div key="listening"
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="flex flex-col items-center gap-4 py-6">
-            <WaveformPulse />
+            {/* L9: AnimatePresence so WaveformPulse exits cleanly despite repeat:Infinity bars */}
+            <AnimatePresence>
+              {step === "listening" && <WaveformPulse key="waveform" />}
+            </AnimatePresence>
             <p className="font-black text-base" style={{ color: G }}>Listening…</p>
             {interimText && (
               <p className="text-sml font-nunito italic text-center px-4" style={{ color: "var(--ds-text-secondary)" }}>

@@ -87,6 +87,11 @@ export default function ColoringStudio({ pages, childId, onClose, t }: ColoringS
   const pageStates   = useRef<(ImageData | null)[]>([]);
   const undoStacks   = useRef<ImageData[][]>([]);
   const redoStacks   = useRef<ImageData[][]>([]);
+  // L8: refs to hold clearable setTimeout handles
+  const showSavedTimer1Ref = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const showSavedTimer2Ref = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  // M16: stable ref to the latest loadFromDb so loadPage never holds a stale closure
+  const loadFromDbRef = useRef<((idx: number) => Promise<string | null>) | null>(null);
 
   const [pageIdx,  setPageIdx]  = useState(0);
   const [loading,  setLoading]  = useState(true);
@@ -116,6 +121,14 @@ export default function ColoringStudio({ pages, childId, onClose, t }: ColoringS
     check();
     window.addEventListener('resize', check);
     return () => window.removeEventListener('resize', check);
+  }, []);
+
+  // L8: clear pending showSaved timers on unmount
+  useEffect(() => {
+    return () => {
+      clearTimeout(showSavedTimer1Ref.current);
+      clearTimeout(showSavedTimer2Ref.current);
+    };
   }, []);
 
   // ── Load / restore a page ──────────────────────────────────
@@ -197,8 +210,8 @@ export default function ColoringStudio({ pages, childId, onClose, t }: ColoringS
       if (restore && saved && saved.width === w && saved.height === h) {
         ctx.putImageData(saved, 0, 0);
       } else {
-        // Try loading from database
-        const dbSave = await loadFromDb(idx);
+        // M16: use ref so loadPage always calls the latest loadFromDb even after child switch
+        const dbSave = await loadFromDbRef.current?.(idx) ?? null;
         if (dbSave) {
           const savedImg = new Image();
           savedImg.onload = () => {
@@ -273,6 +286,9 @@ export default function ColoringStudio({ pages, childId, onClose, t }: ColoringS
     } catch { return null; }
   }, [childId, getPageId]);
 
+  // M16: keep the ref in sync so loadPage's closure always calls the latest version
+  useEffect(() => { loadFromDbRef.current = loadFromDb; }, [loadFromDb]);
+
   const savePage = useCallback(() => {
     saveToDb(pageIdx);
     if (childId) {
@@ -287,7 +303,9 @@ export default function ColoringStudio({ pages, childId, onClose, t }: ColoringS
       a.click();
     } catch {}
     setShowSaved(true);
-    setTimeout(() => setShowSaved(false), 2000);
+    // L8: store timer ref so it can be cleared on unmount
+    clearTimeout(showSavedTimer1Ref.current);
+    showSavedTimer1Ref.current = setTimeout(() => setShowSaved(false), 2000);
   }, [pageIdx, saveToDb, childId, getPageId, pages]);
 
   const shareToNimi = useCallback(async () => {
@@ -316,7 +334,9 @@ export default function ColoringStudio({ pages, childId, onClose, t }: ColoringS
         image_url: `creations/${path}`,
       });
       setShowSaved(true);
-      setTimeout(() => setShowSaved(false), 2000);
+      // L8: store timer ref so it can be cleared on unmount
+      clearTimeout(showSavedTimer2Ref.current);
+      showSavedTimer2Ref.current = setTimeout(() => setShowSaved(false), 2000);
     } catch {}
   }, [childId]);
 
@@ -719,7 +739,7 @@ export default function ColoringStudio({ pages, childId, onClose, t }: ColoringS
             {/* Color swatches — big circles, horizontally scrollable */}
             <div className="flex gap-2 overflow-x-auto px-3 pt-3 pb-1.5" style={{ scrollbarWidth: 'none' }}>
               {KID_COLORS.map(c => (
-                <button key={c} onClick={() => { setColor(c); setTool('brush'); playColorPick(); }}
+                <button key={c} aria-label={`Color ${c}`} onClick={() => { setColor(c); setTool('brush'); playColorPick(); }}
                   className={`flex-shrink-0 rounded-full transition-all border-3 ${
                     color === c && tool !== 'eraser' ? 'border-white scale-110 shadow-lg ring-2 ring-yellow-400' : 'border-transparent'
                   }`}

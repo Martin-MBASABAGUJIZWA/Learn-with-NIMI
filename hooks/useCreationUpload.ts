@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { v4 as uuidv4 } from "uuid";
 import supabase from "@/lib/supabaseClient";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -72,6 +72,8 @@ export function useCreationUpload({ parentId, childId, onCreated, onError, onCel
   const { t } = useLanguage();
   const [uploadForm, setUploadForm] = useState<UploadFormState>(defaultUploadForm);
   const [showUploadModal, setShowUploadModal] = useState(false);
+  // L7: store the WhatsApp cleanup timer so it can be cleared on unmount
+  const cleanupTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const handleUploadSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -106,7 +108,8 @@ export function useCreationUpload({ parentId, childId, onCreated, onError, onCel
 
         window.open(whatsappUrl, "_blank");
 
-        setTimeout(async () => {
+        // L7: store timer reference so unmount cleanup can cancel it
+        cleanupTimerRef.current = setTimeout(async () => {
           try {
             await supabase.storage.from('creations').remove([filePath]);
           } catch (cleanupError) {
@@ -170,6 +173,11 @@ export function useCreationUpload({ parentId, childId, onCreated, onError, onCel
       if (uploadForm.previewUrl) URL.revokeObjectURL(uploadForm.previewUrl);
     };
   }, [uploadForm.previewUrl]);
+
+  // L7: clear the WhatsApp cleanup timer on unmount
+  useEffect(() => {
+    return () => { clearTimeout(cleanupTimerRef.current); };
+  }, []);
 
   return { uploadForm, setUploadForm, showUploadModal, setShowUploadModal, handleUploadSubmit };
 }

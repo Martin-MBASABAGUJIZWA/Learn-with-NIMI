@@ -23,7 +23,8 @@ export default function StoryFlipBook({ pages, onClose, t }: StoryFlipBookProps)
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(0);
   const flipBookRef = useRef<any>(null);
-  const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(null);
+  // M15: use ref instead of state so cleanup always reads the live value
+  const currentAudioRef = useRef<HTMLAudioElement | null>(null);
   const [, setIsPlayingAudio] = useState(false);
 
   // Mobile detection — initialize immediately so first render picks the right viewer
@@ -52,15 +53,16 @@ export default function StoryFlipBook({ pages, onClose, t }: StoryFlipBookProps)
       console.warn("Audio play failed:", error);
       setIsPlayingAudio(false);
     });
-    setCurrentAudio(audio);
+    currentAudioRef.current = audio;
     setIsPlayingAudio(true);
   };
 
   const stopAudio = () => {
-    if (!currentAudio) return;
-    currentAudio.pause();
-    currentAudio.currentTime = 0;
-    setCurrentAudio(null);
+    // M15: read from ref so cleanup closure always has the live instance
+    if (!currentAudioRef.current) return;
+    currentAudioRef.current.pause();
+    currentAudioRef.current.currentTime = 0;
+    currentAudioRef.current = null;
     setIsPlayingAudio(false);
   };
 
