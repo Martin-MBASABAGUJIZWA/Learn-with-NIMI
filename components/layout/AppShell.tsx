@@ -103,8 +103,10 @@ export default function AppShell({ children }: AppShellProps) {
 
   useEffect(() => {
     if (!user) return; // Don't fetch until auth is confirmed
+    let active = true;
     void (async () => {
       const list = await getChildren();
+      if (!active) return;
       if (list.length === 0) {
         router.replace("/onboarding");
         return;
@@ -112,24 +114,26 @@ export default function AppShell({ children }: AppShellProps) {
       const savedId = typeof window !== "undefined" ? localStorage.getItem(ACTIVE_CHILD_KEY) : null;
       const child = list.find(c => c.id === savedId) ?? list[0] ?? null;
       activeChildRef.current = child;
-      setActiveChild(child);
+      if (active) setActiveChild(child);
       if (child) {
-        setLanguageSilent(child.language);
+        if (active) setLanguageSilent(child.language);
         // Shields (getStreakShieldsPurchased + getUsedShieldDates) now run in
         // parallel with everything else. resolveShields below hits the warm
         // qcached results — zero extra network round-trips.
         const [ws, dates, , , badges, cos] = await Promise.all([
           getWeekStreak(child.id, child.language),
           getActivityDates(child.id, child.language),
-          getTotalStars(child.id, child.language).then(setTotalStars),
-          getCurrentLevel(child.id, child.language).then(setLevel),
+          getTotalStars(child.id, child.language).then(v => { if (active) setTotalStars(v); }),
+          getCurrentLevel(child.id, child.language).then(v => { if (active) setLevel(v); }),
           getChildBadges(child.id, child.language),
           getChildCosmetics(child.id),
           getStreakShieldsPurchased(child.id),
           getUsedShieldDates(child.id, child.language),
         ]);
+        if (!active) return;
         setWeekStreak(ws);
         const { usedDates } = await resolveShields(child.id, child.language, dates);
+        if (!active) return;
         setStreakCount(computeStreaks(dates, new Date(), usedDates).current);
         setGems(badges.length);
         setCosmetics(cos);
@@ -145,6 +149,7 @@ export default function AppShell({ children }: AppShellProps) {
       // `user` is already in scope from the outer effect guard (line 105)
       void (async () => {
         const sub = await getActiveSubscription(user.id);
+        if (!active) return;
         if (sub?.payment_provider === "trial" && sub.current_period_end) {
           // Grace period: status is 'expired' but within 24h — show specific copy
           if ((sub as { status?: string }).status === "expired") {
@@ -164,10 +169,11 @@ export default function AppShell({ children }: AppShellProps) {
             .gte("updated_at", new Date(Date.now() - 7 * 86_400_000).toISOString())
             .limit(1)
             .maybeSingle();
-          if (expired) setTrialExpiredBanner(true);
+          if (active && expired) setTrialExpiredBanner(true);
         }
       })();
     })();
+    return () => { active = false; };
   }, [user, router]);
 
   // Listen for cosmetics changes from the shop (equip/unequip)

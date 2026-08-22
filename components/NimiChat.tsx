@@ -27,12 +27,21 @@ export default function NimiChat({
   const [isTalking, setIsTalking] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const chatRef = useRef<HTMLDivElement>(null);
+  // R3: store recognition instance so we can abort on unmount
+  const recognitionRef = useRef<InstanceType<typeof window.webkitSpeechRecognition> | null>(null);
 
   useEffect(() => {
     if (open && chatRef.current) {
       chatRef.current.scrollTop = chatRef.current.scrollHeight;
     }
   }, [chatLog, open]);
+
+  // R3: abort recognition on unmount
+  useEffect(() => {
+    return () => {
+      recognitionRef.current?.abort();
+    };
+  }, []);
 
   const sendToAI = async (question: string) => {
     if (!question.trim()) return;
@@ -63,6 +72,8 @@ export default function NimiChat({
     setIsTalking(true);
 
     if (reader) {
+      // R2: push a placeholder so the streaming loop replaces it, not the user message
+      setChatLog((prev) => [...prev, `🤖 Nimi: `]);
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
@@ -84,7 +95,9 @@ export default function NimiChat({
   const handleVoiceInput = () => {
     if (!("webkitSpeechRecognition" in window)) return alert("Voice not supported!");
 
+    // R3: store instance in ref
     const recognition = new window.webkitSpeechRecognition!();
+    recognitionRef.current = recognition;
     recognition.lang = language;
     recognition.interimResults = false;
     recognition.maxAlternatives = 1;
@@ -139,13 +152,16 @@ export default function NimiChat({
           onChange={(e) => setInput(e.target.value)}
           placeholder="Type or tap the mic 🎤"
         />
+        {/* A1: accessible label for icon-only buttons */}
         <button
+          aria-label="Send message"
           onClick={() => sendToAI(input)}
           className="p-2 rounded-full text-white" style={{ backgroundColor: 'var(--ds-brand-primary)' }}
         >
           <SendHorizontal />
         </button>
         <button
+          aria-label="Voice input"
           onClick={handleVoiceInput}
           className={`p-2 rounded-full ${isListening ? "bg-[var(--ds-brand-primary)]" : "bg-[var(--ds-surface-input)]"}`}
         >

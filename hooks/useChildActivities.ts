@@ -17,9 +17,13 @@ export function useChildActivities(childId?: string) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    let active = true;
     const load = async () => {
       try {
-        if (!childId) { setActivities([]); setIsReady(true); return; }
+        if (!childId) {
+          if (active) { setActivities([]); setIsReady(true); }
+          return;
+        }
 
         const { data, error: fetchError } = await supabase
           .from("child_progress")
@@ -28,16 +32,19 @@ export function useChildActivities(childId?: string) {
           .order("completed_at", { ascending: false });
 
         if (fetchError) throw fetchError;
-        setActivities((data ?? []) as Activity[]);
+        if (active) setActivities((data ?? []) as Activity[]);
       } catch (err: any) {
         console.error("Failed to load activities:", err);
-        setError(err.message || "Unknown error");
-        setActivities([]);
+        if (active) {
+          setError(err.message || "Unknown error");
+          setActivities([]);
+        }
       } finally {
-        setIsReady(true);
+        if (active) setIsReady(true);
       }
     };
     load();
+    return () => { active = false; };
   }, [childId]);
 
   return { activities, isReady, error };

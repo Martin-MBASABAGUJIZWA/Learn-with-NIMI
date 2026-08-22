@@ -1,10 +1,10 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { useRef, useState, useEffect, useMemo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useThemeMotion } from "@/hooks/useThemeMotion";
 import { DURATION } from "@/lib/design-system/motion";
-import { Play, Pause, Volume2, RotateCcw, Sparkles } from "lucide-react";
+import { Play, Pause, RotateCcw, Sparkles } from "lucide-react";
 import { getStorageUrl } from "@/lib/queries";
 
 interface Props {
@@ -22,6 +22,15 @@ export default function StoryAudioPlayer({ url, title, subtitle, color = "bg-[va
   const [duration, setDuration] = useState(0);
   const intervalRef = useRef<number>(0);
   const m = useThemeMotion();
+
+  // R4: compute random bar values once to avoid re-generating on every render
+  const barValues = useMemo(() =>
+    Array.from({ length: 20 }, () => ({
+      height: 12 + Math.random() * 12,
+      duration: DURATION.slow + Math.random() * DURATION.moderate,
+    })),
+    []
+  );
 
   useEffect(() => {
     return () => { clearInterval(intervalRef.current); ref.current?.pause(); };
@@ -87,8 +96,9 @@ export default function StoryAudioPlayer({ url, title, subtitle, color = "bg-[va
       />
 
       <div className="flex items-center gap-4">
-        {/* Play button */}
+        {/* A2: accessible label for Play/Pause button */}
         <motion.button whileTap={m.dangerPress} onClick={toggle}
+          aria-label={playing ? "Pause" : "Play"}
           className={`w-14 h-14 ${color} flex items-center justify-center text-white shadow-lg shrink-0 ring-4 ring-white/60`}
           style={{ borderRadius: 'var(--leaf-r)' }}>
           {playing ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6 ml-0.5" />}
@@ -119,18 +129,27 @@ export default function StoryAudioPlayer({ url, title, subtitle, color = "bg-[va
         </button>
       </div>
 
-      {/* Waveform decoration */}
-      {playing && (
-        <div className="flex items-end justify-center gap-[2px] mt-3 h-6">
-          {Array.from({ length: 20 }).map((_, i) => (
-            <motion.div key={i}
-              className={`w-[3px] rounded-full ${color} opacity-40`}
-              animate={{ height: [4, 12 + Math.random() * 12, 4] }}
-              transition={{ duration: DURATION.slow + Math.random() * DURATION.moderate, repeat: Infinity, delay: i * 0.05 }}
-            />
-          ))}
-        </div>
-      )}
+      {/* M17: wrap waveform bars in AnimatePresence so they exit cleanly */}
+      <AnimatePresence>
+        {playing && (
+          <motion.div
+            key="waveform"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, scaleY: 0 }}
+            className="flex items-end justify-center gap-[2px] mt-3 h-6"
+          >
+            {barValues.map((bar, i) => (
+              <motion.div key={i}
+                className={`w-[3px] rounded-full ${color} opacity-40`}
+                animate={{ height: [4, bar.height, 4] }}
+                exit={{ opacity: 0, scaleY: 0 }}
+                transition={{ duration: bar.duration, repeat: Infinity, delay: i * 0.05 }}
+              />
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

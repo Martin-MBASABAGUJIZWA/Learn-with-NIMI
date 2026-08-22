@@ -36,7 +36,8 @@ export const useSupabaseQuery = <T>(
     return () => {
       isMounted = false;
     };
-  }, [queryFn, dependencies]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [queryFn, ...dependencies]);
 
   return { data, loading, error };
 };
