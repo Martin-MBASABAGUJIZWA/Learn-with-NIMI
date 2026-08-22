@@ -22,8 +22,14 @@ export async function getCachedPassport(
     const file = files?.find(f => f.name === key(childId))
     if (!file) return null
 
-    const modifiedAt = new Date(file.updated_at ?? file.created_at ?? 0).getTime()
-    if (Date.now() - modifiedAt > TTL_MS) return null
+    // M5: if both timestamps are absent we cannot determine age, so treat the
+    // file as fresh rather than forcing a regenerate every request.
+    if (!file.updated_at && !file.created_at) {
+      // fall through to download — file is assumed fresh
+    } else {
+      const modifiedAt = new Date(file.updated_at ?? file.created_at!).getTime()
+      if (Date.now() - modifiedAt > TTL_MS) return null
+    }
 
     const { data } = await supabase.storage.from(BUCKET).download(key(childId))
     if (!data) return null

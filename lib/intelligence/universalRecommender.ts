@@ -34,6 +34,17 @@ import {
   buildGenericEvidence,
 } from '@/lib/recommendationEvidence';
 
+// ── Reading level helper ──────────────────────────────────────────
+// D5: derive a human-readable level label from age rather than passing
+// the raw age number as the readingLevel string.
+function ageToReadingLevel(age: number | null | undefined): string {
+  if (!age) return 'Beginner';
+  if (age <= 4) return 'Beginner';
+  if (age <= 6) return 'Early Reader';
+  if (age <= 8) return 'Reader';
+  return 'Advanced Reader';
+}
+
 // ── Story recs (delegates to existing engine) ─────────────────────
 
 async function storyRecs(
@@ -57,7 +68,7 @@ async function storyRecs(
     const evidence = reasonKey === 'in_progress'
       ? buildInProgressEvidence(childName, r.title, r.completionPct ?? 0)
       : reasonKey === 'level_up'
-        ? buildLevelUpEvidence(childName, ctx.child.age?.toString() ?? 'unknown', quizAccuracy ?? null)
+        ? buildLevelUpEvidence(childName, ageToReadingLevel(ctx.child.age), quizAccuracy ?? null)
         : reasonKey === 'review_needed'
           ? buildReviewNeededEvidence(childName, quizAccuracy ?? 0.50, r.title)
           : reasonKey === 'interest_match'

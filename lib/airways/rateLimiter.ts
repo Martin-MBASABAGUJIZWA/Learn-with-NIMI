@@ -16,8 +16,9 @@ if (
     url:   process.env.UPSTASH_REDIS_REST_URL,
     token: process.env.UPSTASH_REDIS_REST_TOKEN,
   })
-  upstashStrict = new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(3, "60 s"), prefix: "nimipiko:airways" })
-  upstashLight  = new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(5, "60 s"), prefix: "nimipiko:airways" })
+  // M6: each instance gets a distinct prefix so their counters don't collide.
+  upstashStrict = new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(3, "60 s"), prefix: "nimipiko:airways:strict" })
+  upstashLight  = new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(5, "60 s"), prefix: "nimipiko:airways:light"  })
 }
 
 // ── In-memory fallback ────────────────────────────────────────────────────────

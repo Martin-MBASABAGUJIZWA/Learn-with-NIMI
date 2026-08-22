@@ -24,7 +24,7 @@ export function getStoryLibrary(
   // in storyProgressRepository and offlineSlotQueue after every slot completion.
   return qcached(`storyLibrary:${childId}:${language}`, async () => {
     // Fetch RPC and category map in parallel — categories are not in the RPC result set.
-    const [{ data, error }, { data: cats }] = await Promise.all([
+    const [{ data, error }, { data: cats, error: catsError }] = await Promise.all([
       supabase.rpc("get_story_library_progress", {
         p_child_id: childId,
         p_language: language,
@@ -34,6 +34,11 @@ export function getStoryLibrary(
     if (error) {
       console.error("[getStoryLibrary]", error);
       return [];
+    }
+    // L5: log category query errors but continue — stories are returned with
+    // null categories rather than silently swallowing the error.
+    if (catsError) {
+      console.warn("[getStoryLibrary] categories fetch failed (continuing with null categories):", catsError);
     }
     const items = (data ?? []) as StoryLibraryItem[];
     if (cats) {

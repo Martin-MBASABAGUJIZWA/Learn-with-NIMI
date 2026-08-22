@@ -302,13 +302,17 @@ export async function getTodayMissions(
   language: "en" | "fr" | "rw"
 ): Promise<TodayMission[]> {
   const today = new Date().toISOString().slice(0, 10);
+  // L3: use the start of the next day as an exclusive upper bound so that
+  // rows written at 23:59:59.999 or beyond are correctly included/excluded.
+  const nextDay = new Date(new Date(today).getTime() + 24 * 60 * 60 * 1000)
+    .toISOString().slice(0, 10);
   const { data, error } = await supabase
     .from("child_progress")
     .select("mission_id, stars_earned, completed_at, missions(category_slug, stories(title))")
     .eq("child_id", childId)
     .eq("language", language)
     .gte("completed_at", `${today}T00:00:00`)
-    .lt("completed_at", `${today}T23:59:59.999`)
+    .lt("completed_at", `${nextDay}T00:00:00.000Z`)
     .order("completed_at");
 
   if (error || !data) return [];
