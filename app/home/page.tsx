@@ -17,8 +17,6 @@ export default async function HomePage() {
       .order("current_period_end", { ascending: false }).limit(1).maybeSingle(),
   ]);
 
-  // D2: only redirect to /onboarding when data is a confirmed empty array.
-  // A DB error must not be mistaken for "no children" — redirect to an error page instead.
   if (childrenError) {
     console.error("[HomePage] children fetch error:", childrenError);
     redirect("/error");

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import {
   getCurriculumMissions, completeCurriculumMission, getColoringPages, getStoryPages, notifyPushOnCompletion,
+  getChildren,
 } from "@/lib/queries";
 import { queueOfflineCompletion } from "@/lib/offlineQueue";
 import type { CurriculumMission, ColoringPage, StoryPage } from "@/lib/queries";
@@ -48,10 +49,15 @@ export default function MissionCategoryPage() {
   useEffect(() => {
     if (!activity) { router.replace("/missions"); return; }
 
-    const cid = typeof window !== "undefined" ? localStorage.getItem(ACTIVE_CHILD_KEY) : null;
-    setChildId(cid);
+    const storedId = typeof window !== "undefined" ? localStorage.getItem(ACTIVE_CHILD_KEY) : null;
 
     const load = async () => {
+      // Validate stored childId against the authenticated user's children list
+      const children = await getChildren();
+      const validChild = children.find(c => c.id === storedId) ?? children[0] ?? null;
+      const cid = validChild?.id ?? null;
+      setChildId(cid);
+
       if (!cid) { setLoading(false); return; }
 
       setLoading(true);

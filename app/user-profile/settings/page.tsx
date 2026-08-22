@@ -46,30 +46,35 @@ export default function MyProfilePage() {
   }, []);
 
   const load = async () => {
-    const list = await getChildren();
-    if (list.length === 0) {
-      setHasChildren(false);
-      return;
+    try {
+      const list = await getChildren();
+      if (list.length === 0) {
+        setHasChildren(false);
+        return;
+      }
+
+      const savedId = typeof window !== "undefined" ? localStorage.getItem(ACTIVE_CHILD_KEY) : null;
+      const child = list.find(c => c.id === savedId) ?? list[0];
+      setActiveChild(child);
+
+      const [level, stars, badges, curriculumMissions, todayMissions] = await Promise.all([
+        getCurrentLevel(child.id, child.language),
+        getTotalStars(child.id, child.language),
+        getChildBadges(child.id, child.language),
+        getCurriculumMissions(child.id),
+        getTodayMissions(child.id, child.language),
+      ]);
+
+      setLevel(level);
+      setActivitiesCompleted(todayMissions.length);
+      setStarsCollected(stars);
+      setBadgesEarned(badges.length);
+      setCompletedInLevel(new Set(curriculumMissions.filter(m => m.completed).map(m => m.category)));
+    } catch (err) {
+      console.error("[MyProfilePage] load error:", err);
+    } finally {
+      setLoading(false);
     }
-
-    const savedId = typeof window !== "undefined" ? localStorage.getItem(ACTIVE_CHILD_KEY) : null;
-    const child = list.find(c => c.id === savedId) ?? list[0];
-    setActiveChild(child);
-
-    const [level, stars, badges, curriculumMissions, todayMissions] = await Promise.all([
-      getCurrentLevel(child.id, child.language),
-      getTotalStars(child.id, child.language),
-      getChildBadges(child.id, child.language),
-      getCurriculumMissions(child.id),
-      getTodayMissions(child.id, child.language),
-    ]);
-
-    setLevel(level);
-    setActivitiesCompleted(todayMissions.length);
-    setStarsCollected(stars);
-    setBadgesEarned(badges.length);
-    setCompletedInLevel(new Set(curriculumMissions.filter(m => m.completed).map(m => m.category)));
-    setLoading(false);
   };
 
   if (loading) {

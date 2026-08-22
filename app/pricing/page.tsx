@@ -52,7 +52,15 @@ function formatAmount(amount: number, currency: Currency): string {
 }
 
 export default function PricingPage() {
-  return <Suspense><PricingInner /></Suspense>;
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin w-8 h-8 rounded-full border-4 border-[var(--ds-brand-primary)] border-t-transparent" />
+      </div>
+    }>
+      <PricingInner />
+    </Suspense>
+  );
 }
 
 function PricingInner() {

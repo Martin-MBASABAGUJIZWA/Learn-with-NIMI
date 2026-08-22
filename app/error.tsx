@@ -28,7 +28,7 @@ export default function Error({
             Try Again
           </button>
           <Link
-            href="/home"
+            href="/"
             className="bg-[var(--ds-surface-card)] border border-ds-border text-ds-text font-bold px-6 py-3 hover:bg-[var(--ds-surface-card)] transition"
             style={{ borderRadius: 'var(--leaf-r)' }}
           >

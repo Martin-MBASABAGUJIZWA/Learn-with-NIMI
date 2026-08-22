@@ -18,18 +18,18 @@ export default function NotFound() {
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Link
-            href="/stories"
+            href="/"
             className="text-white font-black px-7 py-3.5 shadow-md transition text-mbase"
             style={{ backgroundColor: 'var(--ds-brand-primary)', borderRadius: 'var(--leaf-r)' }}
           >
-            📖 Back to Stories
+            🏠 Go to Home
           </Link>
           <Link
-            href="/"
+            href="/loginpage"
             className="bg-[var(--ds-surface-card)] border border-[var(--ds-border-primary)] text-[var(--ds-text-secondary)] font-bold px-7 py-3.5 hover:bg-[var(--ds-surface-card)] transition text-mbase"
             style={{ borderRadius: 'var(--leaf-r)' }}
           >
-            Home
+            📖 Sign In to read stories
           </Link>
         </div>
       </div>

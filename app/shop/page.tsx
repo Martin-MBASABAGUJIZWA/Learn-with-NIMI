@@ -117,6 +117,7 @@ export default function RewardShopPage() {
   const [cosmetics, setCosmetics] = useState<ChildCosmetics>({ ...EMPTY_COSMETICS });
   const [loading, setLoading] = useState(true);
   const [purchasingId, setPurchasingId] = useState<string | null>(null);
+  const [buying, setBuying] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
   const toastKey = useRef(0);
 
@@ -168,18 +169,24 @@ export default function RewardShopPage() {
   }, new Map<string, number>());
 
   const handleBuy = useCallback(async (item: ShopItem) => {
+    if (buying) return;
     if (!activeChild || balance === null || balance < item.price) return;
     if (!CONSUMABLE_IDS.has(item.id) && ownedIds.has(item.id)) return;
+    setBuying(true);
     setPurchasingId(item.id);
-    const purchase = await purchaseShopItem(activeChild.id, item.id, item.price);
-    setPurchasingId(null);
-    if (!purchase) {
-      showToast(t("shopPurchaseErrorMsg"), "error");
-      return;
+    try {
+      const purchase = await purchaseShopItem(activeChild.id, item.id, item.price);
+      if (!purchase) {
+        showToast(t("shopPurchaseErrorMsg"), "error");
+        return;
+      }
+      setPurchases(prev => [...prev, purchase]);
+      showToast(`${item.emoji} ${t(item.nameKey)} ${t("shopUnlockedCelebration")}`, "success");
+    } finally {
+      setPurchasingId(null);
+      setBuying(false);
     }
-    setPurchases(prev => [...prev, purchase]);
-    showToast(`${item.emoji} ${t(item.nameKey)} ${t("shopUnlockedCelebration")}`, "success");
-  }, [activeChild, balance, ownedIds, t, showToast]);
+  }, [buying, activeChild, balance, ownedIds, t, showToast]);
 
   const handleEquip = useCallback(async (item: ShopItem) => {
     if (!activeChild || !item.slot) return;

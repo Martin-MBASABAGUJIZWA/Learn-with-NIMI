@@ -111,6 +111,7 @@ export default function LandingPage() {
   const [menuOpen,     setMenuOpen]     = useState(false);
   const [stories,      setStories]      = useState<Story[]>([]);
   const [authed,       setAuthed]       = useState(false);
+  const [authChecked,  setAuthChecked]  = useState(false);
   const [scrolled,     setScrolled]     = useState(false);
   const [ctaVisible,   setCtaVisible]   = useState(false);
 
@@ -144,7 +145,8 @@ export default function LandingPage() {
       if (user) setAuthed(true);
       if (Array.isArray(storiesData)) setStories((storiesData as Story[]).slice(0, 4));
       if (testimonialsData) setTestimonials(testimonialsData);
-    }).catch(() => { /* leave defaults — auth/network failure is non-fatal */ });
+    }).catch(() => { /* leave defaults — auth/network failure is non-fatal */ })
+    .finally(() => setAuthChecked(true));
   }, []);
   useEffect(() => {
     const fn = () => {
@@ -163,6 +165,9 @@ export default function LandingPage() {
     window.addEventListener("keydown", fn);
     return () => window.removeEventListener("keydown", fn);
   }, []);
+
+  // While auth is still being determined, keep the CTA inert to avoid flashing /signuppage to logged-in users.
+  const ctaHref = !authChecked ? "#" : authed ? "/home" : "/signuppage";
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -214,7 +219,7 @@ export default function LandingPage() {
           </p>
           <div className="flex justify-center mt-1.5">
             <motion.div whileHover={{scale:1.06}} whileTap={{scale:0.93}} transition={{type:"spring",stiffness:420,damping:22}}>
-              <Link href={authed ? "/home" : "/signuppage"}>
+              <Link href={ctaHref}>
                 <Image src="/themes/default/navs/start-learning.png" alt="Start Learning" width={150} height={100} draggable={false}
                   className="h-auto object-contain drop-shadow-lg select-none" style={{width:"clamp(118px,34vw,150px)"}} />
               </Link>
@@ -264,7 +269,7 @@ export default function LandingPage() {
           </p>
           <div className="flex justify-center -mt-3">
             <motion.div whileHover={{scale:1.06}} whileTap={{scale:0.93}} transition={{type:"spring",stiffness:420,damping:22}}>
-              <Link href={authed ? "/home" : "/signuppage"}>
+              <Link href={ctaHref}>
                 <Image src="/themes/default/navs/start-learning.png" alt="Start Learning" width={270} height={90} draggable={false}
                   className="object-contain drop-shadow-lg select-none" style={{width:"clamp(210px,27vw,270px)", height:"auto"}} />
               </Link>
@@ -311,7 +316,7 @@ export default function LandingPage() {
           </p>
           <div className="flex gap-3 flex-wrap items-center -mt-3">
             <motion.div whileHover={{scale:1.06}} whileTap={{scale:0.93}} transition={{type:"spring",stiffness:420,damping:22}}>
-              <Link href={authed ? "/home" : "/signuppage"}>
+              <Link href={ctaHref}>
                 <Image src="/themes/default/navs/start-learning.png" alt="Start Learning" width={310} height={103} draggable={false}
                   className="object-contain drop-shadow-lg select-none" style={{width:"clamp(230px,16vw,310px)", height:"auto"}} />
               </Link>
@@ -942,7 +947,7 @@ export default function LandingPage() {
 
           <motion.div variants={fadeUp} whileHover={{scale:1.06}} whileTap={{scale:0.95}}
             transition={{type:"spring",stiffness:400,damping:20}}>
-            <Link href={authed ? "/home" : "/signuppage"}>
+            <Link href={ctaHref}>
               <Image src="/themes/default/navs/start-learning.png" alt="Start Learning" width={280} height={93} draggable={false}
                 className="object-contain drop-shadow-xl select-none" style={{width:"clamp(200px,35vw,280px)", height:"auto"}} />
             </Link>
@@ -979,7 +984,7 @@ export default function LandingPage() {
       <LandingNewsletterSection />
 
       {/* ══ STICKY MOBILE CTA ════════════════════════════════════════ */}
-      <StickyMobileCTA href={authed ? "/home" : "/signuppage"} visible={ctaVisible} />
+      <StickyMobileCTA href={ctaHref} visible={ctaVisible} />
 
       {/* ══ FOOTER ═══════════════════════════════════════════════════ */}
       <footer className="bg-gray-950 px-5 sm:px-10 lg:px-14 py-14">

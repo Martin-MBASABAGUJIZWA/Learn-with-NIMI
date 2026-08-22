@@ -62,12 +62,17 @@ export default function OnboardingPage() {
       if (pendingRef) {
         const { data: { session } } = await supabase.auth.getSession();
         if (session?.access_token) {
-          void fetch("/api/referral", {
-            method: "POST",
-            headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
-            body: JSON.stringify({ code: pendingRef }),
-          });
-          sessionStorage.removeItem(PENDING_REF_KEY);
+          try {
+            await fetch("/api/referral", {
+              method: "POST",
+              headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
+              body: JSON.stringify({ code: pendingRef }),
+            });
+          } catch (refErr) {
+            console.warn("[onboarding] referral apply failed (non-blocking):", refErr);
+          } finally {
+            sessionStorage.removeItem(PENDING_REF_KEY);
+          }
         }
       }
     })();
