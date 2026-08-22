@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Loader2, AlertCircle, CheckCircle2, ArrowLeft } from "lucide-react";
 import supabase from "@/lib/supabaseClient";
 
 type Mode = "login" | "forgot" | "forgot-sent";
 
 export default function AdminLoginPage() {
+  const router = useRouter();
   const emailRef = useRef<HTMLInputElement>(null);
 
   const [mode, setMode]               = useState<Mode>("login");
@@ -19,10 +21,10 @@ export default function AdminLoginPage() {
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) window.location.href = "/admin";
+      if (session) router.replace("/admin");
     });
     emailRef.current?.focus();
-  }, []);
+  }, [router]);
 
   const clearError = () => setError("");
 

@@ -260,7 +260,11 @@ export default function AppShell({ children }: AppShellProps) {
     setPendingLanguage(null);
   };
 
-  if (authLoading || !user) return null;
+  if (authLoading || !user) return (
+    <div className="flex items-center justify-center min-h-screen bg-[var(--ds-surface-page,#f9fafb)]">
+      <div className="animate-spin w-10 h-10 rounded-full border-4 border-[var(--ds-brand-primary,#16a34a)] border-t-transparent" />
+    </div>
+  );
 
   return (
     <MotionConfig reducedMotion="user">

@@ -8,7 +8,7 @@ export default async function HomePage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/loginpage");
 
-  const [{ data: childrenData }, { data: subData }] = await Promise.all([
+  const [{ data: childrenData, error: childrenError }, { data: subData }] = await Promise.all([
     supabase.from("children").select("*")
       .or(`parent_id.eq.${user.id},teacher_id.eq.${user.id}`)
       .order("created_at"),
@@ -16,6 +16,9 @@ export default async function HomePage() {
       .eq("parent_id", user.id).eq("status", "active")
       .order("current_period_end", { ascending: false }).limit(1).maybeSingle(),
   ]);
+
+  // DB error — don't redirect to /onboarding (that would create a false account setup loop)
+  if (childrenError) redirect("/");
 
   const children = (childrenData ?? []) as Child[];
   if (children.length === 0) redirect("/onboarding");
