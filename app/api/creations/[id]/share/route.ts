@@ -18,6 +18,22 @@ export async function POST(req: NextRequest, ctx: RouteContext) {
     const { data: { user }, error: authErr } = await supabase.auth.getUser(token);
     if (authErr || !user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+    // S4: Verify the caller owns this creation or is an admin before mutating share count.
+    const { data: creation } = await supabase
+      .from("creations")
+      .select("parent_id")
+      .eq("id", id)
+      .maybeSingle();
+    if (!creation) return NextResponse.json({ error: "Creation not found" }, { status: 404 });
+    if (creation.parent_id !== user.id) {
+      const { data: adminRow } = await supabase
+        .from("admins")
+        .select("id")
+        .eq("id", user.id)
+        .maybeSingle();
+      if (!adminRow) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     const { data, error } = await supabase.rpc("increment_share_count", { creation_id: id });
     if (error) {
       // Fallback: manual increment if RPC not available

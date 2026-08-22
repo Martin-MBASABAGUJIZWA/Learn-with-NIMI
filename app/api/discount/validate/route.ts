@@ -1,9 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import supabase from "@/lib/supabaseClient";
 
+// M1: In-memory rate limit — max 10 requests per IP per minute.
+const discountRateLimit = new Map<string, number[]>();
+const DISCOUNT_MAX = 10;
+const DISCOUNT_WINDOW_MS = 60 * 1000;
+
 // POST { code, productSlug } → { valid, discount_type, discount_value, description }
 // Public endpoint (no auth required) — RLS only exposes active codes.
 export async function POST(req: NextRequest) {
+  const ip = req.headers.get("x-forwarded-for") ?? "unknown";
+  const now = Date.now();
+  const ipTimestamps = (discountRateLimit.get(ip) ?? []).filter(t => now - t < DISCOUNT_WINDOW_MS);
+  if (ipTimestamps.length >= DISCOUNT_MAX) {
+    return NextResponse.json({ valid: false, error: "Too many requests" }, { status: 429 });
+  }
+  ipTimestamps.push(now);
+  discountRateLimit.set(ip, ipTimestamps);
   let body: { code?: string; productSlug?: string };
   try { body = await req.json(); } catch { return NextResponse.json({ valid: false, error: "Bad request" }, { status: 400 }); }
 

@@ -4,13 +4,13 @@ import { getAuthUser } from "@/lib/supabaseRouteAuth";
 import { v4 as uuidv4 } from "uuid";
 import { getServiceClient } from "@/lib/supabase/serviceClient";
 
-const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp", "image/svg+xml"];
+// S2: SVG removed — allows stored XSS via script elements in SVG content.
+const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp"];
 const MIME_TO_EXT: Record<string, string> = {
   "image/jpeg": "jpg",
   "image/png":  "png",
   "image/gif":  "gif",
   "image/webp": "webp",
-  "image/svg+xml": "svg",
 };
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 const STORAGE_BUCKET = "creations";

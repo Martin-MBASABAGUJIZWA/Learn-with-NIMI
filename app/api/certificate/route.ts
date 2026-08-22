@@ -43,6 +43,18 @@ export async function GET(req: NextRequest) {
   // Watermark token: truncated parent ID, low-visibility stamp for tracing
   const watermarkToken = `NMK-${user.id.slice(0, 8).toUpperCase()}`;
 
+  // S6: Allowed hostnames for certificate image URLs.
+  const supabaseHost = (() => {
+    try { return new URL(process.env.NEXT_PUBLIC_SUPABASE_URL ?? "").hostname; } catch { return ""; }
+  })();
+  function isAllowedCertUrl(raw: string): boolean {
+    if (!raw.startsWith("https://")) return false;
+    try {
+      const { hostname } = new URL(raw);
+      return supabaseHost !== "" && hostname === supabaseHost;
+    } catch { return false; }
+  }
+
   // ── Template mode: use admin-configured certificate image ──
   if (storyId) {
     try {
@@ -60,6 +72,12 @@ export async function GET(req: NextRequest) {
         const url = langConfig.image_url.startsWith("http")
           ? langConfig.image_url
           : `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${langConfig.image_url}`;
+
+        // S6: Validate URL before fetching to prevent SSRF.
+        if (!isAllowedCertUrl(url)) {
+          // Skip this template and fall through to the global template / default.
+          throw new Error(`[Certificate] Blocked disallowed image URL: ${new URL(url).hostname}`);
+        }
 
         const nameX    = langConfig.nameX    ?? 397;
         const nameY    = langConfig.nameY    ?? 1010;
@@ -143,6 +161,10 @@ export async function GET(req: NextRequest) {
       .maybeSingle();
 
     if (tmpl?.image_url) {
+      // S6: Validate URL before fetching to prevent SSRF.
+      if (!isAllowedCertUrl(tmpl.image_url)) {
+        throw new Error(`[Certificate] Blocked disallowed global template URL: ${tmpl.image_url}`);
+      }
       const imgRes = await fetch(tmpl.image_url, { signal: AbortSignal.timeout(8000) });
       if (imgRes.ok) {
         const imgBuffer = Buffer.from(await imgRes.arrayBuffer());

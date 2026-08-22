@@ -12,8 +12,9 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const host = req.headers.get("host") ?? "";
-  const base = host.includes("localhost") ? `http://${host}` : `https://${host}`;
+  // S3: Use env vars for base URL — avoids host-header injection attacks.
+  const rawUrl = process.env.NEXT_PUBLIC_APP_URL ?? process.env.VERCEL_URL ?? "http://localhost:3000";
+  const base = rawUrl.startsWith("http") ? rawUrl : `https://${rawUrl}`;
   const auth = { Authorization: `Bearer ${cronSecret}` };
 
   const dailyJobs: Promise<Response>[] = [
