@@ -112,9 +112,10 @@ async function fetchKnowledgeGraph(
     });
     if (!data || !Array.isArray(data) || data.length === 0) return null;
 
-    const rows = (data as Array<{ skill_label: string; mastery_level: string; average_confidence: number }>)
+    // D4: actual RPC columns are curriculum_skill and avg_confidence
+    const rows = (data as Array<{ curriculum_skill: string; mastery_level: string; avg_confidence: number }>)
       .slice(0, 5)
-      .map(r => `${r.skill_label}: ${r.mastery_level} (${Math.round((r.average_confidence ?? 0) * 100)}% confidence)`);
+      .map(r => `${r.curriculum_skill}: ${r.mastery_level} (${Math.round((r.avg_confidence ?? 0) * 100)}% confidence)`);
 
     return `This learner's current skill levels:\n${rows.map(r => `• ${r}`).join('\n')}`;
   } catch {

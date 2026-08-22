@@ -91,9 +91,12 @@ function buildAttributionBlock(
 ): string {
   if (role === 'child' || webSources.length === 0) return '';
 
-  const lines = webSources.map(s =>
-    `• ${s.title} (${new URL(s.url).hostname}) — ${s.reasonSelected}${cacheHit ? ' [cached]' : ''}`
-  );
+  // D8: wrap URL parsing in try/catch — invalid URLs must not crash attribution.
+  const lines = webSources.map(s => {
+    let hostname = s.url;
+    try { hostname = new URL(s.url).hostname; } catch { /* use raw url as fallback */ }
+    return `• ${s.title} (${hostname}) — ${s.reasonSelected}${cacheHit ? ' [cached]' : ''}`;
+  });
   const retrieved = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   return `**Sources consulted (${retrieved})**\n${lines.join('\n')}`;
 }

@@ -1,13 +1,18 @@
-import supabase from "@/lib/supabaseClient";
+import { getServiceClient } from "@/lib/supabase/serviceClient";
 import { qcached, lscached, TTL_LONG } from "@/lib/queryCache";
 import type { Product, Order, Subscription, Currency } from "./types";
+
+// Use the service-role client so this module is safe to import from server-side
+// code (API routes, Server Components, crons) without carrying a browser session.
+// C1: replaced browser-only supabaseClient with service-role client.
+function getDb() { return getServiceClient(); }
 
 const LS_PRODUCTS_TTL = 60 * 60_000; // 1 hour — survives page reloads so pricing shows instantly
 
 export function getProducts(): Promise<Product[]> {
   return lscached("nimi:products:v3", LS_PRODUCTS_TTL, () =>
     qcached("products:v3", async () => {
-      const { data, error } = await supabase
+      const { data, error } = await getDb()
         .from("products")
         .select("*")
         .eq("is_active", true)
@@ -19,7 +24,7 @@ export function getProducts(): Promise<Product[]> {
 }
 
 export async function getProduct(slug: string): Promise<Product | null> {
-  const { data, error } = await supabase
+  const { data, error } = await getDb()
     .from("products")
     .select("*")
     .eq("slug", slug)
@@ -38,7 +43,7 @@ export async function createOrder(params: {
   paymentProvider: string;
   personalizationData?: Record<string, unknown>;
 }): Promise<Order | null> {
-  const { data, error } = await supabase.from("orders").insert({
+  const { data, error } = await getDb().from("orders").insert({
     parent_id: params.parentId,
     child_id: params.childId ?? null,
     product_id: params.productId,
@@ -52,6 +57,7 @@ export async function createOrder(params: {
   if (error) { console.error("[createOrder]", error); return null; }
 
   if (params.amount === 0) {
+    // D6: propagate grantAccess failure so callers detect it.
     await grantAccess(params.parentId, params.productId, data.id);
   }
 
@@ -63,13 +69,15 @@ export async function updateOrderStatus(orderId: string, status: string, provide
   if (providerTxId) updates.provider_transaction_id = providerTxId;
   if (status === "completed") updates.completed_at = new Date().toISOString();
 
-  const { error } = await supabase.from("orders").update(updates).eq("id", orderId);
+  const { error } = await getDb().from("orders").update(updates).eq("id", orderId);
   if (error) { console.error("[updateOrderStatus]", error); return false; }
   return true;
 }
 
+// D6: grantAccess now throws when the content_access INSERT fails so callers
+// (including createOrder) can detect and handle the failure.
 export async function grantAccess(parentId: string, productId: string, orderId: string): Promise<void> {
-  const product = await supabase.from("products").select("tier, story_id").eq("id", productId).single();
+  const product = await getDb().from("products").select("tier, story_id").eq("id", productId).single();
   if (!product.data) return;
 
   const accessType = product.data.tier === "club" ? "club"
@@ -78,7 +86,7 @@ export async function grantAccess(parentId: string, productId: string, orderId: 
     : product.data.tier === "family_bundle" ? "bundle"
     : "story";
 
-  const { error: accessErr } = await supabase.from("content_access").insert({
+  const { error: accessErr } = await getDb().from("content_access").insert({
     parent_id: parentId,
     access_type: accessType,
     story_id: product.data.story_id,
@@ -86,20 +94,27 @@ export async function grantAccess(parentId: string, productId: string, orderId: 
   });
   if (accessErr) {
     console.error("[grantAccess] content_access insert failed:", accessErr.message, { parentId, orderId });
+    throw new Error(`grantAccess failed: ${accessErr.message}`);
   }
 }
 
+// D7: capture error from content_access query and throw so callers can
+// distinguish "no access records" from a DB failure.
 export async function getParentAccess(parentId: string): Promise<string[]> {
-  const { data } = await supabase
+  const { data, error } = await getDb()
     .from("content_access")
     .select("access_type, story_id")
     .eq("parent_id", parentId)
     .eq("is_active", true);
+  if (error) {
+    console.error("[getParentAccess]", error);
+    throw new Error(`getParentAccess failed: ${error.message}`);
+  }
   return (data ?? []).map(d => d.access_type + (d.story_id ? `:${d.story_id}` : ""));
 }
 
 export async function getParentOrders(parentId: string): Promise<Order[]> {
-  const { data } = await supabase
+  const { data } = await getDb()
     .from("orders")
     .select("*")
     .eq("parent_id", parentId)
@@ -108,7 +123,7 @@ export async function getParentOrders(parentId: string): Promise<Order[]> {
 }
 
 export async function getActiveSubscription(parentId: string): Promise<Subscription | null> {
-  const { data } = await supabase
+  const { data } = await getDb()
     .from("nimipiko_subscriptions")
     .select("*")
     .eq("parent_id", parentId)
@@ -122,7 +137,7 @@ export async function getActiveSubscription(parentId: string): Promise<Subscript
   // the UI can show a "payment failed — update your card" warning banner.
   // Once grace_ends_at passes the cron expires them; until then the user still
   // has access and needs to see the warning.
-  const { data: pastDue } = await supabase
+  const { data: pastDue } = await getDb()
     .from("nimipiko_subscriptions")
     .select("*")
     .eq("parent_id", parentId)
@@ -136,7 +151,7 @@ export async function getActiveSubscription(parentId: string): Promise<Subscript
   // 24-hour grace period for recently-expired trials — lets the user finish
   // their session and see a clear "your trial ended" message rather than an
   // abrupt content lockout at the exact expiry second.
-  const { data: grace } = await supabase
+  const { data: grace } = await getDb()
     .from("nimipiko_subscriptions")
     .select("*")
     .eq("parent_id", parentId)

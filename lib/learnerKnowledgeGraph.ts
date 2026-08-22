@@ -114,6 +114,84 @@ export async function getConceptsNeedingReview(
   return (data as ConceptReviewRow[]) ?? [];
 }
 
+// ── Batch Upsert Concept Knowledge ───────────────────────────────────────────
+
+/**
+ * M4: Batch version of upsertConceptKnowledge for callers that process many
+ * words in a loop.  All concept lookups are collapsed into a single `.in()`
+ * query; unknown concepts are seeded and the knowledge RPC is called only
+ * once per distinct concept_id rather than once per word.
+ *
+ * All events must share the same language.
+ * Fire-and-forget safe — errors are logged but never thrown.
+ */
+export async function batchUpsertConceptKnowledge(
+  supabase: SupabaseClient,
+  events:   ConceptUpsertEvent[],
+): Promise<void> {
+  if (events.length === 0) return;
+
+  const language = events[0].language;
+  const normalized = events.map(e => ({ ...e, conceptName: e.conceptName.toLowerCase() }));
+  const wordList   = [...new Set(normalized.map(e => e.conceptName))];
+
+  // 1. Single lookup for all concepts
+  const { data: found, error: lookupError } = await supabase
+    .from("concepts")
+    .select("id, name")
+    .in("name", wordList)
+    .eq("language", language);
+
+  if (lookupError) {
+    console.error("[KnowledgeGraph] batchUpsertConceptKnowledge lookup error:", lookupError.message);
+    return;
+  }
+
+  const idByName = new Map<string, string>(
+    (found ?? []).map(r => [r.name as string, r.id as string])
+  );
+
+  // 2. Seed any missing concepts from the taxonomy
+  const missing = wordList.filter(w => !idByName.has(w));
+  for (const name of missing) {
+    const node = lookupConcept(name);
+    if (!node) continue;
+    const { data: inserted, error: insertError } = await supabase
+      .from("concepts")
+      .upsert({
+        name:             node.name,
+        concept_type:     node.concept_type,
+        language,
+        parent_name:      node.parent_name ?? null,
+        curriculum_skill: node.curriculum_skill ?? null,
+        display_emoji:    node.display_emoji ?? null,
+        description:      node.description ?? null,
+      }, { onConflict: "name,language,concept_type" })
+      .select("id, name")
+      .single();
+    if (!insertError && inserted) {
+      idByName.set(inserted.name as string, inserted.id as string);
+    }
+  }
+
+  // 3. Fire upsert_concept_knowledge for each event that has a resolved concept_id
+  await Promise.all(
+    normalized
+      .filter(e => idByName.has(e.conceptName))
+      .map(e =>
+        supabase.rpc("upsert_concept_knowledge", {
+          p_child_id:   e.childId,
+          p_concept_id: idByName.get(e.conceptName)!,
+          p_seen:       e.seen,
+          p_correct:    e.correct,
+          p_story_id:   e.storyId ?? null,
+        }).then(({ error }) => {
+          if (error) console.error("[KnowledgeGraph] batchUpsert RPC error:", error.message);
+        })
+      )
+  );
+}
+
 // ── Upsert Concept Knowledge ──────────────────────────────────────────────────
 
 /**

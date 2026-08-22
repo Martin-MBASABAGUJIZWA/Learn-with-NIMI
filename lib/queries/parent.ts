@@ -110,6 +110,19 @@ export async function createChild(
     if (!sub) return { data: null, error: "subscription_required" };
   }
 
+  // D3: re-check the child count immediately before inserting to close the TOCTOU
+  // window between the check above and the INSERT below. If the count changed
+  // (concurrent insert) return an error; the DB-level constraint on parent_id
+  // uniqueness is the final guard, but this makes the race much less likely to
+  // succeed silently and returns a clear error to the caller.
+  const { count: countNow } = await supabase
+    .from("children")
+    .select("id", { count: "exact", head: true })
+    .eq("parent_id", user.id);
+  if ((countNow ?? 0) > (count ?? 0)) {
+    return { data: null, error: "Child already added — please refresh and try again." };
+  }
+
   const { data, error } = await supabase
     .from("children")
     .insert({ ...child, parent_id: user.id })

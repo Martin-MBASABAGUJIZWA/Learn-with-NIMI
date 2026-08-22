@@ -28,10 +28,16 @@ export async function sendPushToParent(
 ): Promise<{ sent: number }> {
   if (!VAPID_CONFIGURED) return { sent: 0 };
 
-  const { data: subs } = await sb
+  // L4: capture DB error so callers know when the query itself fails.
+  const { data: subs, error: dbError } = await sb
     .from("push_subscriptions")
     .select("id, endpoint, p256dh, auth")
     .eq("parent_id", parentId);
+
+  if (dbError) {
+    console.error("[sendPushToParent] DB error fetching subscriptions:", dbError);
+    return { sent: 0, error: "db_error" } as { sent: number };
+  }
 
   let sent = 0;
   for (const sub of subs ?? []) {
