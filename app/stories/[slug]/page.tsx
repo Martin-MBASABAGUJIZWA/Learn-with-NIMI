@@ -52,6 +52,20 @@ const ACTIVE_CHILD_KEY = "nimipiko_active_child";
 const ROMAN = ["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV","XVI","XVII","XVIII","XIX","XX"];
 const toRoman = (n: number) => ROMAN[n - 1] ?? String(n);
 
+// Star field — precomputed at module scope so no objects are recreated on re-render
+// and Framer Motion can cache the animation configs across mounts.
+const STARS = [
+  [12,8],[88,5],[34,14],[67,9],[22,20],[78,17],[50,6],[5,30],[95,25],
+  [40,35],[71,28],[15,42],[83,38],[58,48],[28,55],[90,50],[10,62],
+  [75,66],[45,72],[62,80],[30,76],[86,84],[18,90],[55,88],[38,95],
+].map(([x, y], i) => ({
+  x, y,
+  size: i % 5 === 0 ? 3 : i % 3 === 0 ? 2 : 1.5,
+  peakOpacity: i % 4 === 0 ? 0.8 : 0.45,
+  duration: 2 + i * 0.4,
+  delay: i * 0.18,
+}));
+
 /* ─────────────────────────────────────────────────────────────
    Certificate modal — personalized admin template with name
 ───────────────────────────────────────────────────────────── */
@@ -626,16 +640,12 @@ export default function StoryDetailPage() {
                 className="flex-1 flex flex-col relative"
                 style={{ background: "linear-gradient(160deg, #04111f 0%, #091829 45%, #100e24 100%)" }}>
 
-                {/* ── Star field ── */}
-                {[
-                  [12,8],[88,5],[34,14],[67,9],[22,20],[78,17],[50,6],[5,30],[95,25],
-                  [40,35],[71,28],[15,42],[83,38],[58,48],[28,55],[90,50],[10,62],
-                  [75,66],[45,72],[62,80],[30,76],[86,84],[18,90],[55,88],[38,95],
-                ].map(([x,y],i) => (
+                {/* ── Star field (configs precomputed at module scope) ── */}
+                {STARS.map((s, i) => (
                   <motion.div key={i} className="absolute rounded-full pointer-events-none select-none"
-                    style={{ left:`${x}%`, top:`${y}%`, width: i%5===0?3:i%3===0?2:1.5, height: i%5===0?3:i%3===0?2:1.5, background:"#fff" }}
-                    animate={{ opacity:[0.15,i%4===0?0.8:0.45,0.15] }}
-                    transition={{ duration:2+i*0.4, repeat:Infinity, delay:i*0.18, ease:"easeInOut" }} />
+                    style={{ left:`${s.x}%`, top:`${s.y}%`, width:s.size, height:s.size, background:"#fff" }}
+                    animate={{ opacity:[0.15, s.peakOpacity, 0.15] }}
+                    transition={{ duration:s.duration, repeat:Infinity, delay:s.delay, ease:"easeInOut" }} />
                 ))}
 
                 {/* ── Top nav ── */}
