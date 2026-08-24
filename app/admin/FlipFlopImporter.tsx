@@ -2,7 +2,33 @@
 import React, { useState, useRef } from 'react'
 import supabase from '@/lib/supabaseClient'
 import { smartUpload } from '@/lib/uploadWithProgress'
-import { Upload, CheckCircle2, AlertCircle, FileArchive, Image as ImageIcon, Music, X } from 'lucide-react'
+import { Upload, CheckCircle2, AlertCircle, FileArchive, Image as ImageIcon, Music, X, FileText } from 'lucide-react'
+
+async function pdfToImageFiles(pdfFile: File, onPage?: (n: number, total: number) => void): Promise<File[]> {
+  const pdfjsLib = await import('pdfjs-dist')
+  pdfjsLib.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString()
+
+  const arrayBuffer = await pdfFile.arrayBuffer()
+  const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise
+  const pageFiles: File[] = []
+
+  for (let i = 1; i <= pdf.numPages; i++) {
+    onPage?.(i, pdf.numPages)
+    const page = await pdf.getPage(i)
+    const viewport = page.getViewport({ scale: 2 })
+    const canvas = document.createElement('canvas')
+    canvas.width = viewport.width
+    canvas.height = viewport.height
+    const ctx = canvas.getContext('2d')!
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (page as any).render({ canvasContext: ctx, viewport }).promise
+    const blob = await new Promise<Blob>(res => canvas.toBlob(b => res(b!), 'image/jpeg', 0.92))
+    const num = String(i).padStart(3, '0')
+    pageFiles.push(new File([blob], `${num}.jpg`, { type: 'image/jpeg' }))
+  }
+
+  return pageFiles
+}
 
 async function deleteStorageFile(storagePath: string): Promise<void> {
   const slash = storagePath.indexOf('/')
@@ -35,14 +61,18 @@ function extractPageNum(name: string): number {
 export default function FlipFlopImporter({ storyId, storyTitle, language, onDone, onClose }: Props) {
   const [files, setFiles] = useState<DetectedFile[]>([])
   const [importing, setImporting] = useState(false)
+  const [extracting, setExtracting] = useState(false)
+  const [extractProgress, setExtractProgress] = useState('')
   const [progress, setProgress] = useState(0)
   const [currentFile, setCurrentFile] = useState('')
   const [done, setDone] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const handleFiles = (fileList: FileList) => {
+  const handleFiles = async (fileList: FileList) => {
     const detected: DetectedFile[] = []
+    const pdfFiles: File[] = []
+
     for (const f of Array.from(fileList)) {
       const lower = f.name.toLowerCase()
       const pageNum = extractPageNum(f.name)
@@ -50,11 +80,34 @@ export default function FlipFlopImporter({ storyId, storyTitle, language, onDone
         detected.push({ name: f.name, type: 'image', pageNum, file: f })
       } else if (lower.match(/\.(mp3|wav|ogg|m4a|aac)$/)) {
         detected.push({ name: f.name, type: 'audio', pageNum, file: f })
+      } else if (lower.match(/\.pdf$/)) {
+        pdfFiles.push(f)
       }
     }
+
+    if (pdfFiles.length > 0) {
+      setExtracting(true)
+      setError(null)
+      try {
+        for (const pdf of pdfFiles) {
+          const pages = await pdfToImageFiles(pdf, (n, total) => {
+            setExtractProgress(`Extracting ${pdf.name}: page ${n}/${total}…`)
+          })
+          pages.forEach((imgFile, idx) => {
+            detected.push({ name: imgFile.name, type: 'image', pageNum: idx + 1, file: imgFile })
+          })
+        }
+      } catch {
+        setError('Failed to extract PDF pages. Try exporting as images instead.')
+      } finally {
+        setExtracting(false)
+        setExtractProgress('')
+      }
+    }
+
     detected.sort((a, b) => a.pageNum - b.pageNum || a.type.localeCompare(b.type))
     setFiles(detected)
-    setError(null)
+    if (pdfFiles.length === 0) setError(null)
   }
 
   const handleImport = async () => {
@@ -172,18 +225,26 @@ export default function FlipFlopImporter({ storyId, storyTitle, language, onDone
                 {/* Instructions */}
                 <div className="bg-green-50 rounded-xl p-4 text-[12px] text-green-700">
                   <p className="font-bold mb-1">How to import:</p>
-                  <p>Select all page images and audio files at once. Name files with numbers (001.jpg, 002.jpg, etc.) so pages and audio match automatically.</p>
+                  <p>Select page images, a PDF, and/or audio files at once. Name image files with numbers (001.jpg, 002.jpg, etc.) so pages and audio match automatically. A PDF is automatically split into one image per page.</p>
                 </div>
 
+                {/* Extracting spinner */}
+                {extracting && (
+                  <div className="flex items-center gap-3 bg-blue-50 border border-blue-200 rounded-xl px-4 py-3">
+                    <div className="w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full animate-spin shrink-0" />
+                    <p className="text-[12px] text-blue-700 font-medium">{extractProgress || 'Extracting PDF pages…'}</p>
+                  </div>
+                )}
+
                 {/* File picker */}
-                <button onClick={() => inputRef.current?.click()}
-                  className="w-full border-2 border-dashed border-gray-200 rounded-xl py-8 text-center hover:border-green-300 hover:bg-green-50/30 transition">
+                <button onClick={() => inputRef.current?.click()} disabled={extracting}
+                  className="w-full border-2 border-dashed border-gray-200 rounded-xl py-8 text-center hover:border-green-300 hover:bg-green-50/30 transition disabled:opacity-50">
                   <Upload size={28} className="mx-auto text-gray-400 mb-2" />
                   <p className="text-[13px] font-bold text-gray-600">Select Files</p>
-                  <p className="text-[11px] text-gray-400 mt-0.5">Images (jpg, png) + Audio (mp3, wav)</p>
+                  <p className="text-[11px] text-gray-400 mt-0.5">PDF · Images (jpg, png) · Audio (mp3, wav)</p>
                 </button>
-                <input ref={inputRef} type="file" multiple accept="image/*,audio/*" className="hidden"
-                  onChange={e => { if (e.target.files) handleFiles(e.target.files) }} />
+                <input ref={inputRef} type="file" multiple accept="image/*,audio/*,.pdf,application/pdf" className="hidden"
+                  onChange={e => { if (e.target.files) void handleFiles(e.target.files) }} />
 
                 {/* Detection results */}
                 {files.length > 0 && (
@@ -236,9 +297,9 @@ export default function FlipFlopImporter({ storyId, storyTitle, language, onDone
                   <button onClick={onClose} className="flex-1 border border-gray-200 text-gray-600 font-bold text-[13px] rounded-xl py-2.5 hover:bg-gray-50 transition">
                     Cancel
                   </button>
-                  <button onClick={handleImport} disabled={images.length === 0 || importing}
+                  <button onClick={handleImport} disabled={images.length === 0 || importing || extracting}
                     className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold text-[13px] rounded-xl py-2.5 transition disabled:opacity-50">
-                    {importing ? 'Importing...' : `Import ${images.length} Pages`}
+                    {importing ? 'Importing...' : extracting ? 'Extracting...' : `Import ${images.length} Pages`}
                   </button>
                 </div>
               </>
