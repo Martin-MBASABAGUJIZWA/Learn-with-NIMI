@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { ChevronRight, ChevronDown } from "lucide-react";
 import { useLanguage, type Language } from "@/contexts/LanguageContext";
-import { getChildren, updateChildLanguage, type Child } from "@/lib/queries";
+import { getChildren, getCachedUser, updateChildLanguage, type Child } from "@/lib/queries";
 import LanguageSwitchDialog from "@/components/LanguageSwitchDialog";
 
 const ACTIVE_CHILD_KEY = "nimipiko_active_child";
@@ -33,7 +33,10 @@ export default function ContentSettingsCard() {
   const confirmSwitch = async () => {
     if (!pendingLanguage) return;
     setSwitching(true);
-    if (activeChild) await updateChildLanguage(activeChild.id, pendingLanguage);
+    if (activeChild) {
+      const authUser = await getCachedUser();
+      if (authUser) await updateChildLanguage(activeChild.id, pendingLanguage, authUser.id);
+    }
     setLanguage(pendingLanguage);
     setSwitching(false);
     setPendingLanguage(null);

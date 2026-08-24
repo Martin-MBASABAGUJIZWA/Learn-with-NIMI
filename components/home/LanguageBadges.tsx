@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useState } from "react";
 import { useLanguage, type Language } from "@/contexts/LanguageContext";
-import { updateChildLanguage } from "@/lib/queries";
+import { updateChildLanguage, getCachedUser } from "@/lib/queries";
 import type { Child } from "@/lib/queries";
 import LanguageSwitchDialog from "@/components/LanguageSwitchDialog";
 
@@ -27,7 +27,10 @@ export default function LanguageBadges({ activeChild, earnedLanguages, onLanguag
   const confirmSwitch = async () => {
     if (!pendingLanguage) return;
     setSwitching(true);
-    if (activeChild) await updateChildLanguage(activeChild.id, pendingLanguage);
+    if (activeChild) {
+      const authUser = await getCachedUser();
+      if (authUser) await updateChildLanguage(activeChild.id, pendingLanguage, authUser.id);
+    }
     setLanguage(pendingLanguage);
     onLanguageChanged?.(pendingLanguage);
     setSwitching(false);

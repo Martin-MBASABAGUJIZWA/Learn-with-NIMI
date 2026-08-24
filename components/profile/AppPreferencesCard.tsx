@@ -7,7 +7,7 @@ import { useLanguage, Language } from "@/contexts/LanguageContext";
 import { useNimiReader } from "@/contexts/NimiReaderContext";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 import { getQueuedCompletions, flushOfflineQueue } from "@/lib/offlineQueue";
-import { updateChildLanguage } from "@/lib/queries";
+import { updateChildLanguage, getCachedUser } from "@/lib/queries";
 import type { Child } from "@/lib/queries";
 import LanguageSwitchDialog from "@/components/LanguageSwitchDialog";
 
@@ -55,7 +55,10 @@ export default function AppPreferencesCard({ activeChild, onLanguageChanged }: P
   const confirmSwitch = async () => {
     if (!pendingLanguage) return;
     setSwitching(true);
-    if (activeChild) await updateChildLanguage(activeChild.id, pendingLanguage);
+    if (activeChild) {
+      const authUser = await getCachedUser();
+      if (authUser) await updateChildLanguage(activeChild.id, pendingLanguage, authUser.id);
+    }
     setLanguage(pendingLanguage);
     onLanguageChanged?.(pendingLanguage);
     setSwitching(false);

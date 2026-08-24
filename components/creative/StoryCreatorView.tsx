@@ -227,7 +227,6 @@ export default function StoryCreatorView({
         claimChallengeReward(
           childId, childLanguage,
           `story-creator-${new Date().toISOString().slice(0, 10)}`,
-          STARS_AWARD,
         ),
         awardBadge(childId, childLanguage, BADGE_SLUG),
       ]);

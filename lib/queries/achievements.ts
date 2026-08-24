@@ -101,9 +101,21 @@ export function getClaimedChallenges(childId: string, language: "en" | "fr" | "r
 }
 
 // Claims a challenge reward — inserts a row; no-ops if already claimed (unique conflict).
+// The star value is resolved server-side from the challenges table so callers cannot
+// inflate rewards by supplying an arbitrary number.
 export async function claimChallengeReward(
-  childId: string, language: "en" | "fr" | "rw", challengeSlug: string, stars: number
+  childId: string, language: "en" | "fr" | "rw", challengeSlug: string
 ): Promise<boolean> {
+  // Look up the canonical star value. Dynamic/date-scoped slugs won't match a
+  // challenges row, so we fall back to the historical UI default of 10.
+  const { data: row } = await supabase
+    .from("challenges")
+    .select("stars")
+    .eq("slug", challengeSlug)
+    .eq("language", language)
+    .maybeSingle();
+  const stars: number = (row as { stars: number } | null)?.stars ?? 10;
+
   const { error } = await supabase.from("challenge_bonus_stars").insert({
     child_id: childId, language, challenge_slug: challengeSlug, stars,
   });

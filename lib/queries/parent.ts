@@ -128,8 +128,13 @@ export async function createChild(
     .insert({ ...child, parent_id: user.id })
     .select()
     .single();
-  if (error) console.error("[createChild]", error);
-  else {
+  if (error) {
+    // Catch a concurrent insert that slipped through both count checks.
+    if (error.code === "23505") {
+      return { data: null, error: "Child already added — please refresh and try again." };
+    }
+    console.error("[createChild]", error);
+  } else {
     qinvalidate(`children:${user.id}`);
     lsinvalidate(`children:${user.id}`);
     // Drain any guest progress accumulated before sign-up now that a child exists.
@@ -140,11 +145,22 @@ export async function createChild(
 
 export async function updateChild(
   childId: string,
-  updates: Partial<Pick<Child, "name" | "avatar_url" | "language" | "age">>
-): Promise<void> {
-  await supabase.from("children").update(updates).eq("id", childId);
-  const user = await getCachedUser();
-  if (user) { qinvalidate(`children:${user.id}`); lsinvalidate(`children:${user.id}`); }
+  updates: Partial<Pick<Child, "name" | "avatar_url" | "language" | "age">>,
+  userId: string
+): Promise<{ error: string | null }> {
+  // Ownership filter prevents cross-user mutations.
+  const { error } = await supabase
+    .from("children")
+    .update(updates)
+    .eq("id", childId)
+    .eq("parent_id", userId);
+  if (error) {
+    console.error("[updateChild]", error.message);
+    return { error: error.message };
+  }
+  qinvalidate(`children:${userId}`);
+  lsinvalidate(`children:${userId}`);
+  return { error: null };
 }
 
 // Switching language starts a fresh per-category mission sequence for the
@@ -152,17 +168,31 @@ export async function updateChild(
 // progress, stars and badges are preserved untouched.
 export async function updateChildLanguage(
   childId: string,
-  language: "en" | "fr" | "rw"
+  language: "en" | "fr" | "rw",
+  userId: string
 ): Promise<void> {
-  const [user, { data: current }] = await Promise.all([
-    getCachedUser(),
-    supabase.from("children").select("language").eq("id", childId).maybeSingle(),
-  ]);
+  const { data: current } = await supabase
+    .from("children")
+    .select("language")
+    .eq("id", childId)
+    .maybeSingle();
 
-  await supabase.from("children").update({ language }).eq("id", childId);
+  // Ownership filter prevents cross-user mutations.
+  const { error } = await supabase
+    .from("children")
+    .update({ language })
+    .eq("id", childId)
+    .eq("parent_id", userId);
 
-  if (user) { qinvalidate(`children:${user.id}`); lsinvalidate(`children:${user.id}`); }
+  if (error) {
+    console.error("[updateChildLanguage]", error.message);
+    return;
+  }
 
+  qinvalidate(`children:${userId}`);
+  lsinvalidate(`children:${userId}`);
+
+  // Only log the switch after confirming the update succeeded.
   const fromLanguage = current?.language as "en" | "fr" | "rw" | undefined;
   if (fromLanguage && fromLanguage !== language) {
     await supabase.from("language_switch_log").insert({

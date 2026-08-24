@@ -180,7 +180,7 @@ export default function RewardShopPage() {
     setBuying(true);
     setPurchasingId(item.id);
     try {
-      const purchase = await purchaseShopItem(activeChild.id, item.id, item.price);
+      const purchase = await purchaseShopItem(activeChild.id, item.id);
       if (!purchase) {
         showToast(t("shopPurchaseErrorMsg"), "error");
         return;

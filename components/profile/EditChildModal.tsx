@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
-import { updateChild } from "@/lib/queries";
+import { updateChild, getCachedUser } from "@/lib/queries";
 import { useLanguage } from "@/contexts/LanguageContext";
 import AvatarBuilder from "@/components/avatar/AvatarBuilder";
 import { parseAvatar, serializeAvatar, DEFAULT_AVATAR, type AvatarConfig } from "@/lib/avatarConfig";
@@ -27,8 +27,10 @@ export default function EditChildModal({ childId, initialName, initialAvatar, on
   const handleSave = async () => {
     if (!name.trim() || saving) return;
     setSaving(true);
+    const authUser = await getCachedUser();
+    if (!authUser) { setSaving(false); return; }
     const avatar_url = serializeAvatar(avatarCfg);
-    await updateChild(childId, { name: name.trim(), avatar_url });
+    await updateChild(childId, { name: name.trim(), avatar_url }, authUser.id);
     setSaving(false);
     onSaved({ name: name.trim(), avatar_url });
   };

@@ -101,7 +101,6 @@ export default function DrawingCoachView({
       await claimChallengeReward(
         childId, childLanguage,
         `drawing-${subjectId}-${new Date().toISOString().slice(0, 10)}`,
-        STARS_AWARD,
       );
       onStarsEarned?.(STARS_AWARD);
       setStep("done");
