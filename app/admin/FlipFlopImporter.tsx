@@ -89,13 +89,21 @@ export default function FlipFlopImporter({ storyId, storyTitle, language, onDone
       setExtracting(true)
       setError(null)
       try {
+        let seqCounter = 0
         for (const pdf of pdfFiles) {
+          const filenameNum = extractPageNum(pdf.name)
           const pages = await pdfToImageFiles(pdf, (n, total) => {
             setExtractProgress(`Extracting ${pdf.name}: page ${n}/${total}…`)
           })
           pages.forEach((imgFile, idx) => {
-            detected.push({ name: imgFile.name, type: 'image', pageNum: idx + 1, file: imgFile })
+            // Single-page PDF named with a number (e.g. page-7.pdf) → use that number
+            // Multi-page PDF → sequential counter
+            const pageNum = (pages.length === 1 && filenameNum > 0)
+              ? filenameNum
+              : ++seqCounter
+            detected.push({ name: imgFile.name, type: 'image', pageNum, file: imgFile })
           })
+          if (pages.length > 1) seqCounter += pages.length - 1
         }
       } catch {
         setError('Failed to extract PDF pages. Try exporting as images instead.')
