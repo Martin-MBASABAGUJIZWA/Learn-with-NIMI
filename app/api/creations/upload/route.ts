@@ -49,6 +49,21 @@ export async function POST(req: NextRequest) {
     const storagePath = `${user.id}/${uuidv4()}.${ext}`;
     const buffer = Buffer.from(await file.arrayBuffer());
 
+    // H1: Magic-bytes check — verify file content matches the declared MIME type,
+    // not just the client-supplied Content-Type / file.type value.
+    const magic = buffer.slice(0, 12);
+    const mimeOk = (() => {
+      if (file.type === "image/jpeg") return magic[0] === 0xFF && magic[1] === 0xD8 && magic[2] === 0xFF;
+      if (file.type === "image/png")  return magic[0] === 0x89 && magic[1] === 0x50 && magic[2] === 0x4E &&
+        magic[3] === 0x47 && magic[4] === 0x0D && magic[5] === 0x0A && magic[6] === 0x1A && magic[7] === 0x0A;
+      if (file.type === "image/gif")  return magic[0] === 0x47 && magic[1] === 0x49 && magic[2] === 0x46 && magic[3] === 0x38;
+      if (file.type === "image/webp") return magic[8] === 0x57 && magic[9] === 0x45 && magic[10] === 0x42 && magic[11] === 0x50;
+      return true; // No magic-byte spec for this type (e.g. SVG); MIME allowlist above already gated it.
+    })();
+    if (!mimeOk) {
+      return NextResponse.json({ error: "File content does not match declared type" }, { status: 415 });
+    }
+
     const { error: storageError } = await adminClient.storage
       .from(STORAGE_BUCKET)
       .upload(storagePath, buffer, {

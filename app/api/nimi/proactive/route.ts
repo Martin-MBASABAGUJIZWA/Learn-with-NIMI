@@ -54,6 +54,15 @@ export async function GET(req: NextRequest) {
 
   if (!childId) return NextResponse.json({ error: 'childId required' }, { status: 400 });
 
+  // H2: Ownership check — verify the authenticated user owns this child.
+  const { data: childRow } = await sb
+    .from('children')
+    .select('parent_id')
+    .eq('id', childId)
+    .eq('parent_id', session.user.id)
+    .maybeSingle();
+  if (!childRow) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+
   // ── Check pending queue first ─────────────────────────────────
   const { data: pending } = await sb.rpc('get_pending_proactive', {
     p_child_id: childId,
@@ -136,6 +145,15 @@ export async function POST(req: NextRequest) {
   const wordsToReview = typeof body.wordsToReview === 'number' ? body.wordsToReview : 0;
 
   if (!childId) return NextResponse.json({ error: 'childId required' }, { status: 400 });
+
+  // H2: Ownership check — verify the authenticated user owns this child.
+  const { data: childRowPost } = await sb
+    .from('children')
+    .select('parent_id')
+    .eq('id', childId)
+    .eq('parent_id', session.user.id)
+    .maybeSingle();
+  if (!childRowPost) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
   const [ctxResult, memoriesResult] = await Promise.allSettled([
     sb.rpc('get_learner_context',  { p_child_id: childId }),

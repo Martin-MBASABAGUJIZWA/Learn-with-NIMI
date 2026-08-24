@@ -100,6 +100,16 @@ export async function DELETE(
   const schoolId = req.nextUrl.searchParams.get('schoolId');
   if (!schoolId) return NextResponse.json({ error: 'schoolId required' }, { status: 400 });
 
+  // H3: Explicit school-admin check before delete — do not rely on RLS alone.
+  const { data: memberRow } = await db
+    .from('school_members')
+    .select('role')
+    .eq('school_id', schoolId)
+    .eq('user_id', user.id)
+    .eq('role', 'admin')
+    .maybeSingle();
+  if (!memberRow) return NextResponse.json({ error: 'Not a school admin' }, { status: 403 });
+
   const { data: plugin } = await db
     .from('plugins')
     .select('id')
