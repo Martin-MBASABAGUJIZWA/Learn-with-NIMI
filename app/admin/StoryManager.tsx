@@ -454,7 +454,7 @@ export default function StoryManager({ initialStoryId, onNavigate, onOpenSidebar
           </span>
         </div>
         <div className="flex-1 overflow-auto p-6">
-          <StoryEditor story={selected} onSaved={fetchStories} defaultLang={defaultLang} onNavigate={onNavigate} />
+          <StoryEditor story={selected} onSaved={fetchStories} onDeleted={() => { setSelectedId(null); fetchStories() }} defaultLang={defaultLang} onNavigate={onNavigate} />
         </div>
       </div>
     )

@@ -37,7 +37,7 @@ interface ColoringPage {
 
 interface SlotData { story_id: string; slot_key: string; mission_id: string; sort_order: number }
 
-interface StoryEditorProps { story: StoryRow; onSaved: () => void; defaultLang?: Lang; onNavigate?: (table: string) => void }
+interface StoryEditorProps { story: StoryRow; onSaved: () => void; onDeleted?: () => void; defaultLang?: Lang; onNavigate?: (table: string) => void }
 
 const MISSION_ICONS: Record<string, React.ComponentType<{ size?: number }>> = {
   flipflop_audio: BookOpen, story_pdf: FileText, coloring: Palette,
@@ -359,7 +359,7 @@ function FileUploader({ label, url, accept, bucket, pathPrefix, dbSave, onDone, 
 const REQUIRED_STORY_FIELDS = new Set(['title', 'slug'])
 
 /* ── Main Editor ── */
-export default function StoryEditor({ story, onSaved, defaultLang, onNavigate }: StoryEditorProps) {
+export default function StoryEditor({ story, onSaved, onDeleted, defaultLang, onNavigate }: StoryEditorProps) {
   const { success: toastOk, error: toastErr } = useToast()
   const { confirm: confirmAction, dialog: confirmEl } = useConfirmDialog()
   const [activeLang, setActiveLang] = useState<Lang>(defaultLang ?? 'en')
@@ -619,6 +619,62 @@ export default function StoryEditor({ story, onSaved, defaultLang, onNavigate }:
       toastOk(`"${story.title}" retired`)
     } catch (err) {
       toastErr(err instanceof Error ? err.message : 'Could not retire story')
+    } finally {
+      setPublishing(false)
+    }
+  }
+
+  const deleteStory = async () => {
+    const first = await confirmAction({
+      title: '⚠️ Delete story permanently?',
+      message: `"${story.title}" and ALL its content — pages, missions, slots, coloring pages — will be deleted forever. This cannot be undone.`,
+    })
+    if (!first) return
+    const second = await confirmAction({
+      title: 'Are you absolutely sure?',
+      message: `You are about to permanently delete "${story.title}". All learner progress linked to this story will be orphaned. Proceed?`,
+    })
+    if (!second) return
+
+    setPublishing(true)
+    try {
+      // 1. Collect storage URLs to clean up
+      const storageUrls: string[] = [
+        story.cover_url,
+        story.giant_book_url ?? null,
+        ...(flipflopPages.flatMap((p: FlipFlopPage) => [
+          p.image_url,
+          ...p.story_page_versions.map((v: FlipFlopPage['story_page_versions'][number]) => v.audio_url),
+        ])),
+        ...(coloringPages.map((p: { template_image_url?: string | null }) => p.template_image_url ?? null)),
+        ...Object.values(missionVersions).flat().map(v => v.media_url),
+        ...(version ? ['intro_video_url','theme_song_url','meet_characters_url','story_intro_url'].map(k => (version as Record<string,string|null>)[k]) : []),
+      ].filter((u): u is string => !!u)
+
+      // 2. Collect mission IDs linked via story_slots
+      const { data: slotRows } = await supabase.from('story_slots').select('mission_id').eq('story_id', story.id)
+      const missionIds = (slotRows ?? []).map((r: { mission_id: string }) => r.mission_id)
+
+      // 3. Cascade delete DB rows (order: leaf → root)
+      if (flipflopPages.length) await supabase.from('story_page_versions').delete().in('story_page_id', flipflopPages.map((p: FlipFlopPage) => p.id))
+      await supabase.from('story_pages').delete().eq('story_id', story.id)
+      await supabase.from('story_slots').delete().eq('story_id', story.id)
+      if (missionIds.length) {
+        await supabase.from('mission_versions').delete().in('mission_id', missionIds)
+        await supabase.from('missions').delete().in('id', missionIds)
+      }
+      await supabase.from('coloring_pages').delete().eq('story_id', story.id)
+      await supabase.from('story_versions').delete().eq('story_id', story.id)
+      await supabase.from('stories').delete().eq('id', story.id)
+
+      // 4. Clean up storage files (best-effort, don't block on failure)
+      await Promise.allSettled(storageUrls.map(u => deleteStorageFile(u)))
+
+      toastOk(`"${story.title}" deleted permanently`)
+      onDeleted?.()
+    } catch (err) {
+      toastErr(err instanceof Error ? err.message : 'Delete failed — check console')
+      console.error('[deleteStory]', err)
     } finally {
       setPublishing(false)
     }
@@ -1207,6 +1263,15 @@ export default function StoryEditor({ story, onSaved, defaultLang, onNavigate }:
               </button>
             </div>
           )}
+        </div>
+
+        {/* ── Danger zone ── */}
+        <div className="mt-4 pt-4 border-t border-red-100">
+          <button type="button" onClick={deleteStory} disabled={publishing}
+            className="w-full text-[12px] font-bold text-red-600 bg-red-50 border border-red-200 hover:bg-red-100 px-4 py-2.5 rounded-xl transition disabled:opacity-50">
+            🗑️ Delete Story Permanently
+          </button>
+          <p className="text-[10px] text-red-400 text-center mt-1.5">Removes all pages, missions, and files. Cannot be undone.</p>
         </div>
       </div>
     </div>
