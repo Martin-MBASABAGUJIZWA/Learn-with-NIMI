@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useState, useCallback } from 'react'
+import React, { useEffect, useState, useCallback, useRef } from 'react'
 import supabase from '@/lib/supabaseClient'
 import { getCachedAdmin } from './adminAuth'
 import {
@@ -7,6 +7,7 @@ import {
   RefreshCw, X, Menu, Copy, Check, ImageIcon, Download,
 } from 'lucide-react'
 import { ACCENT } from './missionMeta'
+import { useConfirmDialog } from './ConfirmDialog'
 
 const accent = ACCENT.green
 
@@ -153,6 +154,7 @@ export default function AirwaysTemplatesManager({ onNavigate, onOpenSidebar }: A
   )
   const [globalError, setGlobalError] = useState<string | null>(null)
   const [refreshKey, setRefreshKey] = useState(0)
+  const { confirm, dialog: confirmDialog } = useConfirmDialog()
 
   // ── Test download ─────────────────────────────────────────────
   const [children, setChildren] = useState<Child[]>([])
@@ -304,7 +306,7 @@ export default function AirwaysTemplatesManager({ onNavigate, onOpenSidebar }: A
     const rawName = url.split('/').pop()
     if (!rawName) return
     const fileName = rawName.split('?')[0]
-    if (!window.confirm(`Delete the "${key}" template? This cannot be undone.`)) return
+    if (!await confirm({ title: `Delete "${key}" template?`, message: 'This removes the file from storage permanently. Cannot be undone.' })) return
     updateSlot(key, { deleting: true, error: null })
     try {
       const { error } = await supabase.storage.from(BUCKET).remove([fileName])
@@ -329,6 +331,7 @@ export default function AirwaysTemplatesManager({ onNavigate, onOpenSidebar }: A
 
   return (
     <div>
+      {confirmDialog}
       {/* Header */}
       <header className={`border-b border-gray-100 px-4 sm:px-6 py-5 ${accent.soft}`}>
         <div className="flex items-start justify-between gap-4 flex-wrap">

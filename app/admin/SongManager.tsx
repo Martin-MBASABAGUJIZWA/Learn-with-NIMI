@@ -32,7 +32,7 @@ function formatBytes(bytes: number): string {
 }
 
 export default function SongManager({ onNavigate, onOpenSidebar }: Props) {
-  const { error: toastErr } = useToast()
+  const { error: toastErr, success: toastOk } = useToast()
 
   const [admin,       setAdmin]       = useState<{ name: string; role: string } | null>(null)
   const [children,    setChildren]    = useState<ChildRow[]>([])
@@ -41,7 +41,6 @@ export default function SongManager({ onNavigate, onOpenSidebar }: Props) {
   const [query,       setQuery]       = useState('')
   const [uploading,   setUploading]   = useState<Record<string, boolean>>({})
   const [deleting,    setDeleting]    = useState<Record<string, boolean>>({})
-  const [toast,       setToast]       = useState<{ ok: boolean; msg: string } | null>(null)
   const fileInputRef  = useRef<Record<string, HTMLInputElement | null>>({})
 
   useEffect(() => {
@@ -100,11 +99,6 @@ export default function SongManager({ onNavigate, onOpenSidebar }: Props) {
 
   useEffect(() => { loadData() }, [])  // eslint-disable-line react-hooks/exhaustive-deps
 
-  function showToast(ok: boolean, msg: string) {
-    setToast({ ok, msg })
-    setTimeout(() => setToast(null), 3500)
-  }
-
   async function handleUpload(child: ChildRow, file: File) {
     setUploading(p => ({ ...p, [child.id]: true }))
     try {
@@ -126,10 +120,9 @@ export default function SongManager({ onNavigate, onOpenSidebar }: Props) {
         ...p,
         [child.id]: { name: fileName, size: file.size },
       }))
-      showToast(true, `Song uploaded for ${child.name}`)
+      toastOk(`Song uploaded for ${child.name}`)
     } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err)
-      showToast(false, `Upload failed: ${msg}`)
+      toastErr(err instanceof Error ? err.message : `Upload failed`)
     } finally {
       setUploading(p => ({ ...p, [child.id]: false }))
     }
@@ -147,10 +140,9 @@ export default function SongManager({ onNavigate, onOpenSidebar }: Props) {
         .remove([`${child.id}/${existing.name}`])
       if (error) throw error
       setSongs(p => ({ ...p, [child.id]: null }))
-      showToast(true, `Song deleted for ${child.name}`)
+      toastOk(`Song deleted for ${child.name}`)
     } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err)
-      showToast(false, `Delete failed: ${msg}`)
+      toastErr(err instanceof Error ? err.message : `Delete failed`)
     } finally {
       setDeleting(p => ({ ...p, [child.id]: false }))
     }
@@ -188,18 +180,6 @@ export default function SongManager({ onNavigate, onOpenSidebar }: Props) {
           <RefreshCw size={15} className={loading ? 'animate-spin' : ''} />
         </button>
       </div>
-
-      {/* Toast */}
-      {toast && (
-        <div className={`mx-4 mt-3 flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium ${
-          toast.ok
-            ? 'bg-green-50 text-green-800 border border-green-200'
-            : 'bg-red-50 text-red-800 border border-red-200'
-        }`}>
-          {toast.ok ? <CheckCircle2 size={15} /> : <AlertCircle size={15} />}
-          {toast.msg}
-        </div>
-      )}
 
       {/* Search */}
       <div className="px-4 pt-4 pb-2">

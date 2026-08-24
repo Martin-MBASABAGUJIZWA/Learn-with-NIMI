@@ -43,7 +43,8 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   const add = useCallback((message: string, type: ToastType = 'info') => {
     const id = ++counter.current
     setToasts(prev => [...prev, { id, type, message }])
-    setTimeout(() => remove(id), 3500)
+    // Errors stay 10s so admins can read the full message; success/info dismiss in 3.5s
+    setTimeout(() => remove(id), type === 'error' ? 10000 : 3500)
   }, [remove])
 
   const ctx: ToastCtx = {

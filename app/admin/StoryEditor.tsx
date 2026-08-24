@@ -454,7 +454,6 @@ export default function StoryEditor({ story, onSaved, onDeleted, defaultLang, on
   const defaultLangInitRef = useRef(false)
   useEffect(() => {
     if (!defaultLang) return
-    if (defaultLangInitRef.current) toastOk(`${LANGUAGE_META[defaultLang].flag} Switched to ${LANGUAGE_META[defaultLang].label}`)
     defaultLangInitRef.current = true
     setActiveLang(defaultLang)
   }, [defaultLang])
@@ -636,17 +635,17 @@ export default function StoryEditor({ story, onSaved, onDeleted, defaultLang, on
     }
   }
 
+  const [deleteConfirmText, setDeleteConfirmText] = React.useState('')
+  const [showDeletePrompt, setShowDeletePrompt] = React.useState(false)
+
   const deleteStory = async () => {
-    const first = await confirmAction({
-      title: '⚠️ Delete story permanently?',
-      message: `"${story.title}" and ALL its content — pages, missions, slots, coloring pages — will be deleted forever. This cannot be undone.`,
-    })
-    if (!first) return
-    const second = await confirmAction({
-      title: 'Are you absolutely sure?',
-      message: `You are about to permanently delete "${story.title}". All learner progress linked to this story will be orphaned. Proceed?`,
-    })
-    if (!second) return
+    setDeleteConfirmText('')
+    setShowDeletePrompt(true)
+  }
+
+  const executeDelete = async () => {
+    if (deleteConfirmText !== story.title) return
+    setShowDeletePrompt(false)
 
     setPublishing(true)
     try {
@@ -688,8 +687,7 @@ export default function StoryEditor({ story, onSaved, onDeleted, defaultLang, on
       toastOk(`"${story.title}" deleted permanently`)
       onDeleted?.()
     } catch (err) {
-      toastErr(err instanceof Error ? err.message : 'Delete failed — check console')
-      console.error('[deleteStory]', err)
+      toastErr(err instanceof Error ? err.message : 'Delete failed')
     } finally {
       setPublishing(false)
     }
@@ -1282,11 +1280,38 @@ export default function StoryEditor({ story, onSaved, onDeleted, defaultLang, on
 
         {/* ── Danger zone ── */}
         <div className="mt-4 pt-4 border-t border-red-100">
-          <button type="button" onClick={deleteStory} disabled={publishing}
-            className="w-full text-[12px] font-bold text-red-600 bg-red-50 border border-red-200 hover:bg-red-100 px-4 py-2.5 rounded-xl transition disabled:opacity-50">
-            🗑️ Delete Story Permanently
-          </button>
-          <p className="text-[10px] text-red-400 text-center mt-1.5">Removes all pages, missions, and files. Cannot be undone.</p>
+          {showDeletePrompt ? (
+            <div className="bg-red-50 border border-red-200 rounded-xl p-4 space-y-3">
+              <p className="text-[12px] font-bold text-red-700">Type the story title to confirm deletion:</p>
+              <p className="text-[11px] text-red-500 font-mono bg-red-100 rounded px-2 py-1 break-all">{story.title}</p>
+              <input
+                type="text"
+                value={deleteConfirmText}
+                onChange={e => setDeleteConfirmText(e.target.value)}
+                placeholder="Type story title exactly…"
+                className="w-full text-[12px] border border-red-200 rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-red-300 bg-white"
+                autoFocus
+              />
+              <div className="flex gap-2">
+                <button type="button" onClick={() => setShowDeletePrompt(false)}
+                  className="flex-1 text-[12px] font-bold text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 px-3 py-2 rounded-lg transition">
+                  Cancel
+                </button>
+                <button type="button" onClick={executeDelete} disabled={deleteConfirmText !== story.title || publishing}
+                  className="flex-1 text-[12px] font-bold text-white bg-red-600 hover:bg-red-700 px-3 py-2 rounded-lg transition disabled:opacity-40 disabled:cursor-not-allowed">
+                  {publishing ? 'Deleting…' : 'Delete forever'}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <button type="button" onClick={deleteStory} disabled={publishing}
+                className="w-full text-[12px] font-bold text-red-600 bg-red-50 border border-red-200 hover:bg-red-100 px-4 py-2.5 rounded-xl transition disabled:opacity-50">
+                🗑️ Delete Story Permanently
+              </button>
+              <p className="text-[10px] text-red-400 text-center mt-1.5">Removes all pages, missions, and files. Cannot be undone.</p>
+            </>
+          )}
         </div>
       </div>
     </div>

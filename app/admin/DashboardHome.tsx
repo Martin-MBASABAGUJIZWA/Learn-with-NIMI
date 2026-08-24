@@ -27,7 +27,7 @@ interface RevenueStats {
 
 export default function Dashboard({ onNavigate }: DashboardProps) {
   const [loading, setLoading] = useState(true)
-  const [hasError, setHasError] = useState(false)
+  const [hasError, setHasError] = useState<string | null>(null)
   const [stats, setStats] = useState({ published: 0, ready: 0, missing: 0, children: 0, certs: 0, challenges: 0 })
   const [revenue, setRevenue] = useState<RevenueStats>({ activeSubscriptions: 0, mrr: 0, totalRevenue: 0, newThisMonth: 0 })
   const [stories, setStories] = useState<StoryRow[]>([])
@@ -94,7 +94,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
         })
         setStoryReadiness(readinessData)
       } catch (err) {
-        setHasError(true)
+        setHasError(err instanceof Error ? err.message : 'Unknown error loading dashboard data')
       } finally {
         setLoading(false)
       }
@@ -186,7 +186,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
           <AlertCircle className="w-6 h-6" />
         </div>
         <p className="text-sm font-bold text-gray-700">Failed to load dashboard</p>
-        <p className="text-xs text-gray-400 mt-1">Please refresh the page or try again.</p>
+        <p className="text-xs text-gray-400 mt-1 max-w-xs break-words">{hasError}</p>
         <button
           onClick={() => window.location.reload()}
           className="mt-4 inline-flex items-center gap-2 text-white text-xs font-bold px-4 py-2 rounded-full transition bg-green-600 hover:bg-green-700"

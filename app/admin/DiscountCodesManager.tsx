@@ -32,19 +32,15 @@ const EMPTY: Omit<DiscountCode, 'id' | 'uses_count' | 'created_at'> = {
 }
 
 export default function DiscountCodesManager({ onOpenSidebar }: { onOpenSidebar?: () => void }) {
-  const { error: toastErr } = useToast()
+  const { error: toastErr, success: toastOk, toast: toastInfo } = useToast()
   const [codes, setCodes] = useState<DiscountCode[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [form, setForm] = useState({ ...EMPTY })
   const [saving, setSaving] = useState(false)
-  const [toast, setToast] = useState<{ msg: string; ok: boolean } | null>(null)
   const [search, setSearch] = useState('')
 
-  const showToast = (msg: string, ok = true) => {
-    setToast({ msg, ok })
-    setTimeout(() => setToast(null), 3000)
-  }
+  const showToast = (msg: string, ok = true) => ok ? toastOk(msg) : toastErr(msg)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -340,13 +336,6 @@ export default function DiscountCodesManager({ onOpenSidebar }: { onOpenSidebar?
         </div>
       )}
 
-      {/* Toast */}
-      {toast && (
-        <div className={`fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-3 rounded-xl shadow-lg text-white text-sm font-bold ${toast.ok ? 'bg-green-600' : 'bg-red-500'}`}>
-          {toast.ok ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
-          {toast.msg}
-        </div>
-      )}
     </div>
   )
 }

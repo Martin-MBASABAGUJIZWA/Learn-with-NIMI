@@ -617,13 +617,14 @@ export default function StoryManager({ initialStoryId, onNavigate, onOpenSidebar
               className="font-bold text-emerald-600 bg-white border border-emerald-200 hover:bg-emerald-50 rounded-lg px-3 py-1.5 transition disabled:opacity-50">
               Go Live
             </button>
-            <button type="button" onClick={handleBulkDelete} disabled={bulkActing}
-              className="font-bold text-red-600 bg-white border border-red-200 hover:bg-red-50 rounded-lg px-3 py-1.5 transition disabled:opacity-50">
-              Delete all
-            </button>
             <button type="button" onClick={() => setCheckedIds(new Set())}
-              className="font-medium text-gray-500 hover:text-gray-700 ml-auto flex items-center gap-1">
+              className="font-medium text-gray-500 hover:text-gray-700 flex items-center gap-1">
               <X size={12} /> Clear
+            </button>
+            {/* Delete all pushed to the far right and visually de-emphasised to prevent accidental clicks */}
+            <button type="button" onClick={handleBulkDelete} disabled={bulkActing}
+              className="ml-auto font-medium text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg px-2 py-1 transition disabled:opacity-50 flex items-center gap-1">
+              <Trash2 size={12} /> Delete all
             </button>
           </div>
         )}
@@ -741,7 +742,7 @@ export default function StoryManager({ initialStoryId, onNavigate, onOpenSidebar
 
                       {/* Name + age */}
                       <div className="flex-1 min-w-0">
-                        <p className="text-[13px] font-bold text-gray-800 truncate">{s.title}</p>
+                        <p className="text-[13px] font-bold text-gray-800 truncate" title={s.title}>{s.title}</p>
                         <p className="text-[11px] text-gray-400">{formatAge(s.age_min, s.age_max)}</p>
                       </div>
 
@@ -920,7 +921,7 @@ function StoryCoverageMatrix({ stories, onSelect }: { stories: StoryRow[]; onSel
               return (
                 <tr key={s.id} className="border-b border-gray-50 hover:bg-gray-50/40 transition">
                   <td className="px-4 py-3">
-                    <p className="font-bold text-gray-800 truncate max-w-[170px]">{s.title}</p>
+                    <p className="font-bold text-gray-800 truncate max-w-[170px]" title={s.title}>{s.title}</p>
                     <span className={`text-[9px] font-bold uppercase px-1.5 py-0.5 rounded ${
                       s.status === 'published' ? 'bg-emerald-50 text-emerald-600'
                       : s.status === 'review'  ? 'bg-blue-50 text-blue-600'

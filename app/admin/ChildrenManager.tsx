@@ -45,7 +45,7 @@ export default function ChildrenManager({ onNavigate, onOpenSidebar }: Props) {
         const [{ data: kids }, { count: storiesCount }, { data: progress }] = await Promise.all([
           supabase.from('children').select('id, name, avatar_url, age, language, created_at, parent_id, parents(name)').order('created_at', { ascending: false }).limit(200),
           supabase.from('stories').select('*', { count: 'exact', head: true }),
-          supabase.from('child_progress').select('child_id, completed_at').order('completed_at', { ascending: false }).limit(1000),
+          supabase.from('child_progress').select('child_id, completed_at, story_id').order('completed_at', { ascending: false }).limit(1000),
         ])
 
         const totalStories = storiesCount ?? 0
@@ -55,6 +55,8 @@ export default function ChildrenManager({ onNavigate, onOpenSidebar }: Props) {
           const parentData = Array.isArray(pd) ? pd[0] : pd
           const childProgress = (progress ?? []).filter(p => p.child_id === k.id)
           const lastActive = childProgress[0]?.completed_at ?? null
+          // Count distinct stories this child has completed at least one mission in
+          const storiesComplete = new Set(childProgress.map((p: { story_id?: string }) => p.story_id).filter(Boolean)).size
           return {
             id: k.id,
             name: k.name,
@@ -63,7 +65,7 @@ export default function ChildrenManager({ onNavigate, onOpenSidebar }: Props) {
             language: k.language,
             created_at: k.created_at,
             parent_name: parentData?.name ?? 'Unknown',
-            stories_complete: 0,
+            stories_complete: storiesComplete,
             total_stories: totalStories,
             last_active: lastActive,
           }
