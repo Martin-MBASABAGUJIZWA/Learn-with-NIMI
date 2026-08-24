@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import { useLanguage, Language } from "@/contexts/LanguageContext";
 import { useAppTheme } from "@/contexts/AppThemeProvider";
 import { getThemeAssets } from "@/lib/design-system/assetRegistry";
-import { updateChildLanguage, type Child } from "@/lib/queries";
+import { updateChildLanguage, getCachedUser, type Child } from "@/lib/queries";
 import LanguageSwitchDialog from "@/components/LanguageSwitchDialog";
 
 const HEADER_STARS = [
@@ -46,7 +46,10 @@ export default function HomeHeader({ activeChild }: HomeHeaderProps) {
   const confirmSwitch = async () => {
     if (!pendingLanguage) return;
     setSwitching(true);
-    if (activeChild) await updateChildLanguage(activeChild.id, pendingLanguage);
+    if (activeChild) {
+      const authUser = await getCachedUser();
+      if (authUser) await updateChildLanguage(activeChild.id, pendingLanguage, authUser.id);
+    }
     setLanguage(pendingLanguage);
     setSwitching(false);
     setPendingLanguage(null);

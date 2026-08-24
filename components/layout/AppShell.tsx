@@ -252,9 +252,9 @@ export default function AppShell({ children }: AppShellProps) {
   }, []);
 
   const confirmLanguageSwitch = async () => {
-    if (!pendingLanguage || !activeChild) return;
+    if (!pendingLanguage || !activeChild || !user) return;
     setSwitchingLanguage(true);
-    await updateChildLanguage(activeChild.id, pendingLanguage);
+    await updateChildLanguage(activeChild.id, pendingLanguage, user.id);
     setLanguage(pendingLanguage);
     setSwitchingLanguage(false);
     setPendingLanguage(null);

@@ -110,13 +110,32 @@ export async function createChild(
     if (!sub) return { data: null, error: "subscription_required" };
   }
 
+  // NOTE: A DB-level partial unique index enforcing a maximum child count per
+  // free account does not currently exist — the INSERT constraint below is missing
+  // at the database layer. The re-check here minimises the TOCTOU window between
+  // the subscription check above and the INSERT below. It is not a substitute for
+  // a proper DB constraint; add one (e.g. a partial unique index on parent_id where
+  // subscription is null) to make this fully race-safe.
+  const { count: countNow } = await supabase
+    .from("children")
+    .select("id", { count: "exact", head: true })
+    .eq("parent_id", user.id);
+  if ((countNow ?? 0) > (count ?? 0)) {
+    return { data: null, error: "Child already added — please refresh and try again." };
+  }
+
   const { data, error } = await supabase
     .from("children")
     .insert({ ...child, parent_id: user.id })
     .select()
     .single();
-  if (error) console.error("[createChild]", error);
-  else {
+  if (error) {
+    // Catch a concurrent insert that slipped through both count checks.
+    if (error.code === "23505") {
+      return { data: null, error: "Child already added — please refresh and try again." };
+    }
+    console.error("[createChild]", error);
+  } else {
     qinvalidate(`children:${user.id}`);
     lsinvalidate(`children:${user.id}`);
     // Drain any guest progress accumulated before sign-up now that a child exists.
@@ -127,11 +146,22 @@ export async function createChild(
 
 export async function updateChild(
   childId: string,
-  updates: Partial<Pick<Child, "name" | "avatar_url" | "language" | "age">>
-): Promise<void> {
-  await supabase.from("children").update(updates).eq("id", childId);
-  const user = await getCachedUser();
-  if (user) { qinvalidate(`children:${user.id}`); lsinvalidate(`children:${user.id}`); }
+  updates: Partial<Pick<Child, "name" | "avatar_url" | "language" | "age">>,
+  userId: string
+): Promise<{ error: string | null }> {
+  // Ownership filter prevents cross-user mutations.
+  const { error } = await supabase
+    .from("children")
+    .update(updates)
+    .eq("id", childId)
+    .eq("parent_id", userId);
+  if (error) {
+    console.error("[updateChild]", error.message);
+    return { error: error.message };
+  }
+  qinvalidate(`children:${userId}`);
+  lsinvalidate(`children:${userId}`);
+  return { error: null };
 }
 
 // Switching language starts a fresh per-category mission sequence for the
@@ -139,17 +169,31 @@ export async function updateChild(
 // progress, stars and badges are preserved untouched.
 export async function updateChildLanguage(
   childId: string,
-  language: "en" | "fr" | "rw"
+  language: "en" | "fr" | "rw",
+  userId: string
 ): Promise<void> {
-  const [user, { data: current }] = await Promise.all([
-    getCachedUser(),
-    supabase.from("children").select("language").eq("id", childId).maybeSingle(),
-  ]);
+  const { data: current } = await supabase
+    .from("children")
+    .select("language")
+    .eq("id", childId)
+    .maybeSingle();
 
-  await supabase.from("children").update({ language }).eq("id", childId);
+  // Ownership filter prevents cross-user mutations.
+  const { error } = await supabase
+    .from("children")
+    .update({ language })
+    .eq("id", childId)
+    .eq("parent_id", userId);
 
-  if (user) { qinvalidate(`children:${user.id}`); lsinvalidate(`children:${user.id}`); }
+  if (error) {
+    console.error("[updateChildLanguage]", error.message);
+    return;
+  }
 
+  qinvalidate(`children:${userId}`);
+  lsinvalidate(`children:${userId}`);
+
+  // Only log the switch after confirming the update succeeded.
   const fromLanguage = current?.language as "en" | "fr" | "rw" | undefined;
   if (fromLanguage && fromLanguage !== language) {
     await supabase.from("language_switch_log").insert({

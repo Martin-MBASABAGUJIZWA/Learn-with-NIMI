@@ -355,7 +355,7 @@ export default function TreasureClient({ initialChildren }: Props = {}) {
     if (claimed.has(slug)) return;
 
     setClaimingId(challenge.id);
-    const ok = await claimChallengeReward(child.id, language, slug, challenge.stars);
+    const ok = await claimChallengeReward(child.id, language, slug);
     setClaimingId(null);
     if (!ok) return;
 

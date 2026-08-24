@@ -171,7 +171,7 @@ export default function RewardShopPage() {
     if (!activeChild || balance === null || balance < item.price) return;
     if (!CONSUMABLE_IDS.has(item.id) && ownedIds.has(item.id)) return;
     setPurchasingId(item.id);
-    const purchase = await purchaseShopItem(activeChild.id, item.id, item.price);
+    const purchase = await purchaseShopItem(activeChild.id, item.id);
     setPurchasingId(null);
     if (!purchase) {
       showToast(t("shopPurchaseErrorMsg"), "error");

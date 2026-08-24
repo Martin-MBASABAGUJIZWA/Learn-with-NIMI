@@ -156,7 +156,6 @@ export default function CreativityChallengesView({
           claimChallengeReward(
             childId, childLanguage,
             `creative-all-${today}`,
-            BONUS_STARS,
           ),
           awardBadge(childId, childLanguage, BONUS_BADGE),
         ]);

@@ -21,8 +21,22 @@ export function getShopPurchases(childId: string): Promise<ShopPurchase[]> {
   });
 }
 
-// Records a shop purchase, spending `price` stars on `itemId`.
-export async function purchaseShopItem(childId: string, itemId: string, price: number): Promise<ShopPurchase | null> {
+// Records a shop purchase, spending the item's canonical price on `itemId`.
+// The price is looked up server-side from shop_items so callers cannot pass an
+// arbitrary (e.g. zero) cost. Returns null if the item does not exist.
+export async function purchaseShopItem(childId: string, itemId: string): Promise<ShopPurchase | null> {
+  // Fetch canonical price — never trust the caller-supplied value.
+  const { data: shopItem, error: itemErr } = await supabase
+    .from("shop_items")
+    .select("price")
+    .eq("id", itemId)
+    .maybeSingle();
+  if (itemErr || !shopItem) {
+    console.error("[purchaseShopItem] item lookup failed:", itemErr?.message ?? "not found");
+    return null;
+  }
+  const price = (shopItem as { price: number }).price;
+
   const { data, error } = await supabase
     .from("shop_purchases")
     .insert({ child_id: childId, item_id: itemId, price })

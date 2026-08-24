@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  getChildren,
+  getChildren, getCachedUser,
   getWeekStreak, getWeekActivityCounts, getTotalStars,
   getActivityDates, getChildBadges, getChildCertificates, updateChild,
   getConsecutiveStreak, getCompletedStoriesCount, awardMilestoneBadges,
@@ -386,7 +386,9 @@ export default function UserProfileClient({ initialChildren, initialHasSubscript
 
   const handleSaveProfile = async (newName: string, newAvatarUrl: string) => {
     if (!activeChild) return;
-    await updateChild(activeChild.id, { name: newName, avatar_url: newAvatarUrl });
+    const authUser = await getCachedUser();
+    if (!authUser) return;
+    await updateChild(activeChild.id, { name: newName, avatar_url: newAvatarUrl }, authUser.id);
     window.dispatchEvent(new CustomEvent("app:profileUpdate", {
       detail: { childId: activeChild.id, name: newName, avatarUrl: newAvatarUrl },
     }));

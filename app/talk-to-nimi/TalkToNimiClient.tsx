@@ -212,7 +212,7 @@ function NimiChatPageContent({
 
   const handleClaimQuest = async () => {
     if (!childId || questClaimed) return;
-    const ok = await claimChallengeReward(childId, childLanguage, questSlug, QUEST_STARS);
+    const ok = await claimChallengeReward(childId, childLanguage, questSlug);
     if (ok) {
       setQuestClaimed(true);
       setTodayStars(prev => prev + QUEST_STARS);
