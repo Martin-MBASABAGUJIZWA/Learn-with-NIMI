@@ -22,38 +22,49 @@ export interface ReadinessResult {
 
 export function computeReadiness(story: {
   cover_url?: string | null;
-  // Pages present → FlipFlop has content
-  story_pages?: { id: string }[];
-  // Coloring pages present → Coloring activity has content
-  coloring_pages?: { id: string }[];
-  // Prefer English version; fall back to first available
-  story_versions?: {
-    language?: string;
+  story_pages?: {
+    id: string;
+    story_page_versions?: { language: string; image_url?: string | null; audio_url?: string | null }[];
   }[];
-  // Slots carry nested mission_versions so we can check actual media uploads
+  coloring_pages?: { id: string }[];
+  story_versions?: { language?: string }[];
   story_slots?: {
     slot_key: string;
     mission_id?: string | null;
     missions?: {
-      mission_versions: { media_url: string | null }[];
+      mission_versions: { language?: string | null; media_url: string | null }[];
     } | null;
   }[];
+  // When provided, all media checks are scoped to this language
+  language?: string;
 }): ReadinessResult {
-  // Prefer English version — avoids falsely showing 100% when only EN is complete
-  const version =
-    story.story_versions?.find(v => v.language === 'en') ??
-    story.story_versions?.[0];
-
+  const lang = story.language;
   const slots = story.story_slots ?? [];
+  const pages = story.story_pages ?? [];
 
-  // True only when at least one mission_version for this slot has an uploaded file
+  // Check mission media — scoped to language when provided
   const hasMissionMedia = (key: string): boolean => {
     const slot = slots.find(s => s.slot_key === key);
     if (!slot?.mission_id) return false;
-    return (slot.missions?.mission_versions ?? []).some(v => v.media_url);
+    const versions = slot.missions?.mission_versions ?? [];
+    if (lang) return versions.some(v => v.language === lang && !!v.media_url);
+    return versions.some(v => !!v.media_url);
   };
 
-  const hasFlipFlop = (story.story_pages ?? []).length > 0;
+  // FlipFlop: per-language requires ≥1 image AND ≥50% audio coverage for that language.
+  // Global (no language): true if any pages exist.
+  const hasFlipFlop = (() => {
+    if (pages.length === 0) return false;
+    if (!lang) return true;
+    const hasImages = pages.some(p =>
+      (p.story_page_versions ?? []).some(v => v.language === lang && v.image_url)
+    );
+    const audioCount = pages.filter(p =>
+      (p.story_page_versions ?? []).some(v => v.language === lang && v.audio_url)
+    ).length;
+    return hasImages && audioCount >= pages.length * 0.5;
+  })();
+
   const hasColoring = (story.coloring_pages ?? []).length > 0;
 
   const items: ReadinessItem[] = [

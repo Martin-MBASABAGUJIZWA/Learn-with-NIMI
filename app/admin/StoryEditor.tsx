@@ -375,8 +375,8 @@ export default function StoryEditor({ story, onSaved, onDeleted, defaultLang, on
   const [slots, setSlots] = useState<SlotData[]>((story.story_slots ?? []) as SlotData[])
   const version = allStoryVersions[activeLang]
 
-  // Compute readiness from local editor state — keeps the ring accurate after in-session uploads
-  const readiness = React.useMemo(() => {
+  // Compute per-language readiness for all 3 languages — single source of truth
+  const allReadiness = React.useMemo(() => {
     const svFromState = Object.values(allStoryVersions) as Record<string, unknown>[]
     const storyVersionsForReadiness = svFromState.length > 0
       ? svFromState.map(sv => sv as { language?: string })
@@ -391,14 +391,20 @@ export default function StoryEditor({ story, onSaved, onDeleted, defaultLang, on
         }
       } : null
     }).filter(Boolean) as typeof slots
-    return computeReadiness({
+    const base = {
       cover_url: coverUrl,
       story_pages: flipflopPages,
       coloring_pages: coloringPages,
       story_versions: storyVersionsForReadiness,
       story_slots: synthesizedSlots,
-    })
+    }
+    return Object.fromEntries(
+      LANGUAGES.map(lang => [lang, computeReadiness({ ...base, language: lang })])
+    ) as Record<Lang, ReturnType<typeof computeReadiness>>
   }, [coverUrl, flipflopPages, coloringPages, allStoryVersions, missionVersions, slots, story.story_versions])
+
+  // Active-language readiness — the single number used everywhere
+  const readiness = allReadiness[activeLang]
   // Tracks in-flight story_versions inserts per language so concurrent callers
   // share one promise instead of racing duplicate inserts
   const creatingVersionRef = useRef<Partial<Record<Lang, Promise<string | undefined>>>>({})
@@ -685,24 +691,10 @@ export default function StoryEditor({ story, onSaved, onDeleted, defaultLang, on
 
   const versionRecord = version as Record<string, unknown> | undefined
   const langMissionVer = (sk: string) => (missionVersions[sk] ?? []).find(v => v.language === activeLang)
-  const singleFileMissions = ['story_pdf', 'move_explore', 'sing_along', 'bonus_video', 'challenge_1', 'challenge_2', 'challenge_3', 'destination_video'] as const
-  const singleFileDone = singleFileMissions.filter(sk => langMissionVer(sk)?.media_url).length
-  const coloringDone   = coloringPages.length > 0 ? 1 : 0
 
-  // Section 4 completion (9 max): 8 single-file missions + coloring.
-  const section4Count = singleFileDone + coloringDone
-
-  // Per-language readiness (9 max): 8 single-file missions + FlipFlop audio.
-  // Coloring is intentionally excluded — templates are shared across all languages.
-  const langReadiness = (() => {
-    const total = singleFileMissions.length + 1  // 8 + 1 = 9
-    let done = singleFileDone
-    const audioPages = flipflopPages.filter(p =>
-      (p.story_page_versions ?? []).some(v => v.language === activeLang && v.audio_url)
-    )
-    if (flipflopPages.length > 0 && audioPages.length >= flipflopPages.length * 0.5) done += 1
-    return { done, total, pct: total > 0 ? Math.round((done / total) * 100) : 0 }
-  })()
+  // Section 4 badge: activities in Section 4 only (excludes FlipFlop which lives in Section 3)
+  const SECTION4_KEYS = ['story_pdf', 'coloring', 'move_explore', 'sing_along', 'bonus_video', 'challenge_1', 'challenge_2', 'challenge_3', 'destination_video']
+  const section4Count = readiness.items.filter(i => SECTION4_KEYS.includes(i.key) && i.done).length
 
   const anyLangPublished = LANGUAGES.some(lang => {
     const sv = allStoryVersions[lang]
@@ -751,13 +743,13 @@ export default function StoryEditor({ story, onSaved, onDeleted, defaultLang, on
 
         {/* Progress bar */}
         <div className="flex items-center gap-3 sm:gap-4 p-4 sm:p-5">
-          <ReadinessRing score={langReadiness.pct} size={48} strokeWidth={5} hideLabel />
+          <ReadinessRing score={readiness.score} size={48} strokeWidth={5} hideLabel />
           <div className="flex-1 min-w-0">
             <h2 className="text-[15px] sm:text-[16px] font-extrabold text-gray-800 truncate">{story.title} — {LANGUAGE_META[activeLang].label}</h2>
-            <p className="text-[12px] text-gray-500">{langReadiness.done}/{langReadiness.total} items for this language</p>
+            <p className="text-[12px] text-gray-500">{readiness.completed}/{readiness.total} items for this language</p>
             <div className="mt-1.5 w-full bg-gray-100 rounded-full h-2">
-              <div className={`h-full rounded-full transition-all ${langReadiness.pct === 100 ? 'bg-emerald-500' : langReadiness.pct >= 50 ? 'bg-green-500' : 'bg-amber-400'}`}
-                style={{ width: `${langReadiness.pct}%` }} />
+              <div className={`h-full rounded-full transition-all ${readiness.score === 100 ? 'bg-emerald-500' : readiness.score >= 50 ? 'bg-green-500' : 'bg-amber-400'}`}
+                style={{ width: `${readiness.score}%` }} />
             </div>
           </div>
           <button
@@ -977,18 +969,26 @@ export default function StoryEditor({ story, onSaved, onDeleted, defaultLang, on
             )}
           </div>
 
-          {/* Single-file missions: PDF, Move, Sing, Video */}
-          {(['story_pdf', 'move_explore', 'sing_along', 'bonus_video'] as SlotKey[]).map((slotKey, i) => {
+          {/* Single-file missions: PDF, Move, Karaoke, Bonus Video, Challenges, Destination */}
+          {(['story_pdf', 'move_explore', 'sing_along', 'bonus_video', 'challenge_1', 'challenge_2', 'challenge_3', 'destination_video'] as SlotKey[]).map((slotKey, i) => {
             const meta = SLOT_META[slotKey]
             const slot = slots.find((s: SlotData) => s.slot_key === slotKey)
             const langVer = langMissionVer(slotKey)
             const Icon = MISSION_ICONS[slotKey] ?? BookOpen
             const color = MISSION_COLORS[slotKey] ?? 'bg-gray-100 text-gray-600'
             const accept = MISSION_ACCEPT[slotKey] ?? '*/*'
-            const missionNum = slotKey === 'story_pdf' ? 2 : slotKey === 'move_explore' ? 4 : slotKey === 'sing_along' ? 5 : 6
+            const MISSION_NUMS: Record<string, number> = { story_pdf: 2, move_explore: 4, sing_along: 5, bonus_video: 6, challenge_1: 7, challenge_2: 8, challenge_3: 9, destination_video: 10 }
+            const missionNum = MISSION_NUMS[slotKey] ?? 0
+            const isGroupHeader = slotKey === 'challenge_1' || slotKey === 'destination_video'
 
             return (
-              <div key={slotKey} className={`rounded-xl border p-4 ${langVer?.media_url ? 'border-emerald-200 bg-emerald-50/20' : 'border-gray-200'}`}>
+              <React.Fragment key={slotKey}>
+                {isGroupHeader && (
+                  <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 pt-1">
+                    {slotKey === 'challenge_1' ? 'Weekly Challenges' : 'Destination'}
+                  </p>
+                )}
+              <div className={`rounded-xl border p-4 ${langVer?.media_url ? 'border-emerald-200 bg-emerald-50/20' : 'border-gray-200'}`}>
                 <div className="flex items-center gap-3 mb-3">
                   <div className={`w-10 h-10 rounded-xl ${color} flex items-center justify-center shrink-0`}><Icon size={18} /></div>
                   <div className="flex-1 min-w-0">
@@ -1047,6 +1047,7 @@ export default function StoryEditor({ story, onSaved, onDeleted, defaultLang, on
                   </div>
                 )}
               </div>
+              </React.Fragment>
             )
           })}
         </div>
@@ -1093,9 +1094,9 @@ export default function StoryEditor({ story, onSaved, onDeleted, defaultLang, on
         <button type="button" onClick={() => setShowChecklist(p => !p)}
           className="w-full flex items-center justify-between px-5 sm:px-6 py-4 text-left hover:bg-gray-50/50 transition">
           <div>
-            <h3 className="text-[14px] font-extrabold text-gray-800">Content Checklist</h3>
+            <h3 className="text-[14px] font-extrabold text-gray-800">Content Checklist — {LANGUAGE_META[activeLang].label}</h3>
             <p className="text-[12px] text-gray-400 mt-0.5">
-              {readiness.completed}/{readiness.total} required items complete
+              {readiness.completed}/{readiness.total} required items complete for this language
               {readiness.score === 100 && ' — all done ✓'}
             </p>
           </div>
@@ -1151,11 +1152,11 @@ export default function StoryEditor({ story, onSaved, onDeleted, defaultLang, on
                   <span className="text-base">{LANGUAGE_META[lang].flag}</span>
                   <div className="flex-1 min-w-0">
                     <p className="text-[12px] font-bold text-gray-700">{LANGUAGE_META[lang].label}</p>
-                    {isActive && (
+                    {sv && (
                       <div className="mt-1.5 w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
                         <div
-                          className={`h-full rounded-full transition-all ${langReadiness.pct === 100 ? 'bg-emerald-500' : langReadiness.pct >= 50 ? 'bg-green-400' : 'bg-amber-400'}`}
-                          style={{ width: `${langReadiness.pct}%` }}
+                          className={`h-full rounded-full transition-all ${allReadiness[lang].score === 100 ? 'bg-emerald-500' : allReadiness[lang].score >= 50 ? 'bg-green-400' : 'bg-amber-400'}`}
+                          style={{ width: `${allReadiness[lang].score}%` }}
                         />
                       </div>
                     )}
@@ -1169,14 +1170,14 @@ export default function StoryEditor({ story, onSaved, onDeleted, defaultLang, on
                       <span className="group-hover:hidden">Ready</span>
                       <span className="hidden group-hover:inline">Unmark</span>
                     </button>
-                  ) : isActive && langReadiness.pct === 100 ? (
+                  ) : isActive && readiness.score === 100 ? (
                     <button type="button" onClick={markLangReady} disabled={publishing}
                       className="text-[11px] font-bold bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded-lg transition disabled:opacity-50 shrink-0">
                       {publishing ? 'Saving…' : 'Mark Ready'}
                     </button>
                   ) : (
                     <span className="text-[11px] text-gray-400 shrink-0">
-                      {isActive ? `${langReadiness.pct}%` : sv ? 'In progress' : 'Not started'}
+                      {sv ? `${allReadiness[lang].score}%` : 'Not started'}
                     </span>
                   )}
                 </div>
