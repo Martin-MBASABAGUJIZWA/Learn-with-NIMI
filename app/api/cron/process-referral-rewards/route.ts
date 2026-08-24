@@ -10,8 +10,12 @@ import { addMonths } from "@/lib/dateUtils";
 
 export async function GET(req: Request) {
   const supabase = getServiceClient();
+  const cronSecret = process.env.CRON_SECRET;
+  if (!cronSecret) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
   const secret = req.headers.get("authorization");
-  if (!secret || secret !== `Bearer ${process.env.CRON_SECRET}`) {
+  if (!secret || secret !== `Bearer ${cronSecret}`) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 

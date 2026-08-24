@@ -105,6 +105,7 @@ function SignupInner() {
   };
 
   const signup = async () => {
+    if (loading) return;
     if (!name.trim() || !email.trim() || !password) { setError(t("signupErrFillAll")); return; }
     if (password !== confirmPassword) { setError(t("signupErrNoMatch")); return; }
     if (!agreed) { setError(t("signupErrTerms")); return; }

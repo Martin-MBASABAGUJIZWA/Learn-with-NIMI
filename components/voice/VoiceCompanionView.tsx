@@ -264,7 +264,7 @@ export default function VoiceCompanionView({
       {/* Header */}
       <div className="flex items-center gap-3">
         {onClose && (
-          <button onClick={onClose}
+          <button aria-label="Go back" onClick={onClose}
             className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-[var(--ds-surface-card-hover)] transition text-lg"
             style={{ color: "var(--ds-text-secondary)" }}>
             ←
@@ -348,7 +348,7 @@ export default function VoiceCompanionView({
               </p>
             ) : (
               <>
-                <motion.button onClick={handleStart}
+                <motion.button aria-label="Start recording" onClick={handleStart}
                   whileTap={{ scale: 0.95 }}
                   className="w-20 h-20 rounded-full flex items-center justify-center text-white shadow-lg text-3xl hover:opacity-90 transition"
                   style={{ background: G }}>

@@ -49,9 +49,7 @@ export async function syncGuestProgressToSupabase() {
     if (!childId) return;
 
     const missionIds: string[] = guestProgress.completedMissions || [];
-    for (const missionId of missionIds) {
-      await completeChildMission(childId, missionId);
-    }
+    await Promise.all(missionIds.map(id => completeChildMission(childId, id)));
     clearGuestProgress();
   } catch (error) {
     console.error("Failed to sync guest progress:", error);

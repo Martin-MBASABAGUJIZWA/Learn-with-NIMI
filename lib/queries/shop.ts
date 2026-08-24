@@ -67,6 +67,10 @@ export async function equipItem(
   slot: "nimi_outfit" | "piko_outfit" | "frame" | "title_badge",
   itemId: string | null,
 ): Promise<boolean> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return false;
+  const { data: owned } = await supabase.from("children").select("id").eq("id", childId).eq("parent_id", user.id).maybeSingle();
+  if (!owned) return false;
   const { error } = await supabase.from("child_cosmetics").upsert(
     { child_id: childId, [slot]: itemId, updated_at: new Date().toISOString() },
     { onConflict: "child_id" }

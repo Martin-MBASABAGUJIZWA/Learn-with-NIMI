@@ -129,7 +129,7 @@ export const UploadModal: React.FC<UploadModalProps> = ({ onClose, onSuccess, ch
         <div className="p-6">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-2xl font-bold text-ds-text">{success ? 'Upload Complete!' : 'Share Your Creation'}</h2>
-            <button onClick={() => { if (!isUploading) { resetForm(); onClose(); } }}
+            <button aria-label="Close" onClick={() => { if (!isUploading) { resetForm(); onClose(); } }}
               className="text-[var(--ds-text-tertiary)] hover:text-ds-text transition-colors" disabled={isUploading}>
               <X className="w-6 h-6" />
             </button>

@@ -167,12 +167,26 @@ export function getCurrentLevel(childId: string, language: "en" | "fr" | "rw"): 
 
 // Shield-aware consecutive day streak — result cached so parallel callers
 // (home page + AppShell + stories) share one computation.
+// Uses a 400-day window (not the 90-day rawProgressRows window) so streaks
+// longer than 90 days are not silently truncated.
 export function getConsecutiveStreak(childId: string, language: "en" | "fr" | "rw"): Promise<number> {
   return qcached(`consecutiveStreak:${childId}:${language}`, async () => {
-    const [dates, shieldedDates] = await Promise.all([
-      getActivityDates(childId, language),
+    const since = new Date(Date.now() - 400 * 86_400_000).toISOString();
+    const [{ data: streakRows }, shieldedDates] = await Promise.all([
+      supabase
+        .from("child_progress")
+        .select("completed_at")
+        .eq("child_id", childId)
+        .eq("language", language)
+        .gte("completed_at", since)
+        .order("completed_at", { ascending: false }),
       getUsedShieldDates(childId, language),
     ]);
+    const dates = new Set<string>();
+    for (const row of streakRows ?? []) {
+      const d = new Date(row.completed_at);
+      dates.add(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`);
+    }
     return computeStreaks(dates, new Date(), shieldedDates).current;
   });
 }
@@ -242,6 +256,10 @@ export function hasDailyClaimedToday(childId: string, language: "en" | "fr" | "r
 }
 
 export async function claimDailyBonus(childId: string, language: "en" | "fr" | "rw"): Promise<boolean> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return false;
+  const { data: owned } = await supabase.from("children").select("id").eq("id", childId).eq("parent_id", user.id).maybeSingle();
+  if (!owned) return false;
   const slug = todayClaimSlug();
   const { error } = await supabase.from("child_achievements").insert({
     child_id: childId, language, type: "badge", slug,
@@ -274,6 +292,10 @@ export function getClaimedTasksToday(childId: string, language: "en" | "fr" | "r
 }
 
 export async function claimTaskReward(childId: string, language: "en" | "fr" | "rw", category: string): Promise<boolean> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return false;
+  const { data: owned } = await supabase.from("children").select("id").eq("id", childId).eq("parent_id", user.id).maybeSingle();
+  if (!owned) return false;
   const dateStr = todayClaimSlug().replace("daily-claim-", "");
   const { error } = await supabase.from("child_achievements").insert({
     child_id: childId, language, type: "badge",

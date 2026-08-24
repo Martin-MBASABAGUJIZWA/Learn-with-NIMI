@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
     parentIds = [target_parent_id];
   } else {
     // Use service client so RLS on push_subscriptions doesn't filter to just the admin's row
-    const { data: subs } = await adminCheck.from("push_subscriptions").select("parent_id");
+    const { data: subs } = await adminCheck.from("push_subscriptions").select("parent_id").limit(500);
     parentIds = Array.from(new Set((subs ?? []).map((s) => s.parent_id as string)));
   }
 

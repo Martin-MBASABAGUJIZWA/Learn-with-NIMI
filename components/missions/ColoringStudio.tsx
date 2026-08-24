@@ -614,7 +614,7 @@ export default function ColoringStudio({ pages, childId, onClose, t }: ColoringS
             {tool === 'sticker' && (
               <div className="grid grid-cols-4 gap-2">
                 {STICKERS.map(s => (
-                  <button key={s} onClick={() => setActiveSticker(s)}
+                  <button key={s} aria-label={`Sticker ${s}`} onClick={() => setActiveSticker(s)}
                     className={`text-2xl py-2 rounded-2xl border-2 transition-all hover:scale-110 ${
                       activeSticker === s ? 'border-yellow-400 bg-yellow-400/10 scale-110' : 'border-ds-border'
                     }`}>

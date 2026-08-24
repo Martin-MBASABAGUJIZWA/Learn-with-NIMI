@@ -291,7 +291,7 @@ function PricingInner() {
                   </div>
                 </div>
                 {/* Right: CTA */}
-                <a href="/signup"
+                <a href="/signuppage"
                   className="shrink-0 px-6 py-3 rounded-full bg-[var(--ds-brand-primary)] hover:bg-[var(--ds-brand-hover)] text-[var(--ds-nav-bg)] font-black text-[14px] transition flex items-center gap-2 justify-center shadow-sm">
                   Start Free Trial →
                 </a>
