@@ -43,21 +43,29 @@ import type { VocabWord } from "@/components/missions/WordLearnedCard";
 const ACTIVE_CHILD_KEY = "nimipiko_active_child";
 
 const SLOT_T_KEYS: Record<string, string> = {
-  flipflop_audio: "flipflopAudioLabel",
-  story_pdf: "storyPdfLabel",
-  coloring: "coloringLabel",
-  move_explore: "moveExploreLabel",
-  sing_along: "singAlongLabel",
-  bonus_video: "bonusVideoLabel",
+  flipflop_audio:    "flipflopAudioLabel",
+  story_pdf:         "storyPdfLabel",
+  coloring:          "coloringLabel",
+  move_explore:      "moveExploreLabel",
+  sing_along:        "singAlongLabel",
+  bonus_video:       "bonusVideoLabel",
+  challenge_1:       "weeklyChallenge1Label",
+  challenge_2:       "weeklyChallenge2Label",
+  challenge_3:       "weeklyChallenge3Label",
+  destination_video: "destinationVideoLabel",
 };
 
 const SLOT_EMOJI: Record<string, string> = {
-  flipflop_audio: "📚",
-  story_pdf:      "📖",
-  coloring:       "🎨",
-  move_explore:   "🤸",
-  sing_along:     "🎵",
-  bonus_video:    "🎬",
+  flipflop_audio:    "📚",
+  story_pdf:         "📖",
+  coloring:          "🎨",
+  move_explore:      "🤸",
+  sing_along:        "🎵",
+  bonus_video:       "🎬",
+  challenge_1:       "🏅",
+  challenge_2:       "🏅",
+  challenge_3:       "🏅",
+  destination_video: "🌍",
 };
 
 const MISSION_STYLES: Record<string, {

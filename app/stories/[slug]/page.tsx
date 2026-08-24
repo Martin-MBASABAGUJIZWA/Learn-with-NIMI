@@ -190,21 +190,29 @@ const INTRO_ITEMS = [
 ];
 
 const MISSION_META: Record<string, { emoji: string; tKey: string; actionKey: string }> = {
-  flipflop_audio: { emoji: "📚", tKey: "flipflopAudioLabel", actionKey: "storyMissionOpenBook"    },
-  story_pdf:      { emoji: "📖", tKey: "storyPdfLabel",      actionKey: "storyMissionReadStory"   },
-  coloring:       { emoji: "🎨", tKey: "coloringLabel",      actionKey: "storyMissionStartColoring" },
-  move_explore:   { emoji: "🤸", tKey: "moveExploreLabel",   actionKey: "storyMissionLetsMove"    },
-  sing_along:     { emoji: "🎤", tKey: "singAlongLabel",     actionKey: "storyMissionSingAlong"   },
-  bonus_video:    { emoji: "🎬", tKey: "bonusVideoLabel",    actionKey: "storyMissionWatchVideo"  },
+  flipflop_audio:    { emoji: "📚", tKey: "flipflopAudioLabel",    actionKey: "storyMissionOpenBook"      },
+  story_pdf:         { emoji: "📖", tKey: "storyPdfLabel",         actionKey: "storyMissionReadStory"     },
+  coloring:          { emoji: "🎨", tKey: "coloringLabel",         actionKey: "storyMissionStartColoring" },
+  move_explore:      { emoji: "🤸", tKey: "moveExploreLabel",      actionKey: "storyMissionLetsMove"      },
+  sing_along:        { emoji: "🎤", tKey: "singAlongLabel",        actionKey: "storyMissionSingAlong"     },
+  bonus_video:       { emoji: "🎬", tKey: "bonusVideoLabel",       actionKey: "storyMissionWatchVideo"    },
+  challenge_1:       { emoji: "🏅", tKey: "weeklyChallenge1Label", actionKey: "storyMissionChallenge1"    },
+  challenge_2:       { emoji: "🏅", tKey: "weeklyChallenge2Label", actionKey: "storyMissionChallenge2"    },
+  challenge_3:       { emoji: "🏅", tKey: "weeklyChallenge3Label", actionKey: "storyMissionChallenge3"    },
+  destination_video: { emoji: "🌍", tKey: "destinationVideoLabel", actionKey: "storyMissionDestination"   },
 };
 
 const SLOT_BADGE: Record<string, { bg: string; text: string; border: string }> = {
-  flipflop_audio: { bg: "bg-amber-50",  text: "text-amber-700",  border: "border-amber-200"  },
-  story_pdf:      { bg: "bg-amber-50",  text: "text-amber-700",  border: "border-amber-200"  },
-  coloring:       { bg: "bg-orange-50", text: "text-orange-700", border: "border-orange-200" },
-  move_explore:   { bg: "bg-pink-50",   text: "text-pink-700",   border: "border-pink-200"   },
-  sing_along:     { bg: "bg-purple-50", text: "text-purple-700", border: "border-purple-200" },
-  bonus_video:    { bg: "bg-indigo-50", text: "text-indigo-700", border: "border-indigo-200" },
+  flipflop_audio:    { bg: "bg-amber-50",   text: "text-amber-700",   border: "border-amber-200"   },
+  story_pdf:         { bg: "bg-amber-50",   text: "text-amber-700",   border: "border-amber-200"   },
+  coloring:          { bg: "bg-orange-50",  text: "text-orange-700",  border: "border-orange-200"  },
+  move_explore:      { bg: "bg-pink-50",    text: "text-pink-700",    border: "border-pink-200"    },
+  sing_along:        { bg: "bg-purple-50",  text: "text-purple-700",  border: "border-purple-200"  },
+  bonus_video:       { bg: "bg-indigo-50",  text: "text-indigo-700",  border: "border-indigo-200"  },
+  challenge_1:       { bg: "bg-yellow-50",  text: "text-yellow-700",  border: "border-yellow-200"  },
+  challenge_2:       { bg: "bg-yellow-50",  text: "text-yellow-700",  border: "border-yellow-200"  },
+  challenge_3:       { bg: "bg-yellow-50",  text: "text-yellow-700",  border: "border-yellow-200"  },
+  destination_video: { bg: "bg-teal-50",    text: "text-teal-700",    border: "border-teal-200"    },
 };
 
 type Phase = "welcome" | "intro" | "missions" | "certificate" | "challenge" | "complete";
@@ -224,6 +232,7 @@ export default function StoryDetailPage() {
   const [childId, setChildId] = useState<string | null>(null);
   const [childName, setChildName] = useState("");
   const [storyId, setStoryId] = useState<string | null>(null);
+  const [giantBookUrl, setGiantBookUrl] = useState<string | null>(null);
   const [details, setDetails] = useState<StoryDetails | null>(null);
   const [slots, setSlots] = useState<StorySlot[]>([]);
   const [introProgress, setIntroProgress] = useState<StoryIntroProgress[]>([]);
@@ -346,6 +355,7 @@ export default function StoryDetailPage() {
       setChildName(child.name);
       getConsecutiveStreak(child.id, child.language as "en" | "fr" | "rw").then(setStreak);
       setStoryId(story.id);
+      setGiantBookUrl(story.giant_book_url ?? null);
       const [det, sl, intro, cert] = await Promise.all([
         getStoryDetails(story.id, child.language),
         getStorySlots(child.id, story.id, child.language),
@@ -833,6 +843,28 @@ export default function StoryDetailPage() {
                             Mission Chapters
                           </h2>
                         </div>
+
+                        {/* Giant Book entry point — shown when admin has uploaded the image */}
+                        {giantBookUrl && doneCount === 0 && (
+                          <div className="px-4 pb-2">
+                            <motion.button whileHover={{ scale:1.02 }} whileTap={{ scale:0.96 }}
+                              initial={{ opacity:0, y:6 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.2 }}
+                              onClick={() => {
+                                playTap();
+                                const firstSlot = slots[0];
+                                if (firstSlot) router.push(`/stories/${slug}/mission/${firstSlot.slot_key}`);
+                              }}
+                              className="w-full relative rounded-xl overflow-hidden cursor-pointer"
+                              style={{ border:"1.5px solid rgba(201,168,76,0.5)", minHeight:90 }}>
+                              <Image src={getStorageUrl(giantBookUrl)} alt="Open the Giant Book" fill className="object-cover" />
+                              <div className="absolute inset-0" style={{ background:"linear-gradient(to top, rgba(6,16,31,0.72) 0%, transparent 55%)" }} />
+                              <div className="absolute inset-x-0 bottom-0 flex items-center justify-between px-4 py-2.5">
+                                <p className="font-baloo font-black text-white text-sm drop-shadow">📚 Open the Giant Book</p>
+                                <span className="font-baloo font-black text-2xs uppercase tracking-wide" style={{ color:"#c9a84c" }}>Begin →</span>
+                              </div>
+                            </motion.button>
+                          </div>
+                        )}
 
                         {/* Preface — intro not done yet */}
                         {!allIntrosDone && (

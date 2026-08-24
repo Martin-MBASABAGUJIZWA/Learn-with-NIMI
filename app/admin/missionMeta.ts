@@ -185,6 +185,7 @@ export interface StoryRow {
   attitude: string | null
   is_personalizable?: boolean
   personalization_config?: PersonalizationConfig
+  giant_book_url?: string | null
   story_pages: StoryPageRow[]
   coloring_pages?: ColoringPageCountRow[]
   story_versions?: StoryVersionRow[]
@@ -221,16 +222,23 @@ export interface ColoringPageCountRow {
   id: string
 }
 
-export const SLOT_KEYS = ['flipflop_audio', 'story_pdf', 'coloring', 'move_explore', 'sing_along', 'bonus_video'] as const
+export const SLOT_KEYS = [
+  'flipflop_audio', 'story_pdf', 'coloring', 'move_explore', 'sing_along', 'bonus_video',
+  'challenge_1', 'challenge_2', 'challenge_3', 'destination_video',
+] as const
 export type SlotKey = typeof SLOT_KEYS[number]
 
 export const SLOT_META: Record<SlotKey, { emoji: string; label: string; type: MissionType }> = {
-  flipflop_audio: { emoji: '🎧', label: 'FlipFlop Audio',    type: 'story' },
-  story_pdf:      { emoji: '📖', label: 'Story PDF',         type: 'read' },
-  coloring:       { emoji: '🎨', label: 'Coloring Activity', type: 'color' },
-  move_explore:   { emoji: '🤸', label: 'Move & Explore',    type: 'move' },
-  sing_along:     { emoji: '🎤', label: 'Sing Along',        type: 'sing' },
-  bonus_video:    { emoji: '🎬', label: 'Bonus Video',       type: 'watch' },
+  flipflop_audio:    { emoji: '🎧', label: 'FlipFlop Audio',      type: 'story' },
+  story_pdf:         { emoji: '📖', label: 'Story PDF',           type: 'read' },
+  coloring:          { emoji: '🎨', label: 'Coloring Activity',   type: 'color' },
+  move_explore:      { emoji: '🤸', label: 'Move & Explore',      type: 'move' },
+  sing_along:        { emoji: '🎤', label: 'Sing Along',          type: 'sing' },
+  bonus_video:       { emoji: '🎬', label: 'Bonus Video',         type: 'watch' },
+  challenge_1:       { emoji: '🏅', label: 'Weekly Challenge 1',  type: 'watch' },
+  challenge_2:       { emoji: '🏅', label: 'Weekly Challenge 2',  type: 'watch' },
+  challenge_3:       { emoji: '🏅', label: 'Weekly Challenge 3',  type: 'watch' },
+  destination_video: { emoji: '🌍', label: 'Destination Video',   type: 'watch' },
 }
 
 export interface ColoringPageRow {

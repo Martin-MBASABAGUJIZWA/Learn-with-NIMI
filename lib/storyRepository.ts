@@ -137,11 +137,11 @@ export function getStoryRecommendations(
   });
 }
 
-export function getStoryBySlug(slug: string): Promise<{ id: string; slug: string; title: string; cover_url: string | null; theme_emoji: string | null; sort_order: number } | null> {
+export function getStoryBySlug(slug: string): Promise<{ id: string; slug: string; title: string; cover_url: string | null; giant_book_url: string | null; theme_emoji: string | null; sort_order: number } | null> {
   return lscached(`storyBySlug:${slug}`, TTL_LONG, async () => {
     const { data } = await supabase
       .from("stories")
-      .select("id, slug, title, cover_url, theme_emoji, sort_order")
+      .select("id, slug, title, cover_url, giant_book_url, theme_emoji, sort_order")
       .eq("slug", slug)
       .eq("status", "published")
       .maybeSingle();

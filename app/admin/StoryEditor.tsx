@@ -42,21 +42,30 @@ interface StoryEditorProps { story: StoryRow; onSaved: () => void; defaultLang?:
 const MISSION_ICONS: Record<string, React.ComponentType<{ size?: number }>> = {
   flipflop_audio: BookOpen, story_pdf: FileText, coloring: Palette,
   move_explore: PersonStanding, sing_along: Mic, bonus_video: Film,
+  challenge_1: Film, challenge_2: Film, challenge_3: Film, destination_video: Film,
 }
 const MISSION_COLORS: Record<string, string> = {
   flipflop_audio: 'bg-blue-100 text-blue-600', story_pdf: 'bg-amber-100 text-amber-600',
   coloring: 'bg-pink-100 text-pink-600', move_explore: 'bg-green-100 text-green-600',
   sing_along: 'bg-purple-100 text-purple-600', bonus_video: 'bg-red-100 text-red-600',
+  challenge_1: 'bg-yellow-100 text-yellow-700', challenge_2: 'bg-yellow-100 text-yellow-700',
+  challenge_3: 'bg-yellow-100 text-yellow-700', destination_video: 'bg-teal-100 text-teal-700',
 }
 const MISSION_ACCEPT: Record<string, string> = {
   flipflop_audio: 'audio/*', story_pdf: '.pdf,application/pdf', coloring: 'image/*',
   move_explore: 'video/*,audio/*', sing_along: 'audio/*', bonus_video: 'video/*',
+  challenge_1: 'video/*,image/*', challenge_2: 'video/*,image/*', challenge_3: 'video/*,image/*',
+  destination_video: 'video/*',
 }
 const MISSION_HINTS: Record<string, string> = {
-  story_pdf:    'Printable story PDF learners can download. Any page size, optimised for home printing.',
-  move_explore: 'Video or audio guide for a movement activity tied to the story. MP4 or MP3.',
-  sing_along:   'Song audio learners sing with. MP3 or AAC, with lyrics matching the story theme.',
-  bonus_video:  'Extra video content — behind the scenes, author note, or cultural deep-dive. MP4.',
+  story_pdf:         'Printable story PDF learners can download. Any page size, optimised for home printing.',
+  move_explore:      'Video or audio guide for a movement activity tied to the story. MP4 or MP3.',
+  sing_along:        'Song audio learners sing with. MP3 or AAC, with lyrics matching the story theme.',
+  bonus_video:       'Extra video content — behind the scenes, author note, or cultural deep-dive. MP4.',
+  challenge_1:       'Weekly Challenge 1 prompt — video or image showing what the child should do. MP4 or JPG.',
+  challenge_2:       'Weekly Challenge 2 prompt — video or image showing what the child should do. MP4 or JPG.',
+  challenge_3:       'Weekly Challenge 3 prompt — video or image showing what the child should do. MP4 or JPG.',
+  destination_video: 'Book destination video introducing the next learning adventure. MP4.',
 }
 const INTRO_FIELDS = [
   { key: 'intro_video_url',     label: 'Intro Video',        icon: Video,     color: 'bg-red-100 text-red-600',    accept: 'video/*',                hint: 'Short welcome clip shown before the story opens. MP4, 30–90 s recommended.' },
@@ -618,20 +627,17 @@ export default function StoryEditor({ story, onSaved, defaultLang, onNavigate }:
   const versionRecord = version as Record<string, unknown> | undefined
   const introCount = INTRO_FIELDS.filter(f => versionRecord?.[f.key]).length
   const langMissionVer = (sk: string) => (missionVersions[sk] ?? []).find(v => v.language === activeLang)
-  const singleFileMissions = ['story_pdf', 'move_explore', 'sing_along', 'bonus_video'] as const
+  const singleFileMissions = ['story_pdf', 'move_explore', 'sing_along', 'bonus_video', 'challenge_1', 'challenge_2', 'challenge_3', 'destination_video'] as const
   const singleFileDone = singleFileMissions.filter(sk => langMissionVer(sk)?.media_url).length
   const coloringDone   = coloringPages.length > 0 ? 1 : 0
 
-  // Section 4 completion (5 max): 4 single-file missions + coloring.
-  // Coloring templates are shared across languages but still count here — the
-  // learner needs them regardless of language for Section 4 to be complete.
+  // Section 4 completion (9 max): 8 single-file missions + coloring.
   const section4Count = singleFileDone + coloringDone
 
-  // Per-language readiness (9 max): 4 intro fields + 4 single-file missions + FlipFlop audio.
-  // Coloring is intentionally excluded — templates are shared across all languages
-  // so they are not a per-language requirement. If this ever changes, add coloringDone here too.
+  // Per-language readiness (13 max): 4 intro fields + 8 single-file missions + FlipFlop audio.
+  // Coloring is intentionally excluded — templates are shared across all languages.
   const langReadiness = (() => {
-    const total = INTRO_FIELDS.length + singleFileMissions.length + 1  // 4 + 4 + 1 = 9
+    const total = INTRO_FIELDS.length + singleFileMissions.length + 1  // 4 + 8 + 1 = 13
     let done = introCount + singleFileDone
     const audioPages = flipflopPages.filter(p =>
       (p.story_page_versions ?? []).some(v => v.language === activeLang && v.audio_url)
@@ -759,15 +765,28 @@ export default function StoryEditor({ story, onSaved, defaultLang, onNavigate }:
                 </button>
               </div>
             </div>
-            <div className="order-1 sm:order-2">
-              <label className="text-[12px] font-bold text-gray-500 block mb-1.5">Cover Image</label>
-              <FileUploader label="Cover" url={coverUrl || null} accept="image/*"
-                bucket="storyBook" pathPrefix={`covers/${story.id}`}
-                dbSave={async (p) => {
-                  setCoverUrl(p ?? '')
-                  await supabase.from('stories').update({ cover_url: p }).eq('id', story.id)
-                }}
-                onDone={onSaved} />
+            <div className="order-1 sm:order-2 space-y-3">
+              <div>
+                <label className="text-[12px] font-bold text-gray-500 block mb-1.5">Cover Image</label>
+                <FileUploader label="Cover" url={coverUrl || null} accept="image/*"
+                  bucket="storyBook" pathPrefix={`covers/${story.id}`}
+                  dbSave={async (p) => {
+                    setCoverUrl(p ?? '')
+                    await supabase.from('stories').update({ cover_url: p }).eq('id', story.id)
+                  }}
+                  onDone={onSaved} />
+              </div>
+              <div>
+                <label className="text-[12px] font-bold text-gray-500 block mb-1.5">📚 Giant Book Entry Image</label>
+                <p className="text-[11px] text-gray-400 mb-1.5">Large interactive image shown before the story begins. Child clicks it to start the FlipFlop Audio.</p>
+                <FileUploader label="Giant Book" url={story.giant_book_url ?? null} accept="image/*"
+                  bucket="storyBook" pathPrefix={`giant-book/${story.id}`}
+                  dbSave={async (p) => {
+                    await supabase.from('stories').update({ giant_book_url: p }).eq('id', story.id)
+                    onSaved()
+                  }}
+                  onDone={onSaved} />
+              </div>
             </div>
           </div>
         </div>
@@ -873,8 +892,8 @@ export default function StoryEditor({ story, onSaved, defaultLang, onNavigate }:
       </Section>
 
       {/* 4. Other Activities — per language */}
-      <Section number={4} title={`Other Activities — ${LANGUAGE_META[activeLang].label}`} subtitle="PDF, Coloring, Movement, Singing, Video" done={section4Count >= 5}
-        badge={`${section4Count}/5`}>
+      <Section number={4} title={`Other Activities — ${LANGUAGE_META[activeLang].label}`} subtitle="PDF, Coloring, Movement, Singing, Video, Challenges, Destination" done={section4Count >= 9}
+        badge={`${section4Count}/9`}>
         <div className="space-y-3">
           {/* Coloring — multi-page with inline edit */}
           <div className={`rounded-xl border p-4 ${coloringPages.length > 0 ? 'border-emerald-200 bg-emerald-50/20' : 'border-gray-200'}`}>
