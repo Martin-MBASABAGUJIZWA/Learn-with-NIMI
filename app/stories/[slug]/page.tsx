@@ -23,10 +23,9 @@ function badgeDisplayName(slug: string): string {
 }
 import { getStoryBySlug, getStoryDetails, getStorySlots, getStoryLibrary } from "@/lib/storyRepository";
 import type { StoryLibraryItem } from "@/lib/story-types";
-import { getStoryIntroProgress, markIntroItemConsumed } from "@/lib/storyProgressRepository";
 import { getWeeklyChallenges, completeWeeklyChallenge } from "@/lib/weeklyChallengeRepository";
 import { getStoryCertificate } from "@/lib/storyCertificateRepository";
-import type { StoryDetails, StorySlot, StoryIntroProgress, StoryCertificate, WeeklyChallenge } from "@/lib/story-types";
+import type { StoryDetails, StorySlot, StoryCertificate, WeeklyChallenge } from "@/lib/story-types";
 import supabase from "@/lib/supabaseClient";
 import { qinvalidate, lsinvalidate } from "@/lib/queryCache";
 import PricingPaymentModal from "@/components/pricing/PricingPaymentModal";
@@ -44,7 +43,6 @@ import { useAppTheme } from "@/contexts/AppThemeProvider";
 import { getThemeAssets } from "@/lib/design-system/assetRegistry";
 import { getComponentVariant } from "@/lib/design-system/componentVariants";
 import { PageSurface } from "@/components/layout/primitives";
-import MeetCharactersCard from "@/components/stories/MeetCharactersCard";
 import BadgeCircle from "@/components/stories/BadgeCircle";
 
 const ACTIVE_CHILD_KEY = "nimipiko_active_child";
@@ -182,12 +180,6 @@ function CertificateModal({
   );
 }
 
-// Steps 2–4 of the boss's learning journey (Cover is step 1, shown on welcome screen)
-const INTRO_ITEMS = [
-  { key: "intro_video",     emoji: "🎬", tKey: "introVideoLabel",  actionKey: "storyIntroWatch"  },
-  { key: "theme_song",      emoji: "🎵", tKey: "themeSongLabel",   actionKey: "storyIntroListen" },
-  { key: "meet_characters", emoji: "🤝", tKey: "meetCharLabel",    actionKey: "storyIntroMeet"   },
-];
 
 const MISSION_META: Record<string, { emoji: string; tKey: string; actionKey: string }> = {
   flipflop_audio:    { emoji: "📚", tKey: "flipflopAudioLabel",    actionKey: "storyMissionOpenBook"      },
@@ -215,7 +207,7 @@ const SLOT_BADGE: Record<string, { bg: string; text: string; border: string }> =
   destination_video: { bg: "bg-teal-50",    text: "text-teal-700",    border: "border-teal-200"    },
 };
 
-type Phase = "welcome" | "intro" | "missions" | "certificate" | "challenge" | "complete";
+type Phase = "welcome" | "missions" | "certificate" | "challenge" | "complete";
 
 
 export default function StoryDetailPage() {
@@ -235,13 +227,11 @@ export default function StoryDetailPage() {
   const [giantBookUrl, setGiantBookUrl] = useState<string | null>(null);
   const [details, setDetails] = useState<StoryDetails | null>(null);
   const [slots, setSlots] = useState<StorySlot[]>([]);
-  const [introProgress, setIntroProgress] = useState<StoryIntroProgress[]>([]);
   const [certificate, setCertificate] = useState<StoryCertificate | null>(null);
   const [challengeDone, setChallengeDone] = useState(false);
   const [weeklyChallenge, setWeeklyChallenge] = useState<WeeklyChallenge | null>(null);
   const [challengeLoading, setChallengeLoading] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
-  const [activeIntro, setActiveIntro] = useState<string | null>(null);
   const [phase, setPhase] = useState<Phase>("welcome");
   const [showRewardModal, setShowRewardModal] = useState(false);
   const [treasureAnimating, setTreasureAnimating] = useState(false);
@@ -356,16 +346,14 @@ export default function StoryDetailPage() {
       getConsecutiveStreak(child.id, child.language as "en" | "fr" | "rw").then(setStreak);
       setStoryId(story.id);
       setGiantBookUrl(story.giant_book_url ?? null);
-      const [det, sl, intro, cert] = await Promise.all([
+      const [det, sl, cert] = await Promise.all([
         getStoryDetails(story.id, child.language),
         getStorySlots(child.id, story.id, child.language),
-        getStoryIntroProgress(child.id, story.id, child.language),
         getStoryCertificate(child.id, story.id, child.language),
       ]);
       if (cancelled) return;
       setDetails(det);
       setSlots(sl);
-      setIntroProgress(intro);
       setCertificate(cert);
 
       // Prefetch story pages in background so the flipflop_audio slot opens instantly
@@ -373,7 +361,6 @@ export default function StoryDetailPage() {
 
       // Auto-detect phase based on progress
       const doneSlots = sl.filter(s => s.completed).length;
-      const allIntrosDone = INTRO_ITEMS.every(item => intro.find(p => p.slot_key === item.key)?.consumed);
       const allMissionsDone = doneSlots >= sl.length && sl.length > 0;
 
       // Always open the book first; certificate/complete are the only auto-exceptions
@@ -440,16 +427,6 @@ export default function StoryDetailPage() {
     setShowCelebration(true);
   };
 
-  const handleIntroClick = async (key: string) => {
-    if (!childId || !storyId || !details) return;
-    const urlKey = `${key}_url` as keyof StoryDetails;
-    const hasMedia = !!(details[urlKey] as string | null);
-    // meet_characters always opens — shows a built-in character card when no video is uploaded
-    if (!hasMedia && key !== "meet_characters") return;
-    setActiveIntro(activeIntro === key ? null : key);
-    await markIntroItemConsumed(childId, storyId, key);
-    setIntroProgress(prev => prev.map(p => p.slot_key === key ? { ...p, consumed: true } : p));
-  };
 
   // Load existing feeling when certificate phase is entered
   useEffect(() => {
@@ -634,7 +611,6 @@ export default function StoryDetailPage() {
   const totalStars = slots.reduce((s, sl) => s + (sl.completed ? (sl.stars ?? 10) : 0), 0);
   const storyTitle = details?.title ?? slug;
   const isPreview = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("preview") === "true";
-  const allIntrosDone = INTRO_ITEMS.every(item => introProgress.find(p => p.slot_key === item.key)?.consumed);
   const nextMission = slots.find((s, i) => !s.completed && (i === 0 || slots[i - 1]?.completed));
 
   return (
@@ -866,25 +842,6 @@ export default function StoryDetailPage() {
                           </div>
                         )}
 
-                        {/* Preface — intro not done yet */}
-                        {!allIntrosDone && (
-                          <div className="px-4 pb-2">
-                            <motion.button whileHover={{ scale:1.02 }} whileTap={{ scale:0.97 }}
-                              onClick={() => { playTap(); setPhase("intro"); }}
-                              className="w-full flex items-center gap-3 py-2.5 px-4 rounded-xl cursor-pointer"
-                              style={{ background:"linear-gradient(135deg, #1a3558, #06101f)", border:"1.5px solid rgba(201,168,76,0.35)" }}>
-                              <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
-                                style={{ background:"rgba(201,168,76,0.18)" }}>
-                                <Play className="w-3 h-3 fill-current ml-0.5" style={{ color:"#c9a84c" }} />
-                              </div>
-                              <div className="flex-1 text-left">
-                                <p className="font-nunito font-bold text-white text-sm">Meet the Characters</p>
-                                <p className="font-nunito text-2xs" style={{ color:"rgba(255,255,255,0.45)" }}>Watch before starting</p>
-                              </div>
-                              <span className="font-baloo font-black text-2xs uppercase tracking-wide" style={{ color:"#c9a84c" }}>Begin →</span>
-                            </motion.button>
-                          </div>
-                        )}
 
                         {/* ─── Chapter list OR The End ─── */}
                         {doneCount >= totalCount && totalCount > 0 ? (
@@ -1068,24 +1025,14 @@ export default function StoryDetailPage() {
                   </div>{/* /perspective */}
 
                   {/* ── CTA below book ── */}
-                  {!allIntrosDone && (
-                    <motion.button
-                      initial={{ opacity:0, y:16 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.55 }}
-                      whileHover={{ scale:1.02 }} whileTap={{ scale:0.97 }}
-                      onClick={() => { playTap(); setPhase("intro"); }}
-                      className="mt-4 w-full font-baloo font-black text-lg py-4 rounded-2xl flex items-center justify-center gap-3"
-                      style={{ background:"linear-gradient(135deg, #c9a84c, #f0d080)", color:"#06101f", boxShadow:"0 8px 32px rgba(201,168,76,0.32)" }}>
-                      ✨ Begin Your Adventure
-                    </motion.button>
-                  )}
-                  {allIntrosDone && doneCount < totalCount && (
+                  {doneCount < totalCount && (
                     <motion.button
                       initial={{ opacity:0, y:16 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.55 }}
                       whileHover={{ scale:1.02 }} whileTap={{ scale:0.97 }}
                       onClick={() => { playTap(); setPhase("missions"); }}
                       className="mt-4 w-full font-baloo font-black text-lg py-4 rounded-2xl flex items-center justify-center gap-3"
                       style={{ background:"linear-gradient(135deg, #c9a84c, #f0d080)", color:"#06101f", boxShadow:"0 8px 32px rgba(201,168,76,0.32)" }}>
-                      🚀 Continue Adventure
+                      {doneCount === 0 ? "✨ Begin Your Adventure" : "🚀 Continue Adventure"}
                     </motion.button>
                   )}
                 </div>
@@ -1106,106 +1053,7 @@ export default function StoryDetailPage() {
             )}
 
             {/* ═══════════════════════════════════════════ */}
-            {/* PHASE 2: INTRO JOURNEY                     */}
-            {/* ═══════════════════════════════════════════ */}
-            {phase === "intro" && (
-              <motion.div key="intro" initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -50 }}
-                className="flex-1 flex flex-col px-5 py-6">
-
-                <button onClick={() => setPhase("welcome")} className="self-start mb-4 text-[var(--ds-text-tertiary)] flex items-center gap-1 text-sml font-bold">
-                  <ArrowLeft className="w-4 h-4" /> Back
-                </button>
-
-                <h2 className="font-baloo font-black text-[var(--ds-brand-primary)] text-1.5xl text-center mb-2">{t("storyAdventureBegins")}</h2>
-
-                <div className="mb-5 leaf border border-[var(--ds-border-brand)] bg-[var(--ds-brand-subtle)] p-4 shadow-sm">
-                  <p className="font-baloo font-black text-base text-[var(--ds-text-primary)]">First, meet the story helpers</p>
-                  <p className="text-sml text-[var(--ds-text-secondary)] mt-1">Each card opens a tiny adventure. Complete them in order and the path ahead will light up.</p>
-                </div>
-
-                {/* Progress dots */}
-                <div className="flex justify-center gap-2 mb-6">
-                  {INTRO_ITEMS.map(item => {
-                    const done = introProgress.find(p => p.slot_key === item.key)?.consumed ?? false;
-                    return (
-                      <motion.div key={item.key}
-                        animate={done ? { scale: [1, 1.3, 1] } : {}} transition={{ duration: DURATION.slow }}
-                        className={`w-3 h-3 rounded-full ${done ? "bg-[var(--ds-brand-primary)]" : "bg-[var(--ds-brand-soft)]"}`} />
-                    );
-                  })}
-                </div>
-
-                {/* Intro cards — one per item, big and clear */}
-                <div className="space-y-3 flex-1">
-                  {INTRO_ITEMS.map((item, i) => {
-                    const done = introProgress.find(p => p.slot_key === item.key)?.consumed ?? false;
-                    const hasUrl = !!(details?.[`${item.key}_url` as keyof StoryDetails]);
-                    const isActive = activeIntro === item.key;
-                    const prevDone = i === 0 || (introProgress.find(p => p.slot_key === INTRO_ITEMS[i - 1].key)?.consumed ?? false);
-                    const isNext = !done && prevDone;
-
-                    return (
-                      <div key={item.key}>
-                        <motion.button
-                          initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}
-                          whileTap={(hasUrl || item.key === "meet_characters") ? m.buttonPress : {}}
-                          onClick={() => handleIntroClick(item.key)} disabled={!hasUrl && item.key !== "meet_characters"}
-                          className={`w-full p-5 flex items-center gap-4 transition-all ${
-                            done ? "bg-[var(--ds-brand-subtle)] border-2 border-[var(--ds-border-brand)]/40" :
-                            isNext ? `bg-gradient-to-r ${v.contentGradients.storyIntro[i]} border-2 border-white/20 shadow-xl` :
-                            "bg-[var(--ds-surface-card-hover)] border-2 border-ds-border opacity-40"
-                          }`}
-                          style={{ borderRadius: 'var(--leaf-r-lg)' }}>
-                          <motion.span className="text-4xl" animate={isNext ? { rotate: [0, -10, 10, 0] } : {}}
-                            transition={{ duration: DURATION.loopBase, repeat: Infinity }}>{item.emoji}</motion.span>
-                          <div className="flex-1 text-left">
-                            <p className={`font-baloo font-black text-mlg ${done ? "text-[var(--ds-text-primary)]" : isNext ? "text-white" : "text-[var(--ds-text-secondary)]"}`}>{t(item.tKey)}</p>
-                          </div>
-                          {done ? (
-                            <CheckCircle2 className="w-7 h-7 text-[var(--ds-text-brand)] shrink-0" />
-                          ) : isNext && (hasUrl || item.key === "meet_characters") ? (
-                            <motion.div animate={{ scale: [1, 1.15, 1] }} transition={{ duration: DURATION.loopShimmer, repeat: Infinity }}
-                              className="w-12 h-12 rounded-full bg-[var(--ds-surface-card)]/20 flex items-center justify-center shrink-0">
-                              <Play className="w-5 h-5 text-white fill-white ml-0.5" />
-                            </motion.div>
-                          ) : null}
-                        </motion.button>
-
-                        {/* Inline player */}
-                        {isActive && details && (
-                          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} className="mt-2 mb-1">
-                            {item.key === "intro_video" && (
-                              <StoryVideoPlayer url={details.intro_video_url} title={t(item.tKey)} />
-                            )}
-                            {item.key === "theme_song" && (
-                              <StoryAudioPlayer url={details.theme_song_url} title={t("themeSongLabel")} subtitle={storyTitle} color={v.contentGradients.storyIntro[i]} />
-                            )}
-                            {item.key === "meet_characters" && (
-                              details.meet_characters_url
-                                ? <StoryVideoPlayer url={details.meet_characters_url} title={t(item.tKey)} />
-                                : <MeetCharactersCard assets={assets} />
-                            )}
-                          </motion.div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* Begin Adventure button — appears when all intros done */}
-                {allIntrosDone && (
-                  <motion.button initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ ...SPRING.gentle }}
-                    whileHover={m.buttonHover} whileTap={m.buttonPress}
-                    onClick={() => { playUnlock(); setPhase("missions"); }}
-                    className="mt-6 w-full text-white font-baloo font-black text-xl py-4 flex items-center justify-center gap-3" style={{ background: 'linear-gradient(135deg, var(--ds-brand-primary), var(--ds-brand-hover))', borderRadius: 'var(--leaf-r-lg)', boxShadow: '0 8px 24px rgba(26,168,106,0.35)' }}>
-                    {t("storyBeginMyAdventure")}
-                  </motion.button>
-                )}
-              </motion.div>
-            )}
-
-            {/* ═══════════════════════════════════════════ */}
-            {/* PHASE 3: MISSION PATH                      */}
+            {/* PHASE 2: MISSION PATH                      */}
             {/* ═══════════════════════════════════════════ */}
             {phase === "missions" && (
               <motion.div key="missions" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}

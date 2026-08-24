@@ -5,7 +5,7 @@ import { getStorageUrl } from '@/lib/queries'
 import { smartUpload, type UploadProgress } from '@/lib/uploadWithProgress'
 import {
   Upload, CheckCircle2, AlertCircle, Image as ImageIcon,
-  Video, Music, Users as UsersIcon, Play, Eye, ChevronDown,
+  Music, Play, Eye, ChevronDown,
   BookOpen, FileText, Palette, PersonStanding, Mic, Film,
   Plus, Trash2, FileArchive,
 } from 'lucide-react'
@@ -67,12 +67,6 @@ const MISSION_HINTS: Record<string, string> = {
   challenge_3:       'Weekly Challenge 3 prompt — video or image showing what the child should do. MP4 or JPG.',
   destination_video: 'Book destination video introducing the next learning adventure. MP4.',
 }
-const INTRO_FIELDS = [
-  { key: 'intro_video_url',     label: 'Intro Video',        icon: Video,     color: 'bg-red-100 text-red-600',    accept: 'video/*',                hint: 'Short welcome clip shown before the story opens. MP4, 30–90 s recommended.' },
-  { key: 'theme_song_url',      label: 'Theme Song',         icon: Music,     color: 'bg-pink-100 text-pink-600',  accept: 'audio/*',                hint: 'Background music looped during the story. MP3 or AAC, 1–3 min.' },
-  { key: 'meet_characters_url', label: 'Meet Nimi & Piko',   icon: UsersIcon, color: 'bg-blue-100 text-blue-600', accept: 'video/*',                hint: 'Optional character intro video. MP4, 30–60 s. Can be shared across stories.' },
-  { key: 'story_intro_url',     label: 'Story Introduction', icon: Play,      color: 'bg-purple-100 text-purple-600', accept: 'video/*,audio/*,image/*', hint: 'Audio narration or video of the story opener. MP4, MP3, or a static image.' },
-]
 
 /* ── Auto-save text input ── */
 function AutoSaveInput({ label, value, onSave }: { label: string; value: string; onSave: (v: string) => Promise<void> }) {
@@ -385,7 +379,7 @@ export default function StoryEditor({ story, onSaved, onDeleted, defaultLang, on
   const readiness = React.useMemo(() => {
     const svFromState = Object.values(allStoryVersions) as Record<string, unknown>[]
     const storyVersionsForReadiness = svFromState.length > 0
-      ? svFromState.map(sv => sv as { language?: string; intro_video_url?: string | null; theme_song_url?: string | null; meet_characters_url?: string | null; story_intro_url?: string | null })
+      ? svFromState.map(sv => sv as { language?: string })
       : (story.story_versions ?? [])
     const synthesizedSlots = SLOT_KEYS.map(sk => {
       const slot = slots.find(s => s.slot_key === sk)
@@ -659,10 +653,6 @@ export default function StoryEditor({ story, onSaved, onDeleted, defaultLang, on
         ])),
         ...(coloringPages.map((p: { template_image_url?: string | null }) => p.template_image_url ?? null)),
         ...Object.values(missionVersions).flat().map(v => v.media_url),
-        // Collect intro media from ALL language tabs, not just the active one
-        ...Object.values(allStoryVersions).flatMap(sv =>
-          ['intro_video_url','theme_song_url','meet_characters_url','story_intro_url'].map(k => (sv as Record<string,string|null>)[k])
-        ),
       ].filter((u): u is string => !!u)
 
       // 2. Collect mission IDs linked via story_slots
@@ -694,7 +684,6 @@ export default function StoryEditor({ story, onSaved, onDeleted, defaultLang, on
   }
 
   const versionRecord = version as Record<string, unknown> | undefined
-  const introCount = INTRO_FIELDS.filter(f => versionRecord?.[f.key]).length
   const langMissionVer = (sk: string) => (missionVersions[sk] ?? []).find(v => v.language === activeLang)
   const singleFileMissions = ['story_pdf', 'move_explore', 'sing_along', 'bonus_video', 'challenge_1', 'challenge_2', 'challenge_3', 'destination_video'] as const
   const singleFileDone = singleFileMissions.filter(sk => langMissionVer(sk)?.media_url).length
@@ -703,11 +692,11 @@ export default function StoryEditor({ story, onSaved, onDeleted, defaultLang, on
   // Section 4 completion (9 max): 8 single-file missions + coloring.
   const section4Count = singleFileDone + coloringDone
 
-  // Per-language readiness (13 max): 4 intro fields + 8 single-file missions + FlipFlop audio.
+  // Per-language readiness (9 max): 8 single-file missions + FlipFlop audio.
   // Coloring is intentionally excluded — templates are shared across all languages.
   const langReadiness = (() => {
-    const total = INTRO_FIELDS.length + singleFileMissions.length + 1  // 4 + 8 + 1 = 13
-    let done = introCount + singleFileDone
+    const total = singleFileMissions.length + 1  // 8 + 1 = 9
+    let done = singleFileDone
     const audioPages = flipflopPages.filter(p =>
       (p.story_page_versions ?? []).some(v => v.language === activeLang && v.audio_url)
     )
@@ -861,11 +850,9 @@ export default function StoryEditor({ story, onSaved, onDeleted, defaultLang, on
         </div>
       </Section>
 
-      {/* 2. Intro Media — per language */}
-      <Section number={2} title={`Story Introduction — ${LANGUAGE_META[activeLang].label}`} subtitle="Title, description & welcome media" done={introCount === 4}
-        badge={`${introCount}/4`}>
-        {/* Per-language title + description */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
+      {/* 2. Story Metadata — per language */}
+      <Section number={2} title={`Story Text — ${LANGUAGE_META[activeLang].label}`} subtitle="Title and description for this language" done={!!(versionRecord?.title)}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <AutoSaveInput
             key={`title-${activeLang}`}
             label={`Title (${LANGUAGE_META[activeLang].label})`}
@@ -884,31 +871,6 @@ export default function StoryEditor({ story, onSaved, onDeleted, defaultLang, on
               if (vid) { await supabase.from('story_versions').update({ description: v || null }).eq('id', vid); await loadContent() }
             }}
           />
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {INTRO_FIELDS.map(field => {
-            const url = (versionRecord?.[field.key] as string) ?? ''
-            const Icon = field.icon
-            return (
-              <div key={field.key} className={`rounded-xl border p-4 ${url ? 'border-emerald-200 bg-emerald-50/30' : 'border-gray-200'}`}>
-                <div className="flex items-center gap-2 mb-3">
-                  <div className={`w-8 h-8 rounded-lg ${field.color} flex items-center justify-center`}><Icon size={16} /></div>
-                  <span className="text-[13px] font-bold text-gray-700">{field.label}</span>
-                  {url && <CheckCircle2 size={14} className="text-emerald-500 ml-auto" />}
-                </div>
-                <FileUploader label={field.label} url={url || null} accept={field.accept} hint={field.hint}
-                  bucket="storyBook" pathPrefix={`intro/${story.id}-${activeLang}-${field.key}`}
-                  dbSave={async (p) => {
-                    const vid = await getOrCreateVersion(activeLang)
-                    if (vid) {
-                      await supabase.from('story_versions').update({ [field.key]: p }).eq('id', vid)
-                      await loadContent()
-                    }
-                  }}
-                  onDone={onSaved} />
-              </div>
-            )
-          })}
         </div>
       </Section>
 
@@ -1091,7 +1053,7 @@ export default function StoryEditor({ story, onSaved, onDeleted, defaultLang, on
           <ol className="space-y-2">
             {[
               ['Section 1', 'Fill in title, slug, tagline, and upload a cover image.'],
-              ['Section 2', 'For each language tab, upload the 4 intro media files (video, song, characters, intro).'],
+              ['Section 2', 'Add the title and description for each language tab.'],
               ['Section 3', 'Import the FlipFlop page images, then add audio narration per language.'],
               ['Section 4', 'Upload the PDF, coloring templates, and the movement/sing/bonus files.'],
               ['Publish panel', 'Once a language tab shows 100%, click "Mark Ready". When at least one language is ready, "Go Live" becomes active.'],
