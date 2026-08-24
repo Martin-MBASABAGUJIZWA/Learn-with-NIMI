@@ -55,6 +55,15 @@ export async function GET(req: NextRequest) {
 
   if (!childId) return NextResponse.json({ error: 'childId required' }, { status: 400 });
 
+  // H2: Ownership check — verify the authenticated user owns this child.
+  const { data: childRow } = await supabase
+    .from('children')
+    .select('parent_id')
+    .eq('id', childId)
+    .eq('parent_id', user.id)
+    .maybeSingle();
+  if (!childRow) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+
   // Six parallel fetches — all independent, all non-fatal
   const [ctxResult, memResult, masteryResult, reviewResult, intelligenceResult, storyVocabResult] =
     await Promise.allSettled([
