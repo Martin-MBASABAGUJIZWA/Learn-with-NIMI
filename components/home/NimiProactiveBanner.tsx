@@ -66,29 +66,29 @@ export default function NimiProactiveBanner({ childId, language = "en" }: Props)
 
   useEffect(() => {
     if (!childId) return;
-    void fetchSuggestion();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [childId]);
+    let active = true;
+    const fetchSuggestion = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.access_token) return;
 
-  const fetchSuggestion = async () => {
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.access_token) return;
+        const res = await fetch(`/api/nimi/proactive?childId=${childId}&language=${language}`, {
+          headers: { Authorization: `Bearer ${session.access_token}` },
+        });
+        if (!res.ok) return;
 
-      const res = await fetch(`/api/nimi/proactive?childId=${childId}&language=${language}`, {
-        headers: { Authorization: `Bearer ${session.access_token}` },
-      });
-      if (!res.ok) return;
-
-      const data = await res.json() as { suggestions?: ProactiveSuggestion[] };
-      const top = data.suggestions?.[0];
-      if (top && !isDismissed(childId, top.id ?? top.type)) {
-        setSuggestion(top);
+        const data = await res.json() as { suggestions?: ProactiveSuggestion[] };
+        const top = data.suggestions?.[0];
+        if (active && top && !isDismissed(childId, top.id ?? top.type)) {
+          setSuggestion(top);
+        }
+      } catch {
+        // silently fail — proactive banner is non-essential
       }
-    } catch {
-      // silently fail — proactive banner is non-essential
-    }
-  };
+    };
+    void fetchSuggestion();
+    return () => { active = false; };
+  }, [childId, language]);
 
   const handleDismiss = () => {
     if (suggestion) markDismissed(childId, suggestion.id ?? suggestion.type);

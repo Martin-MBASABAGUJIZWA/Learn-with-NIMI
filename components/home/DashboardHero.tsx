@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAppTheme } from "@/contexts/AppThemeProvider";
 import { getThemeAssets } from "@/lib/design-system/assetRegistry";
@@ -61,20 +61,23 @@ export default function DashboardHero({ childName, themeTitle, themeEmoji, level
       <div className="absolute inset-0 pointer-events-none select-none">
         <FloatingParticles effects={effects} />
         <HeroDecoration   effects={effects} />
-        {HERO_STARS.map((s, i) => {
-          const pulse = m.starPulse(i * 0.18);
-          return (
-            <motion.span
-              key={i}
-              className="absolute font-bold leading-none"
-              style={{ top: s.top, left: s.left, color: s.color, fontSize: s.size }}
-              animate={pulse.animate}
-              transition={{ ...pulse.transition, duration: 2.5 + i * 0.3 }}
-            >
-              {s.shape}
-            </motion.span>
-          );
-        })}
+        <AnimatePresence>
+          {HERO_STARS.map((s, i) => {
+            const pulse = m.starPulse(i * 0.18);
+            return (
+              <motion.span
+                key={i}
+                className="absolute font-bold leading-none"
+                style={{ top: s.top, left: s.left, color: s.color, fontSize: s.size }}
+                animate={pulse.animate}
+                transition={{ ...pulse.transition, duration: 2.5 + i * 0.3 }}
+                exit={{ opacity: 0 }}
+              >
+                {s.shape}
+              </motion.span>
+            );
+          })}
+        </AnimatePresence>
       </div>
 
       {/* Greeting row */}

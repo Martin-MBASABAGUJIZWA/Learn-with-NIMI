@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useMotion } from "@/hooks/useMotion";
 import { Check, Lock, Mic, Pause, Play, RotateCcw } from "lucide-react";
@@ -32,6 +32,15 @@ export default function SingAlongContent({ mission, onComplete, completed, savin
   const [readingLine, setReadingLine] = useState(-1);
   const [songFinished, setSongFinished] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  // H28: guard speechSynthesis recursive chain after unmount
+  const mountedRef = useRef(true);
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      window.speechSynthesis?.cancel();
+    };
+  }, []);
 
   const songUrl = mission.media_url ? getStorageUrl(mission.media_url) : null;
   const lyrics = mission.content?.lyrics ?? [];
@@ -59,6 +68,7 @@ export default function SingAlongContent({ mission, onComplete, completed, savin
     setKaraoke(true);
     let i = 0;
     const speakLine = () => {
+      if (!mountedRef.current) return;
       if (i >= lyrics.length) { setReadingLine(-1); return; }
       setReadingLine(i);
       const utter = new SpeechSynthesisUtterance(lyrics[i]);
@@ -85,15 +95,18 @@ export default function SingAlongContent({ mission, onComplete, completed, savin
 
       <div className="relative overflow-hidden leaf-lg border border-purple-100 bg-gradient-to-br from-purple-50 via-white to-violet-50/60 p-6 text-center shadow-card-2xl">
         {/* Floating music notes */}
-        {["🎵", "🎶", "🎵"].map((e, i) => (
-          <motion.span key={i}
-            className="pointer-events-none absolute select-none text-lg opacity-30"
-            style={{ left: `${15 + i * 35}%`, top: 8 }}
-            animate={{ y: [0, -10, 0], opacity: [0.3, 0.6, 0.3] }}
-            transition={{ duration: 2 + i * 0.5, repeat: Infinity, delay: i * 0.8 }}>
-            {e}
-          </motion.span>
-        ))}
+        <AnimatePresence>
+          {["🎵", "🎶", "🎵"].map((e, i) => (
+            <motion.span key={i}
+              className="pointer-events-none absolute select-none text-lg opacity-30"
+              style={{ left: `${15 + i * 35}%`, top: 8 }}
+              animate={{ y: [0, -10, 0], opacity: [0.3, 0.6, 0.3] }}
+              transition={{ duration: 2 + i * 0.5, repeat: Infinity, delay: i * 0.8 }}
+              exit={{ opacity: 0 }}>
+              {e}
+            </motion.span>
+          ))}
+        </AnimatePresence>
         <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-[var(--ds-surface-card)] shadow-sm">
           <span className="select-none text-xl">🎵</span>
         </div>

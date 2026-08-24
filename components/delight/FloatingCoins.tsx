@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useMotion } from "@/hooks/useMotion";
 import { DURATION, EASE } from "@/lib/design-system/motion";
 
@@ -22,18 +22,21 @@ export default function FloatingCoins({ count = 6, className }: Props) {
   const coins = POOL.slice(0, Math.min(count, POOL.length));
 
   return (
-    <div className={`absolute inset-0 pointer-events-none overflow-hidden ${className ?? ""}`}>
-      {coins.map(c => (
-        <motion.span
-          key={c.id}
-          className="absolute select-none"
-          style={{ left: `${c.x}%`, bottom: "5%", fontSize: c.size }}
-          animate={m.reduced ? {} : { y: [0, -50, -100], opacity: [0, 1, 0], scale: [0.6, 1.2, 0.8] }}
-          transition={{ duration: DURATION.loopBase, delay: c.delay, repeat: Infinity, ease: EASE.enter }}
-        >
-          ⭐
-        </motion.span>
-      ))}
-    </div>
+    <AnimatePresence>
+      <div className={`absolute inset-0 pointer-events-none overflow-hidden ${className ?? ""}`}>
+        {coins.map(c => (
+          <motion.span
+            key={c.id}
+            className="absolute select-none"
+            style={{ left: `${c.x}%`, bottom: "5%", fontSize: c.size }}
+            animate={m.reduced ? {} : { y: [0, -50, -100], opacity: [0, 1, 0], scale: [0.6, 1.2, 0.8] }}
+            transition={{ duration: DURATION.loopBase, delay: c.delay, repeat: Infinity, ease: EASE.enter }}
+            exit={{ opacity: 0 }}
+          >
+            ⭐
+          </motion.span>
+        ))}
+      </div>
+    </AnimatePresence>
   );
 }

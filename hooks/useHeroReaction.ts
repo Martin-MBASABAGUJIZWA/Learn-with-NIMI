@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import type { HeroReactionType } from "@/lib/design-system/delight";
 
 const RETURN_TO_IDLE_MS = 3000;
@@ -16,6 +16,9 @@ export function useHeroReaction(defaultReaction: HeroReactionType = "idle") {
       timerRef.current = setTimeout(() => setReaction("idle"), RETURN_TO_IDLE_MS);
     }
   }, []);
+
+  // H19: clear pending timer on unmount to prevent state updates after dismount
+  useEffect(() => () => { if (timerRef.current) clearTimeout(timerRef.current); }, []);
 
   return { reaction, react };
 }

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import { Mic, SendHorizontal, X } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { DURATION } from "@/lib/design-system/motion";
 import { useAppTheme } from "@/contexts/AppThemeProvider";
 
@@ -29,6 +29,13 @@ export default function NimiChat({
   const chatRef = useRef<HTMLDivElement>(null);
   // R3: store recognition instance so we can abort on unmount
   const recognitionRef = useRef<InstanceType<typeof window.webkitSpeechRecognition> | null>(null);
+  // H22: guard against state updates after unmount in sendToAI streaming loop
+  const unmountedRef = useRef(false);
+
+  useEffect(() => {
+    unmountedRef.current = false;
+    return () => { unmountedRef.current = true; };
+  }, []);
 
   useEffect(() => {
     if (open && chatRef.current) {
@@ -69,15 +76,17 @@ export default function NimiChat({
     const reader = response.body?.getReader();
     const decoder = new TextDecoder("utf-8");
     let aiReply = "";
+    if (unmountedRef.current) return;
     setIsTalking(true);
 
     if (reader) {
       // R2: push a placeholder so the streaming loop replaces it, not the user message
-      setChatLog((prev) => [...prev, `🤖 Nimi: `]);
+      if (!unmountedRef.current) setChatLog((prev) => [...prev, `🤖 Nimi: `]);
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
         aiReply += decoder.decode(value, { stream: true });
+        if (unmountedRef.current) return;
         setChatLog((prev) => [...prev.slice(0, -1), `🤖 Nimi: ${aiReply}`]);
       }
     }
@@ -85,10 +94,10 @@ export default function NimiChat({
     if (voiceEnabled && typeof window !== "undefined") {
       const utter = new SpeechSynthesisUtterance(aiReply);
       utter.lang = language;
-      utter.onend = () => setIsTalking(false);
+      utter.onend = () => { if (!unmountedRef.current) setIsTalking(false); };
       window.speechSynthesis.speak(utter);
     } else {
-      setIsTalking(false);
+      if (!unmountedRef.current) setIsTalking(false);
     }
   };
 
@@ -115,59 +124,61 @@ export default function NimiChat({
     recognition.start();
   };
 
-  if (!open) return null;
-
   return (
-    <div className={`fixed inset-0 z-50 bg-gradient-to-br ${theme.gradients.chatBg} p-4 flex flex-col items-center justify-center text-center`}>
-      <div className="absolute top-4 right-4">
-        <button aria-label="Close" onClick={onClose} className="text-xl rounded-full bg-red-400 text-white p-2">
-          <X />
-        </button>
-      </div>
+    <AnimatePresence>
+      {open && (
+        <div className={`fixed inset-0 z-50 bg-gradient-to-br ${theme.gradients.chatBg} p-4 flex flex-col items-center justify-center text-center`}>
+          <div className="absolute top-4 right-4">
+            <button aria-label="Close" onClick={onClose} className="text-xl rounded-full bg-red-400 text-white p-2">
+              <X />
+            </button>
+          </div>
 
-      {/* Nimi Avatar */}
-      <motion.div
-        animate={{ scale: isTalking ? [1, 1.2, 1] : 1 }}
-        transition={{ duration: DURATION.loopSpark, repeat: Infinity }}
-        className="mb-4"
-      >
-        {avatar || <div className="text-6xl animate-bounce">🧚‍♀️</div>}
-      </motion.div>
+          {/* Nimi Avatar */}
+          <motion.div
+            animate={{ scale: isTalking ? [1, 1.2, 1] : 1 }}
+            transition={{ duration: DURATION.loopSpark, repeat: Infinity }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            className="mb-4"
+          >
+            {avatar || <div className="text-6xl animate-bounce">🧚‍♀️</div>}
+          </motion.div>
 
-      {/* Chat Log */}
-      <div
-        ref={chatRef}
-        className="w-full max-w-xl h-64 overflow-y-auto p-4 bg-[var(--ds-surface-card)] leaf shadow-inner text-lg font-semibold space-y-2"
-      >
-        {chatLog.map((line, i) => (
-          <div key={i} className="whitespace-pre-wrap">{line}</div>
-        ))}
-      </div>
+          {/* Chat Log */}
+          <div
+            ref={chatRef}
+            className="w-full max-w-xl h-64 overflow-y-auto p-4 bg-[var(--ds-surface-card)] leaf shadow-inner text-lg font-semibold space-y-2"
+          >
+            {chatLog.map((line, i) => (
+              <div key={i} className="whitespace-pre-wrap">{line}</div>
+            ))}
+          </div>
 
-      {/* Input */}
-      <div className="flex items-center mt-4 gap-2 w-full max-w-xl">
-        <input
-          className="flex-1 text-xl p-2 rounded border-2 border-blue-300"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Type or tap the mic 🎤"
-        />
-        {/* A1: accessible label for icon-only buttons */}
-        <button
-          aria-label="Send message"
-          onClick={() => sendToAI(input)}
-          className="p-2 rounded-full text-white" style={{ backgroundColor: 'var(--ds-brand-primary)' }}
-        >
-          <SendHorizontal />
-        </button>
-        <button
-          aria-label="Voice input"
-          onClick={handleVoiceInput}
-          className={`p-2 rounded-full ${isListening ? "bg-[var(--ds-brand-primary)]" : "bg-[var(--ds-surface-input)]"}`}
-        >
-          <Mic />
-        </button>
-      </div>
-    </div>
+          {/* Input */}
+          <div className="flex items-center mt-4 gap-2 w-full max-w-xl">
+            <input
+              className="flex-1 text-xl p-2 rounded border-2 border-blue-300"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Type or tap the mic 🎤"
+            />
+            <button
+              aria-label="Send message"
+              onClick={() => sendToAI(input)}
+              className="p-2 rounded-full text-white" style={{ backgroundColor: 'var(--ds-brand-primary)' }}
+            >
+              <SendHorizontal />
+            </button>
+            <button
+              aria-label="Voice input"
+              onClick={handleVoiceInput}
+              className={`p-2 rounded-full ${isListening ? "bg-[var(--ds-brand-primary)]" : "bg-[var(--ds-surface-input)]"}`}
+            >
+              <Mic />
+            </button>
+          </div>
+        </div>
+      )}
+    </AnimatePresence>
   );
 }

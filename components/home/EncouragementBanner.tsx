@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { useAppTheme } from "@/contexts/AppThemeProvider";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -18,14 +18,17 @@ export default function EncouragementBanner({ childName }: Props) {
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
       className="bg-[var(--ds-surface-card)] border border-ds-border leaf shadow-ds-card p-4 sm:p-5 flex flex-col sm:flex-row items-center gap-4">
-      <motion.div className="relative shrink-0"
-        animate={{ y: [0, -3, 0] }} transition={{ duration: 3, repeat: Infinity }}>
-        <Image src={assets.nimiCircle} alt="NIMI" width={56} height={56}
-          className="rounded-full border-[3px] border-yellow-400 shadow-lg" />
-        <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-[var(--ds-brand-primary)] rounded-full border-2 border-white flex items-center justify-center">
-          <span className="text-5xs">💬</span>
-        </div>
-      </motion.div>
+      <AnimatePresence>
+        <motion.div className="relative shrink-0"
+          animate={{ y: [0, -3, 0] }} transition={{ duration: 3, repeat: Infinity }}
+          exit={{ opacity: 0 }}>
+          <Image src={assets.nimiCircle} alt="NIMI" width={56} height={56}
+            className="rounded-full border-[3px] border-yellow-400 shadow-lg" />
+          <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-[var(--ds-brand-primary)] rounded-full border-2 border-white flex items-center justify-center">
+            <span className="text-5xs">💬</span>
+          </div>
+        </motion.div>
+      </AnimatePresence>
       <div className="flex-1 text-center sm:text-left">
         <h3 className="font-black text-ds-text text-mbase">
           {t("encourageAmazingMsg").replace("{name}", childName)}

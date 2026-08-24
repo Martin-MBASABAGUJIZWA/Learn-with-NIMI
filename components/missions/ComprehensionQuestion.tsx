@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, X } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -24,13 +24,16 @@ export default function ComprehensionQuestion({ question, onAnswered, current, t
   const { t } = useLanguage();
   const [selected, setSelected] = useState<number | null>(null);
   const [locked, setLocked] = useState(false);
+  // H29: clear timeout on unmount to avoid calling onAnswered after dismount
+  const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  useEffect(() => () => { clearTimeout(timerRef.current); }, []);
 
   const handleSelect = (idx: number) => {
     if (locked) return;
     setSelected(idx);
     setLocked(true);
     const isCorrect = idx === question.correct;
-    setTimeout(() => onAnswered(isCorrect), isCorrect ? 1200 : 1600);
+    timerRef.current = setTimeout(() => onAnswered(isCorrect), isCorrect ? 1200 : 1600);
   };
 
   const isCorrect = selected === question.correct;

@@ -61,6 +61,9 @@ export default function AppShell({ children }: AppShellProps) {
   const { updateReady } = useSwUpdate();
   const [updateDismissed, setUpdateDismissed] = useState(false);
   const activeChildRef = useRef<Child | null>(null);
+  // H26/H27: guard async state setters in childSwitch and languageChange handlers
+  const isMounted = useRef(true);
+  useEffect(() => { isMounted.current = true; return () => { isMounted.current = false; }; }, []);
   const [activeChild, setActiveChild] = useState<Child | null>(null);
   const [level, setLevel]             = useState(1);
   const [totalStars, setTotalStars]   = useState(0);
@@ -200,13 +203,15 @@ export default function AppShell({ children }: AppShellProps) {
       const [ws, dates, , , badges, cos] = await Promise.all([
         getWeekStreak(child.id, child.language),
         getActivityDates(child.id, child.language),
-        getTotalStars(child.id, child.language).then(setTotalStars),
-        getCurrentLevel(child.id, child.language).then(setLevel),
+        getTotalStars(child.id, child.language).then(v => { if (isMounted.current) setTotalStars(v); }),
+        getCurrentLevel(child.id, child.language).then(v => { if (isMounted.current) setLevel(v); }),
         getChildBadges(child.id, child.language),
         getChildCosmetics(child.id),
       ]);
+      if (!isMounted.current) return;
       setWeekStreak(ws);
       const { usedDates } = await resolveShields(child.id, child.language, dates);
+      if (!isMounted.current) return;
       setStreakCount(computeStreaks(dates, new Date(), usedDates).current);
       setGems(badges.length);
       setCosmetics(cos);
@@ -244,12 +249,14 @@ export default function AppShell({ children }: AppShellProps) {
         const [ws, dates] = await Promise.all([
           getWeekStreak(updated.id, lang),
           getActivityDates(updated.id, lang),
-          getTotalStars(updated.id, lang).then(setTotalStars),
-          getCurrentLevel(updated.id, lang).then(setLevel),
-          getChildBadges(updated.id, lang).then(b => setGems(b.length)),
+          getTotalStars(updated.id, lang).then(v => { if (isMounted.current) setTotalStars(v); }),
+          getCurrentLevel(updated.id, lang).then(v => { if (isMounted.current) setLevel(v); }),
+          getChildBadges(updated.id, lang).then(b => { if (isMounted.current) setGems(b.length); }),
         ]);
+        if (!isMounted.current) return;
         setWeekStreak(ws);
         const { usedDates } = await resolveShields(updated.id, lang, dates);
+        if (!isMounted.current) return;
         setStreakCount(computeStreaks(dates, new Date(), usedDates).current);
       })();
     };

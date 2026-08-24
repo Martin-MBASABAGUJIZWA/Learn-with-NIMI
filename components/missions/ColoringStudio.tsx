@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 // @ts-ignore
 import { createPortal } from "react-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useThemeMotion } from "@/hooks/useThemeMotion";
 import { Palette, X, Brush, Eraser, Undo, Redo, Trash2, Save } from "lucide-react";
 import { getStorageUrl } from "@/lib/queries";
@@ -724,13 +724,16 @@ export default function ColoringStudio({ pages, childId, onClose, t }: ColoringS
             onMouseDown={startDraw} onMouseMove={continueDraw} onMouseUp={stopDraw} onMouseLeave={stopDraw}
             onTouchStart={startDraw} onTouchMove={continueDraw} onTouchEnd={stopDraw}
           />
-          {loading && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 pointer-events-none">
-              <motion.span className="text-4xl" animate={{ rotate: [0, 360] }}
-                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}>🎨</motion.span>
-              <p className="text-[var(--ds-text-secondary)] font-nunito font-bold text-sm">{t("storyColorPreparing")}</p>
-            </div>
-          )}
+          <AnimatePresence>
+            {loading && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 pointer-events-none">
+                <motion.span className="text-4xl" animate={{ rotate: [0, 360] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                  exit={{ opacity: 0 }}>🎨</motion.span>
+                <p className="text-[var(--ds-text-secondary)] font-nunito font-bold text-sm">{t("storyColorPreparing")}</p>
+              </div>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* Mobile toolbar — kid-friendly chunky buttons */}
