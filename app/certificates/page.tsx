@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { getChildren, getChildAchievements, getMaxCurriculumLevel, getActiveStories, type ChildAchievement } from "@/lib/queries";
+import supabase from "@/lib/supabaseClient";
 import AppShell from "@/components/layout/AppShell";
 import { Bone } from "@/components/ui/Bone";
 import { PageSurface } from "@/components/layout/primitives";
@@ -21,6 +23,7 @@ export default function CertificatesPage() {
   const { t } = useLanguage();
   const { themeId } = useAppTheme();
   const assets = getThemeAssets(themeId);
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [hasChildren, setHasChildren] = useState(true);
   const [childName, setChildName] = useState("");
@@ -39,6 +42,8 @@ export default function CertificatesPage() {
   const loadProgress = async () => {
     setLoadError(false);
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { router.replace("/loginpage"); return; }
       const list = await getChildren();
       if (list.length === 0) {
         setHasChildren(false);

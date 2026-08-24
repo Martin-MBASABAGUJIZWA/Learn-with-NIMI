@@ -6,6 +6,7 @@ import {
   getCurriculumMissions, completeCurriculumMission, getColoringPages, getStoryPages, notifyPushOnCompletion,
   getChildren,
 } from "@/lib/queries";
+import supabase from "@/lib/supabaseClient";
 import { queueOfflineCompletion } from "@/lib/offlineQueue";
 import type { CurriculumMission, ColoringPage, StoryPage } from "@/lib/queries";
 import { ACTIVITIES } from "@/app/_activityData";
@@ -52,8 +53,11 @@ export default function MissionCategoryPage() {
     const storedId = typeof window !== "undefined" ? localStorage.getItem(ACTIVE_CHILD_KEY) : null;
 
     const load = async () => {
-      // Validate stored childId against the authenticated user's children list
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { router.replace("/loginpage"); return; }
+
       const children = await getChildren();
+      if (children.length === 0) { router.replace("/onboarding"); return; }
       const validChild = children.find(c => c.id === storedId) ?? children[0] ?? null;
       const cid = validChild?.id ?? null;
       setChildId(cid);

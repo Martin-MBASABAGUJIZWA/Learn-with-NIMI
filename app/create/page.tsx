@@ -9,8 +9,10 @@
  */
 
 import { useEffect, useState, useCallback, Suspense } from "react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSearchParams } from "next/navigation";
+import supabase from "@/lib/supabaseClient";
 import AppShell from "@/components/layout/AppShell";
 import { PageSurface, HeroBanner } from "@/components/layout/primitives";
 import { Bone } from "@/components/ui/Bone";
@@ -41,6 +43,7 @@ function CreativeStudioPage() {
   const { themeId } = useAppTheme();
   const assets = getThemeAssets(themeId);
   const searchParams = useSearchParams();
+  const router = useRouter();
 
   const [childId,       setChildId]       = useState<string | null>(null);
   const [childName,     setChildName]     = useState("");
@@ -60,34 +63,40 @@ function CreativeStudioPage() {
   useEffect(() => { void load(); }, []);
 
   const load = async () => {
-    const list = await getChildren();
-    if (list.length === 0) { setLoaded(true); return; }
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { router.replace("/loginpage"); return; }
 
-    const savedId = typeof window !== "undefined" ? localStorage.getItem(ACTIVE_CHILD_KEY) : null;
-    const child   = list.find(c => c.id === savedId) ?? list[0];
+      const list = await getChildren();
+      if (list.length === 0) { return; }
 
-    setChildId(child.id);
-    setChildName(child.name);
-    setChildAge(child.age ?? null);
-    setChildLanguage(child.language);
+      const savedId = typeof window !== "undefined" ? localStorage.getItem(ACTIVE_CHILD_KEY) : null;
+      const child   = list.find(c => c.id === savedId) ?? list[0];
 
-    const [stories, stars] = await Promise.all([
-      getStoryLibrary(child.id, child.language),
-      getTodayStars(child.id, child.language),
-    ]);
+      setChildId(child.id);
+      setChildName(child.name);
+      setChildAge(child.age ?? null);
+      setChildLanguage(child.language);
 
-    setTodayStars(stars);
+      const [stories, stars] = await Promise.all([
+        getStoryLibrary(child.id, child.language),
+        getTodayStars(child.id, child.language),
+      ]);
 
-    const active = stories.find((s: { unlocked: boolean; complete: boolean }) => s.unlocked && !s.complete)
-      ?? stories[0];
-    if (active) {
-      setStoryId(active.sid);
-      setStoryTitle(active.title);
-      setStoryEmoji(active.theme_emoji ?? null);
+      setTodayStars(stars);
+
+      const active = stories.find((s: { unlocked: boolean; complete: boolean }) => s.unlocked && !s.complete)
+        ?? stories[0];
+      if (active) {
+        setStoryId(active.sid);
+        setStoryTitle(active.title);
+        setStoryEmoji(active.theme_emoji ?? null);
+      }
+    } catch (err) {
+      console.error("[CreativeStudioPage] load error:", err);
+    } finally {
+      setLoaded(true);
     }
-
-    setLoaded(false);  // avoid showing skeleton once data arrives
-    setLoaded(true);
   };
 
   const handleStarsEarned = useCallback((n: number) => {

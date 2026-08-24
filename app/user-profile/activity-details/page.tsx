@@ -1,17 +1,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import AppShell from "@/components/layout/AppShell";
 import { PageSurface } from "@/components/layout/primitives";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { getChildren, getAllChildProgress } from "@/lib/queries";
 import type { ProgressRow } from "@/lib/queries";
 import ActivityDetailsList from "@/components/profile/ActivityDetailsList";
+import supabase from "@/lib/supabaseClient";
 
 const ACTIVE_CHILD_KEY = "nimipiko_active_child";
 
 export default function ActivityDetailsPage() {
   const { t } = useLanguage();
+  const router = useRouter();
   const [range, setRange] = useState<"week" | "all">("week");
   const [rows, setRows] = useState<ProgressRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -22,6 +25,8 @@ export default function ActivityDetailsPage() {
     setLoading(true);
     (async () => {
       try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) { router.replace("/loginpage"); return; }
         const list = await getChildren();
         const savedId = typeof window !== "undefined" ? localStorage.getItem(ACTIVE_CHILD_KEY) : null;
         const child = list.find(c => c.id === savedId) ?? list[0];

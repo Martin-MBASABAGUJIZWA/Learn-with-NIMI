@@ -318,12 +318,15 @@ export default function StoryDetailPage() {
   };
 
   useEffect(() => {
+    let cancelled = false;
     void (async () => {
       const [{ data: { user } }, list, story] = await Promise.all([
         supabase.auth.getUser(),
         getChildren(),
         getStoryBySlug(slug),
       ]);
+      if (cancelled) return;
+      if (!user) { router.replace("/loginpage"); return; }
       setParentId(user?.id ?? null);
       if (user?.id) {
         supabase
@@ -349,6 +352,7 @@ export default function StoryDetailPage() {
         getStoryIntroProgress(child.id, story.id, child.language),
         getStoryCertificate(child.id, story.id, child.language),
       ]);
+      if (cancelled) return;
       setDetails(det);
       setSlots(sl);
       setIntroProgress(intro);
@@ -369,6 +373,7 @@ export default function StoryDetailPage() {
 
       setLoading(false);
     })();
+    return () => { cancelled = true; };
   }, [slug, language]);
 
   // Refetch slots + certificate when the tab becomes visible again —

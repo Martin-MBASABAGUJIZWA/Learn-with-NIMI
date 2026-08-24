@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import AppShell from "@/components/layout/AppShell";
 import { Bone } from "@/components/ui/Bone";
@@ -13,6 +14,7 @@ import {
   getShopPurchases, purchaseShopItem, getChildCosmetics, equipItem,
   type Child, type ShopPurchase, type ChildCosmetics,
 } from "@/lib/queries";
+import supabase from "@/lib/supabaseClient";
 import ShopHeader from "@/components/shop/ShopHeader";
 import ShopFilterTabs, { type ShopFilter } from "@/components/shop/ShopFilterTabs";
 import ShopGrid from "@/components/shop/ShopGrid";
@@ -109,6 +111,7 @@ export default function RewardShopPage() {
   const { t } = useLanguage();
   const { themeId } = useAppTheme();
   const assets = getThemeAssets(themeId);
+  const router = useRouter();
 
   const [filter, setFilter] = useState<ShopFilter>("all");
   const [activeChild, setActiveChild] = useState<Child | null>(null);
@@ -133,6 +136,8 @@ export default function RewardShopPage() {
 
   useEffect(() => {
     void (async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { router.replace("/loginpage"); return; }
       const list = await getChildren();
       const savedId = typeof window !== "undefined" ? localStorage.getItem(ACTIVE_CHILD_KEY) : null;
       const child = list.find(c => c.id === savedId) ?? list[0] ?? null;
