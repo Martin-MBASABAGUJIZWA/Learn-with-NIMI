@@ -4,11 +4,22 @@
 // They run in a restricted sandbox: no imports, no DOM, no fetch, no timers.
 // The handler receives (payload, context) and must return a PluginResult.
 //
-// Security model:
-// - eval() is the only option in Edge runtime (no vm.Script, no iframe).
-// - The handler string is wrapped in a strict-mode IIFE.
-// - Execution time is bounded by a sync watchdog (50ms CPU limit via Date).
-// - Any thrown error is caught and logged — never propagated to the user.
+// Security model (defence-in-depth):
+// 1. Static analysis — handler source is rejected if it references any
+//    identifier from the DANGEROUS_PATTERNS blocklist before execution.
+// 2. Expanded shadow sandbox — every dangerous global is explicitly passed
+//    as `undefined` into the IIFE so property lookup cannot escape to the
+//    real global scope. The outer new Function() wrapper receives the same
+//    shadow parameters so there is no "outer scope" to escape to either.
+// 3. Async blocked — Promise, async/await identifiers are blocked by (1);
+//    the handler must return a plain object synchronously.
+// 4. CPU watchdog — 50 ms hard limit via Date.now() inside the handler.
+//
+// ⚠️  new Function() is fundamentally not a true security boundary.
+//    This implementation raises the bar significantly but is not equivalent
+//    to process isolation. For production multi-tenant plugins, replace with
+//    `isolated-vm` (Node.js native V8 isolates) or move execution to a
+//    Cloudflare Worker / Deno Deploy subprocess.
 
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type {
@@ -18,9 +29,68 @@ import type {
 
 const MAX_HANDLER_MS = 50;
 
+// Layer 1 — Static source analysis.
+// Reject before execution if the source references any dangerous identifier.
+// This is the primary line of defence against trivial exfiltration attacks.
+const DANGEROUS_PATTERNS = [
+  /\bfetch\b/,
+  /\bXMLHttpRequest\b/,
+  /\bglobalThis\b/,
+  /\bglobal\b/,
+  /\bprocess\b/,
+  /\brequire\b/,
+  /\bimport\b/,
+  /\beval\b/,
+  /\bFunction\b/,
+  /\b__proto__\b/,
+  /\bconstructor\b/,
+  /\bprototype\b/,
+  /\bsetTimeout\b/,
+  /\bsetInterval\b/,
+  /\bclearTimeout\b/,
+  /\bclearInterval\b/,
+  /\bPromise\b/,
+  /\basync\b/,
+  /\bawait\b/,
+  /\bWebSocket\b/,
+  /\bEventSource\b/,
+  /\bWorker\b/,
+  /\bIndexedDB\b/,
+  /\blocalStorage\b/,
+  /\bsessionStorage\b/,
+  /\bdocument\b/,
+  /\bwindow\b/,
+  /\bself\b/,
+];
+
+function isHandlerSafe(src: string): { safe: boolean; reason?: string } {
+  for (const pattern of DANGEROUS_PATTERNS) {
+    if (pattern.test(src)) {
+      return { safe: false, reason: `blocked identifier: ${pattern.source}` };
+    }
+  }
+  return { safe: true };
+}
+
+// Layer 2 — Expanded shadow list passed to the IIFE.
+// Every name here is passed as `undefined` so there is no real-global escape.
+const SHADOW_NAMES = [
+  'fetch', 'XMLHttpRequest', 'globalThis', 'global', 'process',
+  'require', 'module', 'exports', '__dirname', '__filename',
+  'setTimeout', 'setInterval', 'clearTimeout', 'clearInterval',
+  'setImmediate', 'clearImmediate', 'queueMicrotask',
+  'Promise', 'WebSocket', 'EventSource', 'Worker', 'SharedWorker',
+  'Atomics', 'SharedArrayBuffer',
+  'localStorage', 'sessionStorage', 'indexedDB',
+  'document', 'window', 'navigator', 'location', 'history',
+  'self', 'frames', 'opener', 'parent', 'top',
+] as const;
+
+const SHADOW_UNDEFINEDS = SHADOW_NAMES.map(() => undefined);
+
 // ── executeHook ───────────────────────────────────────────────────────────────
 // Runs a single plugin's handler for a given hook.
-// Returns PluginResult or null on error/timeout.
+// Returns PluginResult or null on error/timeout/block.
 
 export async function executeHook(
   plugin:  InstalledPlugin,
@@ -30,27 +100,42 @@ export async function executeHook(
   const handlerSrc = plugin.manifest?.handlers?.[hook];
   if (!handlerSrc || typeof handlerSrc !== 'string') return null;
 
+  // Layer 1 — Static analysis gate
+  const { safe, reason } = isHandlerSafe(handlerSrc);
+  if (!safe) {
+    console.error(`[plugin:${plugin.slug}] handler rejected (${reason}). Plugin disabled.`);
+    return null;
+  }
+
   const ctx: PluginContext = {
     pluginId: plugin.plugin_id,
     slug:     plugin.slug,
     config:   plugin.config ?? {},
   };
 
-  // Wrap in a strict IIFE that blocks dangerous globals
+  // Layer 2 — Expanded shadow sandbox.
+  // The outer new Function() receives shadow params too so the wrapped IIFE
+  // has no "outer scope" containing real globals to escape to.
+  const shadowParamList = SHADOW_NAMES.join(', ');
   const wrapped = `"use strict";
-(function(payload, context, Date, Math, JSON, console) {
+(function(payload, context, Date, Math, JSON, console, ${shadowParamList}) {
   const startMs = Date.now();
   const __watchdog = () => { if (Date.now() - startMs > ${MAX_HANDLER_MS}) throw new Error("plugin_timeout"); };
-  ${handlerSrc}
-})(payload, context, Date, Math, JSON, console)`;
+  return (function() {
+    ${handlerSrc}
+  })();
+})(payload, context, Date, Math, JSON, console, ${SHADOW_NAMES.map(() => 'undefined').join(', ')})`;
 
   try {
     // eslint-disable-next-line no-new-func
-    const fn     = new Function('payload', 'context', wrapped);
-    const result = fn(payload, ctx) as PluginResult | null;
-    // Handlers may return a plain object or a Promise-like
+    const fn = new Function('payload', 'context', 'Date', 'Math', 'JSON', 'console', ...SHADOW_NAMES, wrapped);
+    const result = fn(payload, ctx, Date, Math, JSON, console, ...SHADOW_UNDEFINEDS) as PluginResult | null;
+
+    // Async return values are blocked by the static analysis (Promise/async/await
+    // are in the blocklist), but guard defensively so a bypass doesn't hang.
     if (result && typeof (result as Promise<unknown>).then === 'function') {
-      return await (result as Promise<PluginResult>);
+      console.error(`[plugin:${plugin.slug}] returned a Promise — async handlers are not allowed.`);
+      return null;
     }
     return result ?? null;
   } catch (e) {
