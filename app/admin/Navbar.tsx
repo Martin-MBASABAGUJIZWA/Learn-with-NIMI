@@ -1,7 +1,7 @@
 'use client'
 import React, { useEffect, useState, useRef } from 'react'
 import supabase from "@/lib/supabaseClient"
-import { getCachedAdmin } from './adminAuth'
+import { getCachedAdmin, clearAdminCache } from './adminAuth'
 import {
   LogOut, Search, ChevronDown, LayoutDashboard, UserCog, Bell, Menu,
   Compass, Baby, Users, BookOpen, X, Loader2, CreditCard, type LucideIcon,
@@ -214,7 +214,7 @@ export default function Navbar({ tables, currentTable, setCurrentTable, onOpenSi
     else if (e.key === 'Enter') { e.preventDefault(); if (activeIndex >= 0) handleSelectResult(results[activeIndex]) }
   }
 
-  const handleLogout = async () => { await supabase.auth.signOut(); window.location.href = '/admin/login' }
+  const handleLogout = async () => { clearAdminCache(); await supabase.auth.signOut(); window.location.href = '/admin/login' }
 
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
 

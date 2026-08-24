@@ -231,13 +231,30 @@ export default function StoryManager({ initialStoryId, onNavigate, onOpenSidebar
     }
   }
 
+  const cascadeDeleteStory = async (id: string) => {
+    const { data: slotRows } = await supabase.from('story_slots').select('mission_id').eq('story_id', id)
+    const missionIds = (slotRows ?? []).map((r: { mission_id: string }) => r.mission_id)
+    const { data: pageRows } = await supabase.from('story_pages').select('id').eq('story_id', id)
+    const pageIds = (pageRows ?? []).map((r: { id: string }) => r.id)
+    if (pageIds.length) await supabase.from('story_page_versions').delete().in('story_page_id', pageIds)
+    await supabase.from('story_pages').delete().eq('story_id', id)
+    await supabase.from('story_slots').delete().eq('story_id', id)
+    if (missionIds.length) {
+      await supabase.from('mission_versions').delete().in('mission_id', missionIds)
+      await supabase.from('missions').delete().in('id', missionIds)
+    }
+    await supabase.from('coloring_pages').delete().eq('story_id', id)
+    await supabase.from('story_versions').delete().eq('story_id', id)
+    await supabase.from('stories').delete().eq('id', id)
+  }
+
   const handleBulkDelete = async () => {
     if (checkedIds.size === 0) return
-    const ok = await confirm({ title: `Delete ${checkedIds.size} stories?`, message: 'This cannot be undone.' })
+    const ok = await confirm({ title: `Delete ${checkedIds.size} stories?`, message: 'This removes all pages, missions, and slots for every selected story. Cannot be undone.' })
     if (!ok) return
     setBulkActing(true)
     try {
-      await Promise.all([...checkedIds].map(id => supabase.from('stories').delete().eq('id', id)))
+      await Promise.all([...checkedIds].map(id => cascadeDeleteStory(id)))
       await fetchStories()
       toastSuccess(`${checkedIds.size} stories deleted`)
       setCheckedIds(new Set())
@@ -298,11 +315,11 @@ export default function StoryManager({ initialStoryId, onNavigate, onOpenSidebar
   }
 
   const handleDelete = async (s: StoryRow) => {
-    const ok = await confirm({ title: `Delete "${s.title}"?`, message: 'This deletes all pages, slots, and progress. Cannot be undone.' })
+    const ok = await confirm({ title: `Delete "${s.title}"?`, message: 'This removes all pages, missions, slots, and files. Cannot be undone.' })
     if (!ok) return
     setMutatingId(s.id)
     try {
-      await supabase.from('stories').delete().eq('id', s.id)
+      await cascadeDeleteStory(s.id)
       await fetchStories()
       if (selectedId === s.id) setSelectedId(null)
       toastSuccess(`"${s.title}" deleted`)
@@ -321,10 +338,19 @@ export default function StoryManager({ initialStoryId, onNavigate, onOpenSidebar
     const neighbor = sorted[swapIdx]
     setMutatingId(s.id)
     try {
-      await Promise.all([
-        supabase.from('stories').update({ sort_order: neighbor.sort_order }).eq('id', s.id),
-        supabase.from('stories').update({ sort_order: s.sort_order }).eq('id', neighbor.id),
-      ])
+      // Use a temporary sort_order to avoid unique-constraint collision during the swap
+      const tmp = Math.max(...stories.map(x => x.sort_order)) + 1000
+      const r1 = await supabase.from('stories').update({ sort_order: tmp }).eq('id', s.id)
+      const r2 = await supabase.from('stories').update({ sort_order: s.sort_order }).eq('id', neighbor.id)
+      const r3 = await supabase.from('stories').update({ sort_order: neighbor.sort_order }).eq('id', s.id)
+      if (r1.error || r2.error || r3.error) {
+        // Revert both on any failure
+        await Promise.allSettled([
+          supabase.from('stories').update({ sort_order: s.sort_order }).eq('id', s.id),
+          supabase.from('stories').update({ sort_order: neighbor.sort_order }).eq('id', neighbor.id),
+        ])
+        toastError('Could not reorder — changes reverted.')
+      }
       await fetchStories()
     } catch (err) {
       toastError(err instanceof Error ? err.message : 'Could not reorder.')
@@ -343,15 +369,16 @@ export default function StoryManager({ initialStoryId, onNavigate, onOpenSidebar
         .select().single()
       if (error) throw error
 
-      // Copy language versions from source (intro media URLs carry over; published resets to false)
+      // Copy language versions — omit media URLs so both stories don't share the same storage objects.
+      // If the original is later deleted and its storage files removed, the copy's references would break.
       const sourceLangs = s.story_versions ?? []
       if (sourceLangs.length > 0) {
         for (const sv of sourceLangs) {
           await supabase.from('story_versions').insert({
             story_id: dup.id, language: sv.language, title: sv.title,
-            cover_url: sv.cover_url, intro_video_url: sv.intro_video_url,
-            theme_song_url: sv.theme_song_url, meet_characters_url: sv.meet_characters_url,
-            story_intro_url: sv.story_intro_url, status: 'draft', published: false,
+            cover_url: null, intro_video_url: null,
+            theme_song_url: null, meet_characters_url: null,
+            story_intro_url: null, status: 'draft', published: false,
           })
         }
       } else {

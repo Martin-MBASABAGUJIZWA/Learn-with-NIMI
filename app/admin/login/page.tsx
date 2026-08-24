@@ -20,8 +20,11 @@ export default function AdminLoginPage() {
   const [error, setError]             = useState("");
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) router.replace("/admin");
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (!session) return
+      // Only redirect to admin if the user is actually an admin — not any authenticated parent/user
+      const { data } = await supabase.from('admins').select('id').eq('id', session.user.id).maybeSingle()
+      if (data) router.replace("/admin")
     });
     emailRef.current?.focus();
   }, [router]);

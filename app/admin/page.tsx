@@ -151,15 +151,15 @@ export default function AdminPanel() {
         setCheckTimedOut(true)
       }
     }
-    void checkAdmin()
-
-    const timeout = setTimeout(() => {
+    const timeoutId = setTimeout(() => {
       if (!cancelled) setCheckTimedOut(true)
     }, 10000)
 
+    void checkAdmin().finally(() => clearTimeout(timeoutId))
+
     return () => {
       cancelled = true
-      clearTimeout(timeout)
+      clearTimeout(timeoutId)
     }
   }, [router, retryKey])
 
@@ -381,7 +381,7 @@ export default function AdminPanel() {
               </div>
             </div>
           )}
-          {!isMissionView && !isStoryView && !isStorySlotsView && !isStoryOrderingView && !isStoryPublishingView && !isFlipFlopView && !isStoryPdfsView && !isVideosView && !isAudioView && !isWeeklyChallengesView && !isFamiliesView && !isColoringView && !isLanguagesView && !isChildrenView && !isParentsView && !isCertificatesView && !isCertTemplatesView && !isRewardsView && !isBadgeImagesView && !isAnalyticsView && !isSettingsView && !isCurriculumView && !isCommunityView && !isProductsView && !isMasterpieceView && !isNewsletterView && !isReferralView && !isDiscountCodesView && !isGiftView && !isAuditLogView && !isPaymentHealthView && !isAirwaysHubView && !isAirwaysTemplatesView && !isKitLayoutView && !isSongManagerView && !isStoryPagesView && !['Buckets', 'Profile', 'admins', 'Dashboard', 'Help', 'notifications'].includes(currentTable) && (
+          {!isMissionView && !isStoryView && !isStorySlotsView && !isStoryOrderingView && !isStoryPublishingView && !isFlipFlopView && !isStoryPdfsView && !isVideosView && !isAudioView && !isWeeklyChallengesView && !isFamiliesView && !isColoringView && !isLanguagesView && !isChildrenView && !isParentsView && !isCertificatesView && !isCertTemplatesView && !isRewardsView && !isBadgeImagesView && !isAnalyticsView && !isSettingsView && !isCurriculumView && !isCommunityView && !isProductsView && !isMasterpieceView && !isNewsletterView && !isReferralView && !isDiscountCodesView && !isGiftView && !isAuditLogView && !isPaymentHealthView && !isAirwaysHubView && !isAirwaysTemplatesView && !isKitLayoutView && !isSongManagerView && !isStoryPagesView && !isTestimonialsView && !isPartnersView && !isConversationHistoryView && !['Buckets', 'Profile', 'admins', 'Dashboard', 'Help', 'notifications'].includes(currentTable) && (
             <TableView table={currentTable} />
           )}
           </ErrorBoundary>
