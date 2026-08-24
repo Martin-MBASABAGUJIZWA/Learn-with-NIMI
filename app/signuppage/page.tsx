@@ -110,35 +110,38 @@ function SignupInner() {
     if (!agreed) { setError(t("signupErrTerms")); return; }
     setLoading(true);
     setError("");
-    const { data, error: signUpError } = await supabase.auth.signUp({ email, password });
-    if (signUpError) { setError(signUpError.message); setLoading(false); return; }
-    if (data.user) {
-      await supabase.from("parents").upsert(
-        { id: data.user.id, email: data.user.email ?? email, name },
-        { onConflict: "id" },
-      );
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.access_token) {
-        void fetch("/api/account/welcome-email", {
-          method: "POST",
-          headers: { Authorization: `Bearer ${session.access_token}` },
-        });
-        if (referralCode) {
-          void fetch("/api/referral", {
+    try {
+      const { data, error: signUpError } = await supabase.auth.signUp({ email, password });
+      if (signUpError) { setError(signUpError.message); return; }
+      if (data.user) {
+        await supabase.from("parents").upsert(
+          { id: data.user.id, email: data.user.email ?? email, name },
+          { onConflict: "id" },
+        );
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.access_token) {
+          void fetch("/api/account/welcome-email", {
             method: "POST",
-            headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
-            body: JSON.stringify({ code: referralCode }),
+            headers: { Authorization: `Bearer ${session.access_token}` },
           });
-          sessionStorage.removeItem(PENDING_REF_KEY);
+          if (referralCode) {
+            void fetch("/api/referral", {
+              method: "POST",
+              headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
+              body: JSON.stringify({ code: referralCode }),
+            });
+            sessionStorage.removeItem(PENDING_REF_KEY);
+          }
+          router.replace("/onboarding");
+        } else {
+          router.replace("/onboarding?verify=1");
         }
-        router.replace("/onboarding");
       } else {
-        router.replace("/onboarding?verify=1");
+        setError(t("signupErrNoUser"));
       }
-    } else {
-      setError(t("signupErrNoUser"));
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const onFocus = (e: React.FocusEvent<HTMLInputElement>) => {

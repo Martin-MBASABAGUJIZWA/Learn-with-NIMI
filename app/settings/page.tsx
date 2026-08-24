@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import AppShell from "@/components/layout/AppShell";
 import { PageSurface } from "@/components/layout/primitives";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -9,9 +11,18 @@ import SettingsAccountCard from "@/components/settings/SettingsAccountCard";
 import ThemePicker from "@/components/settings/ThemePicker";
 import ReferralCard from "@/components/settings/ReferralCard";
 import SentGiftsCard from "@/components/settings/SentGiftsCard";
+import supabase from "@/lib/supabaseClient";
 
 export default function SettingsPage() {
   const { t } = useLanguage();
+  const router = useRouter();
+
+  useEffect(() => {
+    void (async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { router.replace("/loginpage"); }
+    })();
+  }, [router]);
 
   return (
     <AppShell>

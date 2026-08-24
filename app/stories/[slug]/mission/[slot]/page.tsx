@@ -143,6 +143,7 @@ export default function StoryMissionPage() {
   const [wordIdx, setWordIdx] = useState(0);           // index of the vocab word being shown
 
   useEffect(() => {
+    let cancelled = false;
     void (async () => {
       // auth + children + story slug are independent — fetch all three in parallel
       const savedId = typeof window !== "undefined" ? localStorage.getItem(ACTIVE_CHILD_KEY) : null;
@@ -151,6 +152,8 @@ export default function StoryMissionPage() {
         getChildren(),
         getStoryBySlug(slug),
       ]);
+      if (cancelled) return;
+      if (!user) { router.replace("/loginpage"); return; }
       setParentId(user?.id ?? null);
       const child = list.find(c => c.id === savedId) ?? list[0];
       if (!child) { setLoading(false); return; }
@@ -162,6 +165,7 @@ export default function StoryMissionPage() {
       setStoryId(story.id);
 
       const slots = await getStorySlots(child.id, story.id, child.language);
+      if (cancelled) return;
       const currentSlot = slots.find(s => s.slot_key === slotKey);
       if (!currentSlot) { setLoading(false); return; }
 
@@ -189,6 +193,7 @@ export default function StoryMissionPage() {
           .maybeSingle();
         return data ?? null;
       });
+      if (cancelled) return;
 
       if (missionData) {
         // Resolve language-specific version
@@ -225,15 +230,17 @@ export default function StoryMissionPage() {
         try {
           if (slotKey === "flipflop_audio") {
             const pages = await getStoryPages(story.id, child.language);
-            setStoryPages(pages.map(p => ({ ...p, text: personalize(p.text, child.name) })));
+            if (!cancelled) setStoryPages(pages.map(p => ({ ...p, text: personalize(p.text, child.name) })));
           } else {
-            setColoringPages(await getColoringPages(story.id));
+            const pages = await getColoringPages(story.id);
+            if (!cancelled) setColoringPages(pages);
           }
         } finally {
-          setPagesLoading(false);
+          if (!cancelled) setPagesLoading(false);
         }
       }
     })();
+    return () => { cancelled = true; };
   }, [slug, slotKey, language]);
 
   const isPreview = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('preview') === 'true';

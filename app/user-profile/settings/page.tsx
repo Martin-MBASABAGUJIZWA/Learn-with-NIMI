@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { Edit } from "lucide-react";
+import supabase from "@/lib/supabaseClient";
 import {
   getChildren, getCurrentLevel, getCurriculumMissions,
   getTotalStars, getChildBadges, getTodayMissions,
@@ -31,6 +33,7 @@ export default function MyProfilePage() {
   const { t } = useLanguage();
   const { themeId } = useAppTheme();
   const assets = getThemeAssets(themeId);
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [hasChildren, setHasChildren] = useState(true);
   const [activeChild, setActiveChild] = useState<Child | null>(null);
@@ -46,6 +49,8 @@ export default function MyProfilePage() {
   }, []);
 
   const load = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { router.replace("/loginpage"); return; }
     const list = await getChildren();
     if (list.length === 0) {
       setHasChildren(false);

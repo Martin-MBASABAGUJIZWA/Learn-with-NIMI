@@ -4,7 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import {
   getCurriculumMissions, completeCurriculumMission, getColoringPages, getStoryPages, notifyPushOnCompletion,
+  getChildren,
 } from "@/lib/queries";
+import supabase from "@/lib/supabaseClient";
 import { queueOfflineCompletion } from "@/lib/offlineQueue";
 import type { CurriculumMission, ColoringPage, StoryPage } from "@/lib/queries";
 import { ACTIVITIES } from "@/app/_activityData";
@@ -48,11 +50,17 @@ export default function MissionCategoryPage() {
   useEffect(() => {
     if (!activity) { router.replace("/missions"); return; }
 
-    const cid = typeof window !== "undefined" ? localStorage.getItem(ACTIVE_CHILD_KEY) : null;
-    setChildId(cid);
+    const storedId = typeof window !== "undefined" ? localStorage.getItem(ACTIVE_CHILD_KEY) : null;
 
     const load = async () => {
-      if (!cid) { setLoading(false); return; }
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { router.replace("/loginpage"); return; }
+
+      const children = await getChildren();
+      if (children.length === 0) { router.replace("/onboarding"); return; }
+      const validChild = children.find(c => c.id === storedId) ?? children[0];
+      const cid = validChild.id;
+      setChildId(cid);
 
       setLoading(true);
       setLoadError(false);
