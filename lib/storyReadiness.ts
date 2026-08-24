@@ -62,10 +62,6 @@ export function computeReadiness(story: {
 
   const items: ReadinessItem[] = [
     { key: "cover",           label: "Cover Image",         group: "assets",     done: !!story.cover_url,               optional: true },
-    { key: "intro_video",     label: "Intro Video",         group: "assets",     done: !!version?.intro_video_url },
-    { key: "theme_song",      label: "Theme Song",          group: "assets",     done: !!version?.theme_song_url },
-    { key: "meet_characters", label: "Meet Nimi & Piko",    group: "assets",     done: !!version?.meet_characters_url,  optional: true },
-    { key: "story_intro",     label: "Story Introduction",  group: "assets",     done: !!version?.story_intro_url },
     { key: "flipflop_audio",  label: "FlipFlop Audio Book", group: "activities", done: hasFlipFlop },
     { key: "story_pdf",       label: "Story PDF",           group: "activities", done: hasMissionMedia("story_pdf") },
     { key: "coloring",        label: "Coloring Activity",   group: "activities", done: hasColoring },

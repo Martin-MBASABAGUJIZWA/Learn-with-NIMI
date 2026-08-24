@@ -720,29 +720,33 @@ export default function StoryEditor({ story, onSaved, onDeleted, defaultLang, on
         {/* Refresh indicator — thin bar shown during silent reloads */}
         <div className={`h-0.5 bg-green-500 transition-all duration-300 ${contentLoading ? 'opacity-100' : 'opacity-0'}`} />
         {/* Language switcher */}
-        <div className="flex border-b border-gray-100">
+        <div className="flex border-b-2 border-gray-100">
           {LANGUAGES.map(lang => {
             const meta = LANGUAGE_META[lang]
             const sv = allStoryVersions[lang]
             const isPublished = !!(sv && (sv as Record<string, unknown>).published)
+            const isActive = activeLang === lang
             return (
               <button type="button" key={lang} onClick={() => setActiveLang(lang)}
-                className={`flex-1 flex items-center justify-center gap-2 py-3 text-[13px] font-semibold transition border-b-2 ${
-                  activeLang === lang ? 'border-green-600 text-green-600 bg-green-50/30' : 'border-transparent text-gray-400 hover:text-gray-600'
+                className={`relative flex-1 flex flex-col items-center justify-center gap-0.5 py-3.5 transition-all ${
+                  isActive
+                    ? 'bg-green-600 text-white'
+                    : 'text-gray-400 hover:text-gray-700 hover:bg-gray-50'
                 }`}>
-                <span>{meta.flag}</span>
-                <span className="hidden sm:inline">{meta.label}</span>
-                {isPublished && <CheckCircle2 size={12} className="text-emerald-500" />}
-                {sv && !isPublished && <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />}
+                <span className="text-xl leading-none">{meta.flag}</span>
+                <span className="text-[11px] font-black tracking-wide uppercase">{meta.label}</span>
+                {isPublished && (
+                  <span className={`text-[9px] font-bold uppercase tracking-wider ${isActive ? 'text-green-200' : 'text-emerald-500'}`}>✓ Ready</span>
+                )}
+                {sv && !isPublished && (
+                  <span className={`text-[9px] font-bold uppercase tracking-wider ${isActive ? 'text-green-200' : 'text-amber-500'}`}>In progress</span>
+                )}
+                {!sv && (
+                  <span className={`text-[9px] font-bold uppercase tracking-wider ${isActive ? 'text-green-200' : 'text-gray-300'}`}>Not started</span>
+                )}
               </button>
             )
           })}
-        </div>
-
-        {/* Tab legend */}
-        <div className="flex items-center gap-4 px-4 pt-2 pb-0">
-          <span className="flex items-center gap-1 text-[10px] text-gray-400"><CheckCircle2 size={10} className="text-emerald-500" /> Marked ready</span>
-          <span className="flex items-center gap-1 text-[10px] text-gray-400"><span className="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block" /> In progress</span>
         </div>
 
         {/* Progress bar */}
@@ -874,13 +878,25 @@ export default function StoryEditor({ story, onSaved, onDeleted, defaultLang, on
         </div>
       </Section>
 
-      {/* 3. FlipFlop Book — images shared, audio per language */}
-      <Section number={3} title={`FlipFlop Audio Book — ${LANGUAGE_META[activeLang].label}`} subtitle="Page images are shared across all languages; audio narration is uploaded per language" done={flipflopPages.length > 0}
-        badge={`${flipflopPages.length} pages`}>
+      {/* 3. FlipFlop Book — fully per language */}
+      {(() => {
+        const langPages = flipflopPages.filter(p => (p.story_page_versions ?? []).some(v => v.language === activeLang && v.image_url))
+        const langLabel = LANGUAGE_META[activeLang].label
+        return (
+      <Section number={3} title={`FlipFlop Audio Book — ${langLabel}`} subtitle={`All page images and audio are independent per language — ${langLabel} content does not affect other languages`} done={langPages.length > 0}
+        badge={langPages.length > 0 ? `${langPages.length} pages` : 'No pages'}>
         {flipflopPages.length > 0 ? (
           <div className="space-y-3">
+            {langPages.length === 0 && (
+              <div className="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
+                <AlertCircle size={16} className="text-amber-500 shrink-0 mt-0.5" />
+                <p className="text-[12px] text-amber-700">
+                  Pages exist for other languages but none for <strong>{langLabel}</strong> yet. Import pages for this language tab below.
+                </p>
+              </div>
+            )}
             <p className="text-[11px] text-gray-400">
-              Each card below is one page. Click a card image to replace it. Add audio narration for <strong>{LANGUAGE_META[activeLang].label}</strong> using the audio button on each card. The caption field stores the page text shown to learners.
+              Each card is one page for <strong>{langLabel}</strong>. Click a card to upload the image for this language. Add audio narration using the audio button. Caption text is also per language.
             </p>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-3">
               {flipflopPages.map((page, idx) => (
@@ -909,18 +925,20 @@ export default function StoryEditor({ story, onSaved, onDeleted, defaultLang, on
           <div className="text-center py-6 space-y-3">
             <BookOpen size={32} className="mx-auto text-gray-300" />
             <div>
-              <p className="text-[13px] font-semibold text-gray-700">No pages yet</p>
+              <p className="text-[13px] font-semibold text-gray-700">No {langLabel} pages yet</p>
               <p className="text-[12px] text-gray-400 mt-1 max-w-sm mx-auto">
-                A FlipFlop book is a page-by-page audio story — each page has an illustration and spoken narration per language. Import a ZIP of numbered images; audio is added per language afterwards.
+                Each language needs its own set of page images and audio narration — they are fully independent. Import pages specifically for <strong>{langLabel}</strong>.
               </p>
             </div>
             <button type="button" onClick={() => setShowFlipflopImporter(true)}
               className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold text-[13px] rounded-xl px-6 py-3 transition">
-              <FileArchive size={16} /> Import Pages (ZIP or images)
+              <FileArchive size={16} /> Import {langLabel} Pages
             </button>
           </div>
         )}
       </Section>
+        )
+      })()}
 
       {/* 4. Other Activities — per language */}
       <Section number={4} title={`Other Activities — ${LANGUAGE_META[activeLang].label}`} subtitle="PDF, Coloring, Movement, Singing, Video, Challenges, Destination" done={section4Count >= 9}
