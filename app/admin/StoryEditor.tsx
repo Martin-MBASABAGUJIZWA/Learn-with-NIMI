@@ -53,14 +53,14 @@ const MISSION_COLORS: Record<string, string> = {
 }
 const MISSION_ACCEPT: Record<string, string> = {
   flipflop_audio: 'audio/*', story_pdf: '.pdf,application/pdf', coloring: 'image/*',
-  move_explore: 'video/*,audio/*', sing_along: 'audio/*', bonus_video: 'video/*',
+  move_explore: 'video/*,audio/*', sing_along: 'audio/*,video/*', bonus_video: 'video/*',
   challenge_1: 'video/*,image/*', challenge_2: 'video/*,image/*', challenge_3: 'video/*,image/*',
   destination_video: 'video/*',
 }
 const MISSION_HINTS: Record<string, string> = {
   story_pdf:         'Printable story PDF learners can download. Any page size, optimised for home printing.',
   move_explore:      'Video or audio guide for a movement activity tied to the story. MP4 or MP3.',
-  sing_along:        'Song audio learners sing with. MP3 or AAC, with lyrics matching the story theme.',
+  sing_along:        'Song learners sing along with. MP3, AAC, or MP4 video with lyrics matching the story theme.',
   bonus_video:       'Extra video content — behind the scenes, author note, or cultural deep-dive. MP4.',
   challenge_1:       'Weekly Challenge 1 prompt — video or image showing what the child should do. MP4 or JPG.',
   challenge_2:       'Weekly Challenge 2 prompt — video or image showing what the child should do. MP4 or JPG.',
