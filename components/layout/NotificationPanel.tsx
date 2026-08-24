@@ -42,12 +42,13 @@ export default function NotificationPanel({ isOpen, onClose, onCountChange }: Pr
   const cv = getComponentVariant(themeId);
   const m = useMotion();
 
-  const load = async () => {
+  const load = async (active: boolean) => {
     const { data } = await supabase
       .from("notifications")
       .select("*")
       .order("created_at", { ascending: false })
       .limit(20);
+    if (!active) return;
     if (data) {
       setNotifications(data);
       onCountChange(data.filter(n => !n.read).length);
@@ -56,17 +57,26 @@ export default function NotificationPanel({ isOpen, onClose, onCountChange }: Pr
   };
 
   useEffect(() => {
-    if (isOpen) void load();
+    if (!isOpen) return;
+    let active = true;
+    void load(active);
+    return () => { active = false; };
   }, [isOpen]);
 
   useEffect(() => {
-    void load();
+    let active = true;
+    void load(active);
+    return () => { active = false; };
   }, []);
 
+  // H25: use functional state update so onCountChange sees fresh data
   const markRead = async (id: string) => {
     await supabase.from("notifications").update({ read: true }).eq("id", id);
-    setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
-    onCountChange(notifications.filter(n => !n.read && n.id !== id).length);
+    setNotifications(prev => {
+      const next = prev.map(n => n.id === id ? { ...n, read: true } : n);
+      onCountChange(next.filter(n => !n.read).length);
+      return next;
+    });
   };
 
   const markAllRead = async () => {

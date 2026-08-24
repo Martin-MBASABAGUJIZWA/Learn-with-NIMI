@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { useThemeMotion } from "@/hooks/useThemeMotion";
 import { SPRING, DURATION } from "@/lib/design-system/motion";
@@ -58,14 +58,17 @@ export default function WhoIsPlaying({ children, onSelect, onAddChild }: Props) 
     <div className={`min-h-screen bg-gradient-to-b ${theme.gradients.pageBg} flex flex-col items-center justify-center px-4 py-8 relative overflow-hidden`}>
 
       {/* Background sparkles */}
-      {sparkles.map((s, i) => (
-        <motion.div key={i}
-          className="absolute w-1.5 h-1.5 rounded-full pointer-events-none"
-          style={{ left: s.left, top: s.top, backgroundColor: s.color, opacity: 0.4 }}
-          animate={{ opacity: [0.1, 0.6, 0.1], scale: [0.8, 1.4, 0.8] }}
-          transition={{ duration: s.duration, repeat: Infinity, delay: s.delay }}
-        />
-      ))}
+      <AnimatePresence>
+        {sparkles.map((s, i) => (
+          <motion.div key={i}
+            className="absolute w-1.5 h-1.5 rounded-full pointer-events-none"
+            style={{ left: s.left, top: s.top, backgroundColor: s.color, opacity: 0.4 }}
+            animate={{ opacity: [0.1, 0.6, 0.1], scale: [0.8, 1.4, 0.8] }}
+            transition={{ duration: s.duration, repeat: Infinity, delay: s.delay }}
+            exit={{ opacity: 0 }}
+          />
+        ))}
+      </AnimatePresence>
 
       {/* NIMI logo */}
       <motion.div
@@ -171,24 +174,30 @@ export default function WhoIsPlaying({ children, onSelect, onAddChild }: Props) 
       </motion.button>
 
       {/* NIMI + PIKO mascots — split to sides so they frame the center rather than covering it */}
-      <motion.img
-        src={`/themes/${themeId}/characters/nimi.png`}
-        alt="" aria-hidden
-        initial={{ opacity: 0, y: 24 }}
-        animate={{ opacity: 0.85, y: [0, -8, 0] }}
-        transition={{ opacity: { duration: 0.7, delay: 1.1 }, y: { duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 1.1 } }}
-        className="absolute bottom-0 left-2 sm:left-8 h-[110px] sm:h-[140px] w-auto object-contain drop-shadow-2xl pointer-events-none select-none"
-        onError={e => { (e.target as HTMLImageElement).style.display = "none"; }}
-      />
-      <motion.img
-        src={`/themes/${themeId}/characters/piko.png`}
-        alt="" aria-hidden
-        initial={{ opacity: 0, y: 24 }}
-        animate={{ opacity: 0.85, y: [0, -6, 0] }}
-        transition={{ opacity: { duration: 0.7, delay: 1.3 }, y: { duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1.3 } }}
-        className="absolute bottom-0 right-2 sm:right-8 h-[95px] sm:h-[120px] w-auto object-contain drop-shadow-2xl pointer-events-none select-none"
-        onError={e => { (e.target as HTMLImageElement).style.display = "none"; }}
-      />
+      <AnimatePresence>
+        <motion.img
+          key="nimi-mascot"
+          src={`/themes/${themeId}/characters/nimi.png`}
+          alt="" aria-hidden
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 0.85, y: [0, -8, 0] }}
+          transition={{ opacity: { duration: 0.7, delay: 1.1 }, y: { duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 1.1 } }}
+          exit={{ opacity: 0 }}
+          className="absolute bottom-0 left-2 sm:left-8 h-[110px] sm:h-[140px] w-auto object-contain drop-shadow-2xl pointer-events-none select-none"
+          onError={e => { (e.target as HTMLImageElement).style.display = "none"; }}
+        />
+        <motion.img
+          key="piko-mascot"
+          src={`/themes/${themeId}/characters/piko.png`}
+          alt="" aria-hidden
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 0.85, y: [0, -6, 0] }}
+          transition={{ opacity: { duration: 0.7, delay: 1.3 }, y: { duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1.3 } }}
+          exit={{ opacity: 0 }}
+          className="absolute bottom-0 right-2 sm:right-8 h-[95px] sm:h-[120px] w-auto object-contain drop-shadow-2xl pointer-events-none select-none"
+          onError={e => { (e.target as HTMLImageElement).style.display = "none"; }}
+        />
+      </AnimatePresence>
     </div>
   );
 }

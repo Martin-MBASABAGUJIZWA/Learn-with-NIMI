@@ -110,6 +110,7 @@ export function useSpeechRecognition({
 
   const recognitionRef   = useRef<SpeechRecognitionInstance | null>(null);
   const silenceTimerRef  = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const errorTimerRef    = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const onResultRef      = useRef(onResult);
   const onErrorRef       = useRef(onError);
   const finalTranscripts = useRef<string[]>([]);
@@ -215,7 +216,7 @@ export function useSpeechRecognition({
       setError(mapped);
       setStatus("error");
       onErrorRef.current?.(mapped);
-      setTimeout(() => setStatus("idle"), 4000);
+      errorTimerRef.current = setTimeout(() => setStatus("idle"), 4000);
     };
 
     recognitionRef.current = recognition;
@@ -257,6 +258,7 @@ export function useSpeechRecognition({
   useEffect(() => () => {
     activeRef.current = false;
     clearSilenceTimer();
+    if (errorTimerRef.current) clearTimeout(errorTimerRef.current);
     recognitionRef.current?.abort();
   }, [clearSilenceTimer]);
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useThemeMotion } from "@/hooks/useThemeMotion";
 import { X, ChevronLeft, ChevronRight, Lock, Sparkles } from "lucide-react";
@@ -56,6 +56,9 @@ export default function CreateChildModal({ onCreated, onClose }: Props) {
   const [saving, setSaving]       = useState(false);
   const [error, setError]         = useState("");
   const [createdChild, setCreatedChild] = useState<Child | null>(null);
+  // H30: clear the success-delay timer on unmount
+  const successTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  useEffect(() => () => { clearTimeout(successTimerRef.current); }, []);
 
   const handleSubmit = async () => {
     if (!name.trim()) { setError("Please enter a name!"); return; }
@@ -72,7 +75,7 @@ export default function CreateChildModal({ onCreated, onClose }: Props) {
     if (err || !child) { setError(err ?? "Something went wrong. Please try again."); return; }
     setCreatedChild(child);
     setStep("success");
-    setTimeout(() => onCreated(child), 2200);
+    successTimerRef.current = setTimeout(() => onCreated(child), 2200);
   };
 
   const stepLabel = step === "design" ? "1 of 2" : step === "details" ? "2 of 2" : "";

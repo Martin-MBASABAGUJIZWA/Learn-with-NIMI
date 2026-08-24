@@ -48,6 +48,10 @@ export function useNimiChat(initialMessages: ChatMessage[], { childName, onExcha
   const messagesRef = useRef(messages);
   useEffect(() => { messagesRef.current = messages; }, [messages]);
 
+  // H18: guard against state updates after unmount in streaming loops
+  const activeRef = useRef(true);
+  useEffect(() => () => { activeRef.current = false; }, []);
+
   // Persist conversation summary on unmount when there are enough exchanges
   useEffect(() => {
     if (!persistOnUnmount || !childId) return;
@@ -173,20 +177,22 @@ export function useNimiChat(initialMessages: ChatMessage[], { childName, onExcha
       const reply = (data.response ?? "").trim();
 
       if (!reply) {
+        if (!activeRef.current) return;
         updateReply(t("chatErrorMsg"));
       } else {
+        if (!activeRef.current) return;
         updateReply(reply);
         lastReplyRef.current = reply;
         onExchangeComplete?.();
         void speakText(reply, language, {
-          onStart: () => setIsSpeaking(true),
-          onEnd:   () => setIsSpeaking(false),
+          onStart: () => { if (activeRef.current) setIsSpeaking(true); },
+          onEnd:   () => { if (activeRef.current) setIsSpeaking(false); },
         });
       }
     } catch {
-      updateReply(t("chatErrorMsg"));
+      if (activeRef.current) updateReply(t("chatErrorMsg"));
     } finally {
-      setIsTyping(false);
+      if (activeRef.current) setIsTyping(false);
     }
   }, [messages, isTyping, language, childName, childId, childAge, storyId, storyTitle, t, onExchangeComplete, stopReading]);
 
@@ -234,6 +240,7 @@ export function useNimiChat(initialMessages: ChatMessage[], { childName, onExcha
       });
 
       if (res.status === 429) {
+        if (!activeRef.current) return;
         setDailyLimitReached(true);
         setNimiMessagesUsed(10);
         updateReply("Wow, we've talked so much today! 🌟 You've used all 10 of your free chats for today. Come back tomorrow — I'll be here! To chat with me anytime, ask a grown-up about NIMIPIKO Club. 👑");
@@ -265,6 +272,7 @@ export function useNimiChat(initialMessages: ChatMessage[], { childName, onExcha
             const parsed = JSON.parse(data);
             if (parsed.content) {
               reply += parsed.content;
+              if (!activeRef.current) return;
               updateReply(reply);
             }
           } catch {
@@ -274,16 +282,17 @@ export function useNimiChat(initialMessages: ChatMessage[], { childName, onExcha
       }
 
       if (!reply.trim()) {
-        updateReply(t("chatErrorMsg"));
+        if (activeRef.current) updateReply(t("chatErrorMsg"));
       } else {
+        if (!activeRef.current) return;
         onExchangeComplete?.();
         lastReplyRef.current = reply;
         setNimiMessagesUsed(prev => (prev === null ? null : prev + 1));
       }
     } catch {
-      updateReply(t("chatErrorMsg"));
+      if (activeRef.current) updateReply(t("chatErrorMsg"));
     } finally {
-      setIsTyping(false);
+      if (activeRef.current) setIsTyping(false);
     }
   }, [messages, isTyping, language, childName, childId, storyId, t, onExchangeComplete, stopReading]);
 
