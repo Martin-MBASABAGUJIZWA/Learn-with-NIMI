@@ -124,8 +124,7 @@ export async function GET(req: NextRequest) {
       },
     })
   } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err)
-    console.error('[story-pdf] build error:', msg)
-    return NextResponse.json({ error: `Story PDF build failed: ${msg}` }, { status: 500 })
+    console.error('[story-pdf] build error:', err instanceof Error ? err.message : String(err))
+    return NextResponse.json({ error: 'Story PDF generation failed. Please try again.' }, { status: 500 })
   }
 }

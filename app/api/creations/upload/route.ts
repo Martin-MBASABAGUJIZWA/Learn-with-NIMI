@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
 
     if (storageError) {
       console.error("Storage upload error:", storageError);
-      return NextResponse.json({ error: "Storage upload failed", detail: storageError.message }, { status: 500 });
+      return NextResponse.json({ error: "Upload failed. Please try again." }, { status: 500 });
     }
 
     const imageUrl = `${STORAGE_BUCKET}/${storagePath}`;

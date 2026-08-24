@@ -40,7 +40,7 @@ export async function GET(req: NextRequest) {
       .not("email", "is", null)
       .range(offset, offset + PAGE - 1);
 
-    if (pErr) return NextResponse.json({ error: pErr.message }, { status: 500 });
+    if (pErr) { console.error("[weekly-digest] parent query error:", pErr.message); return NextResponse.json({ error: "Internal error" }, { status: 500 }); }
     if (!parents?.length) break;
 
     const parentIds = parents.map(p => p.id);

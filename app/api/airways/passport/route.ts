@@ -313,8 +313,7 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    console.error("[passport] build error:", msg);
-    return NextResponse.json({ error: `Passport build failed: ${msg}` }, { status: 500 });
+    console.error("[passport] build error:", err instanceof Error ? err.message : String(err));
+    return NextResponse.json({ error: "Passport generation failed. Please try again." }, { status: 500 });
   }
 }

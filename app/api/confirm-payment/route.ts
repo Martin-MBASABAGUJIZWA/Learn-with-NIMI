@@ -86,6 +86,11 @@ export async function POST(req: NextRequest) {
     if (!transactionId) {
       return NextResponse.json({ success: false, message: "Missing transaction ID." }, { status: 400 });
     }
+    // Restrict transactionId to safe characters before embedding in the URL path.
+    // CyberSource transaction IDs are hex-UUID-like; anything else is unexpected.
+    if (!/^[a-zA-Z0-9_-]{8,64}$/.test(transactionId)) {
+      return NextResponse.json({ success: false, message: "Invalid transaction ID format." }, { status: 400 });
+    }
 
     // VERIFY WITH CYBERSOURCE — never trust the JWT alone
     let csStatus: string;

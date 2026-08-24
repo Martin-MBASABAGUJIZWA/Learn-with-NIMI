@@ -117,8 +117,7 @@ export async function GET(req: NextRequest) {
       },
     })
   } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err)
-    console.error('[badge] build error:', msg)
-    return NextResponse.json({ error: `Badge build failed: ${msg}` }, { status: 500 })
+    console.error('[badge] build error:', err instanceof Error ? err.message : String(err))
+    return NextResponse.json({ error: 'Badge generation failed. Please try again.' }, { status: 500 })
   }
 }

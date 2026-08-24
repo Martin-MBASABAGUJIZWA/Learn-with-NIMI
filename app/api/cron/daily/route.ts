@@ -23,11 +23,6 @@ export async function GET(req: NextRequest) {
     fetch(`${base}/api/cron/send-gift-emails`,         { headers: auth }),
     fetch(`${base}/api/cron/process-referral-rewards`, { headers: auth }),
     fetch(`${base}/api/cron/expire-checkouts`,         { headers: auth }),
-    // xAPI flush uses X-Service-Key auth
-    fetch(`${base}/api/enterprise/xapi?flush=1`, {
-      method: "POST",
-      headers: { "x-service-key": cronSecret },
-    }),
   ];
 
   // Weekly digest only on Mondays
