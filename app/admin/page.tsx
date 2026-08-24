@@ -69,6 +69,7 @@ const AirwaysTemplatesManager         = dynamicView(() => import('./AirwaysTempl
 const KitLayoutEditor                 = dynamicView(() => import('./KitLayoutEditor'))
 const SongManager                     = dynamicView(() => import('./SongManager'))
 const StoryPagesManager               = dynamicView(() => import('./StoryPagesManager'))
+const PlatformIntroVideoManager       = dynamicView(() => import('./PlatformIntroVideoManager'))
 
 const tables = [
   'categories', 'mission_versions',
@@ -269,6 +270,7 @@ export default function AdminPanel() {
   const isKitLayoutView        = currentTable === 'kit_layout'
   const isSongManagerView      = currentTable === 'song_manager'
   const isStoryPagesView       = currentTable === 'story_pages'
+  const isPlatformIntroVideoView = currentTable === 'platform_intro_video'
 
   return (
     <ToastProvider>
@@ -360,6 +362,7 @@ export default function AdminPanel() {
           {isKitLayoutView        && <KitLayoutEditor onNavigate={setCurrentTable} onOpenSidebar={() => setSidebarOpen(true)} />}
           {isSongManagerView      && <SongManager onNavigate={setCurrentTable} onOpenSidebar={() => setSidebarOpen(true)} />}
           {isStoryPagesView       && <StoryPagesManager onNavigate={setCurrentTable} onOpenSidebar={() => setSidebarOpen(true)} />}
+          {isPlatformIntroVideoView && <PlatformIntroVideoManager onNavigate={setCurrentTable} onOpenSidebar={() => setSidebarOpen(true)} />}
           {currentTable === 'Dashboard' && <DashboardHome onNavigate={setCurrentTable} />}
           {currentTable === 'Help' && (
             <div className="flex items-center justify-center h-full p-8">
@@ -381,7 +384,7 @@ export default function AdminPanel() {
               </div>
             </div>
           )}
-          {!isMissionView && !isStoryView && !isStorySlotsView && !isStoryOrderingView && !isStoryPublishingView && !isFlipFlopView && !isStoryPdfsView && !isVideosView && !isAudioView && !isWeeklyChallengesView && !isFamiliesView && !isColoringView && !isLanguagesView && !isChildrenView && !isParentsView && !isCertificatesView && !isCertTemplatesView && !isRewardsView && !isBadgeImagesView && !isAnalyticsView && !isSettingsView && !isCurriculumView && !isCommunityView && !isProductsView && !isMasterpieceView && !isNewsletterView && !isReferralView && !isDiscountCodesView && !isGiftView && !isAuditLogView && !isPaymentHealthView && !isAirwaysHubView && !isAirwaysTemplatesView && !isKitLayoutView && !isSongManagerView && !isStoryPagesView && !isTestimonialsView && !isPartnersView && !isConversationHistoryView && !['Buckets', 'Profile', 'admins', 'Dashboard', 'Help', 'notifications'].includes(currentTable) && (
+          {!isMissionView && !isStoryView && !isStorySlotsView && !isStoryOrderingView && !isStoryPublishingView && !isFlipFlopView && !isStoryPdfsView && !isVideosView && !isAudioView && !isWeeklyChallengesView && !isFamiliesView && !isColoringView && !isLanguagesView && !isChildrenView && !isParentsView && !isCertificatesView && !isCertTemplatesView && !isRewardsView && !isBadgeImagesView && !isAnalyticsView && !isSettingsView && !isCurriculumView && !isCommunityView && !isProductsView && !isMasterpieceView && !isNewsletterView && !isReferralView && !isDiscountCodesView && !isGiftView && !isAuditLogView && !isPaymentHealthView && !isAirwaysHubView && !isAirwaysTemplatesView && !isKitLayoutView && !isSongManagerView && !isStoryPagesView && !isTestimonialsView && !isPartnersView && !isConversationHistoryView && !isPlatformIntroVideoView && !['Buckets', 'Profile', 'admins', 'Dashboard', 'Help', 'notifications'].includes(currentTable) && (
             <TableView table={currentTable} />
           )}
           </ErrorBoundary>

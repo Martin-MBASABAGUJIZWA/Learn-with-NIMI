@@ -29,10 +29,6 @@ export function computeReadiness(story: {
   // Prefer English version; fall back to first available
   story_versions?: {
     language?: string;
-    intro_video_url?: string | null;
-    theme_song_url?: string | null;
-    meet_characters_url?: string | null;
-    story_intro_url?: string | null;
   }[];
   // Slots carry nested mission_versions so we can check actual media uploads
   story_slots?: {
@@ -61,13 +57,17 @@ export function computeReadiness(story: {
   const hasColoring = (story.coloring_pages ?? []).length > 0;
 
   const items: ReadinessItem[] = [
-    { key: "cover",           label: "Cover Image",         group: "assets",     done: !!story.cover_url,               optional: true },
-    { key: "flipflop_audio",  label: "FlipFlop Audio Book", group: "activities", done: hasFlipFlop },
-    { key: "story_pdf",       label: "Story PDF",           group: "activities", done: hasMissionMedia("story_pdf") },
-    { key: "coloring",        label: "Coloring Activity",   group: "activities", done: hasColoring },
-    { key: "move_explore",    label: "Move & Explore",      group: "activities", done: hasMissionMedia("move_explore") },
-    { key: "sing_along",      label: "Sing Along",          group: "activities", done: hasMissionMedia("sing_along") },
-    { key: "bonus_video",     label: "Bonus Video",         group: "activities", done: hasMissionMedia("bonus_video") },
+    { key: "cover",              label: "Cover Image",         group: "assets",     done: !!story.cover_url,                   optional: true },
+    { key: "flipflop_audio",     label: "FlipFlop Audio Book", group: "activities", done: hasFlipFlop },
+    { key: "story_pdf",          label: "Story PDF",           group: "activities", done: hasMissionMedia("story_pdf") },
+    { key: "coloring",           label: "Coloring Activity",   group: "activities", done: hasColoring },
+    { key: "move_explore",       label: "Move & Explore",      group: "activities", done: hasMissionMedia("move_explore") },
+    { key: "sing_along",         label: "Karaoke",             group: "activities", done: hasMissionMedia("sing_along") },
+    { key: "bonus_video",        label: "Bonus Video",         group: "activities", done: hasMissionMedia("bonus_video") },
+    { key: "challenge_1",        label: "Weekly Challenge 1",  group: "activities", done: hasMissionMedia("challenge_1") },
+    { key: "challenge_2",        label: "Weekly Challenge 2",  group: "activities", done: hasMissionMedia("challenge_2") },
+    { key: "challenge_3",        label: "Weekly Challenge 3",  group: "activities", done: hasMissionMedia("challenge_3") },
+    { key: "destination_video",  label: "Destination Video",   group: "activities", done: hasMissionMedia("destination_video") },
   ];
 
   const required  = items.filter(i => !i.optional);

@@ -11,7 +11,7 @@ import { DURATION, EASE, SPRING } from "@/lib/design-system/motion";
 import AppShell from "@/components/layout/AppShell";
 import { Bone } from "@/components/ui/Bone";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { getChildren, getStorageUrl, getConsecutiveStreak, awardMilestoneBadges, awardBadge, getBadgeImages, createNotification, getStoryPages } from "@/lib/queries";
+import { getChildren, getStorageUrl, getConsecutiveStreak, awardMilestoneBadges, awardBadge, getBadgeImages, createNotification, getStoryPages, getNimipikoPlatformIntroVideoUrl, markChildIntroWatched } from "@/lib/queries";
 import { getMilestoneBadgeMeta } from "@/lib/milestoneBadges";
 
 // Strip language suffix from story badge slugs for display (emotion-detective-en → Emotion Detective)
@@ -207,7 +207,7 @@ const SLOT_BADGE: Record<string, { bg: string; text: string; border: string }> =
   destination_video: { bg: "bg-teal-50",    text: "text-teal-700",    border: "border-teal-200"    },
 };
 
-type Phase = "welcome" | "missions" | "certificate" | "challenge" | "complete";
+type Phase = "onboarding" | "welcome" | "missions" | "certificate" | "challenge" | "complete";
 
 
 export default function StoryDetailPage() {
@@ -233,6 +233,7 @@ export default function StoryDetailPage() {
   const [challengeLoading, setChallengeLoading] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
   const [phase, setPhase] = useState<Phase>("welcome");
+  const [introVideoUrl, setIntroVideoUrl] = useState<string | null>(null);
   const [showRewardModal, setShowRewardModal] = useState(false);
   const [treasureAnimating, setTreasureAnimating] = useState(false);
   const [earnedBadgeSlug, setEarnedBadgeSlug] = useState<string | null>(null);
@@ -319,10 +320,11 @@ export default function StoryDetailPage() {
   useEffect(() => {
     let cancelled = false;
     void (async () => {
-      const [{ data: { user } }, list, story] = await Promise.all([
+      const [{ data: { user } }, list, story, platformIntroUrl] = await Promise.all([
         supabase.auth.getUser(),
         getChildren(),
         getStoryBySlug(slug),
+        getNimipikoPlatformIntroVideoUrl(),
       ]);
       if (cancelled) return;
       if (!user) { router.replace("/loginpage"); return; }
@@ -363,10 +365,19 @@ export default function StoryDetailPage() {
       const doneSlots = sl.filter(s => s.completed).length;
       const allMissionsDone = doneSlots >= sl.length && sl.length > 0;
 
-      // Always open the book first; certificate/complete are the only auto-exceptions
-      if (allMissionsDone && cert) setPhase("complete");
-      else if (allMissionsDone) setPhase("certificate");
-      else setPhase("welcome");
+      // Check onboarding: if a platform intro video exists and this child hasn't seen it yet, show it first
+      const childRecord = await supabase.from("children").select("nimipiko_intro_watched").eq("id", child.id).maybeSingle();
+      const introWatched = childRecord.data?.nimipiko_intro_watched ?? false;
+      if (platformIntroUrl && !introWatched) {
+        setIntroVideoUrl(platformIntroUrl);
+        setPhase("onboarding");
+      } else if (allMissionsDone && cert) {
+        setPhase("complete");
+      } else if (allMissionsDone) {
+        setPhase("certificate");
+      } else {
+        setPhase("welcome");
+      }
 
       setLoading(false);
     })();
@@ -620,6 +631,58 @@ export default function StoryDetailPage() {
         <main className="max-w-3xl mx-auto w-full min-h-screen flex flex-col">
 
           <AnimatePresence mode="wait">
+
+            {/* ═══════════════════════════════════════════ */}
+            {/* PHASE 0: PLATFORM ONBOARDING VIDEO        */}
+            {/* ═══════════════════════════════════════════ */}
+            {phase === "onboarding" && introVideoUrl && (
+              <motion.div key="onboarding"
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                transition={{ duration: 0.4 }}
+                className="flex-1 flex flex-col items-center justify-center relative min-h-screen"
+                style={{ background: "linear-gradient(160deg, #04111f 0%, #091829 45%, #100e24 100%)" }}>
+
+                {/* Star field */}
+                {STARS.map((s, i) => (
+                  <motion.div key={i} className="absolute rounded-full pointer-events-none select-none"
+                    style={{ left:`${s.x}%`, top:`${s.y}%`, width:s.size, height:s.size, background:"#fff" }}
+                    animate={{ opacity:[0.15, s.peakOpacity, 0.15] }}
+                    transition={{ duration:s.duration, delay:s.delay, repeat:Infinity, ease:"easeInOut" }} />
+                ))}
+
+                <div className="relative z-10 w-full max-w-2xl mx-auto px-4 flex flex-col items-center gap-6 py-10">
+                  <div className="text-center space-y-2">
+                    <p className="text-[11px] font-black uppercase tracking-widest text-amber-400">Welcome to Nimipiko ✨</p>
+                    <h1 className="text-2xl font-black text-white leading-tight">Watch before you begin!</h1>
+                    <p className="text-[13px] text-white/60">This short video shows you how the adventure works.</p>
+                  </div>
+
+                  <div className="w-full rounded-2xl overflow-hidden border-2 border-white/10 shadow-2xl bg-black">
+                    <video
+                      src={getStorageUrl(introVideoUrl)}
+                      controls
+                      autoPlay
+                      className="w-full"
+                      style={{ maxHeight: 400 }}
+                    />
+                  </div>
+
+                  <button
+                    onClick={async () => {
+                      if (childId) await markChildIntroWatched(childId).catch(() => {})
+                      const doneSlots = slots.filter(s => s.completed).length
+                      const allDone = doneSlots >= slots.length && slots.length > 0
+                      if (allDone && certificate) setPhase("complete")
+                      else if (allDone) setPhase("certificate")
+                      else setPhase("welcome")
+                    }}
+                    className="w-full max-w-xs py-4 rounded-2xl font-black text-[15px] text-white shadow-lg transition-all active:scale-95"
+                    style={{ background: "linear-gradient(135deg, #C9A84C 0%, #e4c06e 100%)" }}>
+                    ✨ Start My Adventure
+                  </button>
+                </div>
+              </motion.div>
+            )}
 
             {/* ═══════════════════════════════════════════ */}
             {/* PHASE 1: LIVE BOOK                        */}

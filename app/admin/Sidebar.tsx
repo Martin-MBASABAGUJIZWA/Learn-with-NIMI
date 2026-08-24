@@ -6,7 +6,7 @@ import {
   Users, Globe, Award, Bell, FolderOpen, Settings,
   ChevronLeft, ChevronRight, X, CreditCard, Crown, BarChart3, ShieldCheck,
   GraduationCap, Mail, Share2, Tag, Gift, MessageSquareQuote, Handshake,
-  MessagesSquare, ClipboardList, Activity, Plane, Layers, Music, Languages,
+  MessagesSquare, ClipboardList, Activity, Plane, Layers, Music, Languages, Video,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -83,6 +83,7 @@ const NAV_GROUPS: NavGroup[] = [
   {
     label: 'Platform',
     items: [
+      { icon: Video,           label: 'Platform Intro Video', table: 'platform_intro_video' },
       { icon: Bell,            label: 'Notifications',     table: 'notifications' },
       { icon: FolderOpen,      label: 'Media Library',     table: 'Buckets' },
       { icon: BarChart3,       label: 'Analytics',         table: 'child_progress' },

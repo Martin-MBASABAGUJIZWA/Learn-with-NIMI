@@ -110,7 +110,7 @@ const MISSION_STYLES: Record<string, {
     headerBg: "bg-gradient-to-r from-purple-50/80 via-violet-50/40 to-indigo-50/50",
     headerBorder: "border-purple-200/60",
     badgeBg: "bg-purple-50", badgeText: "text-purple-700", badgeBorder: "border-purple-200",
-    emoji: "🎵", label: "Sing Along",
+    emoji: "🎤", label: "Karaoke",
     resultBg: "bg-gradient-to-br from-white via-purple-50/70 to-violet-50/60",
   },
   watch: {

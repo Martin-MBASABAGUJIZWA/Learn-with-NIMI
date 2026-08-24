@@ -233,7 +233,7 @@ export const SLOT_META: Record<SlotKey, { emoji: string; label: string; type: Mi
   story_pdf:         { emoji: '📖', label: 'Story PDF',           type: 'read' },
   coloring:          { emoji: '🎨', label: 'Coloring Activity',   type: 'color' },
   move_explore:      { emoji: '🤸', label: 'Move & Explore',      type: 'move' },
-  sing_along:        { emoji: '🎤', label: 'Sing Along',          type: 'sing' },
+  sing_along:        { emoji: '🎤', label: 'Karaoke',             type: 'sing' },
   bonus_video:       { emoji: '🎬', label: 'Bonus Video',         type: 'watch' },
   challenge_1:       { emoji: '🏅', label: 'Weekly Challenge 1',  type: 'watch' },
   challenge_2:       { emoji: '🏅', label: 'Weekly Challenge 2',  type: 'watch' },

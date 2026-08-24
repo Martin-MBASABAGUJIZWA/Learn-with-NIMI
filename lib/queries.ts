@@ -10,3 +10,4 @@ export * from "./queries/achievements";
 export * from "./queries/shop";
 export * from "./queries/coloring";
 export * from "./queries/notifications";
+export * from "./queries/platformSettings";

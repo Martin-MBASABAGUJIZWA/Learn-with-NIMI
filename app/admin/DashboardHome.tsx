@@ -52,7 +52,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
           supabase.from('nimipiko_subscriptions').select('id, amount, currency, billing_interval, status, created_at').eq('status', 'active'),
           supabase.from('orders').select('amount, currency, payment_status, completed_at'),
           supabase.from('weekly_challenges').select('*', { count: 'exact', head: true }),
-          supabase.from('story_versions').select('story_id, intro_video_url, theme_song_url, meet_characters_url, story_intro_url'),
+          supabase.from('story_versions').select('story_id, language'),
         ])
 
         const allStories = storiesData ?? []

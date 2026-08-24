@@ -60,7 +60,7 @@ const MISSION_ACCEPT: Record<string, string> = {
 const MISSION_HINTS: Record<string, string> = {
   story_pdf:         'Printable story PDF learners can download. Any page size, optimised for home printing.',
   move_explore:      'Video or audio guide for a movement activity tied to the story. MP4 or MP3.',
-  sing_along:        'Song learners sing along with. MP3, AAC, or MP4 video with lyrics matching the story theme.',
+  sing_along:        'Animated karaoke experience — video or audio with on-screen lyrics so children can sing along. MP4, MP3, or AAC.',
   bonus_video:       'Extra video content — behind the scenes, author note, or cultural deep-dive. MP4.',
   challenge_1:       'Weekly Challenge 1 prompt — video or image showing what the child should do. MP4 or JPG.',
   challenge_2:       'Weekly Challenge 2 prompt — video or image showing what the child should do. MP4 or JPG.',
