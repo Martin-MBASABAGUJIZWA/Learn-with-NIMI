@@ -565,10 +565,33 @@ export default function StoryEditor({ story, onSaved, onDeleted, defaultLang, on
     }
   }
 
+  const getOrCreateSlot = async (slotKey: string): Promise<SlotData | undefined> => {
+    const existing = slots.find(s => s.slot_key === slotKey)
+    if (existing) return existing
+    const meta = SLOT_META[slotKey as SlotKey]
+    // 1. Create the mission row
+    const { data: mission, error: mErr } = await supabase
+      .from('missions')
+      .insert({ title: meta.label, type: slotKey, status: 'draft' })
+      .select('id').single()
+    if (mErr || !mission) { toastErr(`Could not create mission: ${mErr?.message}`); return }
+    // 2. Derive sort order from the SLOT_KEYS index
+    const sortOrder = SLOT_KEYS.indexOf(slotKey as SlotKey)
+    // 3. Create the story_slots row
+    const { data: slotRow, error: sErr } = await supabase
+      .from('story_slots')
+      .insert({ story_id: story.id, slot_key: slotKey, mission_id: mission.id, sort_order: sortOrder })
+      .select('story_id, slot_key, mission_id, sort_order').single()
+    if (sErr || !slotRow) { toastErr(`Could not create slot: ${sErr?.message}`); return }
+    setSlots(prev => [...prev, slotRow as SlotData])
+    return slotRow as SlotData
+  }
+
   const getOrCreateMissionVersion = async (slotKey: string, lang: Lang): Promise<string | undefined> => {
     const existing = (missionVersions[slotKey] ?? []).find(v => v.language === lang)
     if (existing) return existing.id
-    const slot = slots.find(s => s.slot_key === slotKey)
+    // Auto-create slot if missing
+    const slot = slots.find(s => s.slot_key === slotKey) ?? await getOrCreateSlot(slotKey)
     if (!slot?.mission_id) return
     const meta = SLOT_META[slotKey as SlotKey]
     const { data, error } = await supabase.from('mission_versions')
@@ -1186,20 +1209,10 @@ export default function StoryEditor({ story, onSaved, onDeleted, defaultLang, on
                     />
                   </div>
                 ) : (
-                  <div className="flex items-center justify-between gap-3 bg-amber-50 rounded-lg px-3 py-2.5">
-                    <p className="text-[12px] text-amber-700 flex items-center gap-1.5">
-                      <AlertCircle size={14} /> Slot not configured
-                    </p>
-                    {onNavigate && (
-                      <button
-                        type="button"
-                        onClick={() => onNavigate(`story_slots:${story.id}`)}
-                        className="text-[11px] font-bold text-amber-700 underline hover:text-amber-900 whitespace-nowrap"
-                      >
-                        Fix in Story Slots →
-                      </button>
-                    )}
-                  </div>
+                  <SetUpSlotButton slotKey={slotKey} label={meta.label} onSetUp={async () => {
+                    await getOrCreateSlot(slotKey)
+                    await loadContent()
+                  }} />
                 )}
               </div>
               </React.Fragment>
@@ -1450,6 +1463,37 @@ export default function StoryEditor({ story, onSaved, onDeleted, defaultLang, on
           )}
         </div>
       </div>
+    </div>
+  )
+}
+
+/* ── Set Up Slot button — auto-creates mission + story_slot in one click ── */
+function SetUpSlotButton({ slotKey, label, onSetUp }: { slotKey: string; label: string; onSetUp: () => Promise<void> }) {
+  const [busy, setBusy] = useState(false)
+  const [done, setDone] = useState(false)
+  const { error: toastErr } = useToast()
+  const handle = async () => {
+    setBusy(true)
+    try { await onSetUp(); setDone(true) }
+    catch (err) { toastErr(err instanceof Error ? err.message : 'Setup failed') }
+    finally { setBusy(false) }
+  }
+  if (done) return (
+    <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3">
+      <CheckCircle2 size={15} className="text-emerald-500 shrink-0" />
+      <span className="text-[12px] font-bold text-emerald-700">Mission slot created — upload your file above.</span>
+    </div>
+  )
+  return (
+    <div className="rounded-xl bg-gray-50 border border-dashed border-gray-200 px-4 py-4 flex items-center justify-between gap-3">
+      <div>
+        <p className="text-[12px] font-bold text-gray-700">Mission not set up yet</p>
+        <p className="text-[11px] text-gray-400 mt-0.5">{label} has no slot — click to initialise it for this story.</p>
+      </div>
+      <button type="button" onClick={handle} disabled={busy}
+        className="flex items-center gap-1.5 text-[12px] font-bold bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-xl transition shrink-0 disabled:opacity-50">
+        {busy ? <><div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" /> Setting up…</> : <><Plus size={13} /> Set Up Mission</>}
+      </button>
     </div>
   )
 }
