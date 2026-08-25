@@ -23,7 +23,7 @@ import {
 
 interface MissionVersionData {
   id: string; language: string; title: string; subtitle: string | null;
-  media_url: string | null; status: string; published: boolean;
+  tip_text: string | null; media_url: string | null; status: string; published: boolean;
 }
 
 interface FlipFlopPage {
@@ -100,6 +100,44 @@ function AutoSaveInput({ label, value, onSave }: { label: string; value: string;
       </div>
       <input type="text" value={val} onChange={e => handleChange(e.target.value)}
         className={`w-full border rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 text-[13px] sm:text-[14px] font-medium text-gray-800 focus:outline-none transition ${
+          saveErr ? 'border-red-300 focus:border-red-400' : 'border-gray-200 focus:border-green-400'
+        }`} />
+    </div>
+  )
+}
+
+/* ── Auto-save textarea ── */
+function AutoSaveTextarea({ label, value, placeholder, rows = 3, onSave }: {
+  label: string; value: string; placeholder?: string; rows?: number
+  onSave: (v: string) => Promise<void>
+}) {
+  const [val, setVal] = useState(value)
+  const [saved, setSaved] = useState(false)
+  const [saveErr, setSaveErr] = useState<string | null>(null)
+  const timer = useRef<ReturnType<typeof setTimeout>>(undefined)
+  const save = useCallback(async (v: string) => {
+    try {
+      await onSave(v)
+      setSaved(true); setSaveErr(null)
+      setTimeout(() => setSaved(false), 1500)
+    } catch (err) { setSaveErr(err instanceof Error ? err.message : 'Save failed') }
+  }, [onSave])
+  useEffect(() => () => { if (timer.current) clearTimeout(timer.current) }, [])
+  const handleChange = (v: string) => {
+    setVal(v); setSaveErr(null)
+    if (timer.current) clearTimeout(timer.current)
+    timer.current = setTimeout(() => save(v), 800)
+  }
+  return (
+    <div>
+      <div className="flex items-center gap-2 mb-1.5">
+        <label className="text-[12px] font-bold text-gray-500">{label}</label>
+        {saved   && <span className="text-[10px] text-emerald-500 font-bold flex items-center gap-0.5"><CheckCircle2 size={10} /> Saved</span>}
+        {saveErr && <span className="text-[10px] text-red-500 font-bold truncate max-w-[180px]">{saveErr}</span>}
+      </div>
+      <textarea rows={rows} value={val} placeholder={placeholder}
+        onChange={e => handleChange(e.target.value)}
+        className={`w-full border rounded-xl px-3 py-2.5 text-[13px] font-medium text-gray-800 focus:outline-none transition resize-none ${
           saveErr ? 'border-red-300 focus:border-red-400' : 'border-gray-200 focus:border-green-400'
         }`} />
     </div>
@@ -357,6 +395,17 @@ function FileUploader({ label, url, accept, bucket, pathPrefix, dbSave, onDone, 
 }
 
 const REQUIRED_STORY_FIELDS = new Set(['title', 'slug'])
+
+const MISSION_NUMS: Record<string, number> = {
+  story_pdf: 2, move_explore: 4, sing_along: 5, bonus_video: 6,
+  challenge_1: 7, challenge_2: 8, challenge_3: 9, destination_video: 10,
+}
+
+const ATTITUDE_PRESETS: Record<string, string[]> = {
+  en: ['CURIOUS', 'BRAVE', 'CREATIVE', 'BRILLIANT', 'KIND', 'DETERMINED', 'EXTRAORDINARY', 'RESILIENT'],
+  fr: ['SUPER CURIEUX', 'COURAGEUX', 'CRÉATIF', 'BRILLANT', 'BIENVEILLANT', 'PERSÉVÉRANT', 'EXTRAORDINAIRE', 'DÉTERMINÉ'],
+  kr: ['호기심 많은', '용감한', '창의적인', '똑똑한', '친절한', '끈기 있는', '특별한', '결연한'],
+}
 
 /* ── Main Editor ── */
 export default function StoryEditor({ story, onSaved, onDeleted, defaultLang, onNavigate }: StoryEditorProps) {
@@ -772,7 +821,7 @@ export default function StoryEditor({ story, onSaved, onDeleted, defaultLang, on
         <div className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-[1fr_200px] lg:grid-cols-[1fr_240px] gap-4 sm:gap-5">
             <div className="space-y-4 order-2 sm:order-1">
-              <AutoSaveInput label="Story Title" value={story.title} onSave={v => saveField('title', v)} />
+              <AutoSaveInput key={`story-title-${story.id}`} label="Story Title" value={story.title} onSave={v => saveField('title', v)} />
               <SlugInput storyId={story.id} initialSlug={story.slug} titleHint={story.title} onSaved={onSaved} />
               <AutoSaveInput label="Tagline" value={story.theme_title ?? ''} onSave={v => saveField('theme_title', v)} />
               {/* Airways attitude — badge text awarded when this story is completed */}
@@ -780,8 +829,11 @@ export default function StoryEditor({ story, onSaved, onDeleted, defaultLang, on
                 <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wide mb-1.5">
                   ✈️ Airways Attitude
                 </label>
+                <p className="text-[10px] text-gray-400 mb-2">
+                  Shown on the child&apos;s passport stamp badge. Pick a preset for <strong>{LANGUAGE_META[activeLang].label}</strong> or type a custom value.
+                </p>
                 <div className="flex gap-2 flex-wrap mb-1.5">
-                  {['SUPER CURIEUX', 'COURAGEUX', 'CRÉATIF', 'BRILLANT', 'BIENVEILLANT', 'PERSÉVÉRANT', 'EXTRAORDINAIRE', 'DÉTERMINÉ'].map(a => (
+                  {ATTITUDE_PRESETS[activeLang].map(a => (
                     <button key={a} type="button"
                       onClick={() => saveField('attitude', a)}
                       className={`px-2 py-0.5 text-[10px] font-black rounded-full border transition ${
@@ -793,8 +845,7 @@ export default function StoryEditor({ story, onSaved, onDeleted, defaultLang, on
                     </button>
                   ))}
                 </div>
-                <AutoSaveInput label="Custom attitude" value={story.attitude ?? ''} onSave={v => saveField('attitude', v)} />
-                <p className="text-[10px] text-gray-400 mt-1">Shown on the attitude badge in the child&apos;s passport. ALL CAPS recommended.</p>
+                <AutoSaveInput key={`attitude-${story.id}`} label="Custom attitude (or edit the preset above)" value={story.attitude ?? ''} onSave={v => saveField('attitude', v)} />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <AutoSaveInput label="Age Min" value={String(story.age_min ?? '')} onSave={v => saveField('age_min', v)} />
@@ -847,24 +898,48 @@ export default function StoryEditor({ story, onSaved, onDeleted, defaultLang, on
       </Section>
 
       {/* 2. Story Metadata — per language */}
-      <Section number={2} title={`Story Text — ${LANGUAGE_META[activeLang].label}`} subtitle="Title and description for this language" done={!!(versionRecord?.title)}>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <AutoSaveInput
-            key={`title-${activeLang}`}
-            label={`Title (${LANGUAGE_META[activeLang].label})`}
-            value={(versionRecord?.title as string) ?? story.title}
+      <Section number={2} title={`Story Text — ${LANGUAGE_META[activeLang].label}`} subtitle="Title, description, excerpt and learning goal for this language" done={!!(versionRecord?.title)}>
+        <div className="space-y-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <AutoSaveInput
+              key={`title-${activeLang}`}
+              label={`Title (${LANGUAGE_META[activeLang].label})`}
+              value={(versionRecord?.title as string) ?? story.title}
+              onSave={async (v) => {
+                const vid = await getOrCreateVersion(activeLang)
+                if (vid) { await supabase.from('story_versions').update({ title: v }).eq('id', vid); await loadContent() }
+              }}
+            />
+            <AutoSaveInput
+              key={`desc-${activeLang}`}
+              label={`Description (${LANGUAGE_META[activeLang].label})`}
+              value={(versionRecord?.description as string) ?? ''}
+              onSave={async (v) => {
+                const vid = await getOrCreateVersion(activeLang)
+                if (vid) { await supabase.from('story_versions').update({ description: v || null }).eq('id', vid); await loadContent() }
+              }}
+            />
+          </div>
+          <AutoSaveTextarea
+            key={`excerpt-${activeLang}`}
+            label={`Short Excerpt — ${LANGUAGE_META[activeLang].label}`}
+            rows={2}
+            value={(versionRecord?.excerpt as string) ?? ''}
+            placeholder="One-sentence teaser shown on social share cards and story PDFs…"
             onSave={async (v) => {
               const vid = await getOrCreateVersion(activeLang)
-              if (vid) { await supabase.from('story_versions').update({ title: v }).eq('id', vid); await loadContent() }
+              if (vid) { await supabase.from('story_versions').update({ excerpt: v || null }).eq('id', vid); await loadContent() }
             }}
           />
-          <AutoSaveInput
-            key={`desc-${activeLang}`}
-            label={`Description (${LANGUAGE_META[activeLang].label})`}
-            value={(versionRecord?.description as string) ?? ''}
+          <AutoSaveTextarea
+            key={`objective-${activeLang}`}
+            label={`Learning Objective — ${LANGUAGE_META[activeLang].label}`}
+            rows={2}
+            value={(versionRecord?.learning_objective as string) ?? ''}
+            placeholder="What the child learns or discovers from this story…"
             onSave={async (v) => {
               const vid = await getOrCreateVersion(activeLang)
-              if (vid) { await supabase.from('story_versions').update({ description: v || null }).eq('id', vid); await loadContent() }
+              if (vid) { await supabase.from('story_versions').update({ learning_objective: v || null }).eq('id', vid); await loadContent() }
             }}
           />
         </div>
@@ -967,35 +1042,103 @@ export default function StoryEditor({ story, onSaved, onDeleted, defaultLang, on
                 <span className="text-[12px] font-bold">Import Coloring Templates</span>
               </button>
             )}
+            {/* Localized text for Coloring mission — same per-language system as other missions */}
+            {(() => {
+              const coloringSlot = slots.find((s: SlotData) => s.slot_key === 'coloring')
+              const coloringLangVer = langMissionVer('coloring')
+              if (!coloringSlot) return null
+              return (
+                <div className="mt-3 pt-3 border-t border-gray-100 space-y-2.5">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Coloring Mission Text — {LANGUAGE_META[activeLang].label}</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    <AutoSaveInput
+                      key={`coloring-title-${activeLang}`}
+                      label={`Title (${LANGUAGE_META[activeLang].label})`}
+                      value={coloringLangVer?.title ?? 'Coloring Activity'}
+                      onSave={async (v) => {
+                        let vid = coloringLangVer?.id
+                        if (!vid) vid = await getOrCreateMissionVersion('coloring', activeLang)
+                        if (vid) { await supabase.from('mission_versions').update({ title: v }).eq('id', vid); await reloadMissionVersions('coloring') }
+                      }}
+                    />
+                    <AutoSaveInput
+                      key={`coloring-subtitle-${activeLang}`}
+                      label={`Subtitle (${LANGUAGE_META[activeLang].label})`}
+                      value={coloringLangVer?.subtitle ?? ''}
+                      onSave={async (v) => {
+                        let vid = coloringLangVer?.id
+                        if (!vid) vid = await getOrCreateMissionVersion('coloring', activeLang)
+                        if (vid) { await supabase.from('mission_versions').update({ subtitle: v || null }).eq('id', vid); await reloadMissionVersions('coloring') }
+                      }}
+                    />
+                  </div>
+                  <AutoSaveTextarea
+                    key={`coloring-tip-${activeLang}`}
+                    label="Teaching Tip (optional)"
+                    rows={2}
+                    value={coloringLangVer?.tip_text ?? ''}
+                    placeholder="e.g. Ask the child to name the colours as they colour each section."
+                    onSave={async (v) => {
+                      let vid = coloringLangVer?.id
+                      if (!vid) vid = await getOrCreateMissionVersion('coloring', activeLang)
+                      if (vid) { await supabase.from('mission_versions').update({ tip_text: v || null }).eq('id', vid); await reloadMissionVersions('coloring') }
+                    }}
+                  />
+                </div>
+              )
+            })()}
           </div>
 
           {/* Single-file missions: PDF, Move, Karaoke, Bonus Video, Challenges, Destination */}
-          {(['story_pdf', 'move_explore', 'sing_along', 'bonus_video', 'challenge_1', 'challenge_2', 'challenge_3', 'destination_video'] as SlotKey[]).map((slotKey, i) => {
+          {(['story_pdf', 'move_explore', 'sing_along', 'bonus_video', 'challenge_1', 'challenge_2', 'challenge_3', 'destination_video'] as SlotKey[]).map((slotKey) => {
             const meta = SLOT_META[slotKey]
             const slot = slots.find((s: SlotData) => s.slot_key === slotKey)
             const langVer = langMissionVer(slotKey)
             const Icon = MISSION_ICONS[slotKey] ?? BookOpen
             const color = MISSION_COLORS[slotKey] ?? 'bg-gray-100 text-gray-600'
             const accept = MISSION_ACCEPT[slotKey] ?? '*/*'
-            const MISSION_NUMS: Record<string, number> = { story_pdf: 2, move_explore: 4, sing_along: 5, bonus_video: 6, challenge_1: 7, challenge_2: 8, challenge_3: 9, destination_video: 10 }
             const missionNum = MISSION_NUMS[slotKey] ?? 0
             const isGroupHeader = slotKey === 'challenge_1' || slotKey === 'destination_video'
+
+            const isChallenge = ['challenge_1', 'challenge_2', 'challenge_3'].includes(slotKey)
+            const isDestination = slotKey === 'destination_video'
+            const challengeWeek = isChallenge ? parseInt(slotKey.split('_')[1]) : 0
+
+            const cardBorder = isChallenge
+              ? (langVer?.media_url ? 'border-yellow-300 bg-yellow-50/40' : 'border-yellow-200 bg-yellow-50/20')
+              : isDestination
+              ? (langVer?.media_url ? 'border-teal-300 bg-teal-50/40' : 'border-teal-200 bg-teal-50/20')
+              : (langVer?.media_url ? 'border-emerald-200 bg-emerald-50/20' : 'border-gray-200')
+
+            const tipLabel = isChallenge
+              ? 'Challenge Brief — what should the child do this week?'
+              : isDestination
+              ? 'Destination Teaser — one-line preview of the next adventure'
+              : 'Teaching Tip (optional)'
 
             return (
               <React.Fragment key={slotKey}>
                 {isGroupHeader && (
                   <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 pt-1">
-                    {slotKey === 'challenge_1' ? 'Weekly Challenges' : 'Destination'}
+                    {isChallenge ? '🏆 Weekly Challenges' : '✈️ Destination'}
                   </p>
                 )}
-              <div className={`rounded-xl border p-4 ${langVer?.media_url ? 'border-emerald-200 bg-emerald-50/20' : 'border-gray-200'}`}>
+              <div className={`rounded-xl border p-4 ${cardBorder}`}>
                 <div className="flex items-center gap-3 mb-3">
-                  <div className={`w-10 h-10 rounded-xl ${color} flex items-center justify-center shrink-0`}><Icon size={18} /></div>
+                  {isChallenge ? (
+                    <div className="w-10 h-10 rounded-xl bg-yellow-400 flex items-center justify-center shrink-0 text-white font-black text-[15px] shadow-sm">
+                      {challengeWeek}
+                    </div>
+                  ) : (
+                    <div className={`w-10 h-10 rounded-xl ${isDestination ? 'bg-teal-100 text-teal-700' : color} flex items-center justify-center shrink-0`}><Icon size={18} /></div>
+                  )}
                   <div className="flex-1 min-w-0">
-                    <span className="text-[10px] font-bold text-gray-400">Mission {missionNum}</span>
+                    <span className={`text-[10px] font-bold ${isChallenge ? 'text-yellow-600' : isDestination ? 'text-teal-600' : 'text-gray-400'}`}>
+                      {isChallenge ? `Week ${challengeWeek} Challenge · Mission ${missionNum}` : `Mission ${missionNum}`}
+                    </span>
                     <p className="text-[14px] font-bold text-gray-800">{meta.label}</p>
                   </div>
-                  {langVer?.media_url && <CheckCircle2 size={16} className="text-emerald-500" />}
+                  {langVer?.media_url && <CheckCircle2 size={16} className={isChallenge ? 'text-yellow-500' : isDestination ? 'text-teal-500' : 'text-emerald-500'} />}
                 </div>
                 {slot ? (
                   <div className="space-y-3">
@@ -1029,6 +1172,18 @@ export default function StoryEditor({ story, onSaved, onDeleted, defaultLang, on
                         }}
                       />
                     </div>
+                    <AutoSaveTextarea
+                      key={`mv-tip-${slotKey}-${activeLang}`}
+                      label={tipLabel}
+                      rows={isChallenge ? 3 : 2}
+                      value={langVer?.tip_text ?? ''}
+                      placeholder={isChallenge ? 'e.g. Draw a picture of your favourite animal and show it to a family member!' : isDestination ? 'e.g. Next stop: the deep ocean…' : 'e.g. Pause here and ask the child what sound the letter makes.'}
+                      onSave={async (v) => {
+                        let vid = langVer?.id
+                        if (!vid) vid = await getOrCreateMissionVersion(slotKey, activeLang)
+                        if (vid) { await supabase.from('mission_versions').update({ tip_text: v || null }).eq('id', vid); await reloadMissionVersions(slotKey) }
+                      }}
+                    />
                   </div>
                 ) : (
                   <div className="flex items-center justify-between gap-3 bg-amber-50 rounded-lg px-3 py-2.5">
