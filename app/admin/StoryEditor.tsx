@@ -1209,10 +1209,12 @@ export default function StoryEditor({ story, onSaved, onDeleted, defaultLang, on
                     />
                   </div>
                 ) : (
-                  <SetUpSlotButton slotKey={slotKey} label={meta.label} onSetUp={async () => {
-                    await getOrCreateSlot(slotKey)
-                    await loadContent()
-                  }} />
+                  <div className="flex items-center gap-2.5 bg-gray-50 border border-dashed border-gray-200 rounded-xl px-4 py-3">
+                    <AlertCircle size={14} className="text-gray-400 shrink-0" />
+                    <p className="text-[12px] text-gray-500">
+                      This mission slot has not been configured for this story yet. Add it through the Story Slots section, then return here to upload content.
+                    </p>
+                  </div>
                 )}
               </div>
               </React.Fragment>
@@ -1467,36 +1469,6 @@ export default function StoryEditor({ story, onSaved, onDeleted, defaultLang, on
   )
 }
 
-/* ── Set Up Slot button — auto-creates mission + story_slot in one click ── */
-function SetUpSlotButton({ slotKey, label, onSetUp }: { slotKey: string; label: string; onSetUp: () => Promise<void> }) {
-  const [busy, setBusy] = useState(false)
-  const [done, setDone] = useState(false)
-  const { error: toastErr } = useToast()
-  const handle = async () => {
-    setBusy(true)
-    try { await onSetUp(); setDone(true) }
-    catch (err) { toastErr(err instanceof Error ? err.message : 'Setup failed') }
-    finally { setBusy(false) }
-  }
-  if (done) return (
-    <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3">
-      <CheckCircle2 size={15} className="text-emerald-500 shrink-0" />
-      <span className="text-[12px] font-bold text-emerald-700">Mission slot created — upload your file above.</span>
-    </div>
-  )
-  return (
-    <div className="rounded-xl bg-gray-50 border border-dashed border-gray-200 px-4 py-4 flex items-center justify-between gap-3">
-      <div>
-        <p className="text-[12px] font-bold text-gray-700">Mission not set up yet</p>
-        <p className="text-[11px] text-gray-400 mt-0.5">{label} has no slot — click to initialise it for this story.</p>
-      </div>
-      <button type="button" onClick={handle} disabled={busy}
-        className="flex items-center gap-1.5 text-[12px] font-bold bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-xl transition shrink-0 disabled:opacity-50">
-        {busy ? <><div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" /> Setting up…</> : <><Plus size={13} /> Set Up Mission</>}
-      </button>
-    </div>
-  )
-}
 
 function Section({ number, title, subtitle, done, badge, children }: {
   number: number; title: string; subtitle: string; done: boolean; badge?: string; children: React.ReactNode
