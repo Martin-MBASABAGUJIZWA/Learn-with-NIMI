@@ -1120,53 +1120,51 @@ export default function StoryDetailPage() {
             {/* ═══════════════════════════════════════════ */}
             {phase === "missions" && (
               <motion.div key="missions" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                className="flex-1 flex flex-col pb-28 relative">
+                className="flex-1 flex flex-col pb-28 relative" style={{ background: '#06101F' }}>
 
-                {/* Tweak 5: Cover image as faded background */}
-                {details?.cover_url && (
-                  <div className="absolute inset-0 z-0 overflow-hidden">
-                    <Image src={getStorageUrl(details.cover_url)} alt="" fill className="object-cover opacity-[0.06] blur-sm scale-110" />
-                  </div>
-                )}
+                {/* Airways starfield background */}
+                <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+                  {Array.from({ length: 44 }).map((_, si) => (
+                    <div key={si} style={{ position: 'absolute', left: `${((si * 137.5) % 100).toFixed(1)}%`, top: `${((si * 61.8) % 100).toFixed(1)}%`, width: si % 6 === 0 ? 2 : 1, height: si % 6 === 0 ? 2 : 1, borderRadius: '50%', background: '#F0E8D5', opacity: 0.03 + (si % 4) * 0.025 }} />
+                  ))}
+                  <div style={{ position: 'absolute', top: '15%', left: '50%', transform: 'translateX(-50%)', width: 320, height: 320, borderRadius: '50%', background: 'radial-gradient(circle, rgba(201,168,76,0.05) 0%, transparent 70%)', pointerEvents: 'none' }} />
+                  <div style={{ position: 'absolute', bottom: '10%', left: '30%', width: 200, height: 200, borderRadius: '50%', background: 'radial-gradient(circle, rgba(59,130,246,0.04) 0%, transparent 70%)', pointerEvents: 'none' }} />
+                </div>
 
                 {/* Top bar */}
                 <div className="flex items-center justify-between px-5 py-4 relative z-10">
-                  <button onClick={() => setPhase("welcome")} className="w-11 h-11 bg-[var(--ds-surface-card-active)] rounded-full flex items-center justify-center text-[var(--ds-text-primary)]">
+                  <button onClick={() => setPhase("welcome")} className="w-11 h-11 rounded-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.08)', border: '1.5px solid rgba(255,255,255,0.1)', color: '#F0E8D5' }}>
                     <ArrowLeft className="w-5 h-5" />
                   </button>
-                  {/* Tweak 4: Star count with bounce */}
                   <div className="flex items-center gap-2">
                     {streak > 0 && (
-                      <div className="flex items-center gap-1 bg-orange-50 border border-orange-200 rounded-full px-3 py-1.5">
+                      <div className="flex items-center gap-1 rounded-full px-3 py-1.5" style={{ background: 'rgba(251,146,60,0.14)', border: '1px solid rgba(251,146,60,0.22)' }}>
                         <motion.span animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 1.5, repeat: Infinity }}>🔥</motion.span>
-                        <span className="font-baloo font-black text-orange-600 text-sml">{streak}</span>
+                        <span className="font-baloo font-black text-sml" style={{ color: '#FCA17D' }}>{streak}</span>
                       </div>
                     )}
                     <motion.div
                       initial={{ scale: 1 }} animate={{ scale: [1, 1.15, 1] }}
                       transition={{ duration: DURATION.slow, delay: DURATION.base }}
-                      className="flex items-center gap-1.5 bg-gradient-to-r from-yellow-500/20 to-amber-500/10 rounded-full px-4 py-2 border border-yellow-400/25 shadow-lg shadow-yellow-500/10">
+                      className="flex items-center gap-1.5 rounded-full px-4 py-2" style={{ background: 'rgba(201,168,76,0.12)', border: '1px solid rgba(201,168,76,0.28)', boxShadow: '0 4px 16px rgba(201,168,76,0.1)' }}>
                       <motion.div animate={{ rotate: [0, 15, -15, 0] }} transition={{ duration: DURATION.loopBase, repeat: Infinity }}>
-                        <Star className="w-5 h-5 text-yellow-400 fill-yellow-400" />
+                        <Star className="w-5 h-5" style={{ color: '#F5C842', fill: '#F5C842' } as React.CSSProperties} />
                       </motion.div>
-                      <span className="font-baloo font-black text-yellow-600 text-base">{totalStars}</span>
+                      <span className="font-baloo font-black text-base" style={{ color: '#F5C842' }}>{totalStars}</span>
                     </motion.div>
                   </div>
                 </div>
 
-                <div className="mx-5 mb-4 leaf border border-white/70 bg-[var(--ds-surface-card)]/85 p-4 shadow-card-2xl backdrop-blur relative z-10">
+                <div className="mx-5 mb-4 leaf p-4 relative z-10" style={{ background: 'rgba(14,30,58,0.92)', border: '1.5px solid rgba(201,168,76,0.2)', boxShadow: '0 8px 32px rgba(0,0,0,0.35)' }}>
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <p className="font-baloo font-black text-mbase text-ds-text">{t("storyAdventureBegins")}</p>
-                      <p className="text-xs text-[var(--ds-text-secondary)] mt-0.5">{doneCount} / {totalCount} · {totalStars} ⭐</p>
+                      <p className="font-baloo font-black text-mbase" style={{ color: '#F0E8D5' }}>{t("storyAdventureBegins")}</p>
+                      <p className="text-xs mt-0.5" style={{ color: 'rgba(240,232,213,0.45)' }}>{doneCount} / {totalCount} · {totalStars} ⭐</p>
                     </div>
                     {(() => {
-                      const nb = nextMission ? (SLOT_BADGE[nextMission.slot_key] ?? { bg: "bg-[var(--ds-brand-subtle)]", text: "text-[var(--ds-text-brand)]", border: "border-[var(--ds-border-brand)]" }) : null;
                       const ne = nextMission ? (MISSION_META[nextMission.slot_key]?.emoji ?? "⭐") : null;
                       return (
-                        <div className={`rounded-full border px-3 py-1.5 text-2xs font-black whitespace-nowrap ${
-                          nb ? `${nb.bg} ${nb.text} ${nb.border}` : "bg-[var(--ds-brand-subtle)] text-[var(--ds-text-brand)] border-[var(--ds-border-brand)]"
-                        }`}>
+                        <div className="rounded-full px-3 py-1.5 text-2xs font-black whitespace-nowrap" style={{ background: 'rgba(201,168,76,0.15)', border: '1px solid rgba(201,168,76,0.3)', color: '#F5C842' }}>
                           {nextMission
                             ? `${ne} Next: ${nextMission.title || t(MISSION_META[nextMission.slot_key]?.tKey ?? "storyMissionGo")}`
                             : "All done ✨"}
@@ -1189,219 +1187,235 @@ export default function StoryDetailPage() {
                     {/* Speech bubble */}
                     <motion.div initial={{ opacity: 0, scale: 0.5, y: 5 }} animate={{ opacity: 1, scale: 1, y: 0 }}
                       transition={{ delay: DURATION.moderate, ...SPRING.card }}
-                      className="absolute -right-28 top-1 bg-[var(--ds-surface-card)] px-3 py-1.5 shadow-lg min-w-[100px]" style={{ borderRadius: 'var(--leaf-r)' }}>
-                      <p className="font-baloo font-bold text-ds-text text-2xs whitespace-nowrap">
+                      className="absolute -right-28 top-1 px-3 py-1.5 shadow-lg min-w-[100px]" style={{ borderRadius: 'var(--leaf-r)', background: '#0E1E3A', border: '1.5px solid rgba(255,255,255,0.09)' }}>
+                      <p className="font-baloo font-bold text-2xs whitespace-nowrap" style={{ color: '#F0E8D5' }}>
                         {doneCount === 0 ? t("storyBubbleLetsGo") : doneCount < totalCount / 2 ? t("storyBubbleGreatStart") : doneCount < totalCount ? t("storyBubbleAlmostThere") : t("storyBubbleYouDidIt")}
                       </p>
-                      <div className="absolute left-[-6px] top-3 w-3 h-3 bg-[var(--ds-surface-card)] rotate-45" />
+                      <div className="absolute left-[-6px] top-3 w-3 h-3 rotate-45" style={{ background: '#0E1E3A' }} />
                     </motion.div>
                   </div>
                 </div>
 
-                {/* ═══ WINDING ADVENTURE MAP ═══ */}
-                <div className="px-5 flex-1 relative z-10">
-
-                  {/* Terrain decorations — scattered along the path */}
-                  {[
-                    { emoji: "🌳", x: "85%", top: "5%", size: 22, opacity: 0.15 },
-                    { emoji: "🌿", x: "10%", top: "15%", size: 18, opacity: 0.12 },
-                    { emoji: "🍄", x: "90%", top: "30%", size: 16, opacity: 0.1 },
-                    { emoji: "🌸", x: "5%", top: "45%", size: 14, opacity: 0.12 },
-                    { emoji: "🦋", x: "88%", top: "55%", size: 16, opacity: 0.15 },
-                    { emoji: "🌻", x: "8%", top: "70%", size: 18, opacity: 0.1 },
-                    { emoji: "🌲", x: "92%", top: "80%", size: 20, opacity: 0.12 },
-                    { emoji: "⭐", x: "15%", top: "88%", size: 12, opacity: 0.08 },
-                  ].map((d, i) => (
-                    <motion.span key={i} className="absolute pointer-events-none select-none"
-                      style={{ left: d.x, top: d.top, fontSize: d.size, opacity: d.opacity }}
-                      animate={{ y: [0, -3, 0], rotate: [0, i % 2 === 0 ? 5 : -5, 0] }}
-                      transition={{ duration: DURATION.loopFloat + i * 0.5, repeat: Infinity, delay: i * 0.3 }}>
-                      {d.emoji}
-                    </motion.span>
-                  ))}
+                {/* ═══ AIRWAYS MISSION PATH ═══ */}
+                <div className="px-4 flex-1 relative z-10 flex flex-col">
 
                   {slots.map((slot, i) => {
                     const metaBase = MISSION_META[slot.slot_key] ?? { emoji: "📌", tKey: slot.slot_key, actionKey: "storyMissionGo" };
-                    const missionColor = v.contentGradients.missionPath[slot.slot_key] ?? "from-gray-500 to-gray-600";
-                    const meta = { ...metaBase, color: missionColor };
                     const isNext = !slot.completed && (i === 0 || slots[i - 1]?.completed);
                     const isLocked = !slot.completed && !isNext;
-                    const isEven = i % 2 === 0;
+                    const isChallenge = slot.slot_key.startsWith('challenge_');
+                    const challengeWeek = isChallenge ? slot.slot_key.split('_')[1] : null;
+                    const isDestination = slot.slot_key === 'destination_video';
+
+                    type CardTheme = { bg: string; border: string; shadow: string; orbBg: string; orbGlow: string; eye: string };
+                    const CARD_THEMES: Record<string, CardTheme> = {
+                      flipflop_audio:    { bg: 'linear-gradient(135deg,#1A2F58 0%,#0E1E3A 100%)', border: 'rgba(96,165,250,0.35)',   shadow: 'rgba(59,130,246,0.22)',  orbBg: 'linear-gradient(135deg,#3B82F6,#1D4ED8)',  orbGlow: 'rgba(59,130,246,0.55)',  eye: '#93C5FD'  },
+                      story_pdf:         { bg: 'linear-gradient(135deg,#2D1A06 0%,#1A1006 100%)', border: 'rgba(251,146,60,0.35)',   shadow: 'rgba(234,88,12,0.22)',   orbBg: 'linear-gradient(135deg,#F97316,#C2410C)',  orbGlow: 'rgba(249,115,22,0.55)', eye: '#FCA17D'  },
+                      coloring:          { bg: 'linear-gradient(135deg,#2D0A2A 0%,#1A0618 100%)', border: 'rgba(232,121,249,0.35)',  shadow: 'rgba(192,38,211,0.22)',  orbBg: 'linear-gradient(135deg,#E879F9,#A21CAF)',  orbGlow: 'rgba(232,121,249,0.55)', eye: '#F0ABFC'  },
+                      move_explore:      { bg: 'linear-gradient(135deg,#062218 0%,#03140E 100%)', border: 'rgba(52,211,153,0.35)',   shadow: 'rgba(16,185,129,0.22)',  orbBg: 'linear-gradient(135deg,#34D399,#047857)',  orbGlow: 'rgba(52,211,153,0.55)',  eye: '#6EE7B7'  },
+                      sing_along:        { bg: 'linear-gradient(135deg,#1E0A38 0%,#110520 100%)', border: 'rgba(167,139,250,0.35)',  shadow: 'rgba(124,58,237,0.22)',  orbBg: 'linear-gradient(135deg,#A78BFA,#6D28D9)',  orbGlow: 'rgba(167,139,250,0.55)', eye: '#C4B5FD'  },
+                      bonus_video:       { bg: 'linear-gradient(135deg,#2A0A10 0%,#180508 100%)', border: 'rgba(251,113,133,0.35)',  shadow: 'rgba(225,29,72,0.22)',   orbBg: 'linear-gradient(135deg,#FB7185,#BE123C)',  orbGlow: 'rgba(251,113,133,0.55)', eye: '#FCA5A5'  },
+                      challenge_1:       { bg: 'linear-gradient(135deg,#241800 0%,#150E00 100%)', border: 'rgba(253,224,71,0.4)',    shadow: 'rgba(202,138,4,0.28)',   orbBg: 'linear-gradient(135deg,#FDE047,#B45309)',  orbGlow: 'rgba(253,224,71,0.6)',   eye: '#FDE047'  },
+                      challenge_2:       { bg: 'linear-gradient(135deg,#241800 0%,#150E00 100%)', border: 'rgba(253,224,71,0.4)',    shadow: 'rgba(202,138,4,0.28)',   orbBg: 'linear-gradient(135deg,#FDE047,#B45309)',  orbGlow: 'rgba(253,224,71,0.6)',   eye: '#FDE047'  },
+                      challenge_3:       { bg: 'linear-gradient(135deg,#241800 0%,#150E00 100%)', border: 'rgba(253,224,71,0.4)',    shadow: 'rgba(202,138,4,0.28)',   orbBg: 'linear-gradient(135deg,#FDE047,#B45309)',  orbGlow: 'rgba(253,224,71,0.6)',   eye: '#FDE047'  },
+                      destination_video: { bg: 'linear-gradient(135deg,#032430 0%,#011520 100%)', border: 'rgba(34,211,238,0.35)',   shadow: 'rgba(6,182,212,0.22)',   orbBg: 'linear-gradient(135deg,#22D3EE,#0E7490)',  orbGlow: 'rgba(34,211,238,0.55)',  eye: '#67E8F9'  },
+                    };
+                    const FALLBACK_THEME: CardTheme = { bg: 'linear-gradient(135deg,#1A2F58,#0E1E3A)', border: 'rgba(255,255,255,0.08)', shadow: 'rgba(0,0,0,0.2)', orbBg: 'linear-gradient(135deg,#4B5563,#1F2937)', orbGlow: 'rgba(0,0,0,0.3)', eye: '#9CA3AF' };
+                    const theme = CARD_THEMES[slot.slot_key] ?? FALLBACK_THEME;
+
+                    const cardBorder = isLocked ? 'rgba(255,255,255,0.04)' : isNext ? theme.border : theme.border.replace(/[\d.]+\)$/, '0.14)');
+                    const cardShadow = isLocked ? 'none' : isNext ? `0 8px 32px ${theme.shadow}, 0 0 0 1px ${theme.border}` : `0 4px 16px rgba(0,0,0,0.25)`;
+
+                    const showChallengeDivider = isChallenge && slot.slot_key === 'challenge_1';
+                    const showDestDivider = isDestination;
 
                     return (
-                      <div key={slot.slot_key} className="relative">
-                        {/* Curved path connector */}
-                        {i > 0 && (
-                          <svg className="w-full h-12 overflow-visible" viewBox="0 0 300 48" preserveAspectRatio="none">
-                            <defs>
-                              <filter id={`glow-${i}`}><feGaussianBlur stdDeviation="4" result="blur" /><feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge></filter>
-                            </defs>
-                            {/* Glow behind completed paths */}
-                            {slots[i-1]?.completed && (
-                              <path d={isEven ? "M 230 0 Q 150 48, 70 48" : "M 70 0 Q 150 48, 230 48"}
-                                fill="none" stroke="var(--ds-brand-primary)" strokeWidth="10" strokeLinecap="round" opacity="0.2" filter={`url(#glow-${i})`} />
-                            )}
-                            {/* Main path */}
-                            <path d={isEven ? "M 230 0 Q 150 48, 70 48" : "M 70 0 Q 150 48, 230 48"}
-                              fill="none" stroke={slots[i-1]?.completed ? "var(--ds-brand-primary)" : "rgba(0,0,0,0.1)"} strokeWidth="5" strokeLinecap="round"
-                              strokeDasharray={isLocked ? "10 10" : "none"} />
-                            {/* Footstep dots along completed paths */}
-                            {slots[i-1]?.completed && [0.2, 0.5, 0.8].map((t, j) => (
-                              <circle key={j} cx={isEven ? 230 - t * 160 : 70 + t * 160} cy={t * 48}
-                                r="3" fill="rgba(0,0,0,0.1)" opacity="1" />
-                            ))}
-                          </svg>
+                      <div key={slot.slot_key}>
+                        {/* Section dividers */}
+                        {(showChallengeDivider || showDestDivider) && (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 0 5px' }}>
+                            <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.06)' }} />
+                            <span style={{ fontSize: 9, fontWeight: 900, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(240,232,213,0.22)', whiteSpace: 'nowrap' }}>
+                              {showChallengeDivider ? '🏆 Weekly Challenges' : '✈️ Destination'}
+                            </span>
+                            <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.06)' }} />
+                          </div>
                         )}
 
-                        {/* Small terrain detail next to some nodes */}
-                        {i === 0 && <span className="absolute -left-2 top-4 text-sm opacity-10 pointer-events-none">🏕️</span>}
-                        {i === 2 && <span className="absolute -right-2 top-4 text-sm opacity-10 pointer-events-none">🌉</span>}
-                        {i === 4 && <span className="absolute -left-2 top-4 text-sm opacity-10 pointer-events-none">⛺</span>}
+                        {/* Connector stem between cards */}
+                        {i > 0 && (
+                          <div style={{ width: 3, height: showChallengeDivider || showDestDivider ? 5 : 18, margin: '0 auto', borderRadius: 2, background: slots[i - 1]?.completed ? 'linear-gradient(180deg,#C9A84C,#F5C842)' : 'rgba(255,255,255,0.07)' }} />
+                        )}
 
-                        {/* Mission node */}
-                        <motion.div
-                          initial={{ opacity: 0, scale: 0.5 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ delay: i * 0.1, ...SPRING.card }}
-                          className={`flex ${isEven ? "justify-start" : "justify-end"}`}>
+                        {/* Airways mission card */}
+                        <Link href={isLocked ? '#' : `/stories/${slug}/mission/${slot.slot_key}`}
+                          onClick={e => { if (isLocked) e.preventDefault(); }}
+                          style={{ display: 'block', textDecoration: 'none' }}>
+                          <motion.div
+                            initial={{ opacity: 0, y: 14 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: i * 0.07, type: 'spring', stiffness: 300, damping: 26 }}
+                            whileHover={!isLocked ? { y: -2, scale: 1.01 } : {}}
+                            whileTap={!isLocked ? { scale: 0.97 } : {}}
+                            style={{
+                              background: isLocked ? '#0B1826' : theme.bg,
+                              border: `2px solid ${cardBorder}`,
+                              boxShadow: cardShadow,
+                              borderRadius: 22,
+                              padding: '14px 14px 14px 13px',
+                              display: 'flex', alignItems: 'center', gap: 12,
+                              position: 'relative', overflow: 'hidden',
+                              opacity: isLocked ? 0.42 : 1,
+                              cursor: isLocked ? 'default' : 'pointer',
+                            }}>
 
-                          <Link href={isLocked ? "#" : `/stories/${slug}/mission/${slot.slot_key}`}
-                            onClick={e => { if (isLocked) e.preventDefault(); }}>
-                            <motion.div
-                              whileTap={!isLocked ? m.dangerPress : {}}
-                              className={`relative flex flex-col items-center gap-2 w-[128px] leaf border p-3 transition-all ${
-                                slot.completed
-                                  ? "border-[var(--ds-border-brand)] bg-[var(--ds-brand-subtle)]/80 shadow-[0_10px_24px_rgba(16,185,129,0.12)]"
-                                  : isNext
-                                    ? "border-amber-200 bg-[var(--ds-surface-card)]/90 shadow-[0_12px_28px_rgba(250,204,21,0.16)]"
-                                    : "border-white/70 bg-[var(--ds-surface-card)]/70 shadow-sm"
-                              }`}>
-                              <div className={`absolute inset-x-3 top-2 h-1 rounded-full ${slot.completed ? "bg-[var(--ds-brand-primary)]" : isNext ? "bg-amber-400" : "bg-slate-200"}`} />
+                            {/* Glass shimmer */}
+                            {!isLocked && (
+                              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.03) 50%, transparent 70%)', pointerEvents: 'none', borderRadius: 22 }} />
+                            )}
 
-                              {/* The big circle */}
-                              <motion.div
-                                animate={isNext ? {
-                                  boxShadow: ["0 0 0 0 rgba(250,204,21,0.4)", "0 0 0 16px rgba(250,204,21,0)", "0 0 0 0 rgba(250,204,21,0.4)"],
-                                } : {}}
-                                transition={{ duration: DURATION.loopBase, repeat: Infinity }}
-                                className={`relative w-[88px] h-[88px] rounded-full flex items-center justify-center transition-all ${
-                                  slot.completed
-                                    ? `bg-gradient-to-br ${meta.color} shadow-xl ring-4 ring-[var(--ds-brand-primary)]/40`
-                                    : isNext
-                                      ? `bg-gradient-to-br ${meta.color} shadow-2xl ring-4 ring-yellow-400/50`
-                                      : "bg-[var(--ds-surface-card)] border-2 border-ds-border"
-                                }`}>
-
-                                {/* Emoji or lock */}
-                                <motion.span className={`${isLocked ? "" : "drop-shadow-lg"}`}
-                                  animate={isNext ? { scale: [1, 1.15, 1], rotate: [0, -8, 8, 0] } : {}}
-                                  transition={{ duration: DURATION.loopSlow, repeat: Infinity }}
-                                  style={{ fontSize: isLocked ? 24 : 40 }}>
-                                  {isLocked ? "🔒" : meta.emoji}
-                                </motion.span>
-
-                                {/* Green check on completed */}
-                                {slot.completed && (
-                                  <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ ...SPRING.card, delay: DURATION.base }}
-                                    className="absolute -bottom-1 -right-1 w-8 h-8 bg-[var(--ds-brand-primary)] rounded-full flex items-center justify-center border-3 border-ds-border shadow-lg">
-                                    <CheckCircle2 className="w-5 h-5 text-[var(--ds-nav-bg)]" />
-                                  </motion.div>
-                                )}
-
-                                {/* Tweak 2: Sparkle confetti on completed */}
-                                {slot.completed && (
-                                  <>
-                                    <motion.span className="absolute -top-3 left-1 text-xs" animate={{ opacity: [0, 1, 0], y: [0, -8, 0], rotate: [0, 180, 360] }} transition={{ duration: DURATION.loopSlow, repeat: Infinity, delay: DURATION.fast }}>⭐</motion.span>
-                                    <motion.span className="absolute -top-2 right-0 text-3xs" animate={{ opacity: [0, 1, 0], y: [0, -6, 0] }} transition={{ duration: DURATION.loopBase, repeat: Infinity, delay: DURATION.slow }}>✨</motion.span>
-                                    <motion.span className="absolute top-0 -left-3 text-5xs" animate={{ opacity: [0, 0.8, 0], x: [-2, -8, -2] }} transition={{ duration: DURATION.loopFloat, repeat: Infinity, delay: DURATION.progress }}>🌟</motion.span>
-                                    <motion.span className="absolute -bottom-2 left-2 text-4xs" animate={{ opacity: [0, 0.7, 0], y: [0, 5, 0] }} transition={{ duration: DURATION.loopSlow, repeat: Infinity, delay: DURATION.moderate }}>💫</motion.span>
-                                  </>
-                                )}
-
-                                {/* Play overlay for next */}
-                                {isNext && (
-                                  <motion.div animate={{ opacity: [0.6, 1, 0.6] }} transition={{ duration: DURATION.loopFast, repeat: Infinity }}
-                                    className="absolute inset-0 rounded-full flex items-center justify-center bg-black/10">
-                                  </motion.div>
-                                )}
-                              </motion.div>
-
-                              {/* Label below circle */}
-                              <p className={`font-baloo font-black text-xs text-center leading-tight ${
-                                isLocked ? "text-[var(--ds-text-tertiary)]" : slot.completed ? "text-[var(--ds-text-primary)]" : "text-[var(--ds-text-primary)]"
-                              }`}>
-                                {slot.title || t(meta.tKey)}
-                              </p>
-
-                              <div className={`text-3xs font-black uppercase tracking-[0.2em] ${
-                                slot.completed ? "text-[var(--ds-text-brand)]" : isNext ? "text-amber-600" : "text-slate-400"
-                              }`}>
-                                {slot.completed && doneCount >= totalCount ? t("masteredLabel") : slot.completed ? "Done ✓" : isNext ? "Ready" : "Soon"}
+                            {/* "Your turn!" badge — top center of next card */}
+                            {isNext && (
+                              <div style={{ position: 'absolute', top: 0, left: 18, background: 'linear-gradient(90deg,#F5C842,#C9A84C)', color: '#07111F', fontSize: 8, fontWeight: 900, letterSpacing: '0.14em', textTransform: 'uppercase', padding: '3px 10px', borderRadius: '0 0 9px 9px' }}>
+                                ⚡ Your turn!
                               </div>
+                            )}
 
-                              {/* Stars below label */}
-                              {!isLocked && (
-                                <div className="flex items-center gap-0.5">
-                                  <Star className={`w-3 h-3 ${slot.completed ? "text-yellow-400 fill-yellow-400" : "text-yellow-400/40 fill-yellow-400/40"}`} />
-                                  <span className={`text-3xs font-bold ${slot.completed ? "text-yellow-600" : "text-yellow-400/40"}`}>{slot.stars ?? 10}</span>
+                            {/* Week label for challenges */}
+                            {isChallenge && challengeWeek && !isLocked && (
+                              <div style={{ position: 'absolute', top: 10, right: 12, fontSize: 9, fontWeight: 900, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(253,224,71,0.5)' }}>
+                                Week {challengeWeek}
+                              </div>
+                            )}
+
+                            {/* Mission orb */}
+                            <motion.div
+                              animate={isNext ? { scale: [1, 1.09, 1] } : {}}
+                              transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                              style={{
+                                width: 54, height: 54, borderRadius: 15, flexShrink: 0,
+                                background: isLocked ? 'rgba(255,255,255,0.03)' : theme.orbBg,
+                                boxShadow: isLocked ? 'none' : `0 4px 14px ${theme.orbGlow}`,
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                fontSize: isLocked ? 20 : isChallenge && challengeWeek ? 20 : 26,
+                                fontWeight: 900,
+                                color: isChallenge && challengeWeek && !isLocked ? '#07111F' : undefined,
+                                filter: isLocked ? 'grayscale(1)' : 'none',
+                                marginTop: isNext ? 8 : 0,
+                              }}>
+                              {isLocked ? '🔒' : isChallenge && challengeWeek ? challengeWeek : metaBase.emoji}
+                            </motion.div>
+
+                            {/* Text block */}
+                            <div style={{ flex: 1, minWidth: 0, marginTop: isNext ? 8 : 0 }}>
+                              <div style={{ fontSize: 9, fontWeight: 900, letterSpacing: '0.15em', textTransform: 'uppercase', color: isLocked ? 'rgba(255,255,255,0.18)' : theme.eye, marginBottom: 3 }}>
+                                {slot.completed ? 'Completed ✓' : isChallenge && challengeWeek ? `Week ${challengeWeek} Challenge` : isDestination ? 'Final Destination' : `Mission ${i + 1}`}
+                              </div>
+                              <div style={{ fontSize: 16, fontWeight: 900, color: isLocked ? 'rgba(240,232,213,0.2)' : slot.completed ? 'rgba(240,232,213,0.5)' : '#F0E8D5', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', lineHeight: 1.2 }}>
+                                {slot.title || t(metaBase.tKey)}
+                              </div>
+                              {slot.subtitle && !isLocked && (
+                                <div style={{ fontSize: 11, fontWeight: 600, color: 'rgba(240,232,213,0.38)', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                  {slot.subtitle}
                                 </div>
                               )}
-                            </motion.div>
-                          </Link>
-                        </motion.div>
+                              {/* Star pips */}
+                              {!isLocked && (
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 3, marginTop: 7 }}>
+                                  {[0, 1, 2].map(j => (
+                                    <div key={j} style={{ width: 7, height: 7, borderRadius: '50%', background: slot.completed ? '#F5C842' : 'rgba(255,255,255,0.08)', boxShadow: slot.completed ? '0 0 4px rgba(245,200,66,0.6)' : 'none' }} />
+                                  ))}
+                                  <span style={{ fontSize: 9, fontWeight: 800, color: slot.completed ? '#F5C842' : 'rgba(240,232,213,0.28)', marginLeft: 3 }}>
+                                    {slot.stars ?? 10} ⭐
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Right CTA */}
+                            <div style={{ flexShrink: 0, marginTop: isNext ? 8 : 0 }}>
+                              {slot.completed ? (
+                                <div style={{ width: 34, height: 34, borderRadius: '50%', background: 'rgba(201,168,76,0.12)', border: '2px solid rgba(201,168,76,0.32)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15 }}>✅</div>
+                              ) : isNext ? (
+                                <motion.div
+                                  animate={{ scale: [1, 1.06, 1] }}
+                                  transition={{ duration: 1.4, repeat: Infinity }}
+                                  style={{ background: 'linear-gradient(135deg,#F5C842,#C9A84C)', color: '#07111F', fontSize: 13, fontWeight: 900, border: 'none', borderRadius: 13, padding: '9px 14px', cursor: 'pointer', whiteSpace: 'nowrap', boxShadow: '0 4px 12px rgba(201,168,76,0.5)' }}>
+                                  Start! →
+                                </motion.div>
+                              ) : isLocked ? (
+                                <span style={{ fontSize: 16 }}>🔒</span>
+                              ) : (
+                                <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'rgba(255,255,255,0.05)', border: '1.5px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(240,232,213,0.35)', fontSize: 15 }}>›</div>
+                              )}
+                            </div>
+
+                            {/* Floating stars when done */}
+                            {slot.completed && (
+                              <>
+                                <motion.span style={{ position: 'absolute', fontSize: 10, left: '64%', top: '12%', pointerEvents: 'none' }}
+                                  animate={{ opacity: [0.8, 0, 0.8], y: [0, -26, 0] }} transition={{ duration: 2.6, repeat: Infinity, delay: 0 }}>⭐</motion.span>
+                                <motion.span style={{ position: 'absolute', fontSize: 8, left: '76%', top: '42%', pointerEvents: 'none' }}
+                                  animate={{ opacity: [0.6, 0, 0.6], y: [0, -20, 0] }} transition={{ duration: 2.6, repeat: Infinity, delay: 0.9 }}>✨</motion.span>
+                              </>
+                            )}
+                          </motion.div>
+                        </Link>
                       </div>
                     );
                   })}
 
-                  {/* ═══ FINISH LINE — Trophy + Piko ═══ */}
-                  <div className="relative mt-2">
-                    <svg className="w-full h-12 overflow-visible" viewBox="0 0 300 48" preserveAspectRatio="none">
-                      <path d={slots.length % 2 === 0 ? "M 230 0 Q 150 48, 150 48" : "M 70 0 Q 150 48, 150 48"}
-                        fill="none" stroke={doneCount >= totalCount ? "var(--ds-brand-primary)" : "rgba(0,0,0,0.1)"} strokeWidth="5" strokeLinecap="round"
-                        strokeDasharray={doneCount >= totalCount ? "none" : "10 10"} />
-                    </svg>
-                    <div className="flex flex-col items-center gap-2">
-                      {/* Trophy */}
-                      <motion.div animate={doneCount >= totalCount ? { scale: [1, 1.15, 1], rotate: [0, 5, -5, 0] } : {}}
-                        transition={{ duration: DURATION.loopBase, repeat: Infinity }}
-                        className={`relative w-24 h-24 rounded-full flex items-center justify-center text-5xl ${
-                          doneCount >= totalCount
-                            ? "bg-gradient-to-br from-yellow-400 to-amber-500 shadow-2xl shadow-yellow-500/30 ring-4 ring-yellow-400/40"
-                            : "bg-[var(--ds-surface-card)] border-2 border-ds-border"
-                        }`}>
-                        {doneCount >= totalCount ? "🏆" : "🔒"}
-                        {doneCount >= totalCount && (
-                          <>
-                            <motion.span className="absolute -top-3 -left-2 text-sm" animate={{ opacity: [0, 1, 0], y: [0, -10, 0] }} transition={{ duration: DURATION.loopBase, repeat: Infinity }}>⭐</motion.span>
-                            <motion.span className="absolute -top-2 -right-3 text-xs" animate={{ opacity: [0, 1, 0], y: [0, -8, 0] }} transition={{ duration: DURATION.loopSlow, repeat: Infinity, delay: DURATION.moderate }}>✨</motion.span>
-                          </>
-                        )}
+                  {/* ═══ AIRWAYS FINISH LINE ═══ */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '16px 0 8px' }}>
+                    <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.06)' }} />
+                    <span style={{ fontSize: 9, fontWeight: 900, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(240,232,213,0.2)', whiteSpace: 'nowrap' }}>🏁 Finish Line</span>
+                    <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.06)' }} />
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, paddingBottom: 24 }}>
+                    <motion.div
+                      animate={doneCount >= totalCount ? { scale: [1, 1.15, 1], rotate: [0, 5, -5, 0] } : {}}
+                      transition={{ duration: DURATION.loopBase, repeat: Infinity }}
+                      style={{
+                        width: 88, height: 88, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 42,
+                        background: doneCount >= totalCount ? 'linear-gradient(135deg,#F5C842,#C9A84C)' : 'rgba(255,255,255,0.04)',
+                        border: doneCount >= totalCount ? '3px solid rgba(245,200,66,0.5)' : '2px solid rgba(255,255,255,0.07)',
+                        boxShadow: doneCount >= totalCount ? '0 12px 40px rgba(201,168,76,0.4)' : 'none',
+                        position: 'relative',
+                      }}>
+                      {doneCount >= totalCount ? '🏆' : '🔒'}
+                      {doneCount >= totalCount && (
+                        <>
+                          <motion.span style={{ position: 'absolute', top: -10, left: -6, fontSize: 13 }}
+                            animate={{ opacity: [0, 1, 0], y: [0, -12, 0] }} transition={{ duration: DURATION.loopBase, repeat: Infinity }}>⭐</motion.span>
+                          <motion.span style={{ position: 'absolute', top: -8, right: -10, fontSize: 11 }}
+                            animate={{ opacity: [0, 1, 0], y: [0, -10, 0] }} transition={{ duration: DURATION.loopSlow, repeat: Infinity, delay: DURATION.moderate }}>✨</motion.span>
+                        </>
+                      )}
+                    </motion.div>
+                    <div style={{ position: 'relative' }}>
+                      <motion.img src={assets.pikoCircle} alt="Piko"
+                        animate={{ y: [0, -4, 0] }} transition={{ duration: DURATION.loopBase, repeat: Infinity, delay: DURATION.moderate }}
+                        style={{ width: 48, height: 48, borderRadius: '50%', border: '3px solid rgba(96,165,250,0.55)', boxShadow: '0 4px 16px rgba(59,130,246,0.22)' }} />
+                      <motion.div initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: DURATION.loopSpark, ...SPRING.gentle }}
+                        style={{ position: 'absolute', left: -88, top: 0, background: '#0E1E3A', border: '1.5px solid rgba(255,255,255,0.09)', borderRadius: 14, padding: '6px 10px', boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }}>
+                        <p style={{ fontFamily: 'inherit', fontWeight: 900, fontSize: 10, color: '#F0E8D5', whiteSpace: 'nowrap' }}>
+                          {doneCount >= totalCount ? t("storyBubbleWeDidIt") : t("storyBubbleKeepGoing")}
+                        </p>
+                        <div style={{ position: 'absolute', right: -5, top: 10, width: 10, height: 10, background: '#0E1E3A', transform: 'rotate(45deg)', borderRight: '1.5px solid rgba(255,255,255,0.09)', borderBottom: '1.5px solid rgba(255,255,255,0.09)' }} />
                       </motion.div>
-                      {/* Piko cheering at the finish */}
-                      <div className="relative">
-                        <motion.img src={assets.pikoCircle} alt="Piko"
-                          animate={{ y: [0, -4, 0] }} transition={{ duration: DURATION.loopBase, repeat: Infinity, delay: DURATION.moderate }}
-                          className="w-12 h-12 rounded-full border-3 border-blue-400 shadow-lg" />
-                        <motion.div initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }}
-                          transition={{ delay: DURATION.loopSpark, ...SPRING.gentle }}
-                          className="absolute -left-24 top-0 bg-[var(--ds-surface-card)] rounded-2xl rounded-br-sm px-2.5 py-1 shadow-lg">
-                          <p className="font-baloo font-bold text-ds-text text-3xs whitespace-nowrap">
-                            {doneCount >= totalCount ? t("storyBubbleWeDidIt") : t("storyBubbleKeepGoing")}
-                          </p>
-                          <div className="absolute right-[-5px] top-2.5 w-2.5 h-2.5 bg-[var(--ds-surface-card)] rotate-45" />
-                        </motion.div>
-                      </div>
                     </div>
                   </div>
                 </div>
 
                 {/* Certificate button */}
                 {doneCount >= totalCount && totalCount > 0 && (
-                  <div className="px-5 mt-4">
+                  <div className="px-5 mt-2 pb-4">
                     <motion.button initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
                       whileTap={m.buttonPress}
                       onClick={() => { playCelebration(); setPhase("certificate"); }}
-                      className="w-full bg-gradient-to-r from-yellow-400 to-amber-500 text-white font-baloo font-black text-xl rounded-full py-4 shadow-2xl shadow-yellow-500/30 flex items-center justify-center gap-3">
+                      className="w-full font-baloo font-black text-xl rounded-full py-4 flex items-center justify-center gap-3"
+                      style={{ background: 'linear-gradient(135deg,#F5C842,#C9A84C)', color: '#07111F', boxShadow: '0 8px 32px rgba(201,168,76,0.45)' }}>
                       {t("storySeeCertificate")}
                     </motion.button>
                   </div>
