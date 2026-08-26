@@ -414,6 +414,7 @@ export default function StoryEditor({ story, onSaved, onDeleted, defaultLang, on
   const { confirm: confirmAction, dialog: confirmEl } = useConfirmDialog()
   const [activeLang, setActiveLang] = useState<Lang>(defaultLang ?? 'en')
   const [coverUrl, setCoverUrl] = useState(story.cover_url ?? '')
+  const [giantBookUrl, setGiantBookUrl] = useState(story.giant_book_url ?? '')
   // Live title mirrors the title field as the admin types — feeds SlugInput so the
   // slug auto-fills in real-time instead of waiting for the DB round-trip.
   const [liveTitle, setLiveTitle] = useState(story.title)
@@ -911,9 +912,10 @@ export default function StoryEditor({ story, onSaved, onDeleted, defaultLang, on
               <div>
                 <label className="text-[12px] font-bold text-gray-500 block mb-1.5">📚 Giant Book Entry Image</label>
                 <p className="text-[11px] text-gray-400 mb-1.5">Large interactive image shown before the story begins. Child clicks it to start the FlipFlop Audio.</p>
-                <FileUploader label="Giant Book" url={story.giant_book_url ?? null} accept="image/*"
+                <FileUploader label="Giant Book" url={giantBookUrl || null} accept="image/*"
                   bucket="storyBook" pathPrefix={`giant-book/${story.id}`}
                   dbSave={async (p) => {
+                    setGiantBookUrl(p ?? '')
                     await supabase.from('stories').update({ giant_book_url: p }).eq('id', story.id)
                     onSaved()
                   }}
