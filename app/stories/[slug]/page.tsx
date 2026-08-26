@@ -1010,14 +1010,8 @@ export default function StoryDetailPage() {
                                 initial={{ opacity:0, y:6 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.3 }}
                                 className="font-baloo font-black text-center leading-tight"
                                 style={{ fontSize:"clamp(0.95rem,2.6vw,1.35rem)", color:"#f5e6c8", textShadow:"0 2px 18px rgba(0,0,0,0.72)" }}>
-                                The Talking Faces
+                                {storyTitle}
                               </motion.h2>
-                              <motion.p
-                                initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:0.42 }}
-                                className="text-center font-nunito font-bold mt-1"
-                                style={{ fontSize:"clamp(0.55rem,1.3vw,0.7rem)", letterSpacing:"0.22em", textTransform:"uppercase", color:"rgba(201,168,76,0.46)" }}>
-                                Nimi at School
-                              </motion.p>
                             </div>
 
                             {/* Ornamental divider */}
