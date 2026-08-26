@@ -69,7 +69,7 @@ const MISSION_HINTS: Record<string, string> = {
 }
 
 /* ── Auto-save text input ── */
-function AutoSaveInput({ label, value, onSave }: { label: string; value: string; onSave: (v: string) => Promise<void> }) {
+function AutoSaveInput({ label, value, onSave, onChange }: { label: string; value: string; onSave: (v: string) => Promise<void>; onChange?: (v: string) => void }) {
   const [val, setVal] = useState(value)
   const [saved, setSaved] = useState(false)
   const [saveErr, setSaveErr] = useState<string | null>(null)
@@ -86,6 +86,7 @@ function AutoSaveInput({ label, value, onSave }: { label: string; value: string;
   }, [onSave])
   useEffect(() => () => { if (timer.current) clearTimeout(timer.current) }, [])
   const handleChange = (v: string) => {
+    onChange?.(v)
     setVal(v)
     setSaveErr(null)
     if (timer.current) clearTimeout(timer.current)
@@ -413,6 +414,9 @@ export default function StoryEditor({ story, onSaved, onDeleted, defaultLang, on
   const { confirm: confirmAction, dialog: confirmEl } = useConfirmDialog()
   const [activeLang, setActiveLang] = useState<Lang>(defaultLang ?? 'en')
   const [coverUrl, setCoverUrl] = useState(story.cover_url ?? '')
+  // Live title mirrors the title field as the admin types — feeds SlugInput so the
+  // slug auto-fills in real-time instead of waiting for the DB round-trip.
+  const [liveTitle, setLiveTitle] = useState(story.title)
   const [missionVersions, setMissionVersions] = useState<Record<string, MissionVersionData[]>>({})
   const [allStoryVersions, setAllStoryVersions] = useState<Record<Lang, { id: string } & Record<string, unknown>>>({} as Record<Lang, { id: string } & Record<string, unknown>>)
   const [publishing, setPublishing] = useState(false)
@@ -844,8 +848,8 @@ export default function StoryEditor({ story, onSaved, onDeleted, defaultLang, on
         <div className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-[1fr_200px] lg:grid-cols-[1fr_240px] gap-4 sm:gap-5">
             <div className="space-y-4 order-2 sm:order-1">
-              <AutoSaveInput key={`story-title-${story.id}`} label="Story Title" value={story.title} onSave={v => saveField('title', v)} />
-              <SlugInput storyId={story.id} initialSlug={story.slug} titleHint={story.title} onSaved={onSaved} />
+              <AutoSaveInput key={`story-title-${story.id}`} label="Story Title" value={story.title} onSave={v => saveField('title', v)} onChange={setLiveTitle} />
+              <SlugInput storyId={story.id} initialSlug={story.slug} titleHint={liveTitle} onSaved={onSaved} />
               <AutoSaveInput label="Tagline" value={story.theme_title ?? ''} onSave={v => saveField('theme_title', v)} />
               {/* Airways attitude — badge text awarded when this story is completed */}
               <div>

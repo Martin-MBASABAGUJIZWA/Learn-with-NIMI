@@ -194,6 +194,16 @@ const MISSION_META: Record<string, { emoji: string; tKey: string; actionKey: str
   destination_video: { emoji: "🌍", tKey: "destinationVideoLabel", actionKey: "storyMissionDestination"   },
 };
 
+// Phase 4 — Book 1 activity stickers; hover added in Phase 7
+const BOOK1_ACTIVITIES = [
+  { key:"flipflop_audio", label:"Listen", bg:"#dbeafe", ring:"#3b82f6", icon:"/assets/icon-flipflop.svg", hover:{ scale:1.13, y:-5, rotate:-4 } },
+  { key:"story_pdf",      label:"Read",   bg:"#fef3c7", ring:"#d97706", icon:"/assets/icon-pdf.svg",      hover:{ scale:1.10, y:-4, rotate:2  } },
+  { key:"coloring",       label:"Create", bg:"#fce7f3", ring:"#ec4899", icon:"/assets/icon-coloring.svg", hover:{ scale:1.12, y:-5, rotate:-3 } },
+  { key:"move_explore",   label:"Move",   bg:"#dcfce7", ring:"#22c55e", icon:"/assets/icon-move.svg",     hover:{ scale:1.15, y:-6, rotate:5  } },
+  { key:"sing_along",     label:"Sing",   bg:"#ede9fe", ring:"#8b5cf6", icon:"/assets/icon-sing.svg",     hover:{ scale:1.11, y:-4, rotate:-2 } },
+  { key:"bonus_video",    label:"Watch",  bg:"#e0e7ff", ring:"#6366f1", icon:"/assets/icon-video.svg",    hover:{ scale:1.10, y:-4, rotate:3  } },
+];
+
 const SLOT_BADGE: Record<string, { bg: string; text: string; border: string }> = {
   flipflop_audio:    { bg: "bg-amber-50",   text: "text-amber-700",   border: "border-amber-200"   },
   story_pdf:         { bg: "bg-amber-50",   text: "text-amber-700",   border: "border-amber-200"   },
@@ -251,8 +261,33 @@ export default function StoryDetailPage() {
   const [storyIsFree, setStoryIsFree] = useState(false);
   const [sharingCert, setSharingCert] = useState(false);
   const [downloadingCert, setDownloadingCert] = useState<"pdf" | "png" | null>(null);
+  // Phase 3 connection point: book-opening animation state
+  const [isBookOpening, setIsBookOpening] = useState(false);
+  const [bookIsOpen, setBookIsOpen] = useState(false);
+  // Phase 5: Nimi/Piko reaction when an activity sticker is tapped
+  const [nimiReacting, setNimiReacting] = useState(false);
   // Guard: prevent badge award effect from firing more than once per mount
   const badgeAwardedRef = useRef(false);
+  // Phase 7: prevent double-navigation when a sticker is tapped
+  const navigatingRef = useRef(false);
+
+  // Phase 6: restore open-book state when child returns from a mission activity
+  useEffect(() => {
+    const key = `nimipiko:story-book-open:${slug}`;
+    try {
+      if (sessionStorage.getItem(key) === "1") {
+        setIsBookOpening(true);
+        setBookIsOpen(true);
+      }
+    } catch { /* sessionStorage unavailable — remain closed */ }
+  }, [slug]);
+
+  // Phase 6: persist open-book state so the child lands back inside the book on return
+  useEffect(() => {
+    if (!bookIsOpen) return;
+    const key = `nimipiko:story-book-open:${slug}`;
+    try { sessionStorage.setItem(key, "1"); } catch { /* ignore */ }
+  }, [bookIsOpen, slug]);
 
   const handleShare = async () => {
     setSharingCert(true);
@@ -685,16 +720,16 @@ export default function StoryDetailPage() {
             )}
 
             {/* ═══════════════════════════════════════════ */}
-            {/* PHASE 1: LIVE BOOK                        */}
+            {/* PHASE 1: GIANT BOOK ENTRY SCENE           */}
             {/* ═══════════════════════════════════════════ */}
             {phase === "welcome" && (
               <motion.div key="welcome"
                 initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                 transition={{ duration: 0.4 }}
-                className="flex-1 flex flex-col relative"
-                style={{ background: "linear-gradient(160deg, #04111f 0%, #091829 45%, #100e24 100%)" }}>
+                className="flex-1 flex flex-col relative overflow-hidden"
+                style={{ background: "linear-gradient(175deg, #03101e 0%, #07182e 38%, #0d1628 65%, #120d20 100%)" }}>
 
-                {/* ── Star field (configs precomputed at module scope) ── */}
+                {/* Starfield */}
                 {STARS.map((s, i) => (
                   <motion.div key={i} className="absolute rounded-full pointer-events-none select-none"
                     style={{ left:`${s.x}%`, top:`${s.y}%`, width:s.size, height:s.size, background:"#fff" }}
@@ -702,414 +737,660 @@ export default function StoryDetailPage() {
                     transition={{ duration:s.duration, repeat:Infinity, delay:s.delay, ease:"easeInOut" }} />
                 ))}
 
-                {/* ── Top nav ── */}
-                <div className="relative z-10 flex items-center justify-between px-4 pt-5 pb-1">
+                {/* Warm amber bloom — ground plane beneath the book */}
+                <div className="absolute inset-x-0 bottom-0 pointer-events-none"
+                  style={{ height:"55%", background:"radial-gradient(ellipse 80% 60% at 50% 100%, rgba(180,110,30,0.10) 0%, transparent 70%)" }} />
+
+                {/* Top nav */}
+                <div className="relative z-10 flex items-center justify-between px-4 pt-5 pb-2 shrink-0">
                   <button onClick={() => router.push("/stories")}
                     className="flex items-center gap-1.5 text-white/40 hover:text-white/70 font-nunito font-bold text-sm transition-colors">
                     <ArrowLeft className="w-4 h-4" /> Library
                   </button>
-                  {streak > 0 && (
-                    <div className="flex items-center gap-1 rounded-full px-3 py-1 border border-orange-400/25"
-                      style={{ background:"rgba(251,146,60,0.12)" }}>
-                      <motion.span animate={{ scale:[1,1.25,1] }} transition={{ duration:1.4, repeat:Infinity }}>🔥</motion.span>
-                      <span className="font-baloo font-black text-orange-300 text-xs">{streak} day streak</span>
-                    </div>
-                  )}
+                  <div className="flex items-center gap-2">
+                    {streak > 0 && (
+                      <div className="flex items-center gap-1 rounded-full px-3 py-1 border border-orange-400/25"
+                        style={{ background:"rgba(251,146,60,0.12)" }}>
+                        <motion.span animate={{ scale:[1,1.25,1] }} transition={{ duration:1.4, repeat:Infinity }}>🔥</motion.span>
+                        <span className="font-baloo font-black text-orange-300 text-xs">{streak} day streak</span>
+                      </div>
+                    )}
+                    {isPreview && (
+                      <span className="font-nunito text-2xs px-2 py-0.5 rounded-full"
+                        style={{ background:"rgba(201,168,76,0.15)", color:"#c9a84c", border:"1px solid rgba(201,168,76,0.3)" }}>
+                        Preview
+                      </span>
+                    )}
+                  </div>
                 </div>
 
-                {/* ── Collection eyebrow ── */}
-                <motion.p initial={{ opacity:0, y:-6 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.12 }}
-                  className="relative z-10 text-center font-nunito text-xs tracking-[0.28em] uppercase mb-2 mt-1"
-                  style={{ color:"rgba(201,168,76,0.5)" }}>
+                {/* Collection eyebrow */}
+                <motion.p initial={{ opacity:0, y:-6 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.1 }}
+                  className="relative z-10 text-center font-nunito text-xs tracking-[0.28em] uppercase shrink-0"
+                  style={{ color:"rgba(201,168,76,0.45)" }}>
                   Nimipiko · Story Collection
                 </motion.p>
 
-                {/* ── Book + CTA ── */}
-                <div className="relative z-10 flex-1 px-3 sm:px-5 pb-4">
+                {/* Story title */}
+                <motion.h1 initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.18 }}
+                  className="relative z-10 text-center font-baloo font-black mt-1 mb-1 shrink-0 px-6 leading-tight"
+                  style={{ fontSize:"clamp(1.05rem,3.5vw,1.55rem)", color:"#f5e6c8" }}>
+                  {storyTitle}
+                </motion.h1>
 
-                  {/* Gold ambient glow beneath book */}
-                  <div className="absolute bottom-16 left-1/2 -translate-x-1/2 w-2/3 h-20 pointer-events-none"
-                    style={{ background:"radial-gradient(ellipse, rgba(201,168,76,0.22) 0%, transparent 70%)", filter:"blur(16px)" }} />
+                {/* Giant Book hero — takes remaining vertical space */}
+                <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 py-2 min-h-0">
 
-                  {/* Perspective wrapper */}
-                  <div style={{ perspective:"1400px" }}>
-                    <motion.div
-                      initial={{ rotateY:28, opacity:0, y:18 }}
-                      animate={{ rotateY:0, opacity:1, y:0 }}
-                      transition={{ type:"spring", stiffness:130, damping:20, delay:0.1 }}
-                      className="relative flex flex-col md:flex-row w-full rounded-2xl overflow-hidden"
-                      style={{
-                        transformOrigin:"left center",
-                        minHeight:520,
-                        boxShadow:"0 0 0 1px rgba(201,168,76,0.28), 0 0 48px rgba(201,168,76,0.14), 0 24px 64px rgba(0,0,0,0.75)",
-                      }}>
+                  {/* Ambient gold glow under the book — gentle breathing */}
+                  <motion.div className="absolute bottom-1/4 left-1/2 -translate-x-1/2 pointer-events-none"
+                    animate={{ scale:[1,1.18,1], opacity:[0.65,1,0.65] }}
+                    transition={{ duration:4.5, repeat:Infinity, ease:"easeInOut" }}
+                    style={{ width:"70%", height:"35%", background:"radial-gradient(ellipse, rgba(201,168,76,0.26) 0%, transparent 70%)", filter:"blur(36px)" }} />
 
-                      {/* ══ LEFT PAGE ══ */}
-                      <div className="md:w-[40%] shrink-0 flex flex-col relative overflow-hidden" style={{ background:"#150d05" }}>
+                  {/* ── Mastered state ── */}
+                  {doneCount >= totalCount && totalCount > 0 ? (
+                    <div className="flex flex-col items-center gap-4">
+                      <motion.div
+                        initial={{ scale:0, rotate:-15 }} animate={{ scale:1, rotate:0 }}
+                        transition={{ type:"spring", stiffness:220, damping:16, delay:0.2 }}
+                        className="w-24 h-24 rounded-full flex items-center justify-center"
+                        style={{ background:"radial-gradient(circle at 35% 35%, #fef9c3, #fde68a 60%, #f59e0b)", boxShadow:"0 0 48px rgba(245,158,11,0.35)" }}>
+                        <span className="text-5xl">🏆</span>
+                      </motion.div>
+                      <motion.p initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:0.4 }}
+                        className="font-baloo font-black text-2xl" style={{ color:"#f5e6c8" }}>
+                        Story Complete!
+                      </motion.p>
+                      <motion.p initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:0.5 }}
+                        className="font-nunito text-sm text-center" style={{ color:"rgba(201,168,76,0.6)" }}>
+                        All {totalCount} chapters mastered
+                      </motion.p>
+                      <motion.button
+                        initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.6 }}
+                        whileHover={{ scale:1.04 }} whileTap={{ scale:0.95 }}
+                        onClick={() => { playCelebration(); setPhase("certificate"); }}
+                        className="font-baloo font-black text-base py-3 px-8 rounded-2xl flex items-center gap-2"
+                        style={{ background:"linear-gradient(135deg, #F5C842, #C9A84C)", color:"#07111F", boxShadow:"0 8px 32px rgba(201,168,76,0.4)" }}>
+                        🌟 {t("storySeeCertificate")}
+                      </motion.button>
+                      <motion.button
+                        initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:0.75 }}
+                        whileHover={{ scale:1.02 }} whileTap={{ scale:0.96 }}
+                        onClick={() => { playTap(); setPhase("missions"); }}
+                        className="font-nunito text-sm underline underline-offset-4"
+                        style={{ color:"rgba(201,168,76,0.5)" }}>
+                        Review missions →
+                      </motion.button>
+                    </div>
 
-                        {/* Cover image — fixed on mobile, 54% of parent on desktop */}
-                        <div className="relative overflow-hidden shrink-0 h-[200px] md:h-[54%]">
-                          {details?.cover_url ? (
-                            <Image src={getStorageUrl(details.cover_url)} alt={storyTitle} fill className="object-cover" />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center"
-                              style={{ background:"linear-gradient(135deg, #7c3a0a, #b45309)" }}>
-                              <motion.span className="text-7xl drop-shadow-xl"
-                                animate={{ scale:[1,1.08,1] }} transition={{ duration:DURATION.loopBase, repeat:Infinity }}>
-                                {details?.theme_emoji ?? "📚"}
-                              </motion.span>
+                  ) : (
+                    /* ── Giant Book: closed → opening → open ── */
+                    <div style={{ perspective:"1200px", perspectiveOrigin:"50% 40%" }} className="flex flex-col items-center w-full">
+
+                      {!bookIsOpen ? (
+                        /* CLOSED / OPENING STATE — portrait card with 3D cover rotation */
+                        <motion.div
+                          initial={{ opacity:0, y:24, scale:0.92 }}
+                          animate={{ opacity:1, y: isBookOpening ? -10 : 0, scale: isBookOpening ? 1.04 : 1 }}
+                          transition={isBookOpening
+                            ? { duration:0.35, ease:"easeOut" }
+                            : { type:"spring", stiffness:110, damping:18, delay:0.22 }}
+                          style={{
+                            position:"relative",
+                            width:"min(300px,82vw)",
+                            aspectRatio:"3/4",
+                            transformStyle:"preserve-3d",
+                          }}>
+
+                          {/* Pages behind the cover — revealed when cover rotates away */}
+                          <div style={{
+                            position:"absolute", inset:0, borderRadius:18, overflow:"hidden",
+                            boxShadow:"0 0 0 1px rgba(201,168,76,0.18)",
+                            display:"flex",
+                          }}>
+                            <div style={{ width:"50%", background:"#150d05", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                              <span style={{ color:"rgba(201,168,76,0.18)", fontSize:36 }}>✦</span>
                             </div>
-                          )}
-                          {/* Gold-tinted fade into page */}
-                          <div className="absolute inset-0 pointer-events-none"
-                            style={{ background:"linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, transparent 38%, #150d05 100%)" }} />
-                          {/* Gold top edge */}
-                          <div className="absolute inset-x-0 top-0 h-[2px] pointer-events-none"
-                            style={{ background:"linear-gradient(to right, transparent, #c9a84c80, transparent)" }} />
-                          {/* Linen texture */}
-                          <div className="absolute inset-0 pointer-events-none opacity-[0.06] mix-blend-overlay"
-                            style={{ backgroundImage:[
-                              "repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(255,255,255,1) 3px,rgba(255,255,255,1) 4px)",
-                              "repeating-linear-gradient(90deg,transparent,transparent 3px,rgba(255,255,255,1) 3px,rgba(255,255,255,1) 4px)",
-                            ].join(",") }} />
-                        </div>
-
-                        {/* Story info */}
-                        <div className="flex-1 flex flex-col px-5 pb-4 pt-1 relative z-10">
-                          {/* Gold ornamental divider */}
-                          <div className="flex items-center gap-2 mb-2">
-                            <div className="flex-1 h-px" style={{ background:"linear-gradient(to right, transparent, rgba(201,168,76,0.4))" }} />
-                            <span className="text-xs select-none" style={{ color:"rgba(201,168,76,0.6)" }}>✦</span>
-                            <div className="flex-1 h-px" style={{ background:"linear-gradient(to left, transparent, rgba(201,168,76,0.4))" }} />
-                          </div>
-
-                          {/* Title */}
-                          <h1 className="font-baloo font-black leading-tight text-center mb-0.5"
-                            style={{ fontSize:"clamp(1rem,2.8vw,1.4rem)", color:"#f5e6c8" }}>
-                            {storyTitle}
-                          </h1>
-                          <p className="text-center font-nunito text-2xs tracking-[0.2em] uppercase mb-3"
-                            style={{ color:"rgba(201,168,76,0.45)" }}>
-                            {childName} · {language.toUpperCase()}
-                          </p>
-
-                          {/* Progress bar */}
-                          <div className="mb-3">
-                            <div className="flex justify-between items-center mb-1">
-                              <span className="font-nunito text-2xs" style={{ color:"rgba(201,168,76,0.45)" }}>Progress</span>
-                              <span className="font-nunito font-bold text-2xs" style={{ color:"rgba(201,168,76,0.45)" }}>{doneCount}/{totalCount}</span>
-                            </div>
-                            <div className="h-1 rounded-full overflow-hidden" style={{ background:"rgba(255,255,255,0.08)" }}>
-                              <motion.div className="h-full rounded-full"
-                                style={{ background:"linear-gradient(to right, #c9a84c, #f0d080)" }}
-                                initial={{ width:0 }}
-                                animate={{ width: totalCount > 0 ? `${(doneCount/totalCount)*100}%` : "0%" }}
-                                transition={{ duration:1, delay:0.45, ease:"easeOut" }} />
-                            </div>
-                          </div>
-
-                          {/* Nimi quote */}
-                          <div className="mt-auto flex items-end gap-2">
-                            <motion.img src={assets.nimiCircle} alt="Nimi"
-                              animate={{ y:[0,-4,0] }} transition={{ duration:3, repeat:Infinity }}
-                              className="w-10 h-10 rounded-full shrink-0 border-2"
-                              style={{ borderColor:"rgba(201,168,76,0.45)", boxShadow:"0 0 12px rgba(201,168,76,0.2)" }} />
-                            <div className="flex-1 rounded-2xl rounded-bl-none px-3 py-2"
-                              style={{ background:"rgba(255,255,255,0.06)", border:"1px solid rgba(201,168,76,0.18)" }}>
-                              <p className="font-nunito text-xs leading-snug italic" style={{ color:"rgba(245,230,200,0.65)" }}>
-                                &ldquo;{doneCount === 0
-                                  ? `${childName}, your adventure awaits!`
-                                  : doneCount < totalCount
-                                  ? `Amazing, ${childName}! Keep going!`
-                                  : `You've mastered it, ${childName}! 🏆`}&rdquo;
-                              </p>
+                            <div style={{ width:2, background:"rgba(201,168,76,0.22)", flexShrink:0 }} />
+                            <div style={{ flex:1, background:"#f0ebe0", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                              <span style={{ color:"rgba(120,80,20,0.12)", fontSize:36 }}>✦</span>
                             </div>
                           </div>
 
-                          {/* Certificate button if mastered */}
-                          {doneCount >= totalCount && totalCount > 0 && (
-                            <motion.button
-                              initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.4 }}
-                              whileHover={{ scale:1.02 }} whileTap={{ scale:0.96 }}
-                              onClick={() => { playCelebration(); setPhase("certificate"); }}
-                              className="mt-3 w-full font-baloo font-black text-sm py-2.5 rounded-xl flex items-center justify-center gap-2"
-                              style={{ background:"linear-gradient(135deg, #c9a84c, #f0d080)", color:"#0a0603", boxShadow:"0 4px 20px rgba(201,168,76,0.35)" }}>
-                              🌟 {t("storySeeCertificate")}
-                            </motion.button>
-                          )}
-                        </div>
+                          {/* Cover — rotates open on tap (transform-origin: left spine edge) */}
+                          <motion.div
+                            animate={{ rotateY: isBookOpening ? -175 : 0 }}
+                            transition={{ type:"spring", stiffness:52, damping:16, delay:0.1 }}
+                            onClick={() => {
+                              if (isBookOpening) return;
+                              playTap();
+                              setIsBookOpening(true);
+                              const reducedMotion = typeof window !== "undefined" &&
+                                window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+                              setTimeout(() => setBookIsOpen(true), reducedMotion ? 50 : 1100);
+                            }}
+                            style={{
+                              position:"absolute", inset:0,
+                              transformOrigin:"left center",
+                              backfaceVisibility:"hidden" as const,
+                              borderRadius:18, overflow:"hidden",
+                              cursor: isBookOpening ? "default" : "pointer",
+                              boxShadow: isBookOpening
+                                ? "-12px 0 40px rgba(0,0,0,0.55), 0 28px 60px rgba(0,0,0,0.65)"
+                                : "0 0 0 1.5px rgba(201,168,76,0.45), 0 0 64px rgba(201,168,76,0.22), 0 32px 80px rgba(0,0,0,0.72)",
+                            }}>
 
-                        {/* Ruled lines */}
-                        {Array.from({ length:5 }).map((_,i) => (
-                          <div key={i} className="absolute inset-x-0 h-px pointer-events-none"
-                            style={{ bottom:`${10+i*8}%`, background:"rgba(201,168,76,0.05)" }} />
-                        ))}
-                      </div>
-
-                      {/* ══ SPINE ══ */}
-                      <div className="hidden md:flex w-7 shrink-0 flex-col items-center justify-between py-5 relative overflow-hidden"
-                        style={{ background:"linear-gradient(to right, #07040200, #130a03, #07040200)" }}>
-                        <div className="w-full h-px" style={{ background:"rgba(201,168,76,0.35)" }} />
-                        <div className="flex flex-col items-center gap-1">
-                          <div className="w-px h-10" style={{ background:"rgba(201,168,76,0.15)" }} />
-                          <span className="font-black text-[5px] tracking-[0.9em] uppercase select-none"
-                            style={{ writingMode:"vertical-rl", color:"rgba(201,168,76,0.4)" }}>NIMIPIKO</span>
-                          <div className="w-px h-10" style={{ background:"rgba(201,168,76,0.15)" }} />
-                        </div>
-                        <div className="w-full h-px" style={{ background:"rgba(201,168,76,0.35)" }} />
-                      </div>
-                      {/* Mobile spine */}
-                      <div className="md:hidden h-5 shrink-0 flex items-center"
-                        style={{ background:"linear-gradient(to bottom, #07040200, #130a03, #07040200)" }}>
-                        <div className="flex-1 h-px mx-6" style={{ background:"rgba(201,168,76,0.35)" }} />
-                      </div>
-
-                      {/* ══ RIGHT PAGE ══ */}
-                      <div className="flex-1 flex flex-col relative overflow-hidden" style={{ background:"#f5f0e5" }}>
-
-                        {/* Binding shadow */}
-                        <div className="absolute inset-y-0 left-0 w-4 pointer-events-none z-10"
-                          style={{ background:"linear-gradient(to right, rgba(0,0,0,0.07), transparent)" }} />
-
-                        {/* Header */}
-                        <div className="px-5 pt-5 pb-2">
-                          <div className="flex items-center gap-2 mb-1">
-                            <div className="flex-1 h-px" style={{ background:"rgba(120,80,20,0.15)" }} />
-                            <span className="font-nunito text-2xs tracking-[0.22em] uppercase" style={{ color:"rgba(120,80,20,0.4)" }}>Your Adventure</span>
-                            <div className="flex-1 h-px" style={{ background:"rgba(120,80,20,0.15)" }} />
-                          </div>
-                          <h2 className="font-baloo font-black text-base text-center leading-none" style={{ color:"#2d1a06" }}>
-                            Mission Chapters
-                          </h2>
-                        </div>
-
-                        {/* Giant Book entry point — shown when admin has uploaded the image */}
-                        {giantBookUrl && doneCount === 0 && (
-                          <div className="px-4 pb-2">
-                            <motion.button whileHover={{ scale:1.02 }} whileTap={{ scale:0.96 }}
-                              initial={{ opacity:0, y:6 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.2 }}
-                              onClick={() => {
-                                playTap();
-                                const firstSlot = slots[0];
-                                if (firstSlot) router.push(`/stories/${slug}/mission/${firstSlot.slot_key}`);
-                              }}
-                              className="w-full relative rounded-xl overflow-hidden cursor-pointer"
-                              style={{ border:"1.5px solid rgba(201,168,76,0.5)", minHeight:90 }}>
-                              <Image src={getStorageUrl(giantBookUrl)} alt="Open the Giant Book" fill className="object-cover" />
-                              <div className="absolute inset-0" style={{ background:"linear-gradient(to top, rgba(6,16,31,0.72) 0%, transparent 55%)" }} />
-                              <div className="absolute inset-x-0 bottom-0 flex items-center justify-between px-4 py-2.5">
-                                <p className="font-baloo font-black text-white text-sm drop-shadow">📚 Open the Giant Book</p>
-                                <span className="font-baloo font-black text-2xs uppercase tracking-wide" style={{ color:"#c9a84c" }}>Begin →</span>
+                            {giantBookUrl ? (
+                              <Image src={getStorageUrl(giantBookUrl)} alt={storyTitle} fill className="object-cover" priority />
+                            ) : (
+                              /* Fallback cover — shown until artwork is uploaded in the admin */
+                              <div className="w-full h-full flex flex-col items-center justify-between overflow-hidden"
+                                style={{ background:"linear-gradient(155deg, #1c3a5e 0%, #0d1f3a 40%, #060f1d 100%)" }}>
+                                {/* Top section */}
+                                <div className="flex flex-col items-center pt-6 px-4 gap-1">
+                                  <span style={{ fontFamily:"var(--font-nunito)", fontSize:"clamp(7px,1.4vw,9px)", letterSpacing:"0.32em", textTransform:"uppercase", color:"rgba(201,168,76,0.55)" }}>
+                                    Nimipiko · Book 1
+                                  </span>
+                                  <div className="w-8 h-px mt-1" style={{ background:"rgba(201,168,76,0.3)" }} />
+                                </div>
+                                {/* Nimi character as cover art */}
+                                <motion.div className="flex-1 flex items-end justify-center overflow-hidden"
+                                  animate={!isBookOpening ? { y:[0,-6,0] } : { y:0 }}
+                                  transition={{ duration:4.2, repeat:Infinity, ease:"easeInOut" }}>
+                                  <img src="/nimi.png" alt="Nimi"
+                                    style={{ height:"clamp(120px,48%,210px)", width:"auto", objectFit:"contain",
+                                      filter:"drop-shadow(0 8px 28px rgba(59,130,246,0.35)) drop-shadow(0 2px 8px rgba(0,0,0,0.5))" }} />
+                                </motion.div>
+                                {/* Title band */}
+                                <div className="w-full flex flex-col items-center pb-5 pt-3 px-4 gap-0.5"
+                                  style={{ background:"linear-gradient(to top, rgba(4,10,22,0.92), transparent)" }}>
+                                  <span className="font-baloo font-black text-center leading-tight"
+                                    style={{ fontSize:"clamp(0.95rem,3vw,1.3rem)", color:"#f5e6c8", textShadow:"0 2px 14px rgba(0,0,0,0.8)" }}>
+                                    {storyTitle}
+                                  </span>
+                                  <span style={{ fontFamily:"var(--font-nunito)", fontWeight:700, fontSize:"clamp(0.55rem,1.3vw,0.7rem)", color:"rgba(201,168,76,0.55)", letterSpacing:"0.18em", textTransform:"uppercase" }}>
+                                    {childName ? `${childName}'s Story` : "Your Story"}
+                                  </span>
+                                </div>
                               </div>
-                            </motion.button>
-                          </div>
-                        )}
+                            )}
 
+                            {/* Pulsing gold border — only when idle */}
+                            <motion.div className="absolute inset-0 z-10 pointer-events-none"
+                              animate={isBookOpening ? { opacity:0 } : { opacity:[0.5,1,0.5] }}
+                              transition={isBookOpening
+                                ? { duration:0.25 }
+                                : { duration:2.4, repeat:Infinity, ease:"easeInOut" }}
+                              style={{ borderRadius:18, border:"1.5px solid rgba(201,168,76,0.38)", boxShadow:"inset 0 0 28px rgba(201,168,76,0.16)" }} />
 
-                        {/* ─── Chapter list OR The End ─── */}
-                        {doneCount >= totalCount && totalCount > 0 ? (
-
-                          /* THE END */
-                          <div className="flex-1 flex flex-col items-center justify-center px-5 pb-4">
+                            {/* Bottom tap hint — fades when opening starts */}
                             <motion.div
-                              initial={{ scale:0, rotate:-15 }} animate={{ scale:1, rotate:0 }}
-                              transition={{ type:"spring", stiffness:220, damping:16, delay:0.2 }}
-                              className="relative w-20 h-20 rounded-full flex items-center justify-center mb-4"
-                              style={{ background:"radial-gradient(circle at 35% 35%, #fef9c3, #fde68a 60%, #f59e0b)" }}>
-                              <span className="text-3xl">🏆</span>
-                              <div className="absolute inset-0 rounded-full border-4" style={{ borderColor:"rgba(245,158,11,0.4)" }} />
+                              animate={{ opacity: isBookOpening ? 0 : 1 }}
+                              transition={{ duration:0.2 }}
+                              className="absolute inset-x-0 bottom-0 z-20 flex items-end justify-center pb-5 pt-16 pointer-events-none"
+                              style={{ background:"linear-gradient(to top, rgba(6,16,31,0.88) 0%, transparent 100%)" }}>
+                              <motion.div
+                                animate={{ opacity:[0.75,1,0.75], y:[0,-2,0] }}
+                                transition={{ duration:2.2, repeat:Infinity, ease:"easeInOut" }}
+                                className="flex items-center gap-2">
+                                <span className="font-baloo font-black text-sm tracking-wide" style={{ color:"#F5C842" }}>
+                                  {doneCount === 0 ? "Open the Book" : `Continue · ${doneCount}/${totalCount}`}
+                                </span>
+                                <motion.span animate={{ x:[0,4,0] }} transition={{ duration:1.2, repeat:Infinity }}
+                                  style={{ color:"#C9A84C" }}>→</motion.span>
+                              </motion.div>
                             </motion.div>
-                            <div className="flex items-center gap-3 w-full mb-2">
-                              <div className="flex-1 h-px" style={{ background:"rgba(120,80,20,0.15)" }} />
-                              <span className="text-xs select-none" style={{ color:"rgba(120,80,20,0.3)" }}>✦</span>
-                              <div className="flex-1 h-px" style={{ background:"rgba(120,80,20,0.15)" }} />
+
+                            {/* Flash of warm light on tap */}
+                            {isBookOpening && (
+                              <motion.div className="absolute inset-0 pointer-events-none z-30"
+                                initial={{ opacity:0.55 }}
+                                animate={{ opacity:0 }}
+                                transition={{ duration:0.55, ease:"easeOut" }}
+                                style={{ background:"radial-gradient(circle at 40% 35%, rgba(255,240,190,0.65), transparent 70%)", borderRadius:18 }} />
+                            )}
+                          </motion.div>
+                        </motion.div>
+
+                      ) : (
+                        /* ══════════════════════════════════════════════════ */
+                        /* PHASE 4 — LIVING TWO-PAGE BOOK SPREAD             */
+                        /* ══════════════════════════════════════════════════ */
+                        <motion.div
+                          initial={{ opacity:0, scale:0.88 }}
+                          animate={{ opacity:1, scale:1 }}
+                          transition={{ type:"spring", stiffness:105, damping:20 }}
+                          className="flex"
+                          style={{
+                            width:"min(720px,96vw)",
+                            borderRadius:18,
+                            overflow:"hidden",
+                            boxShadow:"0 0 0 1.5px rgba(201,168,76,0.3), 0 0 80px rgba(201,168,76,0.18), 0 40px 100px rgba(0,0,0,0.72)",
+                          }}>
+
+                          {/* ══ LEFT PAGE — NIMI AT SCHOOL ══ */}
+                          <div style={{
+                            width:"44%", flexShrink:0,
+                            background:"linear-gradient(165deg, #2c1206 0%, #1a0c04 55%, #200e05 100%)",
+                            position:"relative", overflow:"hidden",
+                            display:"flex", flexDirection:"column",
+                            minHeight:"min(460px,66vh)",
+                          }}>
+                            {/* Paper texture overlay */}
+                            <div className="absolute inset-0 pointer-events-none"
+                              style={{ backgroundImage:"url(/paper-texture.png)", backgroundSize:"220px", backgroundRepeat:"repeat", opacity:0.07, mixBlendMode:"overlay" }} />
+                            {/* Ruled lines */}
+                            {[14,25,36,47,58,69,80].map((pct,li) => (
+                              <div key={li} className="absolute inset-x-0 h-px pointer-events-none"
+                                style={{ top:`${pct}%`, background:"rgba(201,168,76,0.038)" }} />
+                            ))}
+                            {/* Floating gold stars */}
+                            {([14,84,10,88] as number[]).map((x, si) => (
+                              <motion.span key={si} className="absolute pointer-events-none select-none"
+                                style={{ left:`${x}%`, top:`${[9,22,52,66][si]}%`, color:"rgba(201,168,76,0.2)", fontSize:"clamp(7px,1.5vw,10px)" }}
+                                animate={{ y:[0,-3,0], opacity:[0.16,0.3,0.16] }}
+                                transition={{ duration:2.8+si*0.7, repeat:Infinity, delay:si*0.45, ease:"easeInOut" }}>
+                                ✦
+                              </motion.span>
+                            ))}
+                            {/* Corner decorations */}
+                            <span className="absolute top-3.5 right-3.5 pointer-events-none select-none"
+                              style={{ fontSize:"clamp(13px,2.2vw,18px)", opacity:0.48 }}>🍎</span>
+                            <span className="absolute pointer-events-none select-none"
+                              style={{ bottom:"22%", left:"8%", fontSize:"clamp(10px,1.8vw,15px)", opacity:0.28, transform:"rotate(-18deg)" }}>✏️</span>
+
+                            {/* Chapter heading */}
+                            <div className="relative z-10 px-4 pt-4 pb-0 shrink-0">
+                              <div className="flex items-center gap-2 mb-2.5">
+                                <div className="flex-1 h-px" style={{ background:"linear-gradient(to right, transparent, rgba(201,168,76,0.26))" }} />
+                                <span style={{ fontFamily:"var(--font-nunito)", fontSize:"clamp(7px,1.3vw,9px)", letterSpacing:"0.26em", textTransform:"uppercase", color:"rgba(201,168,76,0.42)" }}>Book I</span>
+                                <div className="flex-1 h-px" style={{ background:"linear-gradient(to left, transparent, rgba(201,168,76,0.26))" }} />
+                              </div>
+                              <motion.h2
+                                initial={{ opacity:0, y:6 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.3 }}
+                                className="font-baloo font-black text-center leading-tight"
+                                style={{ fontSize:"clamp(0.95rem,2.6vw,1.35rem)", color:"#f5e6c8", textShadow:"0 2px 18px rgba(0,0,0,0.72)" }}>
+                                The Talking Faces
+                              </motion.h2>
+                              <motion.p
+                                initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:0.42 }}
+                                className="text-center font-nunito font-bold mt-1"
+                                style={{ fontSize:"clamp(0.55rem,1.3vw,0.7rem)", letterSpacing:"0.22em", textTransform:"uppercase", color:"rgba(201,168,76,0.46)" }}>
+                                Nimi at School
+                              </motion.p>
                             </div>
-                            <motion.p initial={{ opacity:0, y:6 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.35 }}
-                              className="font-baloo font-black text-2xl mb-1 tracking-wide" style={{ color:"#2d1a06" }}>
-                              The End
-                            </motion.p>
-                            <motion.p initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:0.5 }}
-                              className="font-nunito text-xs text-center mb-4 leading-relaxed" style={{ color:"rgba(120,80,20,0.5)" }}>
-                              All {totalCount} chapters complete!<br />
-                              <span className="md:hidden">Your certificate is above ↑</span>
-                              <span className="hidden md:inline">Your certificate is on the left.</span>
-                            </motion.p>
-                            <div className="flex items-center gap-3 w-full mb-4">
-                              <div className="flex-1 h-px" style={{ background:"rgba(120,80,20,0.15)" }} />
-                              <span className="text-xs select-none" style={{ color:"rgba(120,80,20,0.3)" }}>✦</span>
-                              <div className="flex-1 h-px" style={{ background:"rgba(120,80,20,0.15)" }} />
+
+                            {/* Ornamental divider */}
+                            <div className="relative z-10 flex items-center gap-2 px-4 mt-2 mb-1 shrink-0">
+                              <div className="flex-1 h-px" style={{ background:"linear-gradient(to right, transparent, rgba(201,168,76,0.2))" }} />
+                              <span style={{ color:"rgba(201,168,76,0.36)", fontSize:8 }}>✦</span>
+                              <div className="flex-1 h-px" style={{ background:"linear-gradient(to left, transparent, rgba(201,168,76,0.2))" }} />
                             </div>
-                            <div className="w-full space-y-1.5">
-                              {slots.map((slot, i) => {
-                                const meta  = MISSION_META[slot.slot_key] ?? { emoji:"📌", tKey:slot.slot_key };
-                                const label = slot.title || t(meta.tKey);
-                                return (
-                                  <motion.div key={slot.slot_key}
-                                    initial={{ opacity:0, x:8 }} animate={{ opacity:1, x:0 }}
-                                    transition={{ delay:0.55 + i * 0.04 }}
-                                    className="flex items-center gap-2">
-                                    <CheckCircle2 className="w-3.5 h-3.5 text-green-500 shrink-0" />
-                                    <span className="font-nunito text-xs truncate flex-1" style={{ color:"rgba(120,80,20,0.6)" }}>{label}</span>
-                                    {slot.stars != null && (
-                                      <span className="font-nunito text-2xs font-semibold text-amber-500">⭐ {slot.stars}</span>
+
+                            {/* Nimi character — floats in remaining space */}
+                            <div className="relative z-10 flex-1 flex items-end justify-center px-3 overflow-hidden">
+                              {/* Floor shadow */}
+                              <div className="absolute bottom-2 left-1/2 -translate-x-1/2 pointer-events-none"
+                                style={{ width:"62%", height:14, background:"radial-gradient(ellipse, rgba(0,0,0,0.42), transparent 70%)", filter:"blur(5px)" }} />
+                              <motion.div animate={{ y:[0,-5,0] }} transition={{ duration:3.8, repeat:Infinity, ease:"easeInOut" }}>
+                                <motion.img src="/nimi.png" alt="Nimi"
+                                  initial={{ opacity:0, y:18 }} animate={{ opacity:1, y:0 }}
+                                  transition={{ type:"spring", stiffness:105, damping:18, delay:0.45 }}
+                                  style={{ height:"clamp(100px,19vh,170px)", width:"auto", objectFit:"contain",
+                                    filter:"drop-shadow(0 6px 16px rgba(0,0,0,0.58))" }} />
+                              </motion.div>
+                              {/* Cloud deco */}
+                              <span className="absolute top-4 right-4 pointer-events-none select-none"
+                                style={{ fontSize:"clamp(11px,2vw,16px)", opacity:0.2 }}>☁️</span>
+                            </div>
+
+                            {/* Progress bar */}
+                            {totalCount > 0 && (
+                              <div className="relative z-10 px-4 py-3 shrink-0"
+                                style={{ borderTop:"1px solid rgba(201,168,76,0.1)" }}>
+                                <div className="flex justify-between items-center mb-1">
+                                  <span style={{ fontFamily:"var(--font-nunito)", fontSize:"clamp(7px,1.2vw,9px)", letterSpacing:"0.14em", textTransform:"uppercase", color:"rgba(201,168,76,0.36)" }}>Progress</span>
+                                  <span style={{ fontFamily:"var(--font-nunito)", fontWeight:700, fontSize:"clamp(7px,1.2vw,9px)", color:"rgba(201,168,76,0.36)" }}>{doneCount}/{totalCount}</span>
+                                </div>
+                                <div style={{ height:3, borderRadius:3, background:"rgba(255,255,255,0.07)", overflow:"hidden" }}>
+                                  <motion.div
+                                    initial={{ width:0 }}
+                                    animate={{ width:`${totalCount>0?(doneCount/totalCount)*100:0}%` }}
+                                    transition={{ duration:1.2, delay:0.7, ease:"easeOut" }}
+                                    style={{ height:"100%", borderRadius:3, background:"linear-gradient(to right,#c9a84c,#f5d67b)" }} />
+                                </div>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* ══ SPINE ══ */}
+                          <div style={{
+                            width:20, flexShrink:0,
+                            background:"linear-gradient(to right, rgba(4,1,0,0.88), rgba(38,18,4,0.95), rgba(4,1,0,0.88))",
+                            position:"relative", display:"flex", flexDirection:"column",
+                            alignItems:"center", justifyContent:"space-between", padding:"16px 0",
+                          }}>
+                            <div style={{ width:"100%", height:1, background:"rgba(201,168,76,0.26)" }} />
+                            {/* Page-curl shadows */}
+                            <div className="absolute inset-y-0 left-0 w-1.5 pointer-events-none"
+                              style={{ background:"linear-gradient(to right, rgba(0,0,0,0.28), transparent)" }} />
+                            <div className="absolute inset-y-0 right-0 w-1.5 pointer-events-none"
+                              style={{ background:"linear-gradient(to left, rgba(0,0,0,0.16), transparent)" }} />
+                            <span style={{ writingMode:"vertical-rl", fontFamily:"var(--font-nunito)", fontWeight:900, fontSize:"4.5px", letterSpacing:"0.9em", textTransform:"uppercase", color:"rgba(201,168,76,0.3)", userSelect:"none" }}>NIMIPIKO</span>
+                            <div style={{ width:"100%", height:1, background:"rgba(201,168,76,0.26)" }} />
+                          </div>
+
+                          {/* ══ RIGHT PAGE — WHAT ARE WE DOING TODAY? ══ */}
+                          <div style={{
+                            flex:1, background:"#f7f2e6",
+                            borderRadius:"0 18px 18px 0",
+                            position:"relative", overflow:"hidden",
+                            display:"flex", flexDirection:"column",
+                          }}>
+                            {/* Paper texture */}
+                            <div className="absolute inset-0 pointer-events-none"
+                              style={{ backgroundImage:"url(/paper-texture.png)", backgroundSize:"220px", backgroundRepeat:"repeat", opacity:0.2 }} />
+                            {/* Ruled lines */}
+                            {[8,14,20,26,32,38,44,50,56,62,68,74,80,86,92].map((pct,li) => (
+                              <div key={li} className="absolute inset-x-0 h-px pointer-events-none"
+                                style={{ top:`${pct}%`, background:"rgba(120,80,20,0.05)" }} />
+                            ))}
+                            {/* Binding shadow */}
+                            <div className="absolute inset-y-0 left-0 w-5 pointer-events-none z-10"
+                              style={{ background:"linear-gradient(to right, rgba(0,0,0,0.065), transparent)" }} />
+                            {/* Bookmark ribbon */}
+                            <div className="absolute top-0 right-7 z-20 pointer-events-none hidden sm:block"
+                              style={{ filter:"drop-shadow(-1px 2px 3px rgba(0,0,0,0.2))" }}>
+                              <div style={{ width:15, height:44, background:"linear-gradient(to right,#7c3aed,#a855f7,#7c3aed)", clipPath:"polygon(0 0,100% 0,100% 80%,50% 100%,0 80%)" }} />
+                            </div>
+
+                            {/* Page header */}
+                            <div className="relative z-10 px-4 pt-3.5 pb-0 shrink-0">
+                              <div className="flex items-center gap-2 mb-1.5">
+                                <div className="flex-1 h-px" style={{ background:"rgba(120,80,20,0.13)" }} />
+                                <span style={{ fontFamily:"var(--font-nunito)", fontSize:"clamp(7px,1.2vw,9px)", letterSpacing:"0.22em", textTransform:"uppercase", color:"rgba(120,80,20,0.32)" }}>Your Adventure</span>
+                                <div className="flex-1 h-px" style={{ background:"rgba(120,80,20,0.13)" }} />
+                              </div>
+                              <motion.h2
+                                initial={{ opacity:0, y:4 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.38 }}
+                                className="font-baloo font-black text-center leading-snug"
+                                style={{ fontSize:"clamp(0.86rem,2.2vw,1.05rem)", color:"#2d1a06" }}>
+                                What are we doing today?
+                              </motion.h2>
+                            </div>
+
+                            {/* Top row of activity stickers — Listen / Read / Create */}
+                            <div className="relative z-10 flex justify-around px-3 pt-2 pb-1 shrink-0">
+                              {BOOK1_ACTIVITIES.slice(0,3).map((act, ai) => {
+                                const slot = slots.find(s => s.slot_key === act.key);
+                                const available = !!slot;
+                                const done = slot?.completed ?? false;
+                                const isHero = act.key === "flipflop_audio";
+
+                                const circle = (
+                                  <div style={{
+                                    width:"clamp(36px,6vw,50px)", height:"clamp(36px,6vw,50px)",
+                                    borderRadius:"50%", flexShrink:0,
+                                    background: available ? act.bg : "#e5e7eb",
+                                    border:`2px solid ${available ? act.ring : "#d1d5db"}`,
+                                    display:"flex", alignItems:"center", justifyContent:"center",
+                                    boxShadow: done
+                                      ? `0 0 0 3px ${act.ring}66, 0 0 16px ${act.ring}35, 0 3px 10px rgba(0,0,0,0.1)`
+                                      : isHero && available
+                                        ? `0 2px 14px ${act.ring}55`
+                                        : available
+                                          ? `0 2px 10px ${act.ring}30`
+                                          : "0 2px 6px rgba(0,0,0,0.07)",
+                                    position:"relative",
+                                  }}>
+                                    {/* Pulsing attention ring — hero (Listen) sticker only */}
+                                    {isHero && available && (
+                                      <motion.div className="absolute inset-0 pointer-events-none"
+                                        animate={{ scale:[1,1.45,1], opacity:[0.55,0,0.55] }}
+                                        transition={{ duration:2.4, repeat:Infinity, ease:"easeOut" }}
+                                        style={{ borderRadius:"50%", border:`2px solid ${act.ring}` }} />
                                     )}
+                                    <img src={act.icon} alt={act.label} style={{ width:"54%", height:"54%", objectFit:"contain" }} />
+                                    {done && (
+                                      <div style={{ position:"absolute", bottom:-4, right:-4, background:"#16a34a", borderRadius:"50%",
+                                        width:"clamp(12px,2vw,15px)", height:"clamp(12px,2vw,15px)",
+                                        display:"flex", alignItems:"center", justifyContent:"center",
+                                        fontSize:"clamp(7px,1.2vw,9px)", color:"white", border:"1.5px solid white", lineHeight:1 }}>✓</div>
+                                    )}
+                                  </div>
+                                );
+
+                                // ── Available sticker — interactive button ──
+                                if (available) {
+                                  return (
+                                    <motion.button key={act.key}
+                                      type="button"
+                                      aria-label={`${act.label} activity`}
+                                      initial={{ opacity:0, y:8, scale:0.85 }}
+                                      animate={{ opacity:1, y:0, scale:1 }}
+                                      transition={{ delay:0.5+ai*0.09, type:"spring", stiffness:155, damping:18 }}
+                                      whileHover={act.hover}
+                                      whileTap={{ scale:0.88 }}
+                                      onClick={() => {
+                                        if (navigatingRef.current) return;
+                                        navigatingRef.current = true;
+                                        playTap();
+                                        setNimiReacting(true);
+                                        setTimeout(() => {
+                                          router.push(`/stories/${slug}/mission/${act.key}`);
+                                        }, 380);
+                                      }}
+                                      style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:3,
+                                        background:"none", border:"none", padding:"5px 6px", margin:"-5px -6px", cursor:"pointer" }}>
+                                      {circle}
+                                      <span style={{ fontFamily:"var(--font-baloo)", fontWeight:900,
+                                        fontSize:"clamp(0.62rem,1.5vw,0.72rem)", color:"#2d1a06", textAlign:"center", lineHeight:1.1 }}>
+                                        {act.label}
+                                      </span>
+                                    </motion.button>
+                                  );
+                                }
+
+                                // ── Unavailable sticker — visual only ──
+                                return (
+                                  <motion.div key={act.key}
+                                    initial={{ opacity:0, y:8, scale:0.85 }}
+                                    animate={{ opacity:1, y:0, scale:1 }}
+                                    transition={{ delay:0.5+ai*0.09, type:"spring", stiffness:155, damping:18 }}
+                                    style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:3,
+                                      opacity:0.28, cursor:"default" }}>
+                                    {circle}
+                                    <span style={{ fontFamily:"var(--font-baloo)", fontWeight:900,
+                                      fontSize:"clamp(0.62rem,1.5vw,0.72rem)", color:"#2d1a06", textAlign:"center", lineHeight:1.1 }}>
+                                      {act.label}
+                                    </span>
                                   </motion.div>
                                 );
                               })}
                             </div>
-                          </div>
 
-                        ) : (
+                            {/* Nimi + Piko characters — centered, dominant */}
+                            <div className="relative z-10 flex items-end justify-center flex-1 pb-0 overflow-hidden"
+                              style={{ gap:"clamp(2px,1.2vw,10px)", minHeight:"clamp(65px,13vh,110px)" }}>
+                              {/* Nimi — reacts when an activity is tapped */}
+                              <motion.div
+                                animate={nimiReacting
+                                  ? { y:[0,-14,5,-9,0], scale:[1,1.16,0.93,1.1,1] }
+                                  : { y:[0,-4,0], rotate:[0,-1,0] }}
+                                transition={nimiReacting
+                                  ? { duration:0.44, ease:"easeOut" }
+                                  : { duration:3.6, repeat:Infinity, ease:"easeInOut" }}>
+                                <motion.img src="/nimi.png" alt="Nimi"
+                                  initial={{ opacity:0, x:-8 }} animate={{ opacity:1, x:0 }}
+                                  transition={{ delay:0.55, type:"spring", stiffness:100, damping:18 }}
+                                  style={{ height:"clamp(68px,13.5vh,108px)", width:"auto", objectFit:"contain",
+                                    filter: nimiReacting
+                                      ? "drop-shadow(0 6px 18px rgba(59,130,246,0.45))"
+                                      : "drop-shadow(0 4px 10px rgba(0,0,0,0.22))" }} />
+                              </motion.div>
+                              {/* Piko — follows with a slight delay */}
+                              <motion.div
+                                animate={nimiReacting
+                                  ? { y:[0,-9,3,-6,0], rotate:[0,6,-2,4,0] }
+                                  : { y:[0,-4,0], rotate:[0,0.9,0] }}
+                                transition={nimiReacting
+                                  ? { duration:0.5, ease:"easeOut", delay:0.06 }
+                                  : { duration:3.1, repeat:Infinity, ease:"easeInOut", delay:0.4 }}>
+                                <motion.img src="/themes/default/characters/piko.png" alt="Piko"
+                                  initial={{ opacity:0, x:8 }} animate={{ opacity:1, x:0 }}
+                                  transition={{ delay:0.65, type:"spring", stiffness:100, damping:18 }}
+                                  style={{ height:"clamp(56px,11vh,88px)", width:"auto", objectFit:"contain",
+                                    filter:"drop-shadow(0 4px 10px rgba(0,0,0,0.18))", marginBottom:4 }} />
+                              </motion.div>
+                            </div>
 
-                          /* ── MISSION ORBS GRID ── */
-                          <div className="flex-1 px-3 pb-2 pt-1 grid grid-cols-2 gap-2.5 content-start overflow-y-auto">
-                            {slots.length === 0 && (
-                              <div className="col-span-2 py-8 text-center">
-                                <Loader2 className="w-5 h-5 animate-spin mx-auto mb-2" style={{ color:"rgba(201,168,76,0.4)" }} />
-                                <p className="font-nunito text-xs" style={{ color:"rgba(120,80,20,0.4)" }}>Loading chapters…</p>
-                              </div>
-                            )}
-                            {slots.map((slot, i) => {
-                              const meta     = MISSION_META[slot.slot_key] ?? { emoji:"📌", tKey:slot.slot_key, actionKey:"storyMissionGo" };
-                              const isNext   = !slot.completed && (i === 0 || slots[i-1]?.completed);
-                              const isLocked = !slot.completed && !isNext;
-                              const label    = slot.title || t(meta.tKey);
+                            {/* Bottom row of activity stickers — Move / Sing / Watch */}
+                            <div className="relative z-10 flex justify-around px-3 pt-1 pb-2 shrink-0">
+                              {BOOK1_ACTIVITIES.slice(3,6).map((act, ai) => {
+                                const slot = slots.find(s => s.slot_key === act.key);
+                                const available = !!slot;
+                                const done = slot?.completed ?? false;
 
-                              if (isLocked) {
+                                const circle = (
+                                  <div style={{
+                                    width:"clamp(36px,6vw,50px)", height:"clamp(36px,6vw,50px)",
+                                    borderRadius:"50%", flexShrink:0,
+                                    background: available ? act.bg : "#e5e7eb",
+                                    border:`2px solid ${available ? act.ring : "#d1d5db"}`,
+                                    display:"flex", alignItems:"center", justifyContent:"center",
+                                    boxShadow: done
+                                      ? `0 0 0 3px ${act.ring}66, 0 0 16px ${act.ring}35, 0 3px 10px rgba(0,0,0,0.1)`
+                                      : available
+                                        ? `0 2px 10px ${act.ring}30`
+                                        : "0 2px 6px rgba(0,0,0,0.07)",
+                                    position:"relative",
+                                  }}>
+                                    <img src={act.icon} alt={act.label} style={{ width:"54%", height:"54%", objectFit:"contain" }} />
+                                    {done && (
+                                      <div style={{ position:"absolute", bottom:-4, right:-4, background:"#16a34a", borderRadius:"50%",
+                                        width:"clamp(12px,2vw,15px)", height:"clamp(12px,2vw,15px)",
+                                        display:"flex", alignItems:"center", justifyContent:"center",
+                                        fontSize:"clamp(7px,1.2vw,9px)", color:"white", border:"1.5px solid white", lineHeight:1 }}>✓</div>
+                                    )}
+                                  </div>
+                                );
+
+                                if (available) {
+                                  return (
+                                    <motion.button key={act.key}
+                                      type="button"
+                                      aria-label={`${act.label} activity`}
+                                      initial={{ opacity:0, y:8, scale:0.85 }}
+                                      animate={{ opacity:1, y:0, scale:1 }}
+                                      transition={{ delay:0.7+ai*0.09, type:"spring", stiffness:155, damping:18 }}
+                                      whileHover={act.hover}
+                                      whileTap={{ scale:0.88 }}
+                                      onClick={() => {
+                                        if (navigatingRef.current) return;
+                                        navigatingRef.current = true;
+                                        playTap();
+                                        setNimiReacting(true);
+                                        setTimeout(() => {
+                                          router.push(`/stories/${slug}/mission/${act.key}`);
+                                        }, 380);
+                                      }}
+                                      style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:3,
+                                        background:"none", border:"none", padding:"5px 6px", margin:"-5px -6px", cursor:"pointer" }}>
+                                      {circle}
+                                      <span style={{ fontFamily:"var(--font-baloo)", fontWeight:900,
+                                        fontSize:"clamp(0.62rem,1.5vw,0.72rem)", color:"#2d1a06", textAlign:"center", lineHeight:1.1 }}>
+                                        {act.label}
+                                      </span>
+                                    </motion.button>
+                                  );
+                                }
+
                                 return (
-                                  <motion.div key={slot.slot_key}
-                                    initial={{ opacity:0, scale:0.88 }} animate={{ opacity:1, scale:1 }}
-                                    transition={{ delay:0.15 + i*0.06 }}
-                                    className="relative flex flex-col items-center justify-center gap-1 py-4 px-2 rounded-2xl select-none"
-                                    style={{ background:"rgba(0,0,0,0.04)", border:"1.5px solid rgba(0,0,0,0.07)" }}>
-                                    <div className="w-11 h-11 rounded-full flex items-center justify-center text-xl opacity-25"
-                                      style={{ background:"rgba(0,0,0,0.06)" }}>
-                                      {meta.emoji}
-                                    </div>
-                                    <p className="font-nunito font-semibold text-2xs text-center leading-tight" style={{ color:"rgba(45,26,6,0.28)" }}>{label}</p>
-                                    <Lock className="w-3 h-3 absolute top-2 right-2" style={{ color:"rgba(45,26,6,0.2)" }} />
-                                    <span className="font-mono font-black" style={{ fontSize:"8px", color:"rgba(45,26,6,0.18)" }}>{toRoman(i+1)}</span>
+                                  <motion.div key={act.key}
+                                    initial={{ opacity:0, y:8, scale:0.85 }}
+                                    animate={{ opacity:1, y:0, scale:1 }}
+                                    transition={{ delay:0.7+ai*0.09, type:"spring", stiffness:155, damping:18 }}
+                                    style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:3,
+                                      opacity:0.28, cursor:"default" }}>
+                                    {circle}
+                                    <span style={{ fontFamily:"var(--font-baloo)", fontWeight:900,
+                                      fontSize:"clamp(0.62rem,1.5vw,0.72rem)", color:"#2d1a06", textAlign:"center", lineHeight:1.1 }}>
+                                      {act.label}
+                                    </span>
                                   </motion.div>
                                 );
-                              }
+                              })}
+                            </div>
 
-                              const orbContent = (
-                                <motion.div
-                                  initial={{ opacity:0, scale:0.88 }} animate={{ opacity:1, scale:1 }}
-                                  transition={{ delay:0.15 + i*0.06 }}
-                                  whileHover={{ scale:1.05 }} whileTap={{ scale:0.95 }}
-                                  className="relative flex flex-col items-center justify-center gap-1 py-4 px-2 rounded-2xl cursor-pointer"
-                                  style={slot.completed ? {
-                                    background:"linear-gradient(135deg, #f0fdf4, #dcfce7)",
-                                    border:"1.5px solid #86efac",
-                                    boxShadow:"0 2px 8px rgba(34,197,94,0.15)",
-                                  } : {
-                                    background:"linear-gradient(135deg, #1a3558, #06101f)",
-                                    border:"1.5px solid rgba(201,168,76,0.38)",
-                                    boxShadow:"0 4px 16px rgba(6,16,31,0.3), 0 0 20px rgba(201,168,76,0.07)",
-                                  }}>
-                                  {/* Glow pulse on next-up mission */}
-                                  {isNext && (
-                                    <motion.div className="absolute inset-0 rounded-2xl pointer-events-none"
-                                      animate={{ opacity:[0.4,0.8,0.4] }} transition={{ duration:2, repeat:Infinity }}
-                                      style={{ background:"radial-gradient(circle, rgba(201,168,76,0.12), transparent)", border:"1px solid rgba(201,168,76,0.25)" }} />
-                                  )}
-                                  {/* Icon orb */}
-                                  <div className="w-12 h-12 rounded-full flex items-center justify-center text-2xl shrink-0"
-                                    style={ slot.completed
-                                      ? { background:"rgba(34,197,94,0.15)" }
-                                      : { background:"rgba(255,255,255,0.09)", boxShadow: isNext ? "0 0 16px rgba(201,168,76,0.25)" : "none" }}>
-                                    {slot.completed
-                                      ? <CheckCircle2 className="w-6 h-6 text-green-500" />
-                                      : <span>{meta.emoji}</span>}
-                                  </div>
-                                  <p className="font-nunito font-bold text-2xs text-center leading-tight"
-                                    style={{ color: slot.completed ? "#15803d" : "#f5e6c8" }}>
-                                    {label}
-                                  </p>
-                                  {isNext && (
-                                    <span className="font-baloo font-black text-2xs uppercase tracking-wide" style={{ color:"#c9a84c" }}>
-                                      Start →
-                                    </span>
-                                  )}
-                                  {slot.completed && slot.stars != null && (
-                                    <span className="font-nunito text-2xs font-semibold text-amber-600">⭐ {slot.stars}</span>
-                                  )}
-                                  <span className="font-mono font-black opacity-35"
-                                    style={{ fontSize:"8px", color: slot.completed ? "#15803d" : "#f5e6c8" }}>
-                                    {toRoman(i+1)}
-                                  </span>
-                                </motion.div>
-                              );
-
-                              return (slot.completed || isNext) ? (
-                                <Link key={slot.slot_key} href={`/stories/${slug}/mission/${slot.slot_key}`} onClick={playTap}>
-                                  {orbContent}
-                                </Link>
-                              ) : (
-                                <div key={slot.slot_key}>{orbContent}</div>
-                              );
-                            })}
+                            {/* Page footer */}
+                            <div className="relative z-10 flex items-center justify-between px-4 py-2 shrink-0"
+                              style={{ borderTop:"1px solid rgba(120,80,20,0.08)" }}>
+                              <span style={{ fontFamily:"var(--font-nunito)", fontStyle:"italic", fontSize:"clamp(7px,1.1vw,9px)", color:"rgba(120,80,20,0.26)" }}>nimipiko.com</span>
+                              <span style={{ fontFamily:"var(--font-nunito)", fontSize:"clamp(7px,1.1vw,9px)", color:"rgba(120,80,20,0.26)" }}>— {childName} —</span>
+                            </div>
                           </div>
 
-                        )}
+                        </motion.div>
+                      )}
 
-                        {/* Footer */}
-                        <div className="px-5 py-2 shrink-0 flex items-center justify-between"
-                          style={{ borderTop:"1px solid rgba(120,80,20,0.1)" }}>
-                          <span className="text-2xs font-nunito italic" style={{ color:"rgba(120,80,20,0.3)" }}>nimipiko.com</span>
-                          <span className="text-2xs font-nunito" style={{ color:"rgba(120,80,20,0.3)" }}>— {doneCount} of {totalCount} —</span>
-                        </div>
-
-                        {/* Page-edge depth strips */}
-                        <div className="absolute top-2 bottom-2 -right-1.5 w-1.5 rounded-r pointer-events-none overflow-hidden hidden md:flex flex-col gap-px" style={{ zIndex:-1 }}>
-                          {[["#ddd5c0"],["#e5dcc8"],["#eae2d0"]].map(([bg],i) => (
-                            <div key={i} className="flex-1 rounded-r" style={{ background:bg }} />
+                      {/* Progress dots — only when book is closed */}
+                      {!bookIsOpen && totalCount > 0 && (
+                        <motion.div
+                          initial={{ opacity:0 }}
+                          animate={{ opacity: isBookOpening ? 0 : 1 }}
+                          transition={{ delay: isBookOpening ? 0 : 0.52 }}
+                          className="flex items-center gap-1.5 mt-4">
+                          {slots.map((slot, i) => (
+                            <div key={i} style={{
+                              width: slot.completed ? 8 : 6,
+                              height: slot.completed ? 8 : 6,
+                              borderRadius:"50%",
+                              background: slot.completed ? "#C9A84C" : "rgba(255,255,255,0.15)",
+                              transition:"all 0.3s",
+                              flexShrink:0,
+                            }} />
                           ))}
-                        </div>
+                        </motion.div>
+                      )}
 
-                        {/* Bookmark ribbon */}
-                        <div className="absolute top-0 right-10 z-20 hidden md:flex flex-col items-center pointer-events-none"
-                          style={{ filter:"drop-shadow(-1px 3px 3px rgba(0,0,0,0.28))" }}>
-                          <div className="w-6 h-20 flex items-center justify-center"
-                            style={{
-                              background:"linear-gradient(to right, #9f1239, #e11d48, #9f1239)",
-                              clipPath:"polygon(0 0, 100% 0, 100% 82%, 50% 100%, 0 82%)",
-                            }}>
-                            <span className="text-white/60 font-black select-none"
-                              style={{ writingMode:"vertical-rl", fontSize:"6px", letterSpacing:"0.18em" }}>
-                              {doneCount >= totalCount && totalCount > 0 ? "✦" : "▶"}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-
-                    </motion.div>
-                  </div>{/* /perspective */}
-
-                  {/* ── CTA below book ── */}
-                  {doneCount < totalCount && (
-                    <motion.button
-                      initial={{ opacity:0, y:16 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.55 }}
-                      whileHover={{ scale:1.02 }} whileTap={{ scale:0.97 }}
-                      onClick={() => { playTap(); setPhase("missions"); }}
-                      className="mt-4 w-full font-baloo font-black text-lg py-4 rounded-2xl flex items-center justify-center gap-3"
-                      style={{ background:"linear-gradient(135deg, #c9a84c, #f0d080)", color:"#06101f", boxShadow:"0 8px 32px rgba(201,168,76,0.32)" }}>
-                      {doneCount === 0 ? "✨ Begin Your Adventure" : "🚀 Continue Adventure"}
-                    </motion.button>
+                      {/* Hint text — only when closed and idle */}
+                      {!bookIsOpen && (
+                        <motion.p
+                          initial={{ opacity:0 }}
+                          animate={{ opacity: isBookOpening ? 0 : 1 }}
+                          transition={{ delay: isBookOpening ? 0 : 0.68 }}
+                          className="font-nunito text-xs mt-2.5 text-center"
+                          style={{ color:"rgba(201,168,76,0.38)" }}>
+                          {doneCount === 0 ? `${childName}, tap the book to begin` : `${doneCount} of ${totalCount} chapters complete`}
+                        </motion.p>
+                      )}
+                    </div>
                   )}
                 </div>
 
-                {/* ── République des Champions teaser ── */}
+                {/* Nimi + République des Champions + Piko footer — fades when book is open */}
                 <motion.div
-                  initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.8 }}
-                  className="relative z-10 flex items-center justify-center gap-2 pb-6 pt-1">
-                  <div className="flex items-center gap-2 rounded-full px-4 py-1.5"
-                    style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(201,168,76,0.2)" }}>
+                  animate={{ opacity: bookIsOpen ? 0 : 1, height: bookIsOpen ? 0 : "auto" }}
+                  transition={{ duration: 0.3 }}
+                  className="relative z-10 flex items-end justify-between px-5 pb-5 shrink-0 overflow-hidden">
+                  <motion.img src={assets.nimiCircle} alt="Nimi"
+                    animate={{ y:[0,-5,0] }} transition={{ duration:3.2, repeat:Infinity, ease:"easeInOut" }}
+                    className="w-11 h-11 rounded-full opacity-50"
+                    style={{ border:"1.5px solid rgba(201,168,76,0.32)", boxShadow:"0 0 16px rgba(201,168,76,0.16)" }} />
+
+                  <motion.div initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:0.9 }}
+                    className="flex items-center gap-2 rounded-full px-3 py-1.5"
+                    style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(201,168,76,0.18)" }}>
                     <span className="text-sm">👑</span>
-                    <span className="font-nunito text-xs tracking-wide" style={{ color:"rgba(201,168,76,0.55)" }}>République des Champions</span>
-                    <span style={{ color:"rgba(201,168,76,0.35)" }}>→</span>
-                  </div>
+                    <span className="font-nunito text-xs tracking-wide" style={{ color:"rgba(201,168,76,0.5)" }}>
+                      République des Champions
+                    </span>
+                  </motion.div>
+
+                  <motion.img src={assets.pikoCircle} alt="Piko"
+                    animate={{ y:[0,-5,0] }} transition={{ duration:2.8, repeat:Infinity, ease:"easeInOut", delay:0.5 }}
+                    className="w-11 h-11 rounded-full opacity-50"
+                    style={{ border:"1.5px solid rgba(201,168,76,0.32)", boxShadow:"0 0 16px rgba(201,168,76,0.16)" }} />
                 </motion.div>
 
               </motion.div>
