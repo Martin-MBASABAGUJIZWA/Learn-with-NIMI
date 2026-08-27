@@ -401,6 +401,11 @@ const ALL_SLOT_KEYS_ORDERED = [
   'challenge_1', 'challenge_2', 'challenge_3', 'destination_video',
 ] as const
 
+// Section 4: 5 required core activities + 4 optional (challenges + destination)
+// Defined at module level — static arrays, never rebuilt on render
+const SECTION4_CORE_KEYS = new Set(['story_pdf', 'coloring', 'move_explore', 'sing_along', 'bonus_video'])
+const SECTION4_ALL_KEYS  = new Set([...SECTION4_CORE_KEYS, 'challenge_1', 'challenge_2', 'challenge_3', 'destination_video'])
+
 /* ── Main Editor ── */
 function StoryEditorInner({ story, onSaved, onDeleted, defaultLang, onNavigate }: StoryEditorProps) {
   const { success: toastOk, error: toastErr } = useToast()
@@ -742,17 +747,26 @@ function StoryEditorInner({ story, onSaved, onDeleted, defaultLang, onNavigate }
       const { data: slotRows } = await supabase.from('story_slots').select('mission_id').eq('story_id', story.id)
       const missionIds = (slotRows ?? []).map((r: { mission_id: string }) => r.mission_id)
 
-      // 3. Cascade delete DB rows (order: leaf → root)
-      if (flipflopPages.length) await supabase.from('story_page_versions').delete().in('story_page_id', flipflopPages.map((p: FlipFlopPage) => p.id))
-      await supabase.from('story_pages').delete().eq('story_id', story.id)
-      await supabase.from('story_slots').delete().eq('story_id', story.id)
-      if (missionIds.length) {
-        await supabase.from('mission_versions').delete().in('mission_id', missionIds)
-        await supabase.from('missions').delete().in('id', missionIds)
+      // 3. Cascade delete DB rows in 3 parallel rounds (leaf → mid → root)
+      // Round 1: leaf rows that reference story_pages or missions
+      if (flipflopPages.length) {
+        await supabase.from('story_page_versions').delete().in('story_page_id', flipflopPages.map((p: FlipFlopPage) => p.id))
       }
-      await supabase.from('coloring_pages').delete().eq('story_id', story.id)
-      await supabase.from('story_versions').delete().eq('story_id', story.id)
-      await supabase.from('stories').delete().eq('id', story.id)
+      // Round 2: mid-level rows — all independent of each other, all ref stories or missions
+      await Promise.all([
+        supabase.from('story_pages').delete().eq('story_id', story.id),
+        supabase.from('story_slots').delete().eq('story_id', story.id),
+        supabase.from('coloring_pages').delete().eq('story_id', story.id),
+        supabase.from('story_versions').delete().eq('story_id', story.id),
+        missionIds.length
+          ? supabase.from('mission_versions').delete().in('mission_id', missionIds)
+          : Promise.resolve(),
+      ])
+      // Round 3: root rows (missions + story — no FK dependents remain)
+      await Promise.all([
+        missionIds.length ? supabase.from('missions').delete().in('id', missionIds) : Promise.resolve(),
+        supabase.from('stories').delete().eq('id', story.id),
+      ])
 
       // 4. Clean up storage files (best-effort, don't block on failure)
       await Promise.allSettled(storageUrls.map(u => deleteStorageFile(u)))
@@ -767,18 +781,30 @@ function StoryEditorInner({ story, onSaved, onDeleted, defaultLang, onNavigate }
   }
 
   const versionRecord = version as Record<string, unknown> | undefined
-  const langMissionVer = (sk: string) => (missionVersions[sk] ?? []).find(v => v.language === activeLang)
 
-  // Section 4: 5 core activities (required) + 4 optional (challenges + destination)
-  const SECTION4_CORE_KEYS = ['story_pdf', 'coloring', 'move_explore', 'sing_along', 'bonus_video']
-  const SECTION4_ALL_KEYS  = [...SECTION4_CORE_KEYS, 'challenge_1', 'challenge_2', 'challenge_3', 'destination_video']
-  const section4CoreDone = readiness.items.filter(i => SECTION4_CORE_KEYS.includes(i.key) && i.done).length
-  const section4Count    = readiness.items.filter(i => SECTION4_ALL_KEYS.includes(i.key) && i.done).length
+  // Stable lookup — memoized so callers in JSX/callbacks don't re-subscribe on every render
+  const langMissionVer = useCallback(
+    (sk: string) => (missionVersions[sk] ?? []).find(v => v.language === activeLang),
+    [missionVersions, activeLang]
+  )
 
-  const anyLangPublished = LANGUAGES.some(lang => {
-    const sv = allStoryVersions[lang]
-    return !!(sv && (sv as Record<string, unknown>).published)
-  })
+  // Section 4 readiness counts — only recompute when the readiness snapshot changes
+  const { section4CoreDone, section4Count } = React.useMemo(() => ({
+    section4CoreDone: readiness.items.filter(i => SECTION4_CORE_KEYS.has(i.key) && i.done).length,
+    section4Count:    readiness.items.filter(i => SECTION4_ALL_KEYS.has(i.key)  && i.done).length,
+  }), [readiness.items])
+
+  // Only recompute when allStoryVersions changes — avoids O(n) scan on every render
+  const anyLangPublished = React.useMemo(
+    () => LANGUAGES.some(lang => !!(allStoryVersions[lang] && (allStoryVersions[lang] as Record<string, unknown>).published)),
+    [allStoryVersions]
+  )
+
+  // Pages for the active language — recomputed only when flipflopPages or activeLang changes
+  const langPages = React.useMemo(
+    () => flipflopPages.filter(p => (p.story_page_versions ?? []).some(v => v.language === activeLang && v.image_url)),
+    [flipflopPages, activeLang]
+  )
 
   const [showChecklist, setShowChecklist] = useState(false)
 
@@ -978,7 +1004,6 @@ function StoryEditorInner({ story, onSaved, onDeleted, defaultLang, onNavigate }
 
       {/* 3. FlipFlop Book — fully per language */}
       {(() => {
-        const langPages = flipflopPages.filter(p => (p.story_page_versions ?? []).some(v => v.language === activeLang && v.image_url))
         const langLabel = LANGUAGE_META[activeLang].label
         return (
       <Section number={3} title={`FlipFlop Audio Book — ${langLabel}`} subtitle={`All page images and audio are independent per language — ${langLabel} content does not affect other languages`} done={langPages.length > 0}
