@@ -691,14 +691,36 @@ function StoryEditorInner({ story, onSaved, onDeleted, defaultLang, onNavigate }
     }
   }
 
-  const sendToReview = async () => {
+  // Marks every language that has hit 100% readiness in one click
+  const markAllReady = async () => {
+    const eligible = LANGUAGES.filter(lang =>
+      allReadiness[lang].score === 100 &&
+      !(allStoryVersions[lang] && (allStoryVersions[lang] as Record<string, unknown>).published)
+    )
+    if (!eligible.length) return
+    const ok = await confirmAction({
+      title: 'Mark all complete languages ready?',
+      message: `${eligible.map(l => LANGUAGE_META[l].label).join(', ')} will be locked as ready to publish.`,
+      danger: false,
+    })
+    if (!ok) return
     setPublishing(true)
     try {
-      await supabase.from('stories').update({ status: 'review' }).eq('id', story.id)
+      await Promise.all(eligible.map(async (lang) => {
+        const unpublishedIds = SLOT_KEYS
+          .map(sk => (missionVersions[sk] ?? []).find(v => v.language === lang))
+          .filter((v): v is MissionVersionData => !!v && v.status !== 'published')
+          .map(v => v.id)
+        if (unpublishedIds.length) {
+          await supabase.from('mission_versions').update({ status: 'published' }).in('id', unpublishedIds)
+        }
+        const svId = await getOrCreateVersion(lang)
+        if (svId) await supabase.from('story_versions').update({ status: 'published', published: true }).eq('id', svId)
+      }))
       await loadContent(); onSaved()
-      toastOk(`"${story.title}" sent to review`)
+      toastOk(`${eligible.map(l => LANGUAGE_META[l].label).join(', ')} marked as ready`)
     } catch (err) {
-      toastErr(err instanceof Error ? err.message : 'Could not send to review')
+      toastErr(err instanceof Error ? err.message : 'Could not mark languages ready')
     } finally {
       setPublishing(false)
     }
@@ -1337,9 +1359,17 @@ function StoryEditorInner({ story, onSaved, onDeleted, defaultLang, onNavigate }
 
         {/* Language versions */}
         <div className="px-5 sm:px-6 pt-5 pb-4 border-b border-gray-100">
-          <div className="flex items-start justify-between gap-3 mb-3">
+          <div className="flex items-center justify-between gap-3 mb-3">
             <h3 className="text-[14px] font-extrabold text-gray-800">Language Versions</h3>
-            <p className="text-[11px] text-gray-400 text-right max-w-[200px] leading-snug">Mark each language ready when its content is complete, then Go Live to publish the story.</p>
+            {LANGUAGES.some(lang =>
+              allReadiness[lang].score === 100 &&
+              !(allStoryVersions[lang] && (allStoryVersions[lang] as Record<string, unknown>).published)
+            ) && (
+              <button type="button" onClick={markAllReady} disabled={publishing}
+                className="text-[11px] font-bold bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded-lg transition disabled:opacity-50 shrink-0">
+                {publishing ? 'Saving…' : '✓ Mark All Ready'}
+              </button>
+            )}
           </div>
           <div className="space-y-2">
             {LANGUAGES.map(lang => {
@@ -1397,19 +1427,16 @@ function StoryEditorInner({ story, onSaved, onDeleted, defaultLang, onNavigate }
               <p className="text-[12px] text-gray-400 mt-0.5">
                 {story.status === 'published'
                   ? `Live${story.published_at ? ` since ${new Date(story.published_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}` : ''}`
-                  : story.status === 'review' ? 'Awaiting editorial review'
                   : story.status === 'retired' ? 'Retired — not visible to learners'
                   : anyLangPublished ? 'Ready to go live' : 'Mark at least one language ready first'}
               </p>
             </div>
             <span className={`text-[11px] font-bold px-2.5 py-1 rounded-full ${
               story.status === 'published' ? 'bg-emerald-100 text-emerald-700'
-              : story.status === 'review'   ? 'bg-blue-100 text-blue-700'
-              : story.status === 'retired'  ? 'bg-zinc-100 text-zinc-500'
-              :                               'bg-gray-100 text-gray-500'
+              : story.status === 'retired' ? 'bg-zinc-100 text-zinc-500'
+              :                              'bg-gray-100 text-gray-500'
             }`}>
               {story.status === 'published' ? '🟢 Live'
-               : story.status === 'review'  ? '🔵 In Review'
                : story.status === 'retired' ? '🔘 Retired'
                :                              '⭕ Draft'}
             </span>
@@ -1426,39 +1453,20 @@ function StoryEditorInner({ story, onSaved, onDeleted, defaultLang, onNavigate }
                 {publishing ? 'Saving…' : 'Retire Story'}
               </button>
             </div>
-          ) : story.status === 'review' ? (
-            <div className="flex flex-wrap gap-2">
-              <button type="button" onClick={goLive} disabled={publishing || !anyLangPublished}
-                className={`font-bold text-[13px] rounded-xl px-5 py-2.5 transition ${
-                  anyLangPublished ? 'bg-emerald-500 hover:bg-emerald-600 text-white' : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                }`}>
-                {publishing ? 'Publishing…' : '🚀 Approve & Go Live'}
-              </button>
-              <button type="button" onClick={takeOffline} disabled={publishing}
-                className="text-[12px] font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 px-4 py-2.5 rounded-xl transition disabled:opacity-50">
-                Back to Draft
-              </button>
-            </div>
           ) : story.status === 'retired' ? (
             <button type="button" onClick={takeOffline} disabled={publishing}
               className="text-[12px] font-bold text-green-700 bg-green-50 border border-green-200 hover:bg-green-100 px-4 py-2.5 rounded-xl transition disabled:opacity-50">
               {publishing ? 'Saving…' : 'Reactivate (→ Draft)'}
             </button>
           ) : (
-            <div className="space-y-2">
-              <button type="button" onClick={goLive} disabled={publishing || !anyLangPublished}
-                className={`w-full font-bold text-[14px] rounded-xl px-6 py-3.5 transition ${
-                  anyLangPublished
-                    ? 'bg-emerald-500 hover:bg-emerald-600 text-white shadow-sm'
-                    : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                }`}>
-                {publishing ? 'Publishing…' : anyLangPublished ? '🚀 Go Live' : 'Mark a language ready first'}
-              </button>
-              <button type="button" onClick={sendToReview} disabled={publishing}
-                className="w-full text-[12px] font-bold text-blue-600 bg-blue-50 border border-blue-200 hover:bg-blue-100 px-4 py-2.5 rounded-xl transition disabled:opacity-50">
-                {publishing ? 'Saving…' : 'Send to Review'}
-              </button>
-            </div>
+            <button type="button" onClick={goLive} disabled={publishing || !anyLangPublished}
+              className={`w-full font-bold text-[14px] rounded-xl px-6 py-3.5 transition ${
+                anyLangPublished
+                  ? 'bg-emerald-500 hover:bg-emerald-600 text-white shadow-sm'
+                  : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+              }`}>
+              {publishing ? 'Publishing…' : anyLangPublished ? '🚀 Go Live' : 'Mark a language ready first'}
+            </button>
           )}
         </div>
 
