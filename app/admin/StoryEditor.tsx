@@ -12,6 +12,10 @@ import {
 import FlipFlopImporter from './FlipFlopImporter'
 import ColoringImporter from './ColoringImporter'
 import PersonalizationEditor from './PersonalizationEditor'
+import FlipFlopPageCard, { type FlipFlopPage } from './FlipFlopPageCard'
+import ColoringPageCard, { type ColoringPage } from './ColoringPageCard'
+import { StoryEditorBoundary } from './StoryEditorBoundary'
+import { deleteStorageFile } from './storageDelete'
 import { useToast } from './Toast'
 import { useConfirmDialog } from './ConfirmDialog'
 import { computeReadiness } from '@/lib/storyReadiness'
@@ -24,15 +28,6 @@ import {
 interface MissionVersionData {
   id: string; language: string; title: string; subtitle: string | null;
   tip_text: string | null; media_url: string | null; status: string; published: boolean;
-}
-
-interface FlipFlopPage {
-  id: string; page_number: number; image_url: string | null;
-  story_page_versions: { id: string; language: string; audio_url: string | null; image_url: string | null; text: string | null }[];
-}
-
-interface ColoringPage {
-  id: string; story_id?: string; page_number: number; template_image_url: string | null;
 }
 
 interface SlotData { story_id: string; slot_key: string; mission_id: string; sort_order: number }
@@ -240,14 +235,6 @@ function formatFileSize(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
 
-async function deleteStorageFile(storagePath: string): Promise<void> {
-  // storagePath format: "bucket/path/to/file.ext"
-  const slash = storagePath.indexOf('/')
-  if (slash === -1) return
-  const bucket = storagePath.substring(0, slash)
-  const path   = storagePath.substring(slash + 1)
-  await supabase.storage.from(bucket).remove([path])
-}
 
 function FileUploader({ label, url, accept, bucket, pathPrefix, dbSave, onDone, hint }: {
   label: string; url: string | null; accept: string
@@ -408,8 +395,14 @@ const ATTITUDE_PRESETS: Record<string, string[]> = {
   kr: ['호기심 많은', '용감한', '창의적인', '똑똑한', '친절한', '끈기 있는', '특별한', '결연한'],
 }
 
+// All slot keys in display order — superset of SLOT_KEYS (which only covers the 6 core slots)
+const ALL_SLOT_KEYS_ORDERED = [
+  'flipflop_audio', 'story_pdf', 'coloring', 'move_explore', 'sing_along', 'bonus_video',
+  'challenge_1', 'challenge_2', 'challenge_3', 'destination_video',
+] as const
+
 /* ── Main Editor ── */
-export default function StoryEditor({ story, onSaved, onDeleted, defaultLang, onNavigate }: StoryEditorProps) {
+function StoryEditorInner({ story, onSaved, onDeleted, defaultLang, onNavigate }: StoryEditorProps) {
   const { success: toastOk, error: toastErr } = useToast()
   const { confirm: confirmAction, dialog: confirmEl } = useConfirmDialog()
   const [activeLang, setActiveLang] = useState<Lang>(defaultLang ?? 'en')
@@ -520,13 +513,13 @@ export default function StoryEditor({ story, onSaved, onDeleted, defaultLang, on
 
   const [contentLoading, setContentLoading] = useState(true)
 
-  const reloadMissionVersions = async (slotKey: string) => {
+  const reloadMissionVersions = useCallback(async (slotKey: string) => {
     const slot = slots.find((s: SlotData) => s.slot_key === slotKey)
     if (!slot?.mission_id) return
     const { data, error } = await supabase.from('mission_versions').select('*').eq('mission_id', slot.mission_id).order('language')
     if (error) { toastErr(`Reload failed: ${error.message}`); return }
     if (data) setMissionVersions(prev => ({ ...prev, [slotKey]: data }))
-  }
+  }, [slots, toastErr])
 
   const saveField = async (field: string, value: string) => {
     if (REQUIRED_STORY_FIELDS.has(field) && !value.trim()) {
@@ -586,8 +579,8 @@ export default function StoryEditor({ story, onSaved, onDeleted, defaultLang, on
       .insert({ title: meta.label, type: slotKey, status: 'draft' })
       .select('id').single()
     if (mErr || !mission) { toastErr(`Could not create mission: ${mErr?.message}`); return }
-    // 2. Derive sort order from the SLOT_KEYS index
-    const sortOrder = SLOT_KEYS.indexOf(slotKey as SlotKey)
+    // 2. Derive sort order from the full ordered slot list (covers extended keys too)
+    const sortOrder = Math.max(0, ALL_SLOT_KEYS_ORDERED.indexOf(slotKey as typeof ALL_SLOT_KEYS_ORDERED[number]))
     // 3. Create the story_slots row
     const { data: slotRow, error: sErr } = await supabase
       .from('story_slots')
@@ -776,9 +769,11 @@ export default function StoryEditor({ story, onSaved, onDeleted, defaultLang, on
   const versionRecord = version as Record<string, unknown> | undefined
   const langMissionVer = (sk: string) => (missionVersions[sk] ?? []).find(v => v.language === activeLang)
 
-  // Section 4 badge: activities in Section 4 only (excludes FlipFlop which lives in Section 3)
-  const SECTION4_KEYS = ['story_pdf', 'coloring', 'move_explore', 'sing_along', 'bonus_video', 'challenge_1', 'challenge_2', 'challenge_3', 'destination_video']
-  const section4Count = readiness.items.filter(i => SECTION4_KEYS.includes(i.key) && i.done).length
+  // Section 4: 5 core activities (required) + 4 optional (challenges + destination)
+  const SECTION4_CORE_KEYS = ['story_pdf', 'coloring', 'move_explore', 'sing_along', 'bonus_video']
+  const SECTION4_ALL_KEYS  = [...SECTION4_CORE_KEYS, 'challenge_1', 'challenge_2', 'challenge_3', 'destination_video']
+  const section4CoreDone = readiness.items.filter(i => SECTION4_CORE_KEYS.includes(i.key) && i.done).length
+  const section4Count    = readiness.items.filter(i => SECTION4_ALL_KEYS.includes(i.key) && i.done).length
 
   const anyLangPublished = LANGUAGES.some(lang => {
     const sv = allStoryVersions[lang]
@@ -1044,7 +1039,7 @@ export default function StoryEditor({ story, onSaved, onDeleted, defaultLang, on
       })()}
 
       {/* 4. Other Activities — per language */}
-      <Section number={4} title={`Other Activities — ${LANGUAGE_META[activeLang].label}`} subtitle="PDF, Coloring, Movement, Singing, Video, Challenges, Destination" done={section4Count >= 9}
+      <Section number={4} title={`Other Activities — ${LANGUAGE_META[activeLang].label}`} subtitle="PDF, Coloring, Movement, Singing, Video, Challenges, Destination" done={section4CoreDone >= 5}
         badge={`${section4Count}/9`}>
         <div className="space-y-3">
           {/* Coloring — multi-page with inline edit */}
@@ -1482,6 +1477,13 @@ export default function StoryEditor({ story, onSaved, onDeleted, defaultLang, on
   )
 }
 
+export default function StoryEditor(props: StoryEditorProps) {
+  return (
+    <StoryEditorBoundary>
+      <StoryEditorInner {...props} />
+    </StoryEditorBoundary>
+  )
+}
 
 function Section({ number, title, subtitle, done, badge, children }: {
   number: number; title: string; subtitle: string; done: boolean; badge?: string; children: React.ReactNode
@@ -1507,243 +1509,3 @@ function Section({ number, title, subtitle, done, badge, children }: {
   )
 }
 
-/* ── FlipFlop Page Card (image + audio per page) ── */
-function FlipFlopPageCard({ page, lang, onUpdated, index, total, onReorder }: {
-  page: FlipFlopPage; lang: Lang; onUpdated: () => void
-  index: number; total: number; onReorder: (dir: 'up' | 'down') => Promise<void>
-}) {
-  const imgRef = useRef<HTMLInputElement>(null)
-  const audioRef = useRef<HTMLInputElement>(null)
-  const [busy, setBusy] = useState('')
-  const [reordering, setReordering] = useState(false)
-  const { error: toastErr } = useToast()
-  const { confirm: confirmDialog, dialog: confirmEl } = useConfirmDialog()
-  const langVer = (page.story_page_versions ?? []).find(v => v.language === lang)
-  const hasAudio = !!langVer?.audio_url
-
-  const handleReorder = async (dir: 'up' | 'down') => {
-    setReordering(true)
-    try {
-      await onReorder(dir)
-    } catch (err) {
-      toastErr(err instanceof Error ? err.message : 'Reorder failed')
-    } finally {
-      setReordering(false)
-    }
-  }
-  // Per-language image; fall back to shared image for pre-095 pages
-  const displayImage = langVer?.image_url ?? page.image_url
-
-  const [caption, setCaption] = useState(langVer?.text ?? '')
-  const captionTimer = useRef<ReturnType<typeof setTimeout>>(undefined)
-  useEffect(() => {
-    setCaption(langVer?.text ?? '')
-  }, [langVer?.text])
-  useEffect(() => () => { if (captionTimer.current) clearTimeout(captionTimer.current) }, [])
-
-  const handleCaption = (v: string) => {
-    setCaption(v)
-    if (captionTimer.current) clearTimeout(captionTimer.current)
-    captionTimer.current = setTimeout(async () => {
-      if (langVer) {
-        const { error } = await supabase.from('story_page_versions').update({ text: v || null }).eq('id', langVer.id)
-        if (error) toastErr(`Caption save failed: ${error.message}`)
-      } else {
-        const { error } = await supabase.from('story_page_versions').insert({ story_page_id: page.id, language: lang, text: v || null, audio_url: null, published: true })
-        if (error) { toastErr(`Caption save failed: ${error.message}`) } else { onUpdated() }
-      }
-    }, 800)
-  }
-
-  const uploadImage = async (f: File) => {
-    setBusy('image')
-    const { error, storagePath } = await smartUpload('storyBook', `pages/${page.id}-${lang}-${Date.now()}.${f.name.split('.').pop()}`, f)
-    if (!error) {
-      // Delete old image from storage before saving new one
-      if (langVer?.image_url) await deleteStorageFile(langVer.image_url).catch(() => {})
-      const dbErr = langVer
-        ? (await supabase.from('story_page_versions').update({ image_url: storagePath }).eq('id', langVer.id)).error
-        : (await supabase.from('story_page_versions').insert({ story_page_id: page.id, language: lang, text: '', image_url: storagePath, audio_url: null, published: true })).error
-      if (dbErr) { toastErr(`Save failed: ${dbErr.message}`) } else { onUpdated() }
-    }
-    setBusy('')
-  }
-
-  const uploadAudio = async (f: File) => {
-    setBusy('audio')
-    const ext = f.name.split('.').pop()
-    const { error, storagePath } = await smartUpload('storyBook', `pages/audio-${page.id}-${Date.now()}.${ext}`, f)
-    if (!error) {
-      // Delete old audio from storage before saving new one
-      if (langVer?.audio_url) await deleteStorageFile(langVer.audio_url).catch(() => {})
-      const { error: dbErr } = langVer
-        ? await supabase.from('story_page_versions').update({ audio_url: storagePath }).eq('id', langVer.id)
-        : await supabase.from('story_page_versions').insert({ story_page_id: page.id, language: lang, text: '', audio_url: storagePath, published: true })
-      if (dbErr) { toastErr(`Save failed: ${dbErr.message}`) } else { onUpdated() }
-    }
-    setBusy('')
-  }
-
-  const deletePage = async () => {
-    const ok = await confirmDialog({ title: `Delete page #${page.page_number}?`, message: 'This will remove the image and all audio versions. Cannot be undone.' })
-    if (!ok) return
-    // Clean up all storage files for this page before deleting DB rows
-    const allVersions = page.story_page_versions ?? []
-    await Promise.all([
-      page.image_url ? deleteStorageFile(page.image_url).catch(() => {}) : null,
-      ...allVersions.flatMap(v => [
-        v.image_url ? deleteStorageFile(v.image_url).catch(() => {}) : null,
-        v.audio_url ? deleteStorageFile(v.audio_url).catch(() => {}) : null,
-      ]),
-    ])
-    const { error: e1 } = await supabase.from('story_page_versions').delete().eq('story_page_id', page.id)
-    if (e1) { toastErr(`Delete failed: ${e1.message}`); return }
-    const { error: e2 } = await supabase.from('story_pages').delete().eq('id', page.id)
-    if (e2) { toastErr(`Delete failed: ${e2.message}`); return }
-    onUpdated()
-  }
-
-  const removeAudio = async () => {
-    if (!langVer) return
-    if (langVer.audio_url) await deleteStorageFile(langVer.audio_url).catch(() => {})
-    const { error } = await supabase.from('story_page_versions').update({ audio_url: null }).eq('id', langVer.id)
-    if (error) { toastErr(`Remove failed: ${error.message}`); return }
-    onUpdated()
-  }
-
-  return (
-    <div className={`rounded-xl border border-gray-200 overflow-hidden bg-white group relative ${reordering ? 'opacity-50 pointer-events-none' : ''}`}>
-      {confirmEl}
-      {/* Reorder arrows */}
-      <div className="absolute top-1.5 right-1.5 z-10 flex gap-0.5 opacity-0 group-hover:opacity-100 transition">
-        <button type="button" disabled={index === 0} onClick={() => handleReorder('up')}
-          className="w-5 h-5 bg-white/90 rounded flex items-center justify-center text-gray-500 hover:text-green-600 disabled:opacity-30 disabled:pointer-events-none shadow-sm">
-          <ChevronDown size={11} className="rotate-180" />
-        </button>
-        <button type="button" disabled={index === total - 1} onClick={() => handleReorder('down')}
-          className="w-5 h-5 bg-white/90 rounded flex items-center justify-center text-gray-500 hover:text-green-600 disabled:opacity-30 disabled:pointer-events-none shadow-sm">
-          <ChevronDown size={11} />
-        </button>
-      </div>
-      {/* Image area */}
-      <div className="aspect-[3/4] bg-gray-100 relative cursor-pointer" onClick={() => imgRef.current?.click()}>
-        {busy === 'image' ? (
-          <div className="w-full h-full flex items-center justify-center"><div className="w-6 h-6 border-2 border-green-500 border-t-transparent rounded-full animate-spin" /></div>
-        ) : displayImage ? (
-          <>
-            <img src={getStorageUrl(displayImage)} alt={`Page ${page.page_number}`} className="w-full h-full object-cover"  loading="lazy" />
-            <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
-              <span className="text-white text-[11px] font-bold bg-black/50 rounded-lg px-3 py-1.5">Replace</span>
-            </div>
-          </>
-        ) : (
-          <div className="w-full h-full flex flex-col items-center justify-center text-gray-300 hover:text-green-400 transition">
-            <ImageIcon size={28} />
-            <span className="text-[11px] font-bold mt-1">Upload Image</span>
-          </div>
-        )}
-        <div className="absolute top-1.5 left-1.5 bg-white/90 backdrop-blur-sm rounded-md px-2 py-0.5 text-[10px] font-bold text-gray-600 shadow-sm">#{page.page_number}</div>
-      </div>
-      <input ref={imgRef} type="file" accept="image/*" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) uploadImage(f) }} />
-
-      {/* Bottom controls */}
-      <div className="p-2.5 space-y-2">
-        {/* Audio */}
-        {busy === 'audio' ? (
-          <div className="flex items-center gap-2 bg-green-50 rounded-lg px-2.5 py-2">
-            <div className="w-4 h-4 border-2 border-green-500 border-t-transparent rounded-full animate-spin shrink-0" />
-            <span className="text-[11px] text-green-600 font-medium">Uploading...</span>
-          </div>
-        ) : hasAudio ? (
-          <div className="space-y-1.5">
-            <audio controls src={getStorageUrl(langVer!.audio_url!)} className="w-full h-8 rounded" />
-            <div className="flex items-center gap-1.5">
-              <Music size={11} className="text-emerald-500 shrink-0" />
-              <span className="text-[10px] text-emerald-700 font-medium truncate flex-1">{langVer?.audio_url?.split('/').pop()}</span>
-              <button type="button" onClick={() => audioRef.current?.click()} className="text-[10px] font-bold text-green-600 hover:underline shrink-0">Replace</button>
-              <button type="button" onClick={removeAudio} className="text-[10px] font-bold text-red-500 hover:underline shrink-0">✕</button>
-            </div>
-          </div>
-        ) : (
-          <button type="button" onClick={() => audioRef.current?.click()}
-            className="w-full flex items-center justify-center gap-1.5 border border-dashed border-gray-200 rounded-lg py-2.5 text-gray-400 hover:text-green-500 hover:border-green-300 transition min-h-[36px]">
-            <Music size={12} />
-            <span className="text-[11px] font-bold">Add Audio</span>
-          </button>
-        )}
-        <input ref={audioRef} type="file" accept="audio/*" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) uploadAudio(f) }} />
-
-        {/* Caption / page text */}
-        <textarea
-          value={caption}
-          onChange={e => handleCaption(e.target.value)}
-          placeholder="Caption…"
-          rows={2}
-          className="w-full text-[11px] text-gray-700 border border-gray-200 rounded-lg px-2.5 py-2 resize-none focus:outline-none focus:border-green-400 transition placeholder:text-gray-300"
-        />
-
-        {/* Delete */}
-        <button type="button" onClick={deletePage}
-          className="w-full flex items-center justify-center gap-1 text-[10px] font-bold text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg py-2 transition min-h-[32px]">
-          <Trash2 size={11} /> Delete Page
-        </button>
-      </div>
-    </div>
-  )
-}
-
-/* ── Coloring Page Card ── */
-function ColoringPageCard({ page, onUpdated }: { page: ColoringPage; onUpdated: () => void }) {
-  const imgRef = useRef<HTMLInputElement>(null)
-  const [busy, setBusy] = useState(false)
-  const { error: toastErr } = useToast()
-  const { confirm: confirmDialog, dialog: confirmEl } = useConfirmDialog()
-
-  const replaceImage = async (f: File) => {
-    setBusy(true)
-    const { error, storagePath } = await smartUpload('storyBook', `coloring/${page.story_id ?? 'x'}/page-${page.page_number}-${Date.now()}.${f.name.split('.').pop()}`, f)
-    if (!error) {
-      if (page.template_image_url) await deleteStorageFile(page.template_image_url).catch(() => {})
-      const { error: dbErr } = await supabase.from('coloring_pages').update({ template_image_url: storagePath }).eq('id', page.id)
-      if (dbErr) { toastErr(`Save failed: ${dbErr.message}`) } else { onUpdated() }
-    }
-    setBusy(false)
-  }
-
-  const deletePage = async () => {
-    const ok = await confirmDialog({ title: 'Delete coloring template?', message: 'This cannot be undone.' })
-    if (!ok) return
-    if (page.template_image_url) await deleteStorageFile(page.template_image_url).catch(() => {})
-    const { error } = await supabase.from('coloring_pages').delete().eq('id', page.id)
-    if (error) { toastErr(`Delete failed: ${error.message}`); return }
-    onUpdated()
-  }
-
-  return (
-    <div className="rounded-xl border border-gray-200 overflow-hidden bg-white group relative">
-      {confirmEl}
-      <div className="aspect-[3/4] bg-gray-50 relative cursor-pointer" onClick={() => imgRef.current?.click()}>
-        {busy ? (
-          <div className="w-full h-full flex items-center justify-center"><div className="w-5 h-5 border-2 border-pink-500 border-t-transparent rounded-full animate-spin" /></div>
-        ) : page.template_image_url ? (
-          <>
-            <img src={getStorageUrl(page.template_image_url)} alt={`Coloring ${page.page_number}`} className="w-full h-full object-cover"  loading="lazy" />
-            <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
-              <span className="text-white text-[11px] font-bold bg-black/50 rounded-lg px-2.5 py-1">Replace</span>
-            </div>
-          </>
-        ) : (
-          <div className="w-full h-full flex flex-col items-center justify-center text-gray-300">
-            <Palette size={20} />
-            <span className="text-[9px] font-bold mt-0.5">Upload</span>
-          </div>
-        )}
-      </div>
-      <input ref={imgRef} type="file" accept="image/*" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) replaceImage(f) }} />
-      <button type="button" onClick={deletePage}
-        className="w-full py-2 text-[10px] font-bold text-red-400 hover:text-red-600 hover:bg-red-50 transition flex items-center justify-center gap-1 min-h-[32px]">
-        <Trash2 size={10} /> Remove
-      </button>
-    </div>
-  )
-}
