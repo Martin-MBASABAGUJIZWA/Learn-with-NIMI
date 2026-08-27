@@ -395,6 +395,22 @@ const ATTITUDE_PRESETS: Record<string, string[]> = {
   kr: ['호기심 많은', '용감한', '창의적인', '똑똑한', '친절한', '끈기 있는', '특별한', '결연한'],
 }
 
+// Missions table columns for each slot key.
+// category_slug must be a valid FK → categories table; type must match missions_type_check.
+// sequence can repeat across stories (unique constraint dropped in migration 045).
+const SLOT_MISSION_COLS: Record<string, { category_slug: string; sequence: number; type: string }> = {
+  flipflop_audio:    { category_slug: 'flipflop',  sequence: 1, type: 'story' },
+  story_pdf:         { category_slug: 'discovery', sequence: 1, type: 'read'  },
+  coloring:          { category_slug: 'coloring',  sequence: 1, type: 'color' },
+  move_explore:      { category_slug: 'movement',  sequence: 1, type: 'move'  },
+  sing_along:        { category_slug: 'morning',   sequence: 1, type: 'sing'  },
+  bonus_video:       { category_slug: 'zoom',      sequence: 1, type: 'watch' },
+  challenge_1:       { category_slug: 'histoire',  sequence: 1, type: 'watch' },
+  challenge_2:       { category_slug: 'histoire',  sequence: 2, type: 'watch' },
+  challenge_3:       { category_slug: 'histoire',  sequence: 3, type: 'watch' },
+  destination_video: { category_slug: 'histoire',  sequence: 4, type: 'watch' },
+}
+
 // All slot keys in display order — superset of SLOT_KEYS (which only covers the 6 core slots)
 const ALL_SLOT_KEYS_ORDERED = [
   'flipflop_audio', 'story_pdf', 'coloring', 'move_explore', 'sing_along', 'bonus_video',
@@ -577,11 +593,12 @@ function StoryEditorInner({ story, onSaved, onDeleted, defaultLang, onNavigate }
   const getOrCreateSlot = async (slotKey: string): Promise<SlotData | undefined> => {
     const existing = slots.find(s => s.slot_key === slotKey)
     if (existing) return existing
-    const meta = SLOT_META[slotKey as SlotKey]
-    // 1. Create the mission row
+    const missionCols = SLOT_MISSION_COLS[slotKey]
+    if (!missionCols) { toastErr(`No mission mapping for slot: ${slotKey}`); return }
+    // 1. Create the mission row — missions table has no title/status; uses category_slug + sequence
     const { data: mission, error: mErr } = await supabase
       .from('missions')
-      .insert({ title: meta.label, type: slotKey, status: 'draft' })
+      .insert({ ...missionCols, story_id: story.id, active: false, stars: 10 })
       .select('id').single()
     if (mErr || !mission) { toastErr(`Could not create mission: ${mErr?.message}`); return }
     // 2. Derive sort order from the full ordered slot list (covers extended keys too)
