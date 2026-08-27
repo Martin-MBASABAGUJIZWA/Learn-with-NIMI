@@ -1264,12 +1264,15 @@ function StoryEditorInner({ story, onSaved, onDeleted, defaultLang, onNavigate }
                     />
                   </div>
                 ) : (
-                  <div className="flex items-center gap-2.5 bg-gray-50 border border-dashed border-gray-200 rounded-xl px-4 py-3">
-                    <AlertCircle size={14} className="text-gray-400 shrink-0" />
-                    <p className="text-[12px] text-gray-500">
-                      This mission slot has not been configured for this story yet. Add it through the Story Slots section, then return here to upload content.
-                    </p>
-                  </div>
+                  <button type="button"
+                    onClick={async () => {
+                      await getOrCreateSlot(slotKey)
+                      await loadContent()
+                    }}
+                    className="w-full border-2 border-dashed border-gray-200 rounded-xl py-4 flex flex-col items-center gap-1.5 text-gray-400 hover:border-green-300 hover:text-green-600 hover:bg-green-50/30 transition">
+                    <Plus size={16} />
+                    <span className="text-[12px] font-bold">Set up {meta.label}</span>
+                  </button>
                 )}
               </div>
               </React.Fragment>
