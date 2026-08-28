@@ -107,7 +107,15 @@ export default function StoryManager({ initialStoryId, onNavigate, onOpenSidebar
     try {
       const { data, error } = await supabase
         .from('stories')
-        .select('id, slug, title, cover_url, giant_book_url, sort_order, is_active, is_free, status, age_min, age_max, published_at, theme_title, theme_emoji, attitude, is_personalizable, personalization_config, story_pages(id, story_id, page_number, image_url, story_page_versions(id, language, text, audio_url, published)), coloring_pages(id), story_versions(id, story_id, language, title, cover_url, intro_video_url, theme_song_url, meet_characters_url, story_intro_url, status, published), story_slots(story_id, slot_key, mission_id, sort_order, missions(id, mission_versions(id, language, media_url)))')
+        .select(`
+          id, slug, title, cover_url, sort_order, is_active, is_free, status,
+          age_min, age_max, published_at, theme_title, theme_emoji, attitude,
+          is_personalizable, personalization_config,
+          story_pages(id),
+          coloring_pages(id),
+          story_versions(id, language, published),
+          story_slots(story_id, slot_key, mission_id, sort_order, missions(id, mission_versions(language, media_url)))
+        `)
         .order('sort_order')
       if (error) throw error
       setStories((data ?? []) as unknown as StoryRow[])
