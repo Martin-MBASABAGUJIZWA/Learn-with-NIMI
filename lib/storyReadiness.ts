@@ -24,6 +24,7 @@ export function computeReadiness(story: {
   cover_url?: string | null;
   story_pages?: {
     id: string;
+    image_url?: string | null;
     story_page_versions?: { language: string; image_url?: string | null; audio_url?: string | null }[];
   }[];
   coloring_pages?: { id: string }[];
@@ -56,8 +57,9 @@ export function computeReadiness(story: {
   const hasFlipFlop = (() => {
     if (pages.length === 0) return false;
     if (!lang) return true;
+    // Images live on the base page (language-neutral illustration) OR a lang-specific version
     const hasImages = pages.some(p =>
-      (p.story_page_versions ?? []).some(v => v.language === lang && v.image_url)
+      !!p.image_url || (p.story_page_versions ?? []).some(v => v.language === lang && v.image_url)
     );
     const audioCount = pages.filter(p =>
       (p.story_page_versions ?? []).some(v => v.language === lang && v.audio_url)
