@@ -46,7 +46,7 @@ export async function uploadWithProgress(
     xhr.setRequestHeader('Authorization', `Bearer ${token}`)
     xhr.setRequestHeader('apikey', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
     xhr.setRequestHeader('x-upsert', 'true')
-    xhr.timeout = 5 * 60 * 1000 // 5 min
+    xhr.timeout = 0 // no timeout — large videos need unlimited time; network errors handled by onerror
 
     xhr.send(file)
   })
