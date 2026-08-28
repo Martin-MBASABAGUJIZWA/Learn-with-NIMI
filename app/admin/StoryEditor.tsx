@@ -480,9 +480,11 @@ function StoryEditorInner({ story, onSaved, onDeleted, defaultLang, onNavigate }
   const loadContent = useCallback(async () => {
     setContentLoading(true)
     try {
-      // Fetch all 4 independent tables in parallel
+      // Single round: all 4 queries in parallel; mission_versions joined through story_slots
       const [slotsResult, svsResult, pagesResult, cpagesResult] = await Promise.all([
-        supabase.from('story_slots').select('story_id, slot_key, mission_id, sort_order').eq('story_id', story.id).order('sort_order'),
+        supabase.from('story_slots')
+          .select('story_id, slot_key, mission_id, sort_order, missions(id, mission_versions(id, language, title, subtitle, tip_text, media_url, status, published))')
+          .eq('story_id', story.id).order('sort_order'),
         supabase.from('story_versions').select('*').eq('story_id', story.id),
         supabase.from('story_pages').select('id, page_number, image_url, story_page_versions(id, language, audio_url, image_url, text)').eq('story_id', story.id).order('page_number'),
         supabase.from('coloring_pages').select('id, page_number, template_image_url').eq('story_id', story.id).order('page_number'),
@@ -490,7 +492,9 @@ function StoryEditorInner({ story, onSaved, onDeleted, defaultLang, onNavigate }
       if (slotsResult.error) throw slotsResult.error
       if (svsResult.error) throw svsResult.error
 
-      const currentSlots = slotsResult.data ?? []
+      const rawSlots = slotsResult.data ?? []
+      // Strip the joined missions data before storing in slots state (SlotData doesn't carry it)
+      const currentSlots = rawSlots.map(({ missions: _m, ...s }) => s) as unknown as SlotData[]
       setSlots(currentSlots)
       setFlipflopPages(pagesResult.data ?? [])
       setColoringPages(cpagesResult.data ?? [])
@@ -499,23 +503,13 @@ function StoryEditorInner({ story, onSaved, onDeleted, defaultLang, onNavigate }
       for (const sv of (svsResult.data ?? [])) { svMap[sv.language as Lang] = sv as { id: string } & Record<string, unknown> }
       setAllStoryVersions(svMap)
 
-      // Fetch mission versions for all configured slots in parallel
-      const slotsWithMissions = SLOT_KEYS
-        .map(sk => ({ sk, slot: currentSlots.find((s: SlotData) => s.slot_key === sk) }))
-        .filter(({ slot }) => !!slot?.mission_id)
-
-      if (slotsWithMissions.length > 0) {
-        const mvResults = await Promise.all(
-          slotsWithMissions.map(({ slot }) =>
-            supabase.from('mission_versions').select('*').eq('mission_id', slot!.mission_id!).order('language')
-          )
-        )
-        const vMap: Record<string, MissionVersionData[]> = {}
-        slotsWithMissions.forEach(({ sk }, i) => {
-          if (mvResults[i].data) vMap[sk] = mvResults[i].data!
-        })
-        setMissionVersions(vMap)
+      // Extract mission versions from the joined slots — no second round needed
+      const vMap: Record<string, MissionVersionData[]> = {}
+      for (const slot of rawSlots) {
+        const mvs = (slot as unknown as { missions?: { mission_versions?: MissionVersionData[] } }).missions?.mission_versions
+        if (slot.mission_id && mvs) vMap[slot.slot_key] = mvs
       }
+      setMissionVersions(vMap)
     } catch (err) {
       toastErr(err instanceof Error ? err.message : 'Failed to load story content')
     } finally {
