@@ -235,6 +235,7 @@ export default function StoryDetailPage() {
   const [childName, setChildName] = useState("");
   const [storyId, setStoryId] = useState<string | null>(null);
   const [giantBookUrl, setGiantBookUrl] = useState<string | null>(null);
+  const [coverUrl, setCoverUrl] = useState<string | null>(null);
   const [details, setDetails] = useState<StoryDetails | null>(null);
   const [slots, setSlots] = useState<StorySlot[]>([]);
   const [certificate, setCertificate] = useState<StoryCertificate | null>(null);
@@ -383,6 +384,7 @@ export default function StoryDetailPage() {
       getConsecutiveStreak(child.id, child.language as "en" | "fr" | "rw").then(setStreak);
       setStoryId(story.id);
       setGiantBookUrl(story.giant_book_url ?? null);
+      setCoverUrl(story.cover_url ?? null);
       const [det, sl, cert] = await Promise.all([
         getStoryDetails(story.id, child.language),
         getStorySlots(child.id, story.id, child.language),
@@ -725,21 +727,26 @@ export default function StoryDetailPage() {
             {phase === "welcome" && (
               <motion.div key="welcome"
                 initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                transition={{ duration: 0.4 }}
+                transition={{ duration: 0.5 }}
                 className="flex-1 flex flex-col relative overflow-hidden"
-                style={{ background: "linear-gradient(175deg, #03101e 0%, #07182e 38%, #0d1628 65%, #120d20 100%)" }}>
+                style={{ background: "linear-gradient(175deg, #0f0600 0%, #1c0c03 30%, #261206 58%, #1a0a02 100%)" }}>
 
-                {/* Starfield */}
+                {/* Dust motes — warm floating particles like a candlelit library */}
                 {STARS.map((s, i) => (
                   <motion.div key={i} className="absolute rounded-full pointer-events-none select-none"
-                    style={{ left:`${s.x}%`, top:`${s.y}%`, width:s.size, height:s.size, background:"#fff" }}
-                    animate={{ opacity:[0.15, s.peakOpacity, 0.15] }}
-                    transition={{ duration:s.duration, repeat:Infinity, delay:s.delay, ease:"easeInOut" }} />
+                    style={{ left:`${s.x}%`, top:`${s.y}%`, width:s.size * 0.9, height:s.size * 0.9,
+                      background: i % 4 === 0 ? "rgba(245,195,90,0.7)" : i % 3 === 0 ? "rgba(201,168,76,0.5)" : "rgba(255,220,140,0.35)" }}
+                    animate={{ opacity:[0.08, s.peakOpacity * 0.55, 0.08], y:[0, -(4 + (i % 5)), 0] }}
+                    transition={{ duration:s.duration * 1.4, repeat:Infinity, delay:s.delay, ease:"easeInOut" }} />
                 ))}
 
-                {/* Warm amber bloom — ground plane beneath the book */}
+                {/* Candlelight bloom — warm amber from below like a lantern on a reading desk */}
                 <div className="absolute inset-x-0 bottom-0 pointer-events-none"
-                  style={{ height:"55%", background:"radial-gradient(ellipse 80% 60% at 50% 100%, rgba(180,110,30,0.10) 0%, transparent 70%)" }} />
+                  style={{ height:"65%", background:"radial-gradient(ellipse 90% 70% at 50% 100%, rgba(201,140,30,0.18) 0%, rgba(160,80,10,0.08) 45%, transparent 70%)" }} />
+
+                {/* Vignette — edges darker to focus eye on the book */}
+                <div className="absolute inset-0 pointer-events-none"
+                  style={{ background:"radial-gradient(ellipse 80% 80% at 50% 50%, transparent 35%, rgba(8,2,0,0.55) 100%)" }} />
 
                 {/* Top nav */}
                 <div className="relative z-10 flex items-center justify-between px-4 pt-5 pb-2 shrink-0">
@@ -781,11 +788,11 @@ export default function StoryDetailPage() {
                 {/* Giant Book hero — takes remaining vertical space */}
                 <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 py-2 min-h-0">
 
-                  {/* Ambient gold glow under the book — gentle breathing */}
+                  {/* Candlelit glow beneath the book — warm amber lantern on a reading desk */}
                   <motion.div className="absolute bottom-1/4 left-1/2 -translate-x-1/2 pointer-events-none"
-                    animate={{ scale:[1,1.18,1], opacity:[0.65,1,0.65] }}
-                    transition={{ duration:4.5, repeat:Infinity, ease:"easeInOut" }}
-                    style={{ width:"70%", height:"35%", background:"radial-gradient(ellipse, rgba(201,168,76,0.26) 0%, transparent 70%)", filter:"blur(36px)" }} />
+                    animate={{ scale:[1,1.22,1], opacity:[0.7,1,0.7] }}
+                    transition={{ duration:4.8, repeat:Infinity, ease:"easeInOut" }}
+                    style={{ width:"80%", height:"40%", background:"radial-gradient(ellipse, rgba(220,160,50,0.32) 0%, rgba(180,100,20,0.14) 50%, transparent 70%)", filter:"blur(40px)" }} />
 
                   {/* ── Mastered state ── */}
                   {doneCount >= totalCount && totalCount > 0 ? (
@@ -860,7 +867,7 @@ export default function StoryDetailPage() {
                           {/* Cover — rotates open on tap (transform-origin: left spine edge) */}
                           <motion.div
                             animate={{ rotateY: isBookOpening ? -175 : 0 }}
-                            transition={{ type:"spring", stiffness:52, damping:16, delay:0.1 }}
+                            transition={{ type:"spring", stiffness:40, damping:24, delay:0.05 }}
                             onClick={() => {
                               if (isBookOpening) return;
                               playTap();
@@ -880,38 +887,15 @@ export default function StoryDetailPage() {
                                 : "0 0 0 1.5px rgba(201,168,76,0.45), 0 0 64px rgba(201,168,76,0.22), 0 32px 80px rgba(0,0,0,0.72)",
                             }}>
 
-                            {giantBookUrl ? (
-                              <Image src={getStorageUrl(giantBookUrl)} alt={storyTitle} fill className="object-cover" priority />
+                            {(giantBookUrl || coverUrl) ? (
+                              <Image src={getStorageUrl(giantBookUrl ?? coverUrl!)} alt={storyTitle} fill className="object-cover" priority />
                             ) : (
-                              /* Fallback cover — shown until artwork is uploaded in the admin */
-                              <div className="w-full h-full flex flex-col items-center justify-between overflow-hidden"
+                              <div className="w-full h-full flex flex-col items-center justify-center"
                                 style={{ background:"linear-gradient(155deg, #1c3a5e 0%, #0d1f3a 40%, #060f1d 100%)" }}>
-                                {/* Top section */}
-                                <div className="flex flex-col items-center pt-6 px-4 gap-1">
-                                  <span style={{ fontFamily:"var(--font-nunito)", fontSize:"clamp(7px,1.4vw,9px)", letterSpacing:"0.32em", textTransform:"uppercase", color:"rgba(201,168,76,0.55)" }}>
-                                    Nimipiko · Book 1
-                                  </span>
-                                  <div className="w-8 h-px mt-1" style={{ background:"rgba(201,168,76,0.3)" }} />
-                                </div>
-                                {/* Nimi character as cover art */}
-                                <motion.div className="flex-1 flex items-end justify-center overflow-hidden"
-                                  animate={!isBookOpening ? { y:[0,-6,0] } : { y:0 }}
-                                  transition={{ duration:4.2, repeat:Infinity, ease:"easeInOut" }}>
-                                  <img src="/nimi.png" alt="Nimi"
-                                    style={{ height:"clamp(120px,48%,210px)", width:"auto", objectFit:"contain",
-                                      filter:"drop-shadow(0 8px 28px rgba(59,130,246,0.35)) drop-shadow(0 2px 8px rgba(0,0,0,0.5))" }} />
-                                </motion.div>
-                                {/* Title band */}
-                                <div className="w-full flex flex-col items-center pb-5 pt-3 px-4 gap-0.5"
-                                  style={{ background:"linear-gradient(to top, rgba(4,10,22,0.92), transparent)" }}>
-                                  <span className="font-baloo font-black text-center leading-tight"
-                                    style={{ fontSize:"clamp(0.95rem,3vw,1.3rem)", color:"#f5e6c8", textShadow:"0 2px 14px rgba(0,0,0,0.8)" }}>
-                                    {storyTitle}
-                                  </span>
-                                  <span style={{ fontFamily:"var(--font-nunito)", fontWeight:700, fontSize:"clamp(0.55rem,1.3vw,0.7rem)", color:"rgba(201,168,76,0.55)", letterSpacing:"0.18em", textTransform:"uppercase" }}>
-                                    {childName ? `${childName}'s Story` : "Your Story"}
-                                  </span>
-                                </div>
+                                <span className="font-baloo font-black text-center px-4 leading-tight"
+                                  style={{ fontSize:"clamp(0.95rem,3vw,1.3rem)", color:"#f5e6c8" }}>
+                                  {storyTitle}
+                                </span>
                               </div>
                             )}
 
@@ -928,7 +912,7 @@ export default function StoryDetailPage() {
                               animate={{ opacity: isBookOpening ? 0 : 1 }}
                               transition={{ duration:0.2 }}
                               className="absolute inset-x-0 bottom-0 z-20 flex items-end justify-center pb-5 pt-16 pointer-events-none"
-                              style={{ background:"linear-gradient(to top, rgba(6,16,31,0.88) 0%, transparent 100%)" }}>
+                              style={{ background:"linear-gradient(to top, rgba(10,4,0,0.88) 0%, transparent 100%)" }}>
                               <motion.div
                                 animate={{ opacity:[0.75,1,0.75], y:[0,-2,0] }}
                                 transition={{ duration:2.2, repeat:Infinity, ease:"easeInOut" }}

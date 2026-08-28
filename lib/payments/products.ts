@@ -1,11 +1,14 @@
-import { getServiceClient } from "@/lib/supabase/serviceClient";
+import { getServiceClient, getAnonClient } from "@/lib/supabase/serviceClient";
 import { qcached, lscached, TTL_LONG } from "@/lib/queryCache";
 import type { Product, Order, Subscription, Currency } from "./types";
 
-// Use the service-role client so this module is safe to import from server-side
-// code (API routes, Server Components, crons) without carrying a browser session.
-// C1: replaced browser-only supabaseClient with service-role client.
-function getDb() { return getServiceClient(); }
+// Server: service-role client (no session needed, full access).
+// Browser: anon client (uses the logged-in user's session via RLS).
+// SUPABASE_SERVICE_ROLE_KEY is not available in the browser bundle.
+function getDb() {
+  if (typeof window === "undefined") return getServiceClient();
+  return getAnonClient();
+}
 
 const LS_PRODUCTS_TTL = 60 * 60_000; // 1 hour — survives page reloads so pricing shows instantly
 

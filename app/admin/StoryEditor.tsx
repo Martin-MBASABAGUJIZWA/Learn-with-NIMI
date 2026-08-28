@@ -441,6 +441,7 @@ function StoryEditorInner({ story, onSaved, onDeleted, defaultLang, onNavigate }
   const [showColoringImporter, setShowColoringImporter] = useState(false)
 
   const [slots, setSlots] = useState<SlotData[]>((story.story_slots ?? []) as SlotData[])
+  const [isFree, setIsFree] = useState(story.is_free)
   const version = allStoryVersions[activeLang]
 
   // Compute per-language readiness for all 3 languages — single source of truth
@@ -552,8 +553,10 @@ function StoryEditorInner({ story, onSaved, onDeleted, defaultLang, onNavigate }
   }
 
   const toggleIsFree = async () => {
-    const { error } = await supabase.from('stories').update({ is_free: !story.is_free }).eq('id', story.id)
-    if (error) { toastErr(`Save failed: ${error.message}`); return }
+    const next = !isFree
+    setIsFree(next)
+    const { error } = await supabase.from('stories').update({ is_free: next }).eq('id', story.id)
+    if (error) { toastErr(`Save failed: ${error.message}`); setIsFree(!next); return }
     onSaved()
   }
 
@@ -944,18 +947,18 @@ function StoryEditorInner({ story, onSaved, onDeleted, defaultLang, onNavigate }
               <div className="flex items-center justify-between rounded-xl border border-gray-100 bg-gray-50 px-4 py-3">
                 <div>
                   <p className="text-[13px] font-bold text-gray-700">
-                    {story.is_free ? '🆓 Free story' : '👑 Premium story'}
+                    {isFree ? '🆓 Free story' : '👑 Premium story'}
                   </p>
                   <p className="text-[11px] text-gray-400 mt-0.5">
-                    {story.is_free ? 'Accessible without a subscription' : 'Requires active NIMIPIKO Club subscription'}
+                    {isFree ? 'Accessible without a subscription' : 'Requires active NIMIPIKO Club subscription'}
                   </p>
                 </div>
                 <button
                   onClick={toggleIsFree}
-                  className={`relative w-11 h-6 rounded-full transition-colors duration-200 focus:outline-none ${story.is_free ? 'bg-emerald-400' : 'bg-gray-300'}`}
+                  className={`relative w-11 h-6 rounded-full transition-colors duration-200 focus:outline-none ${isFree ? 'bg-emerald-400' : 'bg-gray-300'}`}
                   aria-label="Toggle free / premium"
                 >
-                  <span className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${story.is_free ? 'translate-x-6' : 'translate-x-1'}`} />
+                  <span className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${isFree ? 'translate-x-6' : 'translate-x-1'}`} />
                 </button>
               </div>
             </div>

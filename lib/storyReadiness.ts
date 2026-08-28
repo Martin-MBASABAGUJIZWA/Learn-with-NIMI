@@ -52,7 +52,8 @@ export function computeReadiness(story: {
     return versions.some(v => !!v.media_url);
   };
 
-  // FlipFlop: per-language requires ≥1 image AND ≥50% audio coverage for that language.
+  // FlipFlop: per-language requires ≥1 image AND ≥1 audio track for that language.
+  // Not all pages need audio — some are intentionally silent.
   // Global (no language): true if any pages exist.
   const hasFlipFlop = (() => {
     if (pages.length === 0) return false;
@@ -64,7 +65,7 @@ export function computeReadiness(story: {
     const audioCount = pages.filter(p =>
       (p.story_page_versions ?? []).some(v => v.language === lang && v.audio_url)
     ).length;
-    return hasImages && audioCount >= pages.length * 0.5;
+    return hasImages && audioCount >= 1;
   })();
 
   const hasColoring = (story.coloring_pages ?? []).length > 0;
