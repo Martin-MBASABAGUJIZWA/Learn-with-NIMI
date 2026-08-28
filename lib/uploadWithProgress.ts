@@ -1,4 +1,5 @@
 import supabase from './supabaseClient'
+import * as tus from 'tus-js-client'
 
 export interface UploadProgress {
   percent: number
@@ -6,16 +7,16 @@ export interface UploadProgress {
   total: number
 }
 
-export async function uploadWithProgress(
+// Files larger than this use TUS resumable upload (bypasses the project-level HTTP size limit)
+const TUS_THRESHOLD = 10 * 1024 * 1024 // 10 MB
+
+async function uploadSmall(
   bucket: string,
   path: string,
   file: File,
+  token: string,
   onProgress?: (p: UploadProgress) => void,
 ): Promise<{ error: Error | null }> {
-  const { data: { session } } = await supabase.auth.getSession()
-  const token = session?.access_token
-  if (!token) return { error: new Error('Not authenticated') }
-
   const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/${bucket}/${path}`
 
   return new Promise(resolve => {
@@ -23,11 +24,7 @@ export async function uploadWithProgress(
 
     xhr.upload.onprogress = (e) => {
       if (e.lengthComputable && onProgress) {
-        onProgress({
-          percent: Math.round((e.loaded / e.total) * 100),
-          loaded: e.loaded,
-          total: e.total,
-        })
+        onProgress({ percent: Math.round((e.loaded / e.total) * 100), loaded: e.loaded, total: e.total })
       }
     }
 
@@ -49,10 +46,65 @@ export async function uploadWithProgress(
     xhr.setRequestHeader('apikey', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
     xhr.setRequestHeader('x-upsert', 'true')
     xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream')
-    xhr.timeout = 0 // no timeout — large videos need unlimited time; network errors handled by onerror
+    xhr.timeout = 0
 
     xhr.send(file)
   })
+}
+
+function uploadResumable(
+  bucket: string,
+  path: string,
+  file: File,
+  token: string,
+  onProgress?: (p: UploadProgress) => void,
+): Promise<{ error: Error | null }> {
+  const endpoint = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/upload/resumable`
+
+  return new Promise((resolve) => {
+    const upload = new tus.Upload(file, {
+      endpoint,
+      retryDelays: [0, 3000, 6000, 12000],
+      headers: {
+        Authorization: `Bearer ${token}`,
+        apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      },
+      metadata: {
+        bucketName: bucket,
+        objectName: path,
+        contentType: file.type || 'application/octet-stream',
+        cacheControl: '3600',
+      },
+      chunkSize: 6 * 1024 * 1024, // 6 MB chunks
+      onError: (err) => resolve({ error: new Error(err.message) }),
+      onProgress: (bytesUploaded, bytesTotal) => {
+        onProgress?.({
+          percent: Math.round((bytesUploaded / bytesTotal) * 100),
+          loaded: bytesUploaded,
+          total: bytesTotal,
+        })
+      },
+      onSuccess: () => resolve({ error: null }),
+    })
+
+    upload.start()
+  })
+}
+
+export async function uploadWithProgress(
+  bucket: string,
+  path: string,
+  file: File,
+  onProgress?: (p: UploadProgress) => void,
+): Promise<{ error: Error | null }> {
+  const { data: { session } } = await supabase.auth.getSession()
+  const token = session?.access_token
+  if (!token) return { error: new Error('Not authenticated') }
+
+  if (file.size > TUS_THRESHOLD) {
+    return uploadResumable(bucket, path, file, token, onProgress)
+  }
+  return uploadSmall(bucket, path, file, token, onProgress)
 }
 
 export async function compressImage(file: File, maxWidth = 1200, quality = 0.8): Promise<File> {
@@ -97,7 +149,8 @@ export async function smartUpload(
   const file = await compressImage(rawFile)
 
   const sizeLabel = formatBytes(file.size)
-  onProgress?.({ percent: 0, loaded: 0, total: file.size, status: `Uploading ${sizeLabel}...` })
+  const isResumable = file.size > TUS_THRESHOLD
+  onProgress?.({ percent: 0, loaded: 0, total: file.size, status: `Uploading ${sizeLabel}${isResumable ? ' (resumable)' : ''}...` })
 
   const { error } = await uploadWithProgress(bucket, path, file, (p) => {
     onProgress?.({ ...p, status: `${p.percent}% — ${formatBytes(p.loaded)} of ${sizeLabel}` })
