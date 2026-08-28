@@ -35,7 +35,9 @@ export async function uploadWithProgress(
       if (xhr.status >= 200 && xhr.status < 300) {
         resolve({ error: null })
       } else {
-        resolve({ error: new Error(`Upload failed: ${xhr.status}`) })
+        let detail = ''
+        try { detail = (JSON.parse(xhr.responseText) as { message?: string })?.message ?? xhr.responseText } catch { detail = xhr.responseText }
+        resolve({ error: new Error(`Upload failed: ${xhr.status}${detail ? ' — ' + detail : ''}`) })
       }
     }
 
@@ -46,6 +48,7 @@ export async function uploadWithProgress(
     xhr.setRequestHeader('Authorization', `Bearer ${token}`)
     xhr.setRequestHeader('apikey', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
     xhr.setRequestHeader('x-upsert', 'true')
+    xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream')
     xhr.timeout = 0 // no timeout — large videos need unlimited time; network errors handled by onerror
 
     xhr.send(file)
