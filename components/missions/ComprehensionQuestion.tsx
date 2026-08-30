@@ -88,8 +88,8 @@ export default function ComprehensionQuestion({ question, onAnswered, current, t
                 showResult && isSelected ? "bg-red-400 text-white" :
                 "bg-[var(--ds-surface-card-hover)] text-[var(--ds-text-secondary)]"
               }`}>
-                {showResult && isRight ? <Check className="w-4 h-4" /> :
-                 showResult && isSelected ? <X className="w-4 h-4" /> :
+                {showResult && isRight ? <Check className="w-4 h-4" aria-hidden="true" /> :
+                 showResult && isSelected ? <X className="w-4 h-4" aria-hidden="true" /> :
                  String.fromCharCode(65 + i)}
               </span>
               <span className="font-nunito font-bold text-sm text-ds-text">{opt}</span>

@@ -66,7 +66,7 @@ export default function RewardBurst({ active, config = CONFETTI_BURST, className
   return (
     <AnimatePresence onExitComplete={onComplete}>
       {active && (
-        <div key="burst" className={`absolute inset-0 overflow-hidden pointer-events-none ${className}`}>
+        <div key="burst" aria-hidden="true" className={`absolute inset-0 overflow-hidden pointer-events-none ${className}`}>
           {particles.map(p => {
             if (spread === "rain") {
               return (

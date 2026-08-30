@@ -282,28 +282,27 @@ export default function AppShell({ children }: AppShellProps) {
   return (
     <MotionConfig reducedMotion="user">
     <div className="relative min-h-screen overflow-x-hidden">
+      {/* ── Global shell: sky-blue ambient background ── */}
       <div
         className="absolute inset-0 -z-10"
         style={{
-          backgroundImage: `linear-gradient(135deg, rgba(255,255,255,0.82), rgba(246,250,242,0.92)), url('${assets.backgrounds.app}')`,
+          backgroundImage: `linear-gradient(160deg, rgba(255,255,255,0.88) 0%, rgba(220,242,255,0.60) 50%, rgba(219,250,229,0.55) 100%), url('${assets.backgrounds.app}')`,
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundAttachment: "fixed",
         }}
       />
+      {/* Soft sky-blue radial bloom from top-right — gives the "open sky" feel */}
       <div
-        className="pointer-events-none absolute inset-x-0 top-0 h-56 -z-10 opacity-50"
+        className="pointer-events-none absolute inset-x-0 top-0 h-72 -z-10"
         style={{
-          backgroundImage: `linear-gradient(90deg, rgba(255,255,255,0.0), rgba(255,255,255,0.76)), url('${assets.navigation.topbar}')`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          filter: "saturate(1.08)",
+          background: "radial-gradient(ellipse 80% 60% at 70% 0%, rgba(186,230,253,0.38) 0%, rgba(167,243,208,0.18) 55%, transparent 80%)",
         }}
       />
       <div
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-48 -z-10 opacity-35"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-48 -z-10 opacity-30"
         style={{
-          backgroundImage: `linear-gradient(180deg, rgba(255,255,255,0), rgba(255,255,255,0.88)), url('${assets.backgrounds.page}')`,
+          backgroundImage: `linear-gradient(180deg, rgba(255,255,255,0), rgba(240,249,255,0.95)), url('${assets.backgrounds.page}')`,
           backgroundSize: "cover",
           backgroundPosition: "center",
           filter: "saturate(1.05)",
@@ -384,20 +383,20 @@ export default function AppShell({ children }: AppShellProps) {
         {/* ── Top bar ─────────────────────────────────────────────────────── */}
         {activeChild && (
           <div className="sticky top-0 z-20">
-            {/* Background layer — overflow-hidden so ornaments don't bleed, sits behind content */}
+            {/* Background layer */}
             <div
               className={`absolute inset-0 overflow-hidden ${variants.navigationStyle.background} border-b border-[var(--ds-border-primary)]/60 shadow-[0_10px_32px_rgba(15,23,42,0.06)]`}
               style={{
-                backgroundImage: `linear-gradient(90deg, rgba(255,255,255,0.95), rgba(255,255,255,0.88)), url('${assets.navigation.topbar}')`,
+                backgroundImage: `linear-gradient(90deg, rgba(255,255,255,0.97), rgba(240,249,255,0.93)), url('${assets.navigation.topbar}')`,
                 backgroundSize: "cover",
                 backgroundPosition: "center",
-                backdropFilter: "blur(6px)",
+                backdropFilter: "blur(8px)",
               }}
             >
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.65),transparent_42%)]" />
-              <div className="absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-white/35 to-transparent" />
+              <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_80%_at_100%_0%,rgba(186,230,253,0.28),transparent_60%)]" />
+              <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-white/20 to-transparent" />
               <div
-                className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 w-20 h-20 opacity-60"
+                className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 w-20 h-20 opacity-50"
                 style={{
                   backgroundImage: `url('${assets.navigation.ornaments}')`,
                   backgroundSize: "contain",
@@ -405,97 +404,96 @@ export default function AppShell({ children }: AppShellProps) {
                 }}
               />
             </div>
-            {/* Content layer — overflow-visible so dropdowns can escape */}
-            <div className="relative flex items-center h-16 px-4 lg:px-6 max-w-[1800px] mx-auto">
 
-              {/* Mobile only: hamburger + logo */}
-              <div className="flex items-center gap-2 mr-3 shrink-0 lg:hidden">
-                <button
-                  onClick={() => setDrawerOpen(true)}
-                  className="group w-9 h-9 flex items-center justify-center leaf border border-[var(--ds-border-primary)]/60 bg-[var(--ds-surface-card)]/80 text-[var(--ds-text-secondary)] shadow-card-sm2 backdrop-blur-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-[var(--ds-brand-soft)] hover:text-[var(--ds-brand-primary)]"
-                  aria-label="Open menu"
-                >
-                  <svg className="w-5 h-5" viewBox="0 0 20 20" fill="none">
-                    <path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-                  </svg>
-                </button>
-              </div>
+            {/* Content layer — overflow-visible so dropdowns escape */}
+            <div className="relative flex items-center h-16 px-4 lg:px-6 max-w-[1800px] mx-auto gap-3">
 
-              {/* Mobile: search icon only — opens overlay on click */}
+              {/* Mobile: hamburger */}
               <button
-                onClick={() => setSearchOpen(true)}
-                className="md:hidden group w-9 h-9 flex items-center justify-center leaf border border-[var(--ds-border-primary)]/60 bg-[var(--ds-surface-card)]/80 text-[var(--ds-text-secondary)] shadow-card-sm2 backdrop-blur-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-[var(--ds-brand-soft)] hover:text-[var(--ds-brand-primary)]"
-                aria-label="Search"
+                onClick={() => setDrawerOpen(true)}
+                className="lg:hidden w-9 h-9 flex items-center justify-center rounded-xl border border-[var(--ds-border-primary)]/60 bg-white/80 text-[var(--ds-text-secondary)] shadow-sm backdrop-blur-sm transition-all hover:-translate-y-0.5 hover:bg-[var(--ds-brand-soft)] hover:text-[var(--ds-brand-primary)] active:scale-95 shrink-0"
+                aria-label="Open menu"
               >
-                <Search className="w-5 h-5" />
+                <svg className="w-5 h-5" viewBox="0 0 20 20" fill="none">
+                  <path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+                </svg>
               </button>
 
-              {/* Desktop: full search bar */}
+              {/* Mobile: search icon — opens overlay */}
+              <button
+                onClick={() => setSearchOpen(true)}
+                className="md:hidden w-9 h-9 flex items-center justify-center rounded-xl border border-[var(--ds-border-primary)]/60 bg-white/80 text-[var(--ds-text-secondary)] shadow-sm backdrop-blur-sm transition-all hover:-translate-y-0.5 hover:bg-[var(--ds-brand-soft)] hover:text-[var(--ds-brand-primary)] active:scale-95 shrink-0"
+                aria-label="Search"
+              >
+                <Search className="w-4.5 h-4.5" />
+              </button>
+
+              {/* Desktop: search bar */}
               <form
                 onSubmit={e => {
                   e.preventDefault();
                   const q = (e.currentTarget.elements.namedItem("q") as HTMLInputElement).value.trim();
                   if (q) void (window.location.href = `/stories?q=${encodeURIComponent(q)}`);
                 }}
-                className="hidden md:block flex-1 max-w-[420px]"
+                className="hidden md:block flex-1 max-w-[400px]"
               >
-                <div className="relative">
+                <div className="relative group">
+                  <Search className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--ds-text-tertiary)] transition group-focus-within:text-[var(--ds-brand-primary)]" />
                   <input
                     name="q"
                     type="text"
-                    placeholder="Search stories, activities..."
-                    className="w-full h-10 bg-[var(--ds-surface-card)]/85 border border-[var(--ds-border-primary)]/60 leaf pl-4 pr-12 text-sml font-nunito text-[var(--ds-text-primary)] placeholder:text-[var(--ds-text-tertiary)] shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-[var(--ds-brand-soft)] focus:border-[var(--ds-border-brand)] transition"
+                    placeholder="Search stories, activities…"
+                    className="w-full h-[38px] bg-white/80 border border-[var(--ds-border-primary)]/70 rounded-2xl pl-9 pr-4 text-sml font-nunito text-[var(--ds-text-primary)] placeholder:text-[var(--ds-text-tertiary)] shadow-sm backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-[var(--ds-brand-primary)]/30 focus:border-[var(--ds-brand-primary)]/60 transition"
                   />
-                  <button
-                    type="submit"
-                    className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center rounded-xl bg-[var(--ds-brand-soft)] text-[var(--ds-brand-primary)] hover:bg-[var(--ds-brand-primary)] hover:text-white transition"
-                  >
-                    <Search className="w-3.5 h-3.5" />
-                  </button>
                 </div>
               </form>
 
               {/* Right cluster */}
-              <div className="ml-auto flex items-center gap-2.5 pl-3">
+              <div className="ml-auto flex items-center gap-2 shrink-0">
 
-                {/* Stats pill — desktop only */}
-                <div className="hidden md:flex items-center bg-[var(--ds-surface-card)]/90 border border-[var(--ds-border-primary)]/70 rounded-full shadow-sm px-1 py-1 gap-0">
-                  {/* Streak — only shown when active */}
-                  {streakCount > 0 && (
-                    <>
-                      <div className="flex items-center gap-1.5 px-3 py-0.5">
-                        <Flame className="w-[18px] h-[18px] shrink-0" fill="#f97316" strokeWidth={0} />
-                        <div className="leading-none">
-                          <p className="font-baloo font-black text-[var(--ds-text-primary)] text-mbase leading-none">{streakCount}</p>
-                          <p className="font-nunito text-[var(--ds-text-tertiary)] text-3xs mt-0.5">streak</p>
-                        </div>
-                      </div>
-                      <div className="w-px h-5 bg-[var(--ds-border-primary)] rounded-full" />
-                    </>
-                  )}
-                  {/* Stars */}
-                  <div className="flex items-center gap-1.5 px-3 py-0.5">
-                    <span className="text-lg leading-none">⭐</span>
-                    <div className="leading-none">
-                      <p className="font-baloo font-black text-[var(--ds-text-primary)] text-mbase leading-none">{totalStars}</p>
-                      <p className="font-nunito text-[var(--ds-text-tertiary)] text-3xs mt-0.5">stars</p>
-                    </div>
+                {/* ── Streak chip — desktop only ── */}
+                <div
+                  className={`hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-2xl border transition-all ${
+                    streakCount > 0
+                      ? "bg-gradient-to-r from-orange-50 to-amber-50 border-orange-200/80 shadow-sm"
+                      : "bg-white/70 border-[var(--ds-border-primary)]/60"
+                  }`}
+                  title={streakCount > 0 ? `${streakCount}-day streak!` : "No streak yet — start learning!"}
+                >
+                  <span className={`text-xl leading-none ${streakCount === 0 ? "grayscale opacity-40" : ""}`}>🔥</span>
+                  <div className="leading-none">
+                    <p className={`font-baloo font-black text-mbase leading-none ${streakCount > 0 ? "text-orange-600" : "text-[var(--ds-text-tertiary)]"}`}>
+                      {streakCount}
+                    </p>
+                    <p className="font-nunito text-3xs mt-0.5 text-orange-400/80">streak</p>
                   </div>
                 </div>
 
-                {/* Thin divider — desktop only */}
-                <div className="hidden md:block w-px h-6 bg-[var(--ds-border-primary)]/80 rounded-full mx-0.5" />
+                {/* ── Stars chip — desktop only ── */}
+                <div
+                  className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-2xl border bg-gradient-to-r from-yellow-50 to-amber-50 border-yellow-200/80 shadow-sm"
+                  title={`${totalStars} stars earned`}
+                >
+                  <span className="text-xl leading-none">⭐</span>
+                  <div className="leading-none">
+                    <p className="font-baloo font-black text-amber-600 text-mbase leading-none">{totalStars}</p>
+                    <p className="font-nunito text-amber-400/80 text-3xs mt-0.5">stars</p>
+                  </div>
+                </div>
 
-                {/* Bell */}
+                {/* Divider — desktop only */}
+                <div className="hidden md:block w-px h-6 bg-[var(--ds-border-primary)]/60 rounded-full" />
+
+                {/* ── Bell / Notifications ── */}
                 <div className="relative">
                   <button
                     onClick={() => { setShowNotifications(p => !p); setShowLangPicker(false); setShowProfileMenu(false); }}
-                    className="relative w-9 h-9 flex items-center justify-center rounded-full border border-[var(--ds-border-primary)]/80 bg-[var(--ds-surface-card)]/90 shadow-sm transition-all hover:shadow-md hover:border-[var(--ds-border-strong)] hover:-translate-y-0.5 active:scale-95"
+                    className="relative w-9 h-9 flex items-center justify-center rounded-xl border border-[var(--ds-border-primary)]/70 bg-white/80 shadow-sm transition-all hover:shadow-md hover:border-amber-300 hover:bg-amber-50 hover:-translate-y-0.5 active:scale-95"
                     aria-label="Notifications"
                   >
                     <Bell className="w-[17px] h-[17px] text-[var(--ds-text-secondary)]" strokeWidth={1.8} />
                     {unreadCount > 0 && (
-                      <span className="absolute -top-0.5 -right-0.5 min-w-[15px] h-[15px] bg-red-500 rounded-full flex items-center justify-center text-5xs font-black text-white border-[1.5px] border-white px-0.5">
+                      <span className="absolute -top-1 -right-1 min-w-[16px] h-4 bg-red-500 rounded-full flex items-center justify-center text-5xs font-black text-white border-2 border-white px-0.5">
                         {unreadCount}
                       </span>
                     )}
@@ -507,14 +505,14 @@ export default function AppShell({ children }: AppShellProps) {
                   />
                 </div>
 
-                {/* Language picker — desktop only; mobile users access via profile dropdown */}
+                {/* ── Language pill — desktop only ── */}
                 <div className="relative hidden md:block">
                   <button
-                    onClick={() => setShowLangPicker(p => !p)}
-                    className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-[var(--ds-border-primary)]/80 bg-[var(--ds-surface-card)]/90 shadow-sm transition-all hover:shadow-md hover:border-[var(--ds-border-strong)] hover:-translate-y-0.5 active:scale-95"
+                    onClick={() => { setShowLangPicker(p => !p); setShowProfileMenu(false); setShowNotifications(false); }}
+                    className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-2xl border border-[var(--ds-border-primary)]/70 bg-white/80 shadow-sm transition-all hover:shadow-md hover:border-[var(--ds-brand-primary)]/40 hover:bg-[var(--ds-brand-soft)] hover:-translate-y-0.5 active:scale-95"
                     aria-label="Language"
                   >
-                    <Flag lang={language} className="w-6 h-4 rounded-sm flex-shrink-0" />
+                    <Flag lang={language} className="w-5 h-3.5 rounded-sm flex-shrink-0" />
                     <span className="text-2xs font-black text-[var(--ds-text-secondary)] uppercase tracking-wide">{language}</span>
                     <svg className="w-3 h-3 text-[var(--ds-text-tertiary)]" viewBox="0 0 16 16" fill="none">
                       <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
@@ -523,20 +521,24 @@ export default function AppShell({ children }: AppShellProps) {
                   {showLangPicker && (
                     <>
                       <div className="fixed inset-0 z-40" onClick={() => setShowLangPicker(false)} />
-                      <div className="absolute right-0 top-full mt-2 w-44 bg-[var(--ds-surface-card)] border border-[var(--ds-border-primary)]/80 rounded-2xl shadow-xl z-50 overflow-hidden py-1.5">
+                      <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-[var(--ds-border-primary)]/80 rounded-2xl shadow-xl z-50 overflow-hidden py-1.5">
                         {([
-                          { code: "en" as Language, label: "English" },
-                          { code: "fr" as Language, label: "Français" },
-                          { code: "rw" as Language, label: "Kinyarwanda" },
-                        ] as { code: Language; label: string }[]).map(l => (
+                          { code: "en" as Language, label: "English",     flag: "🇬🇧" },
+                          { code: "fr" as Language, label: "Français",    flag: "🇫🇷" },
+                          { code: "rw" as Language, label: "Kinyarwanda", flag: "🇷🇼" },
+                        ] as { code: Language; label: string; flag: string }[]).map(l => (
                           <button
                             key={l.code}
                             onClick={() => { setShowLangPicker(false); setPendingLanguage(l.code); }}
-                            className={`flex items-center gap-2.5 px-3.5 py-2.5 w-full transition font-nunito text-sml ${l.code === language ? "bg-[var(--ds-brand-subtle)] text-[var(--ds-brand-primary)]" : "hover:bg-[var(--ds-surface-card-hover)] text-[var(--ds-text-primary)]"}`}
+                            className={`flex items-center gap-2.5 px-4 py-2.5 w-full transition font-nunito text-sml font-bold ${
+                              l.code === language
+                                ? "bg-[var(--ds-brand-subtle)] text-[var(--ds-brand-primary)]"
+                                : "hover:bg-[var(--ds-surface-card-hover)] text-[var(--ds-text-primary)]"
+                            }`}
                           >
                             <Flag lang={l.code} className="w-6 h-4 rounded-sm flex-shrink-0" />
-                            <span className="font-bold">{l.label}</span>
-                            {l.code === language && <span className="ml-auto text-3xs font-black">✓</span>}
+                            <span className="flex-1 text-left">{l.label}</span>
+                            {l.code === language && <span className="text-3xs font-black text-[var(--ds-brand-primary)]">✓</span>}
                           </button>
                         ))}
                       </div>
@@ -544,26 +546,33 @@ export default function AppShell({ children }: AppShellProps) {
                   )}
                 </div>
 
-                {/* Profile chip */}
+                {/* ── Profile chip ── */}
                 <div className="relative">
                   <button
                     onClick={() => { setShowProfileMenu(p => !p); setShowLangPicker(false); setShowNotifications(false); }}
-                    className="flex items-center gap-2 rounded-full border border-[var(--ds-border-primary)]/80 bg-[var(--ds-surface-card)]/90 pl-1 pr-2.5 py-1 shadow-sm transition-all hover:shadow-md hover:border-[var(--ds-border-strong)] hover:-translate-y-0.5 active:scale-95"
+                    className="flex items-center gap-2 rounded-2xl border border-[var(--ds-border-primary)]/70 bg-white/85 pl-1 pr-3 py-1 shadow-sm transition-all hover:shadow-md hover:border-[var(--ds-brand-primary)]/40 hover:-translate-y-0.5 active:scale-95"
+                    style={{ background: "linear-gradient(135deg, rgba(255,255,255,0.92), rgba(240,253,244,0.85))" }}
                   >
-                    <div className="w-8 h-8 rounded-full border-2 overflow-hidden shrink-0" style={{ borderColor: 'var(--ds-brand-primary)' }}>
+                    {/* Avatar */}
+                    <div className="w-8 h-8 rounded-xl overflow-hidden shrink-0 border-2" style={{ borderColor: "var(--ds-brand-primary)" }}>
                       <ChildAvatar avatarUrl={activeChild.avatar_url} name={activeChild.name} size={32} />
                     </div>
+                    {/* Name + badge — desktop only */}
                     <div className="hidden md:block text-left leading-none">
-                      <div className="flex items-center gap-1.5">
+                      <div className="flex items-center gap-1.5 mb-0.5">
                         <p className="font-baloo font-black text-[var(--ds-text-primary)] text-sml leading-none">{activeChild.name}</p>
-                        <span className="text-5xs font-black px-1 py-0.5 rounded-full bg-[var(--ds-brand-subtle)] text-[var(--ds-brand-primary)] border border-[var(--ds-brand-primary)]/20 leading-none">🧒 Child</span>
+                        <span className="text-5xs font-black px-1.5 py-0.5 rounded-full bg-green-100 text-green-700 border border-green-200/70 leading-none whitespace-nowrap">
+                          🧒 Child
+                        </span>
                       </div>
                       {cosmetics.title_badge && SHOP_ITEM_MAP[cosmetics.title_badge] ? (
-                        <span className={`inline-flex items-center gap-1 text-4xs font-black px-1.5 py-0.5 rounded-full mt-0.5 ${SHOP_ITEM_MAP[cosmetics.title_badge].titleColor ?? "bg-[var(--ds-surface-card-active)] text-[var(--ds-text-secondary)]"}`}>
+                        <span className={`inline-flex items-center gap-1 text-4xs font-black px-1.5 py-0.5 rounded-full ${SHOP_ITEM_MAP[cosmetics.title_badge].titleColor ?? "bg-[var(--ds-surface-card-active)] text-[var(--ds-text-secondary)]"}`}>
                           {SHOP_ITEM_MAP[cosmetics.title_badge].emoji} {t(SHOP_ITEM_MAP[cosmetics.title_badge].nameKey)}
                         </span>
                       ) : (
-                        <p className="font-nunito text-[var(--ds-text-tertiary)] text-3xs mt-0.5">{getLevelLabel(level)} Level {level}</p>
+                        <span className="inline-flex items-center gap-1 text-4xs font-black px-1.5 py-0.5 rounded-full bg-[var(--ds-brand-subtle)] text-[var(--ds-brand-primary)] border border-[var(--ds-brand-primary)]/20">
+                          ✨ {getLevelLabel(level)} {level}
+                        </span>
                       )}
                     </div>
                     <svg className="hidden md:block w-3.5 h-3.5 text-[var(--ds-text-tertiary)] shrink-0 ml-0.5" viewBox="0 0 16 16" fill="none">
@@ -571,49 +580,84 @@ export default function AppShell({ children }: AppShellProps) {
                     </svg>
                   </button>
 
+                  {/* ── Profile dropdown ── */}
                   {showProfileMenu && (
                     <>
                       <div className="fixed inset-0 z-40" onClick={() => setShowProfileMenu(false)} />
-                      <div className="absolute right-0 top-full mt-2 w-56 bg-[var(--ds-surface-card)] border border-[var(--ds-border-primary)]/80 rounded-2xl shadow-xl z-50 overflow-hidden py-1.5">
-                        <div className="px-4 py-3 border-b border-[var(--ds-border-primary)] flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full border-2 overflow-hidden shrink-0" style={{ borderColor: 'var(--ds-brand-primary)' }}>
-                            <ChildAvatar avatarUrl={activeChild.avatar_url} name={activeChild.name} size={40} />
+                      <div className="absolute right-0 top-full mt-2 w-60 bg-white border border-[var(--ds-border-primary)]/80 rounded-2xl shadow-xl z-50 overflow-hidden">
+                        {/* Child card header */}
+                        <div
+                          className="px-4 py-3 border-b border-[var(--ds-border-primary)]/60"
+                          style={{ background: "linear-gradient(135deg, #F0FDF4, #DBEAFE)" }}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-11 h-11 rounded-xl overflow-hidden shrink-0 border-2 border-white shadow-sm">
+                              <ChildAvatar avatarUrl={activeChild.avatar_url} name={activeChild.name} size={44} />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="font-baloo font-black text-[var(--ds-text-primary)] text-mbase truncate">{activeChild.name}</p>
+                              {cosmetics.title_badge && SHOP_ITEM_MAP[cosmetics.title_badge] ? (
+                                <span className={`inline-flex items-center gap-1 text-3xs font-black px-2 py-0.5 rounded-full mt-0.5 ${SHOP_ITEM_MAP[cosmetics.title_badge].titleColor ?? "bg-white/80 text-[var(--ds-text-secondary)]"}`}>
+                                  {SHOP_ITEM_MAP[cosmetics.title_badge].emoji} {t(SHOP_ITEM_MAP[cosmetics.title_badge].nameKey)}
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center gap-1 mt-0.5 text-3xs font-black px-2 py-0.5 rounded-full bg-[var(--ds-brand-subtle)] text-[var(--ds-brand-primary)] border border-[var(--ds-brand-primary)]/20">
+                                  ✨ {getLevelLabel(level)} · Level {level}
+                                </span>
+                              )}
+                            </div>
                           </div>
-                          <div className="min-w-0">
-                            <p className="font-baloo font-black text-[var(--ds-text-primary)] text-mbase truncate">{activeChild.name}</p>
-                            {cosmetics.title_badge && SHOP_ITEM_MAP[cosmetics.title_badge] ? (
-                              <span className={`inline-flex items-center gap-1 text-3xs font-black px-2 py-0.5 rounded-full mt-0.5 ${SHOP_ITEM_MAP[cosmetics.title_badge].titleColor ?? "bg-[var(--ds-surface-card-active)] text-[var(--ds-text-secondary)]"}`}>
-                                {SHOP_ITEM_MAP[cosmetics.title_badge].emoji} {t(SHOP_ITEM_MAP[cosmetics.title_badge].nameKey)}
-                              </span>
-                            ) : (
-                              <p className="font-nunito text-[var(--ds-text-tertiary)] text-2xs mt-0.5">{getLevelLabel(level)} · Level {level}</p>
-                            )}
+                          {/* Mini stats row */}
+                          <div className="flex items-center gap-3 mt-2.5">
+                            <div className="flex items-center gap-1">
+                              <span className={`text-base ${streakCount === 0 ? "grayscale opacity-40" : ""}`}>🔥</span>
+                              <span className="font-baloo font-black text-orange-600 text-sml">{streakCount}</span>
+                              <span className="font-nunito text-3xs text-[var(--ds-text-tertiary)]">streak</span>
+                            </div>
+                            <div className="w-px h-4 bg-[var(--ds-border-primary)]/60 rounded-full" />
+                            <div className="flex items-center gap-1">
+                              <span className="text-base">⭐</span>
+                              <span className="font-baloo font-black text-amber-600 text-sml">{totalStars}</span>
+                              <span className="font-nunito text-3xs text-[var(--ds-text-tertiary)]">stars</span>
+                            </div>
                           </div>
                         </div>
-                        {([
-                          { Icon: User,     label: "My Profile",    href: "/user-profile",         color: "text-blue-500"   },
-                          { Icon: Settings, label: "Settings",      href: "/user-profile/settings", color: "text-[var(--ds-text-secondary)]" },
-                          { Icon: Trophy,   label: "My Treasure",   href: "/treasure",              color: "text-amber-500"  },
-                          { Icon: Crown,    label: "Masterpiece",   href: "/masterpiece",           color: "text-yellow-600" },
-                        ] as { Icon: React.ElementType; label: string; href: string; color: string }[]).map(item => (
-                          <a
-                            key={item.href}
-                            href={item.href}
-                            onClick={() => setShowProfileMenu(false)}
-                            className="flex items-center gap-3 px-4 py-2.5 hover:bg-[var(--ds-surface-card-hover)] transition"
-                          >
-                            <item.Icon className={`w-4 h-4 shrink-0 ${item.color}`} strokeWidth={1.8} />
-                            <span className="font-nunito text-[var(--ds-text-primary)] text-sml font-bold">{item.label}</span>
-                          </a>
-                        ))}
-                        <div className="border-t border-[var(--ds-border-primary)] mt-1 px-4 py-2">
+
+                        {/* Nav items */}
+                        <div className="py-1.5">
+                          {([
+                            { Icon: User,     label: "My Profile",    href: "/user-profile",          iconBg: "bg-blue-100",   iconColor: "text-blue-600"   },
+                            { Icon: Trophy,   label: "My Treasure",   href: "/treasure",              iconBg: "bg-amber-100",  iconColor: "text-amber-600"  },
+                            { Icon: Crown,    label: "Masterpiece",   href: "/masterpiece",           iconBg: "bg-yellow-100", iconColor: "text-yellow-600" },
+                            { Icon: Settings, label: "Settings",      href: "/user-profile/settings", iconBg: "bg-gray-100",   iconColor: "text-gray-500"   },
+                          ] as { Icon: React.ElementType; label: string; href: string; iconBg: string; iconColor: string }[]).map(item => (
+                            <a
+                              key={item.href}
+                              href={item.href}
+                              onClick={() => setShowProfileMenu(false)}
+                              className="flex items-center gap-3 px-4 py-2.5 hover:bg-[var(--ds-surface-card-hover)] transition group"
+                            >
+                              <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${item.iconBg} transition group-hover:scale-105`}>
+                                <item.Icon className={`w-3.5 h-3.5 ${item.iconColor}`} strokeWidth={2} />
+                              </div>
+                              <span className="font-nunito text-[var(--ds-text-primary)] text-sml font-bold">{item.label}</span>
+                            </a>
+                          ))}
+                        </div>
+
+                        {/* Language selector */}
+                        <div className="border-t border-[var(--ds-border-primary)]/60 px-4 py-2.5">
                           <p className="text-3xs font-black text-[var(--ds-text-tertiary)] uppercase tracking-wide mb-1.5">Language</p>
                           <div className="flex gap-1.5">
                             {LANGS.map(l => (
                               <button
                                 key={l.code}
                                 onClick={() => { setShowProfileMenu(false); setPendingLanguage(l.code); }}
-                                className={`flex-1 flex flex-col items-center gap-0.5 py-1.5 rounded-xl border transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ds-brand-primary)] focus-visible:ring-offset-1 ${l.code === language ? "border-[var(--ds-brand-primary)] bg-[var(--ds-brand-subtle)]" : "border-[var(--ds-border-primary)] hover:bg-[var(--ds-surface-card-hover)]"}`}
+                                className={`flex-1 flex flex-col items-center gap-0.5 py-1.5 rounded-xl border transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ds-brand-primary)] focus-visible:ring-offset-1 ${
+                                  l.code === language
+                                    ? "border-[var(--ds-brand-primary)] bg-[var(--ds-brand-subtle)]"
+                                    : "border-[var(--ds-border-primary)] hover:bg-[var(--ds-surface-card-hover)]"
+                                }`}
                               >
                                 <Flag lang={l.code} className="w-6 h-4 rounded-sm" />
                                 <span className={`text-4xs font-black uppercase tracking-wide ${l.code === language ? "text-[var(--ds-brand-primary)]" : "text-[var(--ds-text-secondary)]"}`}>{l.code}</span>
@@ -621,12 +665,16 @@ export default function AppShell({ children }: AppShellProps) {
                             ))}
                           </div>
                         </div>
-                        <div className="border-t border-[var(--ds-border-primary)]">
+
+                        {/* Logout */}
+                        <div className="border-t border-[var(--ds-border-primary)]/60">
                           <button
                             onClick={() => { setShowProfileMenu(false); setShowLogout(true); }}
-                            className="flex items-center gap-3 px-4 py-2.5 w-full hover:bg-red-50 transition"
+                            className="flex items-center gap-3 px-4 py-2.5 w-full hover:bg-red-50 transition group"
                           >
-                            <LogOut className="w-4 h-4 shrink-0 text-red-400" strokeWidth={1.8} />
+                            <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 bg-red-50 group-hover:bg-red-100 transition">
+                              <LogOut className="w-3.5 h-3.5 text-red-400" strokeWidth={2} />
+                            </div>
                             <span className="font-nunito text-red-500 text-sml font-bold">Log out</span>
                           </button>
                         </div>
@@ -638,12 +686,12 @@ export default function AppShell({ children }: AppShellProps) {
               </div>{/* end right cluster */}
             </div>
 
-            {/* Mobile search overlay — slides in when searchOpen */}
+            {/* Mobile search overlay */}
             {searchOpen && (
-              <div className={`md:hidden absolute inset-0 z-50 ${variants.navigationStyle.background} flex items-center h-16 px-4 gap-3 border-b border-[var(--ds-border-primary)] shadow-sm`}>
+              <div className={`md:hidden absolute inset-0 z-50 bg-white/95 backdrop-blur-sm flex items-center h-16 px-4 gap-3 border-b border-[var(--ds-border-primary)] shadow-sm`}>
                 <button
                   onClick={() => setSearchOpen(false)}
-                  className="p-1.5 rounded-full text-[var(--ds-text-secondary)] hover:bg-[var(--ds-surface-card-hover)] transition shrink-0"
+                  className="p-1.5 rounded-xl text-[var(--ds-text-secondary)] hover:bg-[var(--ds-surface-card-hover)] transition shrink-0"
                   aria-label="Close search"
                 >
                   <ArrowLeft className="w-5 h-5" />
@@ -657,17 +705,20 @@ export default function AppShell({ children }: AppShellProps) {
                   }}
                   className="flex-1 flex items-center gap-2"
                 >
-                  <input
-                    name="q"
-                    type="text"
-                    autoFocus
-                    placeholder="Search stories, activities..."
-                    className="flex-1 h-10 bg-[var(--ds-surface-input)] border border-[var(--ds-border-primary)] leaf pl-4 pr-4 text-sml font-nunito text-[var(--ds-text-primary)] placeholder:text-[var(--ds-text-tertiary)] focus:outline-none focus:ring-2 focus:ring-[var(--ds-state-focus)] focus:border-[var(--ds-border-brand)] transition"
-                  />
+                  <div className="relative flex-1">
+                    <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--ds-text-tertiary)]" />
+                    <input
+                      name="q"
+                      type="text"
+                      autoFocus
+                      placeholder="Search stories, activities…"
+                      className="w-full h-10 bg-[var(--ds-surface-input)] border border-[var(--ds-border-primary)] rounded-2xl pl-9 pr-4 text-sml font-nunito text-[var(--ds-text-primary)] placeholder:text-[var(--ds-text-tertiary)] focus:outline-none focus:ring-2 focus:ring-[var(--ds-brand-primary)]/30 focus:border-[var(--ds-brand-primary)]/60 transition"
+                    />
+                  </div>
                   <button
                     type="submit"
-                    className="w-10 h-10 flex items-center justify-center transition shrink-0"
-                    style={{ backgroundColor: 'var(--ds-brand-primary)', borderRadius: 'var(--leaf-r-sm)' }}
+                    className="w-10 h-10 flex items-center justify-center rounded-xl transition shrink-0 active:scale-95"
+                    style={{ backgroundColor: "var(--ds-brand-primary)" }}
                   >
                     <Search className="w-4 h-4 text-white" />
                   </button>
@@ -677,7 +728,7 @@ export default function AppShell({ children }: AppShellProps) {
           </div>
         )}
 
-        <div id="main-content" className="flex-1 flex flex-col w-full max-w-[1800px] mx-auto px-4 py-4 pb-[88px] sm:px-6 sm:py-6 lg:px-8 lg:py-8 lg:pb-8">
+        <div id="main-content" className="flex-1 flex flex-col w-full max-w-[1800px] mx-auto px-4 py-4 pb-[88px] sm:px-5 sm:py-5 lg:px-6 lg:py-6 lg:pb-8">
           {children}
         </div>
       </div>

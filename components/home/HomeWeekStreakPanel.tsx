@@ -72,7 +72,7 @@ export default function HomeWeekStreakPanel({ weekStreak, consecutiveStreak, tot
       {/* Big number + message — or empty-state prompt */}
       {noStreak ? (
         <div className="px-4 pt-3 pb-2 flex items-center gap-3">
-          <motion.span className="text-5xl leading-none"
+          <motion.span aria-hidden="true" className="text-5xl leading-none"
             animate={{ y: [0, -5, 0] }}
             transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}>
             🔥

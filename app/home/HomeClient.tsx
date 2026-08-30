@@ -6,7 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { useThemeMotion } from "@/hooks/useThemeMotion";
-import { Heart, Star, Flame, Play, ChevronRight, Check, Crown } from "lucide-react";
+import { Crown } from "lucide-react";
 import supabase from "@/lib/supabaseClient";
 import {
   getChildren, ensureParentRow, getStorageUrl,
@@ -32,6 +32,7 @@ import HomeAdventureSection  from "@/components/home/HomeAdventureSection";
 import HomeStoryLibrarySection from "@/components/home/HomeStoryLibrarySection";
 import HomeStoryJourneyPanel from "@/components/home/HomeStoryJourneyPanel";
 import HomeWeekStreakPanel   from "@/components/home/HomeWeekStreakPanel";
+import HomeMotivationCard    from "@/components/home/HomeMotivationCard";
 import NotificationOptInPrompt from "@/components/home/NotificationOptInPrompt";
 import WelcomeBackOverlay      from "@/components/home/WelcomeBackOverlay";
 import NimiProactiveBanner     from "@/components/home/NimiProactiveBanner";
@@ -47,14 +48,6 @@ const LEVELS = [
   { labelKey: "levelNameHero",      icon: "⭐", maxXp: 120  },
 ];
 
-const ACTIVITIES = [
-  { img: "/icons/story/Read.png",       labelKey: "activityRead",       subKey: "activityReadSub",       href: "/stories" },
-  { img: "/icons/story/create.png",     labelKey: "activityCreate",     subKey: "activityCreateSub",     href: "/stories" },
-  { img: "/icons/story/play.png",       labelKey: "activityPlay",       subKey: "activityPlaySub",       href: "/stories" },
-  { img: "/icons/story/sing.png",       labelKey: "activitySing",       subKey: "activitySingSub",       href: "/stories" },
-  { img: "/icons/story/challenges.png", labelKey: "activityChallenges", subKey: "activityChallengesSub", href: "/treasure" },
-  { img: "/icons/story/Community.png",  labelKey: "activityCommunity",  subKey: "activityCommunitySub",  href: "/community" },
-];
 
 
 const CATEGORY_VISUALS: Record<string, { emoji: string; bg: string; accent: string; label: string }> = {
@@ -568,29 +561,22 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
           <div className="min-h-screen pb-24">
             <Bone className="w-full rounded-none" style={{ height: 380 }} />
             <div className="max-w-[1400px] mx-auto px-4 lg:px-6 py-6 flex flex-col xl:flex-row gap-6">
-              <div className="flex-1 space-y-8">
-                <div className="leaf-lg border border-[var(--ds-border-primary)] p-5 space-y-4">
-                  <Bone className="h-7 w-48" />
-                  <div className="grid grid-cols-3 lg:grid-cols-6 gap-3">
-                    {Array.from({ length: 6 }).map((_, i) => <Bone key={i} className="aspect-square leaf" />)}
-                  </div>
-                </div>
-                <div className="leaf-lg border border-[var(--ds-border-primary)] p-5 space-y-4">
-                  <Bone className="h-7 w-56" />
-                  <div className="flex gap-4 overflow-hidden">
-                    {Array.from({ length: 4 }).map((_, i) => <Bone key={i} className="shrink-0 w-[160px] h-[220px] leaf" />)}
-                  </div>
+              <div className="flex-1 min-w-0 space-y-5">
+                <div className="grid grid-cols-1 lg:grid-cols-[40%_1fr] gap-5">
+                  <Bone className="h-[340px] leaf-lg" />
+                  <Bone className="h-[340px] leaf-lg" />
                 </div>
               </div>
-              <div className="w-full xl:w-[284px] space-y-5">
-                <Bone className="h-[280px] leaf-lg" />
+              <div className="w-full xl:w-[284px] xl:shrink-0 space-y-4">
                 <Bone className="h-[180px] leaf-lg" />
+                <Bone className="h-[220px] leaf-lg" />
+                <Bone className="h-[140px] leaf-lg" />
               </div>
             </div>
           </div>
         </>
       ) : (
-        <div className={`min-h-screen content-enter transition-opacity duration-300${refreshing ? " opacity-50 pointer-events-none" : ""}`} style={{ background: "linear-gradient(180deg, #f0f4f8 0%, #f5f8fb 40%, #ffffff 100%)" }}>
+        <div className={`min-h-screen content-enter transition-opacity duration-300${refreshing ? " opacity-50 pointer-events-none" : ""}`} style={{ background: "linear-gradient(180deg, #f0f4f8 0%, #f2f7f2 50%, #eef6ee 100%)" }}>
 
           {/* ════════════════════════════════ HERO ══════════════════════════ */}
           <motion.div
@@ -600,336 +586,197 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
             {/* ═══════════════════════ HERO: WORLD STAGE ═══════════════════════ */}
             <div className="relative overflow-hidden" style={{ minHeight: 460 }}>
 
-              {/* ── Layer 1: Hero background ── */}
-              <div className={`absolute inset-0 pointer-events-none bg-gradient-to-br ${theme.gradients.hero}`} />
-              {/* Soft radial glow from top */}
-              <div className="absolute inset-x-0 top-0 h-[45%] pointer-events-none"
-                style={{ background: "radial-gradient(ellipse 60% 55% at 50% 0%, rgba(255,255,255,0.15) 0%, transparent 70%)" }} />
+              {/* ── Decorative scene layer — all purely visual, screen-reader hidden ── */}
+              <div aria-hidden="true" className="absolute inset-0 pointer-events-none select-none">
 
-              {/* ── Clouds ── */}
-              <motion.div className="absolute top-[5%] left-[8%] text-5xl pointer-events-none select-none leading-none opacity-85"
-                animate={{ x: [0, 20, 0], y: [0, -5, 0] }} transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}>☁️</motion.div>
-              <motion.div className="absolute top-[2%] left-[46%] text-4xl pointer-events-none select-none leading-none opacity-70"
-                animate={{ x: [0, -16, 0], y: [0, -3, 0] }} transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}>☁️</motion.div>
-              <motion.div className="absolute top-[7%] right-[10%] text-4xl pointer-events-none select-none leading-none opacity-80"
-                animate={{ x: [0, 14, 0], y: [0, -6, 0] }} transition={{ duration: 9, repeat: Infinity, ease: "easeInOut", delay: 0.8 }}>⛅</motion.div>
-              {/* Sparkles */}
-              <motion.div className="absolute top-[5%] left-[30%] text-2xl pointer-events-none select-none leading-none"
-                animate={{ scale: [1, 1.4, 1], opacity: [0.7, 1, 0.7] }} transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}>✨</motion.div>
-              <motion.div className="absolute top-[3%] right-[26%] text-xl pointer-events-none select-none leading-none"
-                animate={{ scale: [1, 1.5, 1], opacity: [0.5, 1, 0.5] }} transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut", delay: 0.7 }}>✨</motion.div>
-              <motion.div className="absolute top-[12%] left-[44%] text-lg pointer-events-none select-none leading-none"
-                animate={{ scale: [1, 1.6, 1], opacity: [0.4, 0.9, 0.4] }} transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut", delay: 1.2 }}>⭐</motion.div>
-              {/* Butterflies */}
-              <motion.div className="absolute top-[18%] left-[7%] text-4xl pointer-events-none select-none leading-none"
-                animate={{ x: [0, 28, 10, 35, 0], y: [0, -16, 6, -12, 0], rotate: [0, 15, -10, 8, 0] }}
-                transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}>🦋</motion.div>
-              <motion.div className="absolute top-[22%] right-[7%] text-3xl pointer-events-none select-none leading-none"
-                animate={{ x: [0, -22, -8, -30, 0], y: [0, -12, 8, -8, 0], rotate: [0, -12, 8, -5, 0] }}
-                transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 1.8 }}>🦋</motion.div>
-              <motion.div className="absolute top-[9%] left-[63%] text-2xl pointer-events-none select-none leading-none"
-                animate={{ x: [0, 14, -8, 18, 0], y: [0, -14, 5, -8, 0] }}
-                transition={{ duration: 9, repeat: Infinity, ease: "easeInOut", delay: 3.5 }}>🦋</motion.div>
-              {/* Flower cluster — left */}
-              <motion.div className="absolute bottom-[24%] left-[0.5%] text-5xl pointer-events-none select-none leading-none"
-                animate={{ rotate: [0, 8, -6, 0], scale: [1, 1.07, 1] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}>🌸</motion.div>
-              <motion.div className="absolute bottom-[19%] left-[5%] text-4xl pointer-events-none select-none leading-none"
-                animate={{ rotate: [0, -6, 8, 0], scale: [1, 1.09, 1] }} transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}>🌺</motion.div>
-              <motion.div className="absolute bottom-[25%] left-[10%] text-3xl pointer-events-none select-none leading-none"
-                animate={{ rotate: [0, 10, -7, 0], scale: [1, 1.06, 1] }} transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: 0.9 }}>🌼</motion.div>
-              <motion.div className="absolute bottom-[20%] left-[15%] text-2xl pointer-events-none select-none leading-none"
-                animate={{ rotate: [0, -8, 6, 0], scale: [1, 1.08, 1] }} transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut", delay: 1.4 }}>🌷</motion.div>
-              {/* Flower cluster — right */}
-              <motion.div className="absolute bottom-[23%] right-[0.5%] text-5xl pointer-events-none select-none leading-none"
-                animate={{ rotate: [0, -8, 6, 0], scale: [1, 1.07, 1] }} transition={{ duration: 4.2, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}>🌼</motion.div>
-              <motion.div className="absolute bottom-[18%] right-[5%] text-4xl pointer-events-none select-none leading-none"
-                animate={{ rotate: [0, 6, -8, 0], scale: [1, 1.09, 1] }} transition={{ duration: 5.2, repeat: Infinity, ease: "easeInOut", delay: 0.8 }}>🌷</motion.div>
-              <motion.div className="absolute bottom-[24%] right-[10%] text-3xl pointer-events-none select-none leading-none"
-                animate={{ rotate: [0, -6, 8, 0], scale: [1, 1.07, 1] }} transition={{ duration: 4.8, repeat: Infinity, ease: "easeInOut", delay: 1.3 }}>🌸</motion.div>
-              <motion.div className="absolute bottom-[19%] right-[15%] text-2xl pointer-events-none select-none leading-none"
-                animate={{ rotate: [0, 8, -6, 0], scale: [1, 1.06, 1] }} transition={{ duration: 5.8, repeat: Infinity, ease: "easeInOut", delay: 1.9 }}>🌺</motion.div>
+                {/* Layer 1: Hero background */}
+                <div className={`absolute inset-0 bg-gradient-to-br ${theme.gradients.hero}`} />
+                {/* Soft radial glow from top */}
+                <div className="absolute inset-x-0 top-0 h-[45%]"
+                  style={{ background: "radial-gradient(ellipse 60% 55% at 50% 0%, rgba(255,255,255,0.15) 0%, transparent 70%)" }} />
 
-              {/* ── Layer 2: Ground glow ── */}
-              {/* Subtle bottom fade to blend into page */}
-              <div className="absolute bottom-0 inset-x-0 h-[25%] pointer-events-none"
-                style={{ background: "linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.12) 100%)" }} />
+                {/* Clouds */}
+                <motion.div className="absolute top-[5%] left-[8%] text-5xl leading-none opacity-85"
+                  animate={{ x: [0, 20, 0], y: [0, -5, 0] }} transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}>☁️</motion.div>
+                <motion.div className="absolute top-[2%] left-[46%] text-4xl leading-none opacity-70"
+                  animate={{ x: [0, -16, 0], y: [0, -3, 0] }} transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}>☁️</motion.div>
+                <motion.div className="absolute top-[7%] right-[10%] text-4xl leading-none opacity-80"
+                  animate={{ x: [0, 14, 0], y: [0, -6, 0] }} transition={{ duration: 9, repeat: Infinity, ease: "easeInOut", delay: 0.8 }}>⛅</motion.div>
+                {/* Sparkles */}
+                <motion.div className="absolute top-[5%] left-[30%] text-2xl leading-none"
+                  animate={{ scale: [1, 1.4, 1], opacity: [0.7, 1, 0.7] }} transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}>✨</motion.div>
+                <motion.div className="absolute top-[3%] right-[26%] text-xl leading-none"
+                  animate={{ scale: [1, 1.5, 1], opacity: [0.5, 1, 0.5] }} transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut", delay: 0.7 }}>✨</motion.div>
+                <motion.div className="absolute top-[12%] left-[44%] text-lg leading-none"
+                  animate={{ scale: [1, 1.6, 1], opacity: [0.4, 0.9, 0.4] }} transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut", delay: 1.2 }}>⭐</motion.div>
+                {/* Butterflies */}
+                <motion.div className="absolute top-[18%] left-[7%] text-4xl leading-none"
+                  animate={{ x: [0, 28, 10, 35, 0], y: [0, -16, 6, -12, 0], rotate: [0, 15, -10, 8, 0] }}
+                  transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}>🦋</motion.div>
+                <motion.div className="absolute top-[22%] right-[7%] text-3xl leading-none"
+                  animate={{ x: [0, -22, -8, -30, 0], y: [0, -12, 8, -8, 0], rotate: [0, -12, 8, -5, 0] }}
+                  transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 1.8 }}>🦋</motion.div>
+                <motion.div className="absolute top-[9%] left-[63%] text-2xl leading-none"
+                  animate={{ x: [0, 14, -8, 18, 0], y: [0, -14, 5, -8, 0] }}
+                  transition={{ duration: 9, repeat: Infinity, ease: "easeInOut", delay: 3.5 }}>🦋</motion.div>
+                {/* Flower cluster — left */}
+                <motion.div className="absolute bottom-[24%] left-[0.5%] text-5xl leading-none"
+                  animate={{ rotate: [0, 8, -6, 0], scale: [1, 1.07, 1] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}>🌸</motion.div>
+                <motion.div className="absolute bottom-[19%] left-[5%] text-4xl leading-none"
+                  animate={{ rotate: [0, -6, 8, 0], scale: [1, 1.09, 1] }} transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}>🌺</motion.div>
+                <motion.div className="absolute bottom-[25%] left-[10%] text-3xl leading-none"
+                  animate={{ rotate: [0, 10, -7, 0], scale: [1, 1.06, 1] }} transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: 0.9 }}>🌼</motion.div>
+                <motion.div className="absolute bottom-[20%] left-[15%] text-2xl leading-none"
+                  animate={{ rotate: [0, -8, 6, 0], scale: [1, 1.08, 1] }} transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut", delay: 1.4 }}>🌷</motion.div>
+                {/* Flower cluster — right */}
+                <motion.div className="absolute bottom-[23%] right-[0.5%] text-5xl leading-none"
+                  animate={{ rotate: [0, -8, 6, 0], scale: [1, 1.07, 1] }} transition={{ duration: 4.2, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}>🌼</motion.div>
+                <motion.div className="absolute bottom-[18%] right-[5%] text-4xl leading-none"
+                  animate={{ rotate: [0, 6, -8, 0], scale: [1, 1.09, 1] }} transition={{ duration: 5.2, repeat: Infinity, ease: "easeInOut", delay: 0.8 }}>🌷</motion.div>
+                <motion.div className="absolute bottom-[24%] right-[10%] text-3xl leading-none"
+                  animate={{ rotate: [0, -6, 8, 0], scale: [1, 1.07, 1] }} transition={{ duration: 4.8, repeat: Infinity, ease: "easeInOut", delay: 1.3 }}>🌸</motion.div>
+                <motion.div className="absolute bottom-[19%] right-[15%] text-2xl leading-none"
+                  animate={{ rotate: [0, 8, -6, 0], scale: [1, 1.06, 1] }} transition={{ duration: 5.8, repeat: Infinity, ease: "easeInOut", delay: 1.9 }}>🌺</motion.div>
+
+                {/* Layer 2: Ground glow */}
+                <div className="absolute bottom-0 inset-x-0 h-[25%]"
+                  style={{ background: "linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.12) 100%)" }} />
+
+              </div>{/* end decorative layer */}
 
 
 
               {/* ══════════════════════════════════════════════════════════════
-                   Layer 3 — CONTENT (3 columns, items aligned to bottom)
+                   Layer 3 — CONTENT: greeting left, characters right
               ══════════════════════════════════════════════════════════════ */}
-              <div className="relative z-10 flex flex-col items-center justify-end px-4 sm:px-6 pb-14 sm:pb-18 pt-5 sm:pt-8 max-w-[900px] mx-auto min-h-[420px]">
+              <div className="relative z-10 flex flex-col md:flex-row md:items-end px-4 sm:px-6 pb-10 sm:pb-14 pt-6 sm:pt-8 max-w-[980px] mx-auto min-h-[440px] gap-4 md:gap-8 justify-center md:justify-between">
 
-                {/* ── LEFT: Continue Your Story card ─────────────────────── */}
-                <motion.div variants={up}
-                  className="hidden">
-                  {curStory ? (
-                    <div className="relative leaf-lg p-5 overflow-hidden"
-                      style={{
-                        background: "linear-gradient(150deg,#34d399 0%,#10b981 28%,#059669 60%,#047857 100%)",
-                        boxShadow: "0 24px 64px rgba(5,150,105,0.50), 0 2px 0 rgba(255,255,255,0.18) inset",
-                        border: "1.5px solid rgba(255,255,255,0.18)",
-                      }}>
+                {/* ── LEFT / TOP: Greeting + Progress card ─────────────── */}
+                <motion.div variants={up} className="w-full md:flex-1 md:max-w-[400px] flex flex-col justify-end mx-auto md:mx-0">
+                  {/* Glass card */}
+                  <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-white/70"
+                    style={{ background: "rgba(255,255,255,0.94)", backdropFilter: "blur(24px)" }}>
 
-                      {/* Top-right glow blob */}
-                      <div className="absolute -top-8 -right-8 w-32 h-32 rounded-full pointer-events-none"
-                        style={{ background: "radial-gradient(circle, rgba(255,255,255,0.18) 0%, transparent 70%)" }} />
+                    {/* Rainbow accent bar */}
+                    <div className="h-1.5 w-full"
+                      style={{ background: "linear-gradient(90deg,#22c55e,#38bdf8,#a78bfa,#f59e0b)" }} />
 
-                      {/* Stars */}
-                      <motion.span className="absolute top-3 right-4 text-2.5xl pointer-events-none select-none drop-shadow-lg"
-                        animate={{ y: [0, -5, 0], rotate: [0, 10, 0] }}
-                        transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}>⭐</motion.span>
-                      <motion.span className="absolute top-7 right-[52px] text-base pointer-events-none select-none opacity-80"
-                        animate={{ y: [0, -4, 0], scale: [1, 1.3, 1] }}
-                        transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}>✨</motion.span>
-
-                      <p className="font-baloo font-black text-white text-base mb-4 pr-16 drop-shadow">
-                        Continue Your Story
+                    <div className="px-5 pt-4 pb-4">
+                      {/* Time greeting */}
+                      <p className="font-nunito font-extrabold text-[var(--ds-text-brand)] text-2xs tracking-widest uppercase mb-1.5">
+                        {greeting} ✨
                       </p>
 
-                      {/* Cover + info */}
-                      <div className="flex gap-3 mb-4">
-                        <div className="relative w-[110px] h-[110px] rounded-2xl overflow-hidden shrink-0"
-                          style={{ boxShadow: "0 0 0 3px rgba(255,255,255,0.3), 0 8px 24px rgba(0,0,0,0.35)" }}>
-                          <Image src={curStory.cover_url ? getStorageUrl(curStory.cover_url) : "/current-story.png"}
-                            alt={curStory.title} fill className="object-cover" />
-                          <div className="absolute inset-0 bg-black/10 flex items-center justify-center">
-                            <div className="w-10 h-10 bg-[var(--ds-surface-card)] rounded-full flex items-center justify-center shadow-xl">
-                              <Play className="w-4 h-4 fill-[var(--ds-brand-primary)] text-[var(--ds-brand-primary)] ml-0.5" />
-                            </div>
-                          </div>
-                        </div>
-                        <div className="flex-1 min-w-0 flex flex-col justify-center gap-1.5">
-                          <p className="font-baloo font-black text-white text-mlg leading-tight line-clamp-2 drop-shadow">
-                            {curStory.title}
-                          </p>
-                          <p className="font-nunito text-white/65 text-xs">
-                            Page {doneSlots} of {totalSlots || "?"}
-                          </p>
-                          <div className="flex items-center gap-2 mt-0.5">
-                            <div className="flex-1 h-3 rounded-full overflow-hidden"
-                              style={{ background: "rgba(255,255,255,0.18)" }}>
-                              <motion.div className="h-full rounded-full"
-                                style={{ background: "linear-gradient(90deg, var(--ds-brand-soft), var(--ds-brand-primary))" }}
-                                initial={{ width: 0 }} animate={{ width: `${pct}%` }}
-                                transition={{ duration: 1.2, ease: "easeOut", delay: 0.4 }} />
-                            </div>
-                            <span className="font-baloo font-black text-white text-sml shrink-0">{pct}%</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <Link href={`/stories/${curStory.slug}`}
-                        className="flex items-center justify-center gap-2 w-full font-baloo font-black text-amber-900 text-base py-3.5 leaf transition-all hover:-translate-y-0.5 active:scale-95"
-                        style={{
-                          background: "linear-gradient(135deg,#fcd34d,#f59e0b)",
-                          boxShadow: "0 4px 20px rgba(245,158,11,0.5), 0 1px 0 rgba(255,255,255,0.4) inset",
-                        }}>
-                        Continue My Journey
-                        <Play className="w-[15px] h-[15px] fill-amber-900 stroke-0" />
-                      </Link>
-                    </div>
-                  ) : (
-                    <div className="relative leaf-lg p-5 shadow-2xl overflow-hidden"
-                      style={{ background: "linear-gradient(150deg,#34d399 0%,#059669 45%,#047857 100%)" }}>
-                      <motion.span className="absolute top-3 right-5 text-2xl pointer-events-none select-none"
-                        animate={{ y: [0, -5, 0] }} transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}>🔭</motion.span>
-                      <p className="font-baloo font-black text-white text-mlg mb-1 pr-10">Your story awaits!</p>
-                      <p className="font-nunito text-white/80 text-sml mb-5">Zilo found some great ones at the Library.</p>
-                      <Link href="/stories"
-                        className="flex items-center justify-center gap-2 w-full font-baloo font-black text-amber-900 text-base py-3.5 leaf shadow-xl transition-all hover:-translate-y-0.5 active:scale-95"
-                        style={{ background: "linear-gradient(135deg,#fbbf24,#f59e0b)" }}>
-                        Start Your Journey <ChevronRight className="w-4 h-4" />
-                      </Link>
-                    </div>
-                  )}
-                </motion.div>
-
-                {/* ── CENTER: Greeting glass card + Characters ─────────── */}
-                <div className="w-full flex flex-col items-center justify-end gap-0">
-
-                  {/* Greeting */}
-                  <motion.div variants={up}
-                    className="mb-4 w-full max-w-[420px] rounded-2xl border border-white/50 shadow-2xl overflow-hidden text-center"
-                    style={{ background: "rgba(255,255,255,0.88)", backdropFilter: "blur(20px)" }}>
-
-                    {/* Name + XP section */}
-                    <div className="px-5 pt-4 pb-3">
-                      <p className="font-nunito font-semibold text-[var(--ds-text-brand)] text-2xs tracking-wide mb-0.5 uppercase">
-                        {greeting} ✈️
-                      </p>
+                      {/* Child name — big and bold */}
                       <h1 className="font-baloo font-black text-[var(--ds-text-primary)]"
-                        style={{ fontSize: "clamp(1.4rem,3.8vw,2rem)", lineHeight: 1.15 }}>
+                        style={{ fontSize: "clamp(1.8rem,5vw,2.4rem)", lineHeight: 1.1, letterSpacing: "-0.01em" }}>
                         {activeChild?.name ?? "Explorer"}!
                       </h1>
-                      {cosmetics.title_badge && SHOP_ITEM_MAP[cosmetics.title_badge] && (
-                        <span className={`inline-flex items-center gap-1.5 text-2xs font-black px-2.5 py-0.5 rounded-full mt-1 shadow-sm ${SHOP_ITEM_MAP[cosmetics.title_badge].titleColor ?? "bg-[var(--ds-surface-card-active)] text-[var(--ds-text-secondary)]"}`}>
-                          {SHOP_ITEM_MAP[cosmetics.title_badge].emoji} {t(SHOP_ITEM_MAP[cosmetics.title_badge].nameKey)}
-                        </span>
-                      )}
-                      {/* XP bar — key resets fill animation when child switches */}
-                      <div className="mt-3">
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="font-nunito font-bold text-[var(--ds-text-tertiary)] text-3xs">{levelInfo?.icon} Lv.{xpLevel} · {levelInfo ? t(levelInfo.labelKey) : ""}</span>
-                          <span className="font-baloo font-black text-[var(--ds-text-brand)] text-3xs">{xpIn}/{xpNeeded} ⭐</span>
+
+                      {/* Title badge or level pill */}
+                      <div className="mt-2">
+                        {cosmetics.title_badge && SHOP_ITEM_MAP[cosmetics.title_badge] ? (
+                          <span className={`inline-flex items-center gap-1.5 text-xs font-black px-3 py-1 rounded-full shadow-sm ${SHOP_ITEM_MAP[cosmetics.title_badge].titleColor ?? "bg-[var(--ds-surface-card-active)] text-[var(--ds-text-secondary)]"}`}>
+                            {SHOP_ITEM_MAP[cosmetics.title_badge].emoji} {t(SHOP_ITEM_MAP[cosmetics.title_badge].nameKey)}
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1.5 text-xs font-black px-3 py-1 rounded-full bg-[var(--ds-brand-subtle)] text-[var(--ds-brand-primary)] border border-[var(--ds-brand-primary)]/20">
+                            {levelInfo?.icon} {levelInfo ? t(levelInfo.labelKey) : "Explorer"} · Lv.{xpLevel}
+                          </span>
+                        )}
+                      </div>
+
+                      {/* XP bar */}
+                      <div className="mt-3.5">
+                        <div className="flex items-center justify-between mb-1.5">
+                          <span className="font-nunito font-bold text-[var(--ds-text-tertiary)] text-2xs">
+                            {levelInfo?.icon} Lv.{xpLevel} · {levelInfo ? t(levelInfo.labelKey) : ""}
+                          </span>
+                          <span className="font-baloo font-black text-[var(--ds-text-brand)] text-2xs">{xpIn}/{xpNeeded} ⭐</span>
                         </div>
-                        <div className="h-2 bg-[var(--ds-surface-card-active)] rounded-full overflow-hidden">
+                        <div className="h-3 bg-[var(--ds-surface-card-active)] rounded-full overflow-hidden shadow-inner">
                           <motion.div key={`xp-${activeChild?.id}`} className="h-full rounded-full"
-                            style={{ background: "linear-gradient(90deg,var(--ds-brand-primary),var(--ds-brand-hover))" }}
+                            style={{ background: "linear-gradient(90deg,#22c55e,#16a34a,#0ea5e9)" }}
                             initial={{ width: 0 }} animate={{ width: `${xpPct}%` }}
-                            transition={{ duration: 1.2, ease: "easeOut", delay: 0.4 }} />
+                            transition={{ duration: 1.4, ease: "easeOut", delay: 0.5 }} />
                         </div>
                       </div>
                     </div>
 
-                    {/* Stats footer — 3-cell divided bar */}
-                    <div className="flex items-stretch divide-x divide-gray-100 bg-[var(--ds-surface-card-hover)]/70 border-t border-[var(--ds-border-primary)]">
-                      <div className="flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5">
-                        <Flame className={`w-[15px] h-[15px] ${consecutiveStreak > 0 ? "fill-orange-400 text-orange-400" : "fill-gray-300 text-[var(--ds-text-tertiary)]"}`} />
-                        <span className={`font-baloo font-black text-sm leading-none ${consecutiveStreak > 0 ? "text-orange-500" : "text-[var(--ds-text-tertiary)]"}`}>
+                    {/* Stats footer — 3 colorful emoji cells */}
+                    <div className="flex items-stretch divide-x divide-[var(--ds-border-primary)] bg-[var(--ds-surface-card-hover)]/60 border-t border-[var(--ds-border-primary)]">
+                      <div className="flex-1 flex flex-col items-center justify-center gap-0.5 py-3">
+                        <span className={`text-xl leading-none ${consecutiveStreak === 0 ? "grayscale opacity-40" : ""}`}>🔥</span>
+                        <span className={`font-baloo font-black text-base leading-none mt-0.5 ${consecutiveStreak > 0 ? "text-orange-500" : "text-[var(--ds-text-tertiary)]"}`}>
                           {consecutiveStreak > 0 ? consecutiveStreak : "–"}
                         </span>
-                        <span className="font-nunito text-[var(--ds-text-tertiary)] text-4xs leading-none">{t("homeStatStreak")}</span>
+                        <span className="font-nunito text-[var(--ds-text-tertiary)] text-4xs leading-none mt-0.5">{t("homeStatStreak")}</span>
                       </div>
-                      <div className="flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5">
-                        <Star className="w-[15px] h-[15px] fill-amber-400 text-amber-400" />
-                        <span className="font-baloo font-black text-amber-500 text-sm leading-none">{totalStars}</span>
-                        <span className="font-nunito text-[var(--ds-text-tertiary)] text-4xs leading-none">{t("homeStatStars")}</span>
+                      <div className="flex-1 flex flex-col items-center justify-center gap-0.5 py-3">
+                        <span className="text-xl leading-none">⭐</span>
+                        <span className="font-baloo font-black text-amber-500 text-base leading-none mt-0.5">{totalStars}</span>
+                        <span className="font-nunito text-[var(--ds-text-tertiary)] text-4xs leading-none mt-0.5">{t("homeStatStars")}</span>
                       </div>
-                      <div className="flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5">
-                        <Heart className="w-[15px] h-[15px] fill-rose-400 text-rose-400" />
-                        <span className="font-baloo font-black text-rose-500 text-sm leading-none">{level}</span>
-                        <span className="font-nunito text-[var(--ds-text-tertiary)] text-4xs leading-none">{t("homeStatLevel")}</span>
+                      <div className="flex-1 flex flex-col items-center justify-center gap-0.5 py-3">
+                        <span className="text-xl leading-none">❤️</span>
+                        <span className="font-baloo font-black text-rose-500 text-base leading-none mt-0.5">{level}</span>
+                        <span className="font-nunito text-[var(--ds-text-tertiary)] text-4xs leading-none mt-0.5">{t("homeStatLevel")}</span>
                       </div>
-                    </div>
-                  </motion.div>
-
-                  {/* Characters on their world stage */}
-                  <motion.div variants={up} className="relative flex items-end justify-center">
-                    {/* Stage spotlight — gold runway glow rising from ground */}
-                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[340px] sm:w-[440px] h-[110px] pointer-events-none"
-                      style={{ background: "radial-gradient(ellipse 70% 60% at 50% 100%, rgba(201,168,76,0.35) 0%, rgba(201,168,76,0.08) 50%, transparent 75%)" }} />
-
-                    {/* NIMI with outfit badge */}
-                    <div className="relative">
-                      <motion.img src={`/themes/${themeId}/characters/nimi.png`} alt="Nimi"
-                        className="h-[185px] sm:h-[225px] lg:h-[265px] w-auto object-contain drop-shadow-2xl select-none"
-                        animate={{ y: [0, -9, 0] }} transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
-                        onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
-                      {cosmetics.nimi_outfit && SHOP_ITEM_MAP[cosmetics.nimi_outfit] && (
-                        <motion.span
-                          initial={{ scale: 0 }} animate={{ scale: 1 }}
-                          className="absolute bottom-6 right-0 text-4xl drop-shadow-xl leading-none pointer-events-none select-none"
-                          title={t(SHOP_ITEM_MAP[cosmetics.nimi_outfit].nameKey)}
-                        >
-                          {SHOP_ITEM_MAP[cosmetics.nimi_outfit].emoji}
-                        </motion.span>
-                      )}
-                    </div>
-
-                    {/* PIKO with outfit badge */}
-                    <div className="relative mx-2">
-                      <motion.img src={`/themes/${themeId}/characters/piko.png`} alt="Piko"
-                        className="h-[165px] sm:h-[200px] lg:h-[235px] w-auto object-contain drop-shadow-2xl select-none"
-                        animate={{ y: [0, -6, 0] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-                        onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
-                      {cosmetics.piko_outfit && SHOP_ITEM_MAP[cosmetics.piko_outfit] && (
-                        <motion.span
-                          initial={{ scale: 0 }} animate={{ scale: 1 }}
-                          className="absolute bottom-6 right-0 text-4xl drop-shadow-xl leading-none pointer-events-none select-none"
-                          title={t(SHOP_ITEM_MAP[cosmetics.piko_outfit].nameKey)}
-                        >
-                          {SHOP_ITEM_MAP[cosmetics.piko_outfit].emoji}
-                        </motion.span>
-                      )}
-                    </div>
-
-                    <motion.img src={`/themes/${themeId}/characters/zilo.png`} alt="Zilo"
-                      className="h-[175px] sm:h-[215px] lg:h-[250px] w-auto object-contain drop-shadow-2xl select-none"
-                      animate={{ y: [0, -8, 0] }} transition={{ duration: 3.8, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-                      onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
-                  </motion.div>
-                </div>
-
-                {/* ── RIGHT: Trust + Streak + Level ───────────────────── */}
-                <motion.div variants={up}
-                  className="hidden">
-
-                  {/* Latest Achievement — only shown when the child has at least one badge */}
-                  {achievements.length > 0 && (() => {
-                    const latest = achievements[achievements.length - 1];
-                    const badge  = parseBadgeSlug(latest.slug);
-                    const today  = new Date().toDateString();
-                    return (
-                      <div className="px-4 py-3.5 rounded-2xl border border-white/50 shadow-2xl"
-                        style={{ background: "rgba(255,255,255,0.65)", backdropFilter: "blur(18px)" }}>
-                        <p className="font-baloo font-black text-[var(--ds-text-brand)] text-2xs uppercase tracking-widest mb-2.5">Latest Badge</p>
-                        <div className="flex items-center gap-3">
-                          <div className="relative shrink-0">
-                            <div className="w-[52px] h-[52px] rounded-2xl flex items-center justify-center text-3.5xl shadow-lg"
-                              style={{ background: `linear-gradient(145deg,${badge.from},${badge.to})` }}>
-                              {badge.emoji}
-                            </div>
-                            <motion.div
-                              className="absolute -top-1 -right-1 w-4 h-4 bg-amber-400 rounded-full flex items-center justify-center shadow-md"
-                              animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 1.8, repeat: Infinity }}>
-                              <Star className="w-2.5 h-2.5 fill-white text-white" />
-                            </motion.div>
-                          </div>
-                          <div>
-                            <p className="font-baloo font-black text-amber-600 text-mbase leading-tight">{badge.label}</p>
-                            <p className="font-nunito font-bold text-[var(--ds-text-brand)] text-2xs">
-                              {new Date(latest.earned_at).toDateString() === today ? "Earned today 🎉" : "Recently earned ✨"}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })()}
-
-                  {/* Streak card — frosted */}
-                  <div className="rounded-2xl p-4 shadow-xl border border-amber-200/60"
-                    style={{ background: "rgba(254,243,199,0.92)", backdropFilter: "blur(14px)" }}>
-                    <div className="flex items-center gap-2 mb-0.5">
-                      <Flame className="w-5 h-5 text-orange-500 fill-orange-500" />
-                      <span className="font-baloo font-black text-orange-600 text-mlg">{consecutiveStreak} {consecutiveStreak === 1 ? t("homeStreakDayLabel") : t("homeStreakDaysLabel")} {t("heroStreakLabel")}</span>
-                    </div>
-                    <p className="font-nunito font-bold text-amber-700 text-xs mb-3">
-                      {consecutiveStreak >= 7 ? t("homeStreakUnstoppable") : consecutiveStreak >= 3 ? t("homeStreakOnFire") : consecutiveStreak > 0 ? t("homeStreakKeepItUp") : t("homeStreakStart")}
-                    </p>
-                    <div className="flex justify-between">
-                      {WEEK_DAYS.map((day, i) => {
-                        const done    = weekStreak[i];
-                        const isToday = i === todayIdx;
-                        const future  = i > todayIdx;
-                        return (
-                          <div key={i} className="flex flex-col items-center gap-1">
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center shadow-sm transition-all ${
-                              done    ? "bg-[var(--ds-brand-primary)] shadow-[var(--ds-brand-soft)]" :
-                              isToday ? "bg-amber-100 border-2 border-amber-400" :
-                              future  ? "bg-amber-50 border border-amber-100 opacity-40" :
-                                        "bg-amber-100/60 border border-amber-200"
-                            }`}>
-                              {done    ? <Check className="w-4 h-4 text-white" strokeWidth={2.5} /> :
-                               isToday ? <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-300" /> :
-                                         null}
-                            </div>
-                            <span className={`font-nunito font-bold text-4xs ${
-                              done ? "text-[var(--ds-text-brand)]" : isToday ? "text-amber-600 font-black" : "text-amber-400"
-                            }`}>{day}</span>
-                          </div>
-                        );
-                      })}
                     </div>
                   </div>
-
                 </motion.div>
 
-              </div>{/* end 3-column */}
+                {/* ── RIGHT / BOTTOM: Characters on world stage ─────────── */}
+                <motion.div variants={up} className="relative flex items-end justify-center md:justify-end shrink-0">
+                  {/* Stage spotlight — gold runway glow rising from ground */}
+                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[340px] sm:w-[440px] h-[110px] pointer-events-none"
+                    style={{ background: "radial-gradient(ellipse 70% 60% at 50% 100%, rgba(201,168,76,0.35) 0%, rgba(201,168,76,0.08) 50%, transparent 75%)" }} />
+
+                  {/* NIMI with outfit badge */}
+                  <div className="relative">
+                    <motion.img src={`/themes/${themeId}/characters/nimi.png`} alt="Nimi"
+                      className="h-[185px] sm:h-[225px] lg:h-[265px] w-auto object-contain drop-shadow-2xl select-none"
+                      animate={{ y: [0, -9, 0] }} transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
+                      onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                    {cosmetics.nimi_outfit && SHOP_ITEM_MAP[cosmetics.nimi_outfit] && (
+                      <motion.span
+                        initial={{ scale: 0 }} animate={{ scale: 1 }}
+                        className="absolute bottom-6 right-0 text-4xl drop-shadow-xl leading-none pointer-events-none select-none"
+                        title={t(SHOP_ITEM_MAP[cosmetics.nimi_outfit].nameKey)}
+                      >
+                        {SHOP_ITEM_MAP[cosmetics.nimi_outfit].emoji}
+                      </motion.span>
+                    )}
+                  </div>
+
+                  {/* PIKO with outfit badge */}
+                  <div className="relative mx-2">
+                    <motion.img src={`/themes/${themeId}/characters/piko.png`} alt="Piko"
+                      className="h-[165px] sm:h-[200px] lg:h-[235px] w-auto object-contain drop-shadow-2xl select-none"
+                      animate={{ y: [0, -6, 0] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+                      onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                    {cosmetics.piko_outfit && SHOP_ITEM_MAP[cosmetics.piko_outfit] && (
+                      <motion.span
+                        initial={{ scale: 0 }} animate={{ scale: 1 }}
+                        className="absolute bottom-6 right-0 text-4xl drop-shadow-xl leading-none pointer-events-none select-none"
+                        title={t(SHOP_ITEM_MAP[cosmetics.piko_outfit].nameKey)}
+                      >
+                        {SHOP_ITEM_MAP[cosmetics.piko_outfit].emoji}
+                      </motion.span>
+                    )}
+                  </div>
+
+                  {/* ZILO */}
+                  <motion.img src={`/themes/${themeId}/characters/zilo.png`} alt="Zilo"
+                    className="h-[175px] sm:h-[215px] lg:h-[250px] w-auto object-contain drop-shadow-2xl select-none"
+                    animate={{ y: [0, -8, 0] }} transition={{ duration: 3.8, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                    onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                </motion.div>
+
+              </div>{/* end content */}
 
               {/* ── Wave bottom transition ─────────────────────────────────── */}
-              <div className="absolute bottom-0 left-0 right-0 z-20 pointer-events-none" style={{ lineHeight: 0 }}>
+              <div aria-hidden="true" className="absolute bottom-0 left-0 right-0 z-20 pointer-events-none" style={{ lineHeight: 0 }}>
                 <svg viewBox="0 0 1440 110" xmlns="http://www.w3.org/2000/svg"
                   className="w-full block" preserveAspectRatio="none">
                   <defs>
@@ -974,23 +821,6 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
             </div>
           </div>
 
-          {/* ════════════════════════ QUICK ACTIONS ═════════════════════════ */}
-          <div className="relative z-10 px-4 sm:px-6 pt-3 pb-1 max-w-[1400px] mx-auto">
-            <motion.div
-              initial="hidden" animate="visible" variants={stagger}
-              className="grid grid-cols-3 sm:grid-cols-6 gap-2.5 sm:gap-3">
-              {ACTIVITIES.map(({ img, labelKey, subKey, href }) => (
-                <motion.div key={labelKey} variants={pop}>
-                  <Link href={href}
-                    className="group flex flex-col items-center gap-1.5 bg-[var(--ds-surface-card)]/90 backdrop-blur-sm border border-[var(--ds-border-primary)] hover:border-[var(--ds-border-brand)] rounded-2xl px-2 py-3.5 sm:py-4 shadow-sm hover:shadow-md hover:-translate-y-1 active:scale-95 transition-all">
-                    <img src={img} alt={t(labelKey)} className="w-10 h-10 sm:w-11 sm:h-11 object-contain drop-shadow-sm group-hover:scale-110 transition-transform duration-200" />
-                    <p className="font-baloo font-black text-[var(--ds-text-primary)] text-xs sm:text-sml leading-tight text-center">{t(labelKey)}</p>
-                    <p className="font-nunito text-[var(--ds-text-tertiary)] text-4xs sm:text-3xs text-center hidden sm:block leading-tight">{t(subKey)}</p>
-                  </Link>
-                </motion.div>
-              ))}
-            </motion.div>
-          </div>
 
           {/* ════════════════════════════ BELOW HERO ════════════════════════ */}
           <div className="relative">
@@ -1040,41 +870,44 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
             <div className="relative z-10 flex flex-col xl:flex-row xl:items-start gap-6 px-4 lg:px-6 py-6 max-w-[1400px] mx-auto">
 
               {/* ══ MAIN COLUMN ══════════════════════════════════════════════ */}
-              <main className="flex-1 min-w-0 space-y-10">
+              <main className="flex-1 min-w-0">
 
-                {/* ── YOUR ADVENTURE ─────────────────────────────────────── */}
-                <HomeAdventureSection
-                  curStory={curStory}
-                  doneSlots={doneSlots}
-                  totalSlots={totalSlots}
-                  pct={pct}
-                  slots={slots}
-                  up={up}
-                  stagger={stagger}
-                  hasSubscription={hasSubscription}
-                  nextPremiumStory={nextPremiumStory}
-                />
+                {/* ── YOUR ADVENTURE + STORY LIBRARY — side by side ──────── */}
+                <div className="grid grid-cols-1 lg:grid-cols-[40%_1fr] gap-5 items-stretch">
+                  <HomeAdventureSection
+                    curStory={curStory}
+                    doneSlots={doneSlots}
+                    totalSlots={totalSlots}
+                    pct={pct}
+                    slots={slots}
+                    up={up}
+                    stagger={stagger}
+                    hasSubscription={hasSubscription}
+                    nextPremiumStory={nextPremiumStory}
+                  />
 
-                {/* ── STORY LIBRARY ─────────────────────────────────────────── */}
-                <HomeStoryLibrarySection
-                  stories={stories}
-                  curStory={curStory}
-                  hasSubscription={hasSubscription}
-                  up={up}
-                  stagger={stagger}
-                  pop={pop}
-                  onPrefetch={activeChild ? (storyId) => {
-                    void getStoryDetails(storyId, activeChild.language);
-                    void getStorySlots(activeChild.id, storyId, activeChild.language);
-                  } : undefined}
-                />
+                  <HomeStoryLibrarySection
+                    stories={stories}
+                    curStory={curStory}
+                    hasSubscription={hasSubscription}
+                    up={up}
+                    stagger={stagger}
+                    pop={pop}
+                    onPrefetch={activeChild ? (storyId) => {
+                      void getStoryDetails(storyId, activeChild.language);
+                      void getStorySlots(activeChild.id, storyId, activeChild.language);
+                    } : undefined}
+                  />
+                </div>
 
               </main>
 
-              {/* ══ RIGHT PANEL ════════════════════════════════════════════════ */}
-              <aside className="w-full xl:w-[284px] xl:shrink-0 xl:self-start xl:sticky xl:top-[80px]">
-                <div className="flex flex-col gap-3 xl:max-h-[calc(100vh-96px)] xl:overflow-y-auto xl:pb-6 xl:pr-0.5"
-                  style={{ scrollbarWidth: "thin", scrollbarColor: "#d1d5db transparent" }}>
+              {/* ══ RIGHT COMPANION PANEL — sticky below h-16 (64px) header ══ */}
+              <aside className="w-full xl:w-[284px] xl:shrink-0 xl:self-start xl:sticky xl:top-[68px]">
+                <div
+                  className="flex flex-col gap-4 xl:max-h-[calc(100vh-76px)] xl:overflow-y-auto xl:pb-6 xl:pr-0.5"
+                  style={{ scrollbarWidth: "thin", scrollbarColor: "#d1d5db transparent" } as React.CSSProperties}
+                >
 
                   {/* ── Trial Countdown ─────────────────────────────────────── */}
                   {isTrial && (
@@ -1119,13 +952,19 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
                     <NimiProactiveBanner childId={activeChild.id} language={activeChild.language} />
                   )}
 
-                  {/* ── Story Journey ───────────────────────────────────────── */}
+                  {/* 1. TODAY'S MISSION — most actionable, always first ──────── */}
                   <HomeStoryJourneyPanel curStory={curStory} slots={slots} pct={pct} hasSubscription={hasSubscription} nextPremiumStory={nextPremiumStory} />
 
-                  {/* ── Week Streak ─────────────────────────────────────────── */}
+                  {/* 2. DAILY STREAK ─────────────────────────────────────────── */}
                   <HomeWeekStreakPanel weekStreak={weekStreak} consecutiveStreak={consecutiveStreak} totalStars={totalStars} streakBroke={streakBroke} />
 
-                  {/* Achievements, Community, Masterpiece → accessible from nav, not sidebar */}
+                  {/* 3. ENCOURAGEMENT — dynamic based on streak ─────────────── */}
+                  <HomeMotivationCard
+                    consecutiveStreak={consecutiveStreak}
+                    isComplete={!!curStory?.complete}
+                  />
+
+                  {/* Achievements, Community, Masterpiece → accessible from nav */}
 
                 </div>
               </aside>

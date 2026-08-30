@@ -42,7 +42,7 @@ export default function WordLearnedCard({ word, onNext, current, total }: WordLe
     >
       <div className="flex items-center mb-3">
         <p className="font-nunito font-black text-3xs uppercase tracking-[0.2em] text-teal-400">
-          ✨ {t("wordLearnedTitle")}
+          📚 {t("wordLearnedTitle")}
         </p>
         {total && total > 1 && (
           <span className="ml-auto font-nunito font-bold text-3xs text-teal-300">{current}/{total}</span>
@@ -66,12 +66,12 @@ export default function WordLearnedCard({ word, onNext, current, total }: WordLe
               <motion.button
                 onClick={playAudio}
                 whileTap={{ scale: 0.9 }}
-                className={`w-8 h-8 rounded-full flex items-center justify-center transition ${
+                className={`w-11 h-11 rounded-full flex items-center justify-center transition shrink-0 ${
                   played ? "bg-teal-400 text-white" : "bg-teal-100 text-teal-500 hover:bg-teal-200"
                 }`}
                 aria-label={t("tapToHear")}
               >
-                <Volume2 className="w-4 h-4" />
+                <Volume2 className="w-5 h-5" aria-hidden="true" />
               </motion.button>
             )}
           </div>
@@ -83,7 +83,7 @@ export default function WordLearnedCard({ word, onNext, current, total }: WordLe
       <div className="flex items-center justify-between mt-4">
         <div className="flex gap-1.5">
           {["🌟", "✨", "💫", "⭐", "🌟"].map((e, i) => (
-            <motion.span key={i} className="text-2xs select-none"
+            <motion.span key={i} aria-hidden="true" className="text-2xs select-none"
               animate={{ y: [0, -4, 0], opacity: [0.5, 1, 0.5] }}
               transition={{ duration: 1.5 + i * 0.2, repeat: Infinity, delay: i * 0.3 }}>
               {e}

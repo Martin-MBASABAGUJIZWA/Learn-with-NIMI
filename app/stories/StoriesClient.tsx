@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { useThemeMotion } from "@/hooks/useThemeMotion";
 import { DURATION, SPRING } from "@/lib/design-system/motion";
 import { CheckCircle2, Star, Search, ChevronLeft, ChevronRight, Crown, Play } from "lucide-react";
@@ -11,14 +11,11 @@ import AppShell from "@/components/layout/AppShell";
 import { Bone } from "@/components/ui/Bone";
 import { RefreshingBadge } from "@/components/layout/RefreshingBadge";
 import { useLanguage, type Language } from "@/contexts/LanguageContext";
-import { useAppTheme } from "@/contexts/AppThemeProvider";
-import { getThemeAssets } from "@/lib/design-system/assetRegistry";
 import { getChildren, getStorageUrl, getTotalStars, getWeekStreak, getConsecutiveStreak, getChildBadges, getBadgeImages, getTodayMissions, type Child } from "@/lib/queries";
 import { getStoryLibrary, getCurrentStoryId } from "@/lib/storyRepository";
 import { getActiveSubscription } from "@/lib/payments/products";
 import supabase from "@/lib/supabaseClient";
 import type { StoryLibraryItem } from "@/lib/story-types";
-import { PageSurface, HeroBanner } from "@/components/layout/primitives";
 import StatsSidebar from "@/components/home/StatsSidebar";
 
 const ACTIVE_CHILD_KEY = "nimipiko_active_child";
@@ -36,7 +33,7 @@ const CATEGORY_SPINE: Record<string, string> = {
 };
 
 const CATEGORY_META: Record<string, { emoji: string; key: string; activeClass: string; inactiveClass: string }> = {
-  animals:    { emoji: "🐾", key: "storyCatAnimals",    activeClass: "bg-[var(--ds-brand-primary)] text-white border-[var(--ds-border-brand)]",   inactiveClass: "bg-[var(--ds-brand-subtle)] text-[var(--ds-text-brand)] border-[var(--ds-border-brand)] hover:bg-[var(--ds-brand-soft)]" },
+  animals:    { emoji: "🦁", key: "storyCatAnimals",    activeClass: "bg-amber-500 text-white border-amber-500",       inactiveClass: "bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100" },
   friendship: { emoji: "❤️", key: "storyCatFriendship", activeClass: "bg-pink-500 text-white border-pink-500",         inactiveClass: "bg-pink-50 text-pink-700 border-pink-200 hover:bg-pink-100" },
   bedtime:    { emoji: "🌙", key: "storyCatBedtime",    activeClass: "bg-indigo-500 text-white border-indigo-500",     inactiveClass: "bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100" },
   adventure:  { emoji: "🚀", key: "storyCatAdventure",  activeClass: "bg-orange-500 text-white border-orange-500",    inactiveClass: "bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-100" },
@@ -44,6 +41,8 @@ const CATEGORY_META: Record<string, { emoji: string; key: string; activeClass: s
   nature:     { emoji: "🌿", key: "storyCatNature",     activeClass: "bg-teal-500 text-white border-teal-500",        inactiveClass: "bg-teal-50 text-teal-700 border-teal-200 hover:bg-teal-100" },
   family:     { emoji: "👨‍👩‍👧", key: "storyCatFamily",    activeClass: "bg-violet-500 text-white border-violet-500",   inactiveClass: "bg-violet-50 text-violet-700 border-violet-200 hover:bg-violet-100" },
   creativity: { emoji: "🎨", key: "storyCatCreativity", activeClass: "bg-blue-500 text-white border-blue-500",        inactiveClass: "bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100" },
+  school:     { emoji: "🏫", key: "storyCatSchool",     activeClass: "bg-sky-500 text-white border-sky-500",          inactiveClass: "bg-sky-50 text-sky-700 border-sky-200 hover:bg-sky-100" },
+  funny:      { emoji: "😂", key: "storyCatFunny",      activeClass: "bg-lime-500 text-white border-lime-500",        inactiveClass: "bg-lime-50 text-lime-700 border-lime-200 hover:bg-lime-100" },
 };
 
 // BC1: Hoisted to module scope — defining components inside .map() creates a
@@ -58,34 +57,120 @@ interface BookBodyProps {
 }
 
 function BookBody({ story, isCurrent, hasCover, spineColor, dimmed = false, locked }: BookBodyProps) {
-  return (
-    <div className="relative group">
+  const pct = Math.round((story.progress ?? 0) * 100);
+  const isInProgress = pct > 0 && !story.complete;
+  const reduced = useReducedMotion();
 
+  return (
+    <div className="relative group flex flex-col gap-1.5">
+
+      {/* Card shell */}
       <motion.div
-        whileHover={{ scale: 1.03 }}
+        whileHover={reduced ? {} : { scale: 1.03, y: -4, boxShadow: "0 16px 40px rgba(0,0,0,0.22)" }}
         whileTap={{ scale: 0.97 }}
         transition={{ type: "spring", stiffness: 300, damping: 24 }}
-        className="relative rounded-xl overflow-hidden cursor-pointer"
+        className="relative leaf-lg overflow-hidden cursor-pointer"
         style={{
-          height: "clamp(190px, 30vw, 280px)",
+          height: "clamp(160px, 20vw, 230px)",
+          opacity: dimmed ? 0.55 : 1,
+          outline: isCurrent ? "3px solid var(--ds-color-brand-gold, #F5C842)" : undefined,
+          outlineOffset: isCurrent ? "2px" : undefined,
+          boxShadow: "var(--shadow-card-sm, 0 2px 10px rgba(0,0,0,0.10))",
         }}>
 
+        {/* Cover image or fallback */}
         {hasCover ? (
-          <Image
-            src={getStorageUrl(story.cover_url!)}
-            alt={story.title}
-            fill
-            className="object-cover"
-            draggable={false}
-          />
+          <>
+            <Image
+              src={getStorageUrl(story.cover_url!)}
+              alt={story.title}
+              fill
+              className={`object-cover transition-transform duration-500 ${reduced ? "" : "group-hover:scale-105"}`}
+              draggable={false}
+            />
+            {/* Gradient overlay — bottom-heavy so artwork is dominant */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/5 to-transparent" />
+          </>
         ) : (
-          <div className="w-full h-full flex flex-col items-center justify-center gap-2"
-            style={{ background: `linear-gradient(135deg, ${spineColor}cc, ${spineColor}88)` }}>
-            <span className="text-5xl">{story.theme_emoji}</span>
-            <p className="font-baloo font-black text-white text-center text-xs px-3 leading-tight">{story.title}</p>
+          <div className="w-full h-full flex flex-col items-center justify-center gap-2 transition-all duration-300 group-hover:brightness-110"
+            style={{ background: `linear-gradient(145deg, ${spineColor}ee, ${spineColor}88)` }}>
+            <motion.span
+              className="text-5xl drop-shadow-md"
+              animate={reduced ? {} : { rotate: [0, 4, -4, 0] }}
+              transition={{ duration: 4, repeat: Infinity, repeatDelay: 3, ease: "easeInOut" }}>
+              {story.theme_emoji}
+            </motion.span>
+            <p className="font-baloo font-black text-white text-center text-xs px-3 leading-tight drop-shadow-sm">{story.title}</p>
+          </div>
+        )}
+
+        {/* Hover play/read affordance — fades in on hover */}
+        {!locked && !story.complete && (
+          <div className={`absolute inset-0 flex flex-col items-center justify-center gap-1.5 transition-opacity duration-200 pointer-events-none ${reduced ? "opacity-0" : "opacity-0 group-hover:opacity-100"}`}>
+            <div className="flex flex-col items-center gap-1">
+              <div className="w-11 h-11 rounded-full flex items-center justify-center"
+                style={{ background: "rgba(0,0,0,0.55)", backdropFilter: "blur(4px)", border: "2px solid rgba(255,255,255,0.75)" }}>
+                <Play className="w-4 h-4 text-white fill-white ml-0.5" />
+              </div>
+              <span className="font-baloo font-black text-white text-xs drop-shadow-md"
+                style={{ textShadow: "0 1px 4px rgba(0,0,0,0.8)" }}>
+                {isInProgress ? "Continue" : "Read"}
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* "Current story" gold pulse ring */}
+        {isCurrent && (
+          <motion.div
+            className="absolute inset-0 leaf-lg pointer-events-none"
+            animate={{ boxShadow: ["0 0 0 0 rgba(245,200,66,0.5)", "0 0 0 6px rgba(245,200,66,0)", "0 0 0 0 rgba(245,200,66,0)"] }}
+            transition={{ duration: 2.2, repeat: Infinity }}
+          />
+        )}
+
+        {/* Completion badge */}
+        {story.complete && (
+          <motion.div
+            initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ ...SPRING.bounce, delay: 0.1 }}
+            className="absolute top-2 right-2 w-7 h-7 rounded-full bg-green-500 border-2 border-white shadow-lg flex items-center justify-center"
+            title="Completed!">
+            <CheckCircle2 className="w-4 h-4 text-white" strokeWidth={2.5} />
+          </motion.div>
+        )}
+
+        {/* Premium lock overlay */}
+        {locked === "premium" && (
+          <div className="absolute inset-0 bg-black/55 flex flex-col items-center justify-center gap-1.5 backdrop-blur-[1px]">
+            <div className="w-10 h-10 rounded-full bg-yellow-400/20 border-2 border-yellow-400/60 flex items-center justify-center">
+              <Star className="w-5 h-5 text-yellow-300" />
+            </div>
+            <p className="font-baloo font-black text-white text-xs text-center px-2 drop-shadow">Club</p>
+          </div>
+        )}
+
+        {/* In-progress bar pinned to bottom of card */}
+        {isInProgress && !locked && (
+          <div className="absolute bottom-0 inset-x-0 h-2 bg-black/25">
+            <motion.div
+              className="h-full bg-gradient-to-r from-yellow-400 to-orange-400"
+              initial={{ width: 0 }}
+              animate={{ width: `${pct}%` }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+            />
           </div>
         )}
       </motion.div>
+
+      {/* Title below the card */}
+      <div className="px-0.5 flex items-start justify-between gap-1 transition-transform duration-200 group-hover:-translate-y-0.5">
+        <p className="font-baloo font-black text-[var(--ds-text-primary)] text-xs leading-tight line-clamp-2 flex-1">
+          {story.title}
+        </p>
+        {isInProgress && !locked && (
+          <span className="shrink-0 font-baloo font-black text-[10px] text-orange-500 leading-none mt-0.5">{pct}%</span>
+        )}
+      </div>
     </div>
   );
 }
@@ -98,11 +183,10 @@ interface Props {
 export default function StoriesClient({ initialChildren, initialHasSubscription }: Props = {}) {
   const { t } = useLanguage();
   const m = useThemeMotion();
-  const { themeId } = useAppTheme();
-  const assets = getThemeAssets(themeId);
   const [stories, setStories] = useState<StoryLibraryItem[]>([]);
   const [currentId, setCurrentId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [childName, setChildName] = useState("");
   const [refreshing, setRefreshing] = useState(false);
   const [totalStars, setTotalStars] = useState(0);
   const [weekStreak, setWeekStreak] = useState<boolean[]>([false,false,false,false,false,false,false]);
@@ -133,6 +217,7 @@ export default function StoriesClient({ initialChildren, initialHasSubscription 
     ]);
 
     if (silent && gen !== switchGenRef.current) return;
+    setChildName(child.name ?? "");
     setStories(lib);
     setCurrentId(cur);
     setWeekStreak(streak);
@@ -205,10 +290,10 @@ export default function StoriesClient({ initialChildren, initialHasSubscription 
   }, [loadForChild]);
 
   const activeCategories = Array.from(new Set(stories.map(s => s.category).filter(Boolean))) as string[];
-  const hasCategories = activeCategories.length > 1;
+  const hasCategories = activeCategories.length >= 1;
 
   const categoryTabs = [
-    { key: "all", emoji: "📚", label: t("storyCatAll"), activeClass: "bg-ds-action text-white border-ds-action", inactiveClass: "bg-[var(--ds-surface-card)] text-[var(--ds-text-secondary)] border-ds-border hover:bg-[var(--ds-surface-card-hover)]" },
+    { key: "all", emoji: "⊞", label: t("storyCatAll"), activeClass: "bg-ds-action text-white border-ds-action", inactiveClass: "bg-[var(--ds-surface-card)] text-[var(--ds-text-secondary)] border-ds-border hover:bg-[var(--ds-surface-card-hover)]" },
     ...activeCategories.map(c => ({
       key: c,
       emoji: CATEGORY_META[c]?.emoji ?? "📖",
@@ -232,182 +317,350 @@ export default function StoriesClient({ initialChildren, initialHasSubscription 
 
   const currentStory = stories.find(s => s.sid === currentId);
   const completedCount = stories.filter(s => s.complete).length;
+  const inProgress = stories.filter(s => !s.complete && (s.progress ?? 0) > 0).length;
 
   return (
     <AppShell>
       <RefreshingBadge show={refreshing} />
-      <PageSurface>
-      <div className={`max-w-7xl mx-auto px-4 sm:px-6 py-5 pb-28 w-full xl:flex xl:gap-6 xl:items-start content-enter transition-opacity duration-300${refreshing ? " opacity-50 pointer-events-none" : ""}`}>
+      <div className={`w-full xl:flex xl:gap-8 xl:items-start pb-28 content-enter transition-opacity duration-300${refreshing ? " opacity-50 pointer-events-none" : ""}`}>
       <main className="flex-1 min-w-0">
 
         {/* ═══ HERO BANNER ═══ */}
-        <HeroBanner zone="library" className="mb-6 overflow-hidden">
-          {/* Background orbs */}
-          <div className="absolute -top-8 -right-8 w-48 h-48 rounded-full bg-[var(--ds-surface-card)]/10 blur-xl" />
-          <div className="absolute -bottom-10 -left-10 w-56 h-56 rounded-full bg-[var(--ds-surface-card)]/8 blur-2xl" />
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="relative leaf-lg overflow-hidden mb-4"
+          style={{
+            minHeight: 150,
+            background: "linear-gradient(135deg, #1F5C38 0%, #2D7A4F 30%, #3D8A62 60%, #6DBF88 85%, #81C784 100%)",
+          }}>
 
-          {/* Floating sparkle stars */}
+          {/* Soft left-side scrim for text legibility */}
+          <div className="absolute inset-0 pointer-events-none"
+            style={{ background: "linear-gradient(105deg, rgba(10,40,20,0.35) 0%, rgba(10,40,20,0.10) 45%, transparent 68%)" }} />
+
+          {/* Floating decorative elements */}
+          <div aria-hidden="true" className="absolute inset-0 pointer-events-none select-none z-10">
           {([
-            { top: "18%", left: "5%",  size: 18, delay: 0,   rotate: true  },
-            { top: "70%", left: "12%", size: 12, delay: 0.8, rotate: false },
-            { top: "22%", right: "4%", size: 22, delay: 0.3, rotate: true  },
-            { top: "72%", right: "8%", size: 14, delay: 1.2, rotate: false },
-            { top: "50%", right: "18%",size: 10, delay: 0.6, rotate: false },
-          ] as Array<{top:string;size:number;delay:number;rotate:boolean;left?:string;right?:string}>).map((s, i) => (
+            { top: "10%", left: "40%",  size: 20, delay: 0,   glyph: "⭐" },
+            { top: "65%", left: "32%",  size: 14, delay: 1.1, glyph: "✨" },
+            { top: "15%", left: "58%",  size: 13, delay: 0.7, glyph: "💫" },
+            { top: "75%", right: "14%", size: 16, delay: 0.4, glyph: "⭐" },
+            { top: "20%", right: "20%", size: 11, delay: 1.5, glyph: "✨" },
+          ] as Array<{top:string;size:number;delay:number;glyph:string;left?:string;right?:string}>).map((s, i) => (
             <motion.span key={i} className="absolute pointer-events-none select-none"
               style={{ top: s.top, left: s.left, right: s.right, fontSize: s.size }}
-              animate={{
-                opacity: [0.4, 1, 0.4],
-                scale:   [0.7, 1.3, 0.7],
-                rotate:  s.rotate ? [0, 25, -25, 0] : [0, 0, 0],
-              }}
-              transition={{ duration: DURATION.loopBase + DURATION.moderate, repeat: Infinity, delay: s.delay }}
-              aria-hidden>⭐</motion.span>
+              animate={{ opacity: [0.5, 1, 0.5], scale: [0.8, 1.25, 0.8], y: [0, -5, 0] }}
+              transition={{ duration: 3 + i * 0.4, repeat: Infinity, delay: s.delay }}>{s.glyph}</motion.span>
           ))}
+          </div>
 
-          <div className="relative z-10 flex items-center gap-4 px-5 py-5 sm:px-8 sm:py-6">
-            {/* Animated Nimi */}
-            <motion.div className="relative shrink-0"
-              animate={{ y: [0, -6, 0] }}
-              transition={{ duration: DURATION.loopSlow, repeat: Infinity }}>
-              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full border-2 border-white/50 shadow-xl overflow-hidden">
-                <img src={assets.nimiCircle} alt="Nimi" className="w-full h-full object-cover" draggable={false} />
-              </div>
-              <motion.div className="absolute -bottom-1 -right-1 text-lg"
-                animate={{ rotate: [0, 15, -10, 0], scale: [1, 1.2, 1] }}
-                transition={{ duration: DURATION.loopBase, repeat: Infinity, delay: 1 }}>
-                ✨
+          <div className="relative z-20 flex items-stretch min-h-[150px]">
+
+            {/* Left — greeting + CTA */}
+            <div className="flex-1 flex flex-col justify-center px-5 py-4 sm:px-6">
+              <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, duration: 0.45 }}>
+                <p className="font-nunito font-bold text-white/75 text-xs mb-0.5">Welcome back,</p>
+                <h1 className="font-baloo font-black text-white leading-tight drop-shadow-md mb-1"
+                  style={{ fontSize: "clamp(1.35rem, 3.5vw, 2rem)" }}>
+                  {childName ? `${childName}! 👋` : "Explorer! 👋"}
+                </h1>
+                <p className="font-nunito font-semibold text-white/80 text-xs mb-2.5 leading-snug">
+                  Pick a story and start your adventure with Nimi!
+                </p>
               </motion.div>
-            </motion.div>
-
-            {/* Text */}
-            <div className="flex-1 min-w-0">
-              <p className="text-white/60 text-3xs font-nunito font-black uppercase tracking-[0.18em] mb-0.5">
-                ✨ {t("storyLibraryEyebrow")}
-              </p>
-              <h1 className="font-baloo font-black text-white text-2.5xl sm:text-4xl leading-tight drop-shadow-md">
-                {t("storyLibraryTitle")}
-              </h1>
-              <p className="text-white/85 text-sml font-nunito font-semibold mt-0.5">
-                {t("storyLibrarySubtitle")}
-              </p>
+              <motion.button
+                onClick={() => document.getElementById("story-shelf")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+                initial={{ opacity: 0, scale: 0.85 }} animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.28, ...SPRING.bounce }}
+                whileHover={{ scale: 1.05, boxShadow: "0 6px 24px rgba(0,0,0,0.22)" }}
+                whileTap={{ scale: 0.95 }}
+                className="inline-flex items-center gap-2 font-baloo font-black text-sm px-5 py-2 rounded-full cursor-pointer self-start"
+                style={{
+                  background: "linear-gradient(135deg, #F5C842, #F59E0B)",
+                  color: "#07111F",
+                  boxShadow: "0 4px 18px rgba(245,156,11,0.4)",
+                }}>
+                {"Let's Explore!"} <span>🚀</span>
+              </motion.button>
             </div>
 
-            {/* Stats chips */}
-            <div className="flex flex-col items-end gap-1.5 shrink-0">
-              {completedCount > 0 && (
-                <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ ...SPRING.bounce, delay: 0.3 }}
-                  className="flex items-center gap-1.5 bg-[var(--ds-surface-card)]/20 border border-white/30 rounded-full px-3 py-1.5">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-white" />
-                  <span className="font-baloo font-black text-white text-sml">{completedCount} done</span>
-                </motion.div>
-              )}
-              {stories.length > 0 && (
-                <div className="flex items-center gap-1.5 bg-[var(--ds-surface-card)]/15 border border-white/20 rounded-full px-3 py-1.5">
-                  <span className="text-xs">📚</span>
-                  <span className="font-baloo font-black text-white text-sml">{stories.length} stories</span>
+            {/* Middle — stat chips (desktop) */}
+            <div className="hidden sm:flex flex-col justify-center gap-1.5 px-2">
+              <motion.div
+                initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.35, duration: 0.4 }}
+                className="flex items-center gap-2 bg-white/90 rounded-xl px-3 py-2 shadow-md"
+                style={{ minWidth: 135 }}>
+                <span className="text-base">📗</span>
+                <div>
+                  <p className="font-baloo font-black text-gray-800 text-xs leading-none">{inProgress}</p>
+                  <p className="font-nunito text-gray-500 text-3xs leading-none mt-0.5">
+                    {inProgress === 1 ? "Book in progress" : "Books in progress"}
+                  </p>
                 </div>
-              )}
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.45, duration: 0.4 }}
+                className="flex items-center gap-2 bg-white/90 rounded-xl px-3 py-2 shadow-md"
+                style={{ minWidth: 135 }}>
+                <span className="text-base">⭐</span>
+                <div>
+                  <p className="font-baloo font-black text-gray-800 text-xs leading-none">{completedCount}</p>
+                  <p className="font-nunito text-gray-500 text-3xs leading-none mt-0.5">
+                    {completedCount === 1 ? "Story finished" : "Stories finished"}
+                  </p>
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Right — Nimi + Piko characters */}
+            <div className="relative shrink-0 flex items-end justify-end pr-2 overflow-hidden" style={{ width: "clamp(100px, 18vw, 180px)" }}>
+              <motion.img
+                src="/themes/default/characters/piko.png"
+                alt="Piko"
+                animate={{ y: [0, -7, 0] }}
+                transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut", delay: 0.4 }}
+                className="absolute bottom-0"
+                style={{
+                  height: "clamp(90px, 13vw, 145px)",
+                  width: "auto",
+                  objectFit: "contain",
+                  left: "0%",
+                  filter: "drop-shadow(0 6px 14px rgba(0,0,0,0.22))",
+                }}
+                draggable={false}
+              />
+              <motion.img
+                src="/themes/default/characters/nimi.png"
+                alt="Nimi"
+                initial={{ y: 0, rotate: 0 }}
+                animate={{ y: [0, -6, 0], rotate: [0, 8, -4, 0] }}
+                transition={{
+                  y: { duration: 3, repeat: Infinity, ease: "easeInOut", repeatDelay: 0.5 },
+                  rotate: { duration: 1.2, repeat: 0, delay: 0.4, ease: "easeInOut" },
+                }}
+                className="absolute bottom-0"
+                style={{
+                  height: "clamp(110px, 15vw, 165px)",
+                  width: "auto",
+                  objectFit: "contain",
+                  right: "4px",
+                  filter: "drop-shadow(0 8px 18px rgba(0,0,0,0.28))",
+                }}
+                draggable={false}
+              />
+            </div>
+
+          </div>
+        </motion.div>
+
+        {/* ═══ CONTINUE ADVENTURE — green hero ═══ */}
+        {currentStory && !currentStory.complete && (() => {
+          const pct = Math.round((currentStory.progress ?? 0) * 100);
+          const progressLabel =
+            pct === 0   ? "Ready for an adventure! 🗺️" :
+            pct < 25    ? "Just getting started! 🌱" :
+            pct < 50    ? "You're on your way! 🚀" :
+            pct < 75    ? "Halfway there! ⚡" :
+            pct < 100   ? "Almost there! 🔥" :
+                          "Adventure complete! ⭐";
+          return (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15, duration: 0.45 }}
+              className="relative leaf-lg overflow-hidden mb-4 cursor-pointer group"
+              style={{
+                background: "linear-gradient(130deg, #1F5C38 0%, #2D7A4F 45%, #163D28 100%)",
+                minHeight: 120,
+              }}>
+
+              <Link href={`/stories/${currentStory.slug}`} className="block">
+                <div className="relative z-20 flex items-center min-h-[120px]">
+
+              {/* Floating music notes — decorative, screen-reader hidden */}
+              <div aria-hidden="true" className="absolute inset-0 pointer-events-none select-none z-10">
+              {(["⭐","✨","💫"] as string[]).map((n, i) => (
+                <motion.span key={i} className="absolute pointer-events-none select-none"
+                  style={{ top: `${[10,18,6][i]}%`, left: `${[48,60,72][i]}%`, fontSize: 18, color: "#F5C842" }}
+                  animate={{ y: [0,-10,0], scale: [0.85, 1.25, 0.85], opacity: [0.55,1,0.55] }}
+                  transition={{ duration: 2.4+i*0.5, repeat: Infinity, delay: i*0.6 }}>{n}</motion.span>
+              ))}
+              </div>
+
+              {/* Teal sound wave bars — positioned on outer container, bottom-right of banner */}
+              <div className="absolute right-3 bottom-5 flex items-end gap-0.5 z-10 pointer-events-none" style={{ height: 40 }}>
+                {[0.4,0.7,1,0.75,0.5,0.85,0.6,1,0.65,0.4].map((h,i) => (
+                  <motion.div key={i}
+                    animate={{ scaleY: [h, h*0.35+0.6, h] }}
+                    transition={{ duration: 0.55+i*0.07, repeat: Infinity, ease: "easeInOut", delay: i*0.055 }}
+                    style={{ width: 3, borderRadius: 2, background: "rgba(245,200,66,0.55)",
+                      height: `${h*40}px`, transformOrigin: "bottom" }} />
+                ))}
+              </div>
+
+                  {/* Left — story info */}
+                  <div className="flex-1 px-5 py-3 sm:px-6 flex flex-col justify-center">
+                    <p className="font-nunito font-black uppercase tracking-[0.12em] text-white/55 mb-0.5"
+                      style={{ fontSize: 9 }}>
+                      {t("storyContinueAdventure")}
+                    </p>
+                    <h2 className="font-baloo font-black text-white leading-tight mb-1"
+                      style={{ fontSize: "clamp(1rem, 2.8vw, 1.4rem)" }}>
+                      {currentStory.title}
+                    </h2>
+                    <p className="font-nunito font-semibold text-white/70 text-xs mb-2 leading-snug">
+                      {progressLabel}
+                    </p>
+                    <div className="flex items-center gap-3">
+                      <motion.div
+                        whileHover={{ scale: 1.07, boxShadow: "0 6px 24px rgba(245,156,11,0.5)" }}
+                        whileTap={{ scale: 0.94 }}
+                        className="inline-flex items-center gap-1.5 font-baloo font-black text-sm px-5 py-2 rounded-full shadow-lg"
+                        style={{
+                          background: "linear-gradient(135deg, #F5C842, #F59E0B)",
+                          color: "#07111F",
+                          boxShadow: "0 4px 18px rgba(245,156,11,0.4)",
+                        }}>
+                        Continue <Play className="w-3.5 h-3.5 fill-current" />
+                      </motion.div>
+                    </div>
+                  </div>
+
+                  {/* Right — characters */}
+                  <div className="shrink-0 relative flex items-end justify-end overflow-hidden"
+                    style={{ width: "clamp(100px, 18vw, 180px)", minHeight: 120 }}>
+                    <motion.img
+                      src="/themes/default/characters/piko.png"
+                      alt="Piko"
+                      animate={{ y: [0,-5,0] }}
+                      transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
+                      className="absolute bottom-0"
+                      style={{ height: "clamp(85px,13vw,135px)", width: "auto", objectFit: "contain",
+                        left: "5%", filter: "drop-shadow(0 4px 12px rgba(0,0,0,0.3))" }}
+                      draggable={false}
+                    />
+                    <motion.img
+                      src="/themes/default/characters/nimi.png"
+                      alt="Nimi"
+                      animate={{ y: [0,-6,0] }}
+                      transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                      className="absolute bottom-0"
+                      style={{ height: "clamp(100px,15vw,155px)", width: "auto", objectFit: "contain",
+                        right: 4, filter: "drop-shadow(0 6px 16px rgba(0,0,0,0.32))" }}
+                      draggable={false}
+                    />
+                  </div>
+
+                </div>
+
+                {/* Progress % pill — absolute on the banner itself (not inside overflow-hidden char div) */}
+                <div className="absolute bottom-4 right-5 pointer-events-none select-none z-30">
+                  <span className="font-baloo font-black text-sm px-3 py-1 rounded-full"
+                    style={{ background: "rgba(0,0,0,0.60)", color: "#F5C842",
+                      border: "1.5px solid rgba(245,200,66,0.4)", backdropFilter: "blur(6px)" }}>
+                    {pct}%
+                  </span>
+                </div>
+              </Link>
+            </motion.div>
+          );
+        })()}
+
+        {/* ═══ STORY LIBRARY PANEL ═══ */}
+        <div className="leaf-lg mt-1"
+          style={{
+            background: "var(--ds-surface-card)",
+            border: "1px solid var(--ds-border-primary)",
+            boxShadow: "var(--shadow-card-md, 0 2px 20px rgba(0,0,0,0.07))",
+          }}>
+        <div className="p-4 sm:p-5 pb-5">
+
+        {/* ═══ PICK YOUR ADVENTURE ═══ */}
+        <div className="mb-3">
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="font-baloo font-black text-[var(--ds-text-primary)] text-lg flex items-center gap-2">
+              Pick Your Adventure <span aria-hidden="true">🗺️</span>
+            </h2>
+            {/* Compact inline search */}
+            <div className="relative hidden sm:block">
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--ds-text-tertiary)]" />
+              <input type="text" value={search} onChange={e => { setSearch(e.target.value); setPage(1); }}
+                placeholder={t("storySearchPlaceholder")}
+                className="bg-[var(--ds-surface-card)] border border-ds-border rounded-full pl-9 pr-4 py-2 text-xs text-ds-text placeholder:text-[var(--ds-text-tertiary)] focus:outline-none focus:border-[var(--ds-state-focus)] focus:ring-2 focus:ring-[var(--ds-state-focus)]/20 transition w-52" />
             </div>
           </div>
-        </HeroBanner>
-
-        {/* ═══ CONTINUE HERO — current story ═══ */}
-        {currentStory && !currentStory.complete && (
-          <Link href={`/stories/${currentStory.slug}`}>
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-              whileHover={{ scale: 1.01 }} whileTap={m.buttonPress}
-              className="page-shell mb-6 overflow-hidden cursor-pointer group">
-              <div className="relative h-40 sm:h-48">
-                {currentStory.cover_url ? (
-                  <Image src={getStorageUrl(currentStory.cover_url)} alt={currentStory.title} fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-700" draggable={false} />
-                ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-                    <span className="text-7xl">{currentStory.theme_emoji}</span>
-                  </div>
-                )}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
-
-                <div className="absolute bottom-0 inset-x-0 p-4 sm:p-5">
-                  <p className="text-yellow-300 text-2xs font-black uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
-                    <Play className="w-3 h-3 fill-yellow-300" /> {t("storyContinueAdventure")}
-                  </p>
-                  <h2 className="font-baloo font-black text-white text-xl sm:text-2.5xl leading-tight mb-2">
-                    {currentStory.theme_emoji} {currentStory.title}
-                  </h2>
-                  <div className="flex items-center gap-3">
-                    <div className="flex-1 bg-[var(--ds-surface-card)]/20 rounded-full h-2.5 overflow-hidden">
-                      <motion.div className="bg-gradient-to-r from-yellow-400 to-orange-400 h-full rounded-full"
-                        initial={{ width: 0 }} animate={{ width: `${currentStory.progress * 100}%` }}
-                        transition={{ duration: DURATION.loopSpark }} />
-                    </div>
-                    <span className="text-white/80 font-baloo font-black text-sml shrink-0">
-                      {Math.round(currentStory.progress * 100)}%
-                    </span>
-                  </div>
-                </div>
-
-                {/* Pulsing play button */}
-                <motion.div
-                  animate={{ scale: [1, 1.12, 1], boxShadow: ["0 0 0 0 rgba(251,191,36,0.5)", "0 0 0 10px rgba(251,191,36,0)", "0 0 0 0 rgba(251,191,36,0)"] }}
-                  transition={{ duration: DURATION.loopFast, repeat: Infinity }}
-                  className="absolute top-4 right-4 w-12 h-12 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center shadow-xl">
-                  <Play className="w-5 h-5 text-white fill-white ml-0.5" />
-                </motion.div>
-              </div>
-            </motion.div>
-          </Link>
-        )}
-
-        {/* ═══ FILTERS ═══ */}
-        {hasCategories ? (
-          <div className="page-shell mb-5 p-3 sm:p-4">
-            {/* Colorful category tabs */}
-            <div className="flex gap-2 overflow-x-auto pb-2 mb-3" style={{ scrollbarWidth: "none" }}>
+          {/* Mobile search */}
+          <div className="relative sm:hidden mb-2">
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--ds-text-tertiary)]" />
+            <input type="text" value={search} onChange={e => { setSearch(e.target.value); setPage(1); }}
+              placeholder={t("storySearchPlaceholder")}
+              className="w-full bg-[var(--ds-surface-card)] border border-ds-border rounded-full pl-9 pr-4 py-2 text-xs text-ds-text placeholder:text-[var(--ds-text-tertiary)] focus:outline-none focus:border-[var(--ds-state-focus)] focus:ring-2 focus:ring-[var(--ds-state-focus)]/20 transition" />
+          </div>
+          {/* Category pills */}
+          {hasCategories && (
+            <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
               {categoryTabs.map(cat => (
                 <motion.button key={cat.key}
                   onClick={() => { setCategory(cat.key); setPage(1); }}
-                  whileTap={{ scale: 0.94 }}
-                  className={`flex items-center gap-1.5 px-4 py-2 rounded-full font-baloo font-black text-sml whitespace-nowrap shrink-0 transition-all border ${
+                  animate={category === cat.key ? { scale: [1, 1.08, 1] } : { scale: 1 }}
+                  transition={{ duration: 0.25, ease: "easeOut" }}
+                  whileTap={{ scale: 0.93 }}
+                  className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full font-baloo font-black text-xs whitespace-nowrap shrink-0 transition-all border ${
                     category === cat.key ? cat.activeClass : cat.inactiveClass
-                  } ${category === cat.key ? "shadow-md" : ""}`}>
-                  <span className="text-base leading-none">{cat.emoji}</span>
+                  } ${category === cat.key ? "shadow-sm" : ""}`}>
+                  <span className="text-sm leading-none">{cat.emoji}</span>
                   {cat.label}
                 </motion.button>
               ))}
             </div>
-            {/* Search */}
-            <div className="relative">
-              <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--ds-text-tertiary)]" />
-              <input type="text" value={search} onChange={e => { setSearch(e.target.value); setPage(1); }}
-                placeholder={t("storySearchPlaceholder")}
-                className="w-full bg-ds-input border border-ds-border rounded-full pl-10 pr-4 py-2.5 text-sml text-ds-text placeholder:text-[var(--ds-text-tertiary)] focus:outline-none focus:border-[var(--ds-state-focus)] focus:ring-2 focus:ring-[var(--ds-state-focus)]/20 transition" />
-            </div>
-          </div>
-        ) : (
-          /* No categories — compact inline search only */
-          <div className="mb-5 relative">
-            <Search size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ds-text-tertiary)] z-10" />
-            <input type="text" value={search} onChange={e => { setSearch(e.target.value); setPage(1); }}
-              placeholder="Search for a story..."
-              className="w-full bg-[var(--ds-surface-card)] border border-ds-border rounded-2xl pl-11 pr-4 py-3 text-sml text-ds-text placeholder:text-[var(--ds-text-tertiary)] focus:outline-none focus:border-[var(--ds-state-focus)] focus:ring-2 focus:ring-[var(--ds-state-focus)]/20 shadow-ds-card transition" />
-          </div>
-        )}
+          )}
+        </div>
 
         {/* ═══ BOOK SHELF ═══ */}
+        <div id="story-shelf" />
         {loading ? (
-          <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-5 py-2">
-            {Array.from({ length: 10 }).map((_, i) => <Bone key={i} className="h-52 rounded-lg" />)}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5 py-2">
+            {Array.from({ length: 8 }).map((_, i) => <Bone key={i} className="leaf-lg" style={{ height: "clamp(160px, 20vw, 230px)" }} />)}
           </div>
+        ) : stories.length === 0 ? (
+          /* No stories at all for this child — coming soon state */
+          <motion.div
+            initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.45 }}
+            className="flex items-center gap-5 px-6 py-5 leaf-lg mt-2"
+            style={{ background: "linear-gradient(135deg, #FFF9E6 0%, #FFF3C4 100%)", border: "1.5px solid #F5C842" }}>
+            <motion.img
+              src="/themes/default/characters/nimi.png" alt="Nimi"
+              animate={{ y: [0, -5, 0] }}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+              style={{ height: 72, width: "auto", objectFit: "contain", filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.12))", flexShrink: 0 }}
+              draggable={false}
+            />
+            <div className="flex-1 min-w-0">
+              <p className="font-baloo font-black text-gray-800 text-base leading-tight mb-0.5">More adventures are coming! 🚀</p>
+              <p className="font-nunito text-gray-600 text-sm leading-snug">Nimi is getting new stories ready for you. Check back soon!</p>
+            </div>
+            <motion.span animate={{ rotate: [0, 15, -15, 0], scale: [1, 1.15, 1] }}
+              transition={{ duration: 3.5, repeat: Infinity, repeatDelay: 1 }}
+              className="text-3xl shrink-0 select-none" aria-hidden>✨</motion.span>
+          </motion.div>
         ) : paginated.length === 0 ? (
-          <div className="page-shell text-center py-16 px-8">
-            <motion.span className="text-7xl block mb-4"
-              animate={{ rotate: [0, 12, -12, 0], scale: [1, 1.1, 1] }}
-              transition={{ duration: DURATION.loopBase, repeat: Infinity }}>📚</motion.span>
-            <p className="font-baloo font-black text-ds-text text-xl mb-1">{t("storyNoResults")}</p>
-            <p className="font-nunito text-ds-muted text-sml">Try a different search or category!</p>
-          </div>
+          /* Stories exist but search/category filter returned nothing */
+          <motion.div
+            initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+            className="flex flex-col items-center justify-center py-12 px-8 text-center">
+            <motion.img
+              src="/themes/default/characters/piko.png" alt="Piko"
+              animate={{ y: [0, -6, 0] }}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+              style={{ height: 80, width: "auto", objectFit: "contain", filter: "drop-shadow(0 4px 10px rgba(0,0,0,0.12))" }}
+              className="mb-3" draggable={false}
+            />
+            <p className="font-baloo font-black text-[var(--ds-text-primary)] text-xl mb-1">{t("storyNoResults")}</p>
+            <p className="font-nunito text-[var(--ds-text-tertiary)] text-sm">Try a different search or pick another category!</p>
+          </motion.div>
         ) : (
           <>
             {/* Club upgrade wall */}
@@ -415,7 +668,7 @@ export default function StoriesClient({ initialChildren, initialHasSubscription 
               <Link href="/pricing" className="block mb-5">
                 <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
                   whileHover={{ scale: 1.01 }} whileTap={m.buttonPress}
-                  className="flex items-center gap-4 rounded-2xl px-5 py-4 cursor-pointer group bg-ds-club shadow-ds-club">
+                  className="flex items-center gap-4 leaf-lg px-5 py-4 cursor-pointer group bg-ds-club shadow-ds-club">
                   <motion.div animate={{ y: [0, -4, 0] }} transition={{ duration: DURATION.loopSlow, repeat: Infinity }}
                     className="w-12 h-12 rounded-2xl bg-[var(--ds-surface-card)]/20 flex items-center justify-center shrink-0 border border-white/30">
                     <Crown className="w-6 h-6 text-yellow-300" />
@@ -434,7 +687,7 @@ export default function StoriesClient({ initialChildren, initialHasSubscription 
             )}
 
             {/* Book shelf */}
-            <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-5 sm:gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5 sm:gap-6">
               <AnimatePresence mode="popLayout">
               {paginated.map((story, i) => {
                 const isCurrent      = story.sid === currentId;
@@ -494,10 +747,13 @@ export default function StoriesClient({ initialChildren, initialHasSubscription 
           </div>
         )}
 
+        </div>{/* /p-4 sm:p-5 */}
+        </div>{/* /story library panel */}
+
       </main>
 
       {/* Stats sidebar — desktop only */}
-      <aside className="hidden xl:block xl:w-[280px] xl:shrink-0 sticky top-[80px]">
+      <aside className="hidden xl:block xl:w-[300px] xl:shrink-0 sticky top-[68px]">
         <StatsSidebar
           weekStreak={weekStreak}
           streakCount={streakCount}
@@ -509,7 +765,6 @@ export default function StoriesClient({ initialChildren, initialHasSubscription 
       </aside>
 
       </div>
-      </PageSurface>
     </AppShell>
   );
 }

@@ -76,48 +76,49 @@ const MISSION_STYLES: Record<string, {
   badgeBorder: string;
   emoji: string;
   label: string;
+  friendlyLabel: string;
   resultBg: string;
 }> = {
   story: {
     headerBg: "bg-gradient-to-r from-amber-50/80 via-yellow-50/50 to-amber-50/80",
     headerBorder: "border-amber-200/60",
     badgeBg: "bg-amber-50", badgeText: "text-amber-700", badgeBorder: "border-amber-200",
-    emoji: "📚", label: "Story Time",
+    emoji: "🎧", label: "Listen", friendlyLabel: "Let's Listen!",
     resultBg: "bg-gradient-to-br from-white via-amber-50/70 to-yellow-50/60",
   },
   read: {
     headerBg: "bg-gradient-to-r from-amber-50/80 via-[#fdfaf4]/60 to-orange-50/60",
     headerBorder: "border-amber-200/60",
     badgeBg: "bg-amber-50", badgeText: "text-amber-700", badgeBorder: "border-amber-200",
-    emoji: "📖", label: "Story Book",
+    emoji: "📖", label: "Read", friendlyLabel: "Let's Read!",
     resultBg: "bg-gradient-to-br from-white via-amber-50/60 to-orange-50/40",
   },
   color: {
     headerBg: "bg-gradient-to-r from-orange-50/80 via-pink-50/40 to-purple-50/50",
     headerBorder: "border-orange-200/60",
     badgeBg: "bg-orange-50", badgeText: "text-orange-700", badgeBorder: "border-orange-200",
-    emoji: "🎨", label: "Art Studio",
+    emoji: "🎨", label: "Create", friendlyLabel: "Let's Create!",
     resultBg: "bg-gradient-to-br from-white via-orange-50/70 to-pink-50/60",
   },
   move: {
     headerBg: "bg-gradient-to-r from-pink-50/80 via-rose-50/40 to-orange-50/50",
     headerBorder: "border-pink-200/60",
     badgeBg: "bg-pink-50", badgeText: "text-pink-700", badgeBorder: "border-pink-200",
-    emoji: "🤸", label: "Move & Groove",
+    emoji: "🤸", label: "Move", friendlyLabel: "Let's Move!",
     resultBg: "bg-gradient-to-br from-white via-pink-50/70 to-orange-50/60",
   },
   sing: {
     headerBg: "bg-gradient-to-r from-purple-50/80 via-violet-50/40 to-indigo-50/50",
     headerBorder: "border-purple-200/60",
     badgeBg: "bg-purple-50", badgeText: "text-purple-700", badgeBorder: "border-purple-200",
-    emoji: "🎤", label: "Karaoke",
+    emoji: "🎵", label: "Sing", friendlyLabel: "Let's Sing!",
     resultBg: "bg-gradient-to-br from-white via-purple-50/70 to-violet-50/60",
   },
   watch: {
     headerBg: "bg-gradient-to-r from-indigo-50/80 via-blue-50/40 to-slate-50/50",
     headerBorder: "border-indigo-200/60",
     badgeBg: "bg-indigo-50", badgeText: "text-indigo-700", badgeBorder: "border-indigo-200",
-    emoji: "🎬", label: "Movie Time",
+    emoji: "🎬", label: "Watch", friendlyLabel: "Let's Watch!",
     resultBg: "bg-gradient-to-br from-white via-indigo-50/70 to-blue-50/60",
   },
 };
@@ -322,17 +323,32 @@ export default function StoryMissionPage() {
       <PageSurface className={isPreview ? "pt-10" : ""}>
         <main className="max-w-4xl mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6 pb-24 flex-1 w-full">
 
-          {/* Header */}
-          <div className={`mb-5 border ${missionStyle.headerBorder} ${missionStyle.headerBg} p-4 shadow-card-2xl`} style={{ borderRadius: 'var(--leaf-r-lg)' }}>
-            <div className="flex items-center gap-3">
+          {/* Airways header */}
+          <div className={`mb-4 border ${missionStyle.headerBorder} ${missionStyle.headerBg} shadow-card-2xl overflow-hidden`} style={{ borderRadius: 'var(--leaf-r-lg)' }}>
+
+            {/* Top bar: back button + airways label */}
+            <div className="flex items-center justify-between px-4 pt-3 pb-2.5 border-b border-[var(--ds-border-primary)]/20">
               <button onClick={() => router.push(`/stories/${slug}`)}
-                className="w-10 h-10 bg-[var(--ds-surface-card)] border border-ds-border rounded-full flex items-center justify-center text-ds-text transition hover:bg-[var(--ds-surface-card)] shadow-sm">
-                <ArrowLeft className="w-5 h-5" />
+                aria-label="Back to my adventure"
+                className="flex items-center gap-1.5 min-h-[44px] px-3 bg-[var(--ds-surface-card)] border border-ds-border rounded-full text-[var(--ds-text-secondary)] hover:text-[var(--ds-text-brand)] hover:border-[var(--ds-border-brand)] transition shadow-sm font-nunito font-bold text-xs whitespace-nowrap">
+                <ArrowLeft className="w-4 h-4 shrink-0" aria-hidden="true" />
+                <span className="hidden sm:inline">My Adventure</span>
               </button>
+              <p aria-hidden="true" className="font-nunito font-black text-3xs uppercase tracking-widest text-[var(--ds-text-tertiary)] flex items-center gap-1">
+                <span>✈️</span>
+                <span>NIMIPIKO AIRWAYS</span>
+              </p>
+            </div>
+
+            {/* Mission identity body */}
+            <div className="px-4 py-4 flex items-start gap-3">
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 flex-wrap">
+                <p className="font-baloo font-black text-2xl sm:text-3xl leading-none mb-2" style={{ color: 'var(--ds-text-brand)' }}>
+                  {missionStyle.emoji} {missionStyle.friendlyLabel}
+                </p>
+                <div className="flex items-center gap-2 flex-wrap mb-2">
                   <span className={`rounded-full border ${missionStyle.badgeBorder} ${missionStyle.badgeBg} px-2.5 py-1 text-3xs font-black uppercase tracking-[0.24em] ${missionStyle.badgeText}`}>
-                    {missionStyle.emoji} {missionStyle.label}
+                    {missionStyle.label}
                   </span>
                   {completed && (
                     <span className="rounded-full border border-[var(--ds-border-brand)]/30 bg-[var(--ds-brand-subtle)] px-2.5 py-1 text-3xs font-black uppercase tracking-[0.24em] text-[var(--ds-brand-primary)]">
@@ -340,28 +356,40 @@ export default function StoryMissionPage() {
                     </span>
                   )}
                 </div>
-                <h1 className="font-baloo font-black text-xl sm:text-2xl text-ds-text leading-tight mt-1">
+                <h1 className="font-baloo font-black text-lg sm:text-xl text-ds-text leading-tight">
                   {slot?.title || t(SLOT_T_KEYS[slotKey] ?? '') || slotKey}
                 </h1>
-                <p className="text-[var(--ds-text-secondary)] text-sml mt-1">
-                  Activity {slot?.slot_order} of {allSlots.length || 6} · {slot?.subtitle}
+                <p className="font-nunito text-[var(--ds-text-tertiary)] text-xs mt-0.5">
+                  Stop {slot?.slot_order ?? "?"} of {allSlots.length || 6}
+                  {slot?.subtitle ? ` · ${slot.subtitle}` : ""}
                 </p>
               </div>
-              {completed ? (
-                <div className="rounded-full bg-[var(--ds-brand-subtle)] p-2.5 border border-[var(--ds-border-brand)]">
-                  <CheckCircle2 className="w-6 h-6 text-[var(--ds-brand-primary)] shrink-0" />
-                </div>
-              ) : (
-                <div className="rounded-full bg-amber-50 p-2.5 border border-amber-200">
-                  <Star className="w-5 h-5 text-amber-500 fill-amber-500" />
-                </div>
-              )}
+
+              {/* Nimi companion */}
+              <div className="shrink-0 flex flex-col items-center gap-1 pt-0.5">
+                <Image
+                  src={assets.nimiCircle}
+                  alt="Nimi"
+                  width={52}
+                  height={52}
+                  className="w-[52px] h-[52px] rounded-full border-2 border-white/80 shadow-md object-cover"
+                />
+                {completed ? (
+                  <CheckCircle2 className="w-4 h-4 text-[var(--ds-brand-primary)]" aria-hidden="true" />
+                ) : (
+                  <Star className="w-4 h-4 text-amber-400 fill-amber-400" aria-hidden="true" />
+                )}
+              </div>
             </div>
           </div>
 
           {/* Mission Progress Strip */}
           {allSlots.length > 0 && (
-            <div className="mb-4 px-1">
+            <div className="mb-4 px-1" aria-hidden="true">
+              <p aria-hidden="true" className="font-nunito font-black text-3xs uppercase tracking-[0.2em] text-[var(--ds-text-tertiary)] mb-2.5 flex items-center gap-1.5">
+                <span>✈️</span>
+                <span>Your Journey</span>
+              </p>
               {/* Track + nodes */}
               <div className="relative flex items-center justify-between">
                 {/* Background track */}
@@ -507,21 +535,39 @@ export default function StoryMissionPage() {
                 <RewardBurst active config={CONFETTI_BURST} className="absolute inset-0" />
 
                 <div className="relative z-10">
-                  <motion.img src={assets.starMascot} alt="" className="w-16 h-16 mx-auto mb-3"
+                  <motion.p
+                    initial={{ scale: 0.7, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 18, delay: 0.05 }}
+                    className="font-baloo font-black text-[var(--ds-brand-primary)] text-2xl mb-2">
+                    ✈️ MISSION COMPLETE!
+                  </motion.p>
+                  <motion.img src={assets.starMascot} alt="" className="w-14 h-14 mx-auto mb-2"
                     initial={{ scale: 0, rotate: -20 }} animate={{ scale: 1, rotate: 0 }}
                     transition={{ ...SPRING.gentle, delay: 0.2 }} />
-                  <AnimatedCheckmark className="mx-auto mb-3" />
+                  <AnimatedCheckmark className="mx-auto mb-2" />
 
                   {outcome.queued ? (
                     <div className="mx-auto inline-flex items-center justify-center gap-2 rounded-full border border-blue-200 bg-[var(--ds-surface-card)]/90 px-4 py-2 mb-3 shadow-sm">
                       <span className="font-nunito text-blue-700 text-sml font-bold">{t("slotSavedOffline")}</span>
                     </div>
                   ) : (
-                    <div className="mx-auto inline-flex items-center justify-center gap-2 rounded-full border border-amber-200 bg-[var(--ds-surface-card)]/90 px-4 py-2 mb-3 shadow-sm">
-                      <Image src={assets.starMascot} alt="" width={24} height={24} className="w-6 h-6" />
-                      <span className="font-baloo font-black text-amber-500 text-3.5xl">+{outcome.result.stars_earned}</span>
-                      <span className="font-nunito text-[var(--ds-text-secondary)] text-sm font-bold">{t("storyStarsLabel")}</span>
-                    </div>
+                    <>
+                      <div aria-hidden="true" className="flex items-center justify-center gap-3 mb-2">
+                        {[0, 1, 2].map(i => (
+                          <motion.span key={i}
+                            initial={{ scale: 0, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            transition={{ type: "spring", stiffness: 260, damping: 16, delay: 0.3 + i * 0.18 }}
+                            className="text-4xl select-none leading-none">
+                            ⭐
+                          </motion.span>
+                        ))}
+                      </div>
+                      <div className="mx-auto inline-flex items-center justify-center gap-2 rounded-full border border-amber-200 bg-[var(--ds-surface-card)]/90 px-4 py-2 mb-3 shadow-sm">
+                        <span className="font-baloo font-black text-amber-500 text-3.5xl">+{outcome.result.stars_earned}</span>
+                        <span className="font-nunito text-[var(--ds-text-secondary)] text-sm font-bold">{t("storyStarsLabel")}</span>
+                      </div>
+                    </>
                   )}
 
                   {res?.story_complete && (
@@ -540,13 +586,21 @@ export default function StoryMissionPage() {
                   )}
 
                   {(!res?.story_complete) && (
-                    <p className="font-nunito text-ds-text text-sm mb-3">{t("storyGreatJob")}</p>
+                    <motion.div
+                      initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.55 }}
+                      className="mb-3">
+                      <p className="font-nunito font-black text-[var(--ds-text-tertiary)] text-xs mb-0.5">
+                        🛫 Next stop reached!
+                      </p>
+                      <p className="font-nunito text-ds-text text-sm">{t("storyGreatJob")}</p>
+                    </motion.div>
                   )}
 
                   <motion.button initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.9 }}
+                    whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
                     onClick={() => router.push(`/stories/${slug}`)}
-                    className="font-baloo font-black bg-cta-gradient text-white text-base rounded-full px-7 py-3 shadow-lg shadow-ds-cta transition hover:shadow-ds-hover">
-                    {res?.story_complete ? t("storyViewCert") : t("storyContinueArrow")}
+                    className="font-baloo font-black bg-cta-gradient text-white text-base rounded-full px-8 py-3.5 min-h-[48px] shadow-lg shadow-ds-cta transition hover:shadow-ds-hover">
+                    {res?.story_complete ? t("storyViewCert") : "📖 Back to My Adventure"}
                   </motion.button>
 
                   {/* Share row */}
@@ -575,7 +629,7 @@ export default function StoryMissionPage() {
                       }}
                       className="w-full flex items-center justify-center gap-2 rounded-2xl border border-[var(--ds-border-primary)] bg-[var(--ds-surface-card)] hover:bg-[var(--ds-surface-card)] px-4 py-3 font-baloo font-black text-sm text-[var(--ds-text-secondary)] transition shadow-sm"
                     >
-                      <Share2 className="w-4 h-4 text-[var(--ds-text-secondary)]" />
+                      <Share2 aria-hidden="true" className="w-4 h-4 text-[var(--ds-text-secondary)]" />
                       {t("shareFriendsBtn")}
                     </button>
                   </motion.div>

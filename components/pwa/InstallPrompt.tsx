@@ -81,39 +81,30 @@ export default function InstallPrompt() {
   };
 
   return (
-    <div className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:w-80 z-50 bg-[var(--ds-surface-card)] border border-ds-border shadow-ds-card p-4 flex flex-col gap-2" style={{ borderRadius: 'var(--leaf-r)' }}>
-      <button
-        onClick={dismiss}
-        aria-label="Dismiss"
-        className="absolute top-2 right-2 text-[var(--ds-text-tertiary)] hover:text-ds-text transition"
-      >
-        <X className="w-4 h-4" />
-      </button>
-      <div className="flex items-center gap-2">
-        <Download className="w-5 h-5 text-[var(--ds-brand-primary)]" />
-        <p className="font-black text-ds-text text-sm">{t("installPromptTitle")}</p>
-      </div>
-      <p className="text-[var(--ds-text-secondary)] text-xs leading-relaxed">{t("installPromptBody")}</p>
-      {ios ? (
-        <p className="text-ds-text text-xs font-semibold bg-[var(--ds-surface-card-hover)] rounded-lg px-3 py-2 mt-1">
-          {t("iosInstallInstructions")}
-        </p>
-      ) : (
-        <div className="flex items-center gap-2 mt-1">
-          <button
-            onClick={install}
-            className="flex-1 bg-[var(--ds-brand-primary)] hover:bg-[var(--ds-brand-hover)] text-white font-black text-xs rounded-full py-2 shadow transition"
-          >
+    <div
+      className="fixed bottom-5 right-4 z-50 flex items-center gap-3 px-4 py-2.5 sm:w-72"
+      style={{
+        borderRadius: "var(--leaf-r)",
+        background: "var(--ds-surface-card)",
+        border: "1px solid var(--ds-border-primary)",
+        boxShadow: "0 4px 20px rgba(0,0,0,0.12)",
+      }}>
+      <Download className="w-4 h-4 shrink-0 text-[var(--ds-brand-primary)]" />
+      <div className="flex-1 min-w-0">
+        <p className="font-baloo font-black text-[var(--ds-text-primary)] text-xs leading-tight">{t("installPromptTitle")}</p>
+        {ios ? (
+          <p className="text-[var(--ds-text-tertiary)] text-3xs leading-snug mt-0.5">{t("iosInstallInstructions")}</p>
+        ) : (
+          <button onClick={install}
+            className="text-[var(--ds-brand-primary)] font-bold text-3xs hover:underline mt-0.5">
             {t("installBtn")}
           </button>
-          <button
-            onClick={dismiss}
-            className="text-[var(--ds-text-tertiary)] hover:text-ds-text text-xs font-semibold px-2"
-          >
-            {t("installLaterBtn")}
-          </button>
-        </div>
-      )}
+        )}
+      </div>
+      <button onClick={dismiss} aria-label="Dismiss"
+        className="shrink-0 text-[var(--ds-text-tertiary)] hover:text-[var(--ds-text-primary)] transition">
+        <X className="w-3.5 h-3.5" />
+      </button>
     </div>
   );
 }

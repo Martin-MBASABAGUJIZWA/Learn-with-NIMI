@@ -123,9 +123,9 @@ export default function StoryAudioPlayer({ url, title, subtitle, color = "bg-[va
         </div>
 
         {/* Restart */}
-        <button onClick={restart}
-          className="w-10 h-10 rounded-full bg-[var(--ds-surface-card)]/80 border border-[var(--ds-border-brand)] flex items-center justify-center text-[var(--ds-text-secondary)] hover:text-[var(--ds-text-brand)] transition shrink-0 shadow-sm">
-          <RotateCcw className="w-4 h-4" />
+        <button onClick={restart} aria-label="Restart"
+          className="w-11 h-11 rounded-full bg-[var(--ds-surface-card)]/80 border border-[var(--ds-border-brand)] flex items-center justify-center text-[var(--ds-text-secondary)] hover:text-[var(--ds-text-brand)] transition shrink-0 shadow-sm">
+          <RotateCcw className="w-4 h-4" aria-hidden="true" />
         </button>
       </div>
 
@@ -134,6 +134,7 @@ export default function StoryAudioPlayer({ url, title, subtitle, color = "bg-[va
         {playing && (
           <motion.div
             key="waveform"
+            aria-hidden="true"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0, scaleY: 0 }}

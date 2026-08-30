@@ -98,6 +98,7 @@ export default function SingAlongContent({ mission, onComplete, completed, savin
         <AnimatePresence>
           {["🎵", "🎶", "🎵"].map((e, i) => (
             <motion.span key={i}
+              aria-hidden="true"
               className="pointer-events-none absolute select-none text-lg opacity-30"
               style={{ left: `${15 + i * 35}%`, top: 8 }}
               animate={{ y: [0, -10, 0], opacity: [0.3, 0.6, 0.3] }}
@@ -108,7 +109,7 @@ export default function SingAlongContent({ mission, onComplete, completed, savin
           ))}
         </AnimatePresence>
         <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-[var(--ds-surface-card)] shadow-sm">
-          <span className="select-none text-xl">🎵</span>
+          <span aria-hidden="true" className="select-none text-xl">🎵</span>
         </div>
         <div className="flex items-center justify-center gap-4 mb-4">
           <motion.img src={assets.nimiCircle} alt="NIMI"
@@ -135,7 +136,7 @@ export default function SingAlongContent({ mission, onComplete, completed, savin
               <button onClick={repeat}
                 className="w-12 h-12 rounded-full bg-[var(--ds-surface-card-hover)] hover:bg-[var(--ds-surface-card-active)] flex items-center justify-center text-[var(--ds-text-secondary)] transition"
                 aria-label={t("repeatLabel")}>
-                <RotateCcw className="w-5 h-5" />
+                <RotateCcw className="w-5 h-5" aria-hidden="true" />
               </button>
 
               <button onClick={togglePlay}
@@ -144,15 +145,15 @@ export default function SingAlongContent({ mission, onComplete, completed, savin
                 }`}
                 aria-label={playing ? t("pauseLabel") : t("playSongLabel")}>
                 {playing
-                  ? <Pause className="w-7 h-7 text-white fill-white" />
-                  : <Play className="w-7 h-7 text-white fill-white ml-1" />}
+                  ? <Pause className="w-7 h-7 text-white fill-white" aria-hidden="true" />
+                  : <Play className="w-7 h-7 text-white fill-white ml-1" aria-hidden="true" />}
               </button>
 
               {language !== "rw" && lyrics.length > 0 && (
                 <button onClick={readAlong}
                   className="w-12 h-12 rounded-full bg-purple-400/20 hover:bg-purple-400/30 flex items-center justify-center text-purple-500 transition"
                   aria-label={t("readToMeLabel")}>
-                  <Mic className="w-5 h-5" />
+                  <Mic className="w-5 h-5" aria-hidden="true" />
                 </button>
               )}
             </div>
@@ -162,7 +163,7 @@ export default function SingAlongContent({ mission, onComplete, completed, savin
             <button onClick={readAlong}
               className="w-16 h-16 rounded-full bg-[var(--ds-brand-primary)] hover:bg-[var(--ds-brand-hover)] hover:scale-105 flex items-center justify-center shadow-xl transition-all"
               aria-label={t("readToMeLabel")}>
-              <Mic className="w-7 h-7 text-white" />
+              <Mic className="w-7 h-7 text-white" aria-hidden="true" />
             </button>
             <p className="text-xs font-black text-ds-text uppercase">{t("readToMeLabel")}</p>
           </div>
@@ -172,7 +173,7 @@ export default function SingAlongContent({ mission, onComplete, completed, savin
       {lyrics.length > 0 && (
         <div className="leaf border border-purple-100 bg-[var(--ds-surface-card)]/80 p-4 shadow-sm">
           <div className="flex items-center justify-between mb-2 gap-2 flex-wrap">
-            <p className="font-black text-ds-text text-xs uppercase">🎵 {t("songLyricsTitle")}</p>
+            <p className="font-black text-ds-text text-xs uppercase"><span aria-hidden="true">🎵 </span>{t("songLyricsTitle")}</p>
             <button onClick={() => setKaraoke(k => !k)}
               className={`text-xs font-black rounded-full px-3 py-1 transition ${
                 karaoke ? "bg-purple-500 text-white" : "bg-[var(--ds-surface-card-hover)] text-[var(--ds-text-secondary)] border border-[var(--ds-border-primary)]"
@@ -203,10 +204,10 @@ export default function SingAlongContent({ mission, onComplete, completed, savin
             transition={{ type: "spring", stiffness: 320, damping: 24 }}
             className="leaf border border-yellow-200 bg-gradient-to-r from-yellow-50 via-amber-50 to-yellow-50 p-3 flex items-center justify-center gap-2 shadow-sm"
           >
-            <motion.span animate={{ rotate: [0, -20, 20, -20, 0] }} transition={{ duration: 0.5, delay: 0.1 }}
+            <motion.span aria-hidden="true" animate={{ rotate: [0, -20, 20, -20, 0] }} transition={{ duration: 0.5, delay: 0.1 }}
               className="text-2xl select-none">🎉</motion.span>
             <p className="font-baloo font-black text-amber-800 text-mbase">{t("greatSinging")}</p>
-            <motion.span animate={{ rotate: [0, 20, -20, 20, 0] }} transition={{ duration: 0.5, delay: 0.3 }}
+            <motion.span aria-hidden="true" animate={{ rotate: [0, 20, -20, 20, 0] }} transition={{ duration: 0.5, delay: 0.3 }}
               className="text-2xl select-none">⭐</motion.span>
           </motion.div>
         )}
