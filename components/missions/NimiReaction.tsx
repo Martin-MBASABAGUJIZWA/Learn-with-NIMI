@@ -4,32 +4,19 @@ import { motion } from "framer-motion";
 import { useAppTheme } from "@/contexts/AppThemeProvider";
 import { getThemeAssets } from "@/lib/design-system/assetRegistry";
 import { SPRING } from "@/lib/design-system/motion";
+import { useThemeMotion } from "@/hooks/useThemeMotion";
 
+// Airways-toned reactions — warm, playful, child-friendly flight-guide persona.
+// Deterministic: only reactions[0] is used (stable across re-mounts).
 const REACTIONS: Record<string, string[]> = {
-  story:  ["You listened to every page! 📚", "What a great story explorer! 🌟", "You followed every word! 🎧"],
-  read:   ["You read every single page! 📖", "Incredible reader! 🌟", "Look at you go, bookworm! 📚"],
-  color:  ["Your artwork is beautiful! 🎨", "What amazing colors you chose! ✨", "You're a real artist! 🖌️"],
-  move:   ["You did all the moves! 💪", "Super dancer right there! 🕺", "Look at those awesome moves! 🤸"],
-  sing:   ["I heard you singing along! 🎵", "What a beautiful voice! 🎶", "You're a superstar! ⭐"],
-  watch:  ["You watched the whole thing! 🎬", "Great job paying attention! 👀", "Movie time champion! 🍿"],
-};
-
-const COLORS: Record<string, string> = {
-  story:  "border-amber-200 bg-amber-50",
-  read:   "border-amber-200 bg-amber-50",
-  color:  "border-orange-200 bg-orange-50",
-  move:   "border-pink-200 bg-pink-50",
-  sing:   "border-purple-200 bg-purple-50",
-  watch:  "border-indigo-200 bg-indigo-50",
-};
-
-const TEXT_COLORS: Record<string, string> = {
-  story:  "text-amber-800",
-  read:   "text-amber-800",
-  color:  "text-orange-800",
-  move:   "text-pink-800",
-  sing:   "text-purple-800",
-  watch:  "text-indigo-800",
+  story:       ["Great listening, traveler! 🎧✈️", "You followed every word! 📚", "What a journey! 🌟"],
+  read:        ["You read the whole stop! 📖✈️", "Incredible reading, explorer! 🌟", "Look at you go, bookworm! 📚"],
+  color:       ["Beautiful work, little traveler! 🎨✈️", "What amazing colors you chose! ✨", "You're a real artist! 🖌️"],
+  move:        ["Wonderful moves, superstar! 🕺✈️", "Your flight energy is amazing! 💪", "Look at those awesome moves! 🤸"],
+  sing:        ["What a voice, superstar traveler! 🎵✈️", "Beautiful singing! 🎶", "You're a superstar! ⭐"],
+  watch:       ["You watched it all the way through! 🎬✈️", "Great job paying attention! 👀", "Movie champion! 🍿"],
+  destination: ["You discovered this stop! Great exploring! ✨✈️", "Your curiosity made this stop wonderful! 🌍", "Wonderful exploring! 🌟"],
+  challenge:   ["You tackled the challenge stop! Amazing! 🏆✈️", "What a champion you are! 🌟", "Incredible effort! ⭐"],
 };
 
 interface NimiReactionProps {
@@ -39,11 +26,9 @@ interface NimiReactionProps {
 export default function NimiReaction({ missionType }: NimiReactionProps) {
   const { themeId } = useAppTheme();
   const assets = getThemeAssets(themeId);
+  const m = useThemeMotion();
   const reactions = REACTIONS[missionType] ?? REACTIONS.story;
-  // deterministic pick from the list (no random so it doesn't re-render differently on re-mount)
   const reaction = reactions[0];
-  const borderBg = COLORS[missionType] ?? "border-[var(--ds-border-brand)] bg-[var(--ds-brand-subtle)]";
-  const textColor = TEXT_COLORS[missionType] ?? "text-[var(--ds-text-brand)]";
 
   return (
     <motion.div
@@ -55,14 +40,37 @@ export default function NimiReaction({ missionType }: NimiReactionProps) {
       <motion.img
         src={assets.nimiCircle}
         alt="Nimi"
-        animate={{ y: [0, -5, 0] }}
-        transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-        className="w-14 h-14 rounded-full border-4 border-yellow-300 shadow-lg flex-shrink-0"
+        animate={m.reduced ? {} : { y: [0, -5, 0] }}
+        transition={m.reduced ? {} : { duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+        className="w-14 h-14 rounded-full border-4 shadow-lg flex-shrink-0"
+        style={{ borderColor: '#C9A84C' }}
       />
-      <div className={`relative flex-1 leaf border ${borderBg} px-4 py-3 shadow-sm`}>
+      <div
+        className="relative flex-1 leaf px-4 py-3 shadow-sm border"
+        style={{
+          borderColor: 'rgba(201,168,76,0.5)',
+          background: 'rgba(201,168,76,0.09)',
+        }}
+      >
         {/* Speech tail */}
-        <div className="absolute left-[-6px] top-[14px] w-3 h-3 rotate-45 border-l border-b border-inherit bg-inherit" style={{ borderColor: "inherit" }} />
-        <p className={`font-baloo font-black text-mbase ${textColor} leading-snug`}>{reaction}</p>
+        <div
+          className="absolute left-[-6px] top-[14px] w-3 h-3 rotate-45 border-l border-b"
+          style={{
+            borderColor: 'rgba(201,168,76,0.5)',
+            backgroundColor: 'rgba(201,168,76,0.09)',
+          }}
+        />
+        {/* Airways eyebrow */}
+        <p
+          className="font-nunito font-black text-3xs uppercase tracking-widest mb-1"
+          style={{ color: 'rgba(201,168,76,0.75)' }}
+          aria-hidden="true"
+        >
+          <span>✈️ </span>Nimi says
+        </p>
+        <p className="font-baloo font-black text-mbase text-[var(--ds-text-primary)] leading-snug">
+          {reaction}
+        </p>
       </div>
     </motion.div>
   );

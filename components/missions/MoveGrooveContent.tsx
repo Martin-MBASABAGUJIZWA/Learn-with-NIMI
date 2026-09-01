@@ -73,26 +73,26 @@ export default function MoveGrooveContent({ mission, onComplete, completed, savi
     <div className="space-y-4">
       <div className="relative overflow-hidden leaf border border-pink-100 bg-gradient-to-r from-pink-50 via-white to-orange-50/70 p-5 shadow-sm text-center">
         <motion.span
-          className="absolute left-3 top-2 select-none text-xl opacity-50"
-          animate={{ scale: [1, 1.3, 1], rotate: [-5, 5, -5] }}
+          className="absolute left-3 top-2 select-none text-xl opacity-50" aria-hidden="true"
+          animate={m.reduced ? {} : { scale: [1, 1.3, 1], rotate: [-5, 5, -5] }}
           transition={{ duration: 1.5, repeat: Infinity }}>💪</motion.span>
         <motion.span
-          className="absolute right-3 top-2 select-none text-xl opacity-50"
-          animate={{ scale: [1, 1.25, 1] }}
+          className="absolute right-3 top-2 select-none text-xl opacity-50" aria-hidden="true"
+          animate={m.reduced ? {} : { scale: [1, 1.25, 1] }}
           transition={{ duration: 2, repeat: Infinity, delay: 0.7 }}>🕺</motion.span>
 
         <motion.img
           src={assets.nimiHappy}
           alt="NIMI"
-          animate={{ y: [0, -6, 0], rotate: [-4, 4, -4] }}
+          animate={m.reduced ? {} : { y: [0, -6, 0], rotate: [-4, 4, -4] }}
           transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
           className="relative z-10 mx-auto mb-3 h-16 w-16 rounded-full border-4 border-pink-300 object-cover shadow-lg"
         />
 
         <div className="relative z-10 mb-2 flex items-center justify-center gap-1.5">
           {["🤸", "🎶", "💃"].map((e, i) => (
-            <motion.span key={i} className="select-none text-lg"
-              animate={{ y: [0, -4, 0] }}
+            <motion.span key={i} className="select-none text-lg" aria-hidden="true"
+              animate={m.reduced ? {} : { y: [0, -4, 0] }}
               transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.3 }}>
               {e}
             </motion.span>
@@ -200,8 +200,8 @@ export default function MoveGrooveContent({ mission, onComplete, completed, savi
               ) : (
                 /* Emoji fallback card */
                 <>
-                  <motion.span className="text-4xl block mb-2"
-                    animate={{ scale: [1, 1.15, 1] }} transition={{ duration: 2, repeat: Infinity, delay: i * 0.3 }}>
+                  <motion.span className="text-4xl block mb-2" aria-hidden="true"
+                    animate={m.reduced ? {} : { scale: [1, 1.15, 1] }} transition={{ duration: 2, repeat: Infinity, delay: i * 0.3 }}>
                     {p.emoji}
                   </motion.span>
                   <div className="flex items-center justify-center gap-1">

@@ -28,21 +28,26 @@ export default function MissionCompleteBanner({ storySlug }: Props) {
       initial={{ scale: 0.8, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       transition={SPRING.modal}
-      className="relative overflow-hidden leaf-lg border border-[var(--ds-brand-primary)]/30 bg-gradient-to-br from-white via-emerald-50/70 to-amber-50/60 p-6 text-center shadow-card-2xl"
+      className="relative overflow-hidden leaf-lg border p-6 text-center shadow-card-2xl"
+      style={{
+        background: 'linear-gradient(135deg, #06101F 0%, #0d1e3a 60%, #09152a 100%)',
+        borderColor: 'rgba(201,168,76,0.45)',
+      }}
     >
       <Image src={assets.rewards.celebration} alt="" aria-hidden="true" fill
-        className="object-cover pointer-events-none opacity-[0.06]" />
+        className="object-cover pointer-events-none opacity-[0.04]" />
 
       <RewardBurst active config={CONFETTI_BURST} className="absolute inset-0" />
 
       <div className="relative z-10">
-        {/* Journey eyebrow */}
+        {/* Airways eyebrow */}
         <motion.p
           initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.05, duration: 0.3 }}
-          className="font-nunito font-black text-3xs uppercase tracking-widest text-[var(--ds-text-tertiary)] mb-2"
+          className="font-nunito font-black text-3xs uppercase tracking-widest mb-2"
+          style={{ color: 'rgba(201,168,76,0.85)' }}
         >
-          <span aria-hidden="true">✈️ </span>Stop Complete
+          <span aria-hidden="true">✈️ </span>NIMIPIKO AIRWAYS · STOP COMPLETE
         </motion.p>
 
         <motion.div
@@ -58,7 +63,8 @@ export default function MissionCompleteBanner({ storySlug }: Props) {
         <motion.p
           initial={{ scale: 0.7, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
           transition={{ type: "spring", stiffness: 300, damping: 18, delay: 0.15 }}
-          className="font-baloo font-black text-[var(--ds-brand-primary)] text-3xl sm:text-4xl leading-none"
+          className="font-baloo font-black text-3xl sm:text-4xl leading-none"
+          style={{ color: '#F5C842' }}
         >
           YOU DID IT! 🎉
         </motion.p>
@@ -68,7 +74,7 @@ export default function MissionCompleteBanner({ storySlug }: Props) {
         <motion.p
           initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.4, duration: DURATION.base, ease: EASE.enter }}
-          className="font-baloo font-black text-[var(--ds-text-primary)] text-xl"
+          className="font-baloo font-black text-xl text-white"
         >
           {t("storyMissionCompleteTitle")}
         </motion.p>
@@ -95,7 +101,7 @@ export default function MissionCompleteBanner({ storySlug }: Props) {
         <motion.p
           initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.7, duration: DURATION.base, ease: EASE.enter }}
-          className="font-nunito text-[var(--ds-text-secondary)] text-sm"
+          className="font-nunito text-white/70 text-sm"
         >
           {t("storyMissionCompleteDesc")}
         </motion.p>
@@ -107,9 +113,10 @@ export default function MissionCompleteBanner({ storySlug }: Props) {
           >
             <Link
               href={`/stories/${storySlug}`}
-              className="inline-flex items-center gap-2 mt-4 font-baloo font-black bg-[var(--ds-brand-primary)] hover:bg-[var(--ds-brand-hover)] text-white text-base rounded-full px-7 py-3.5 min-h-[48px] shadow-lg transition hover:scale-[1.02] active:scale-[0.98]"
+              className="inline-flex items-center gap-2 mt-4 font-baloo font-black text-base rounded-full px-7 py-3.5 min-h-[48px] shadow-lg transition hover:scale-[1.02] active:scale-[0.98]"
+              style={{ background: '#C9A84C', color: '#06101F' }}
             >
-              📖 Back to My Adventure
+              ✈️ Return to My Flight
             </Link>
           </motion.div>
         )}

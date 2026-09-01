@@ -101,7 +101,7 @@ export default function SingAlongContent({ mission, onComplete, completed, savin
               aria-hidden="true"
               className="pointer-events-none absolute select-none text-lg opacity-30"
               style={{ left: `${15 + i * 35}%`, top: 8 }}
-              animate={{ y: [0, -10, 0], opacity: [0.3, 0.6, 0.3] }}
+              animate={m.reduced ? {} : { y: [0, -10, 0], opacity: [0.3, 0.6, 0.3] }}
               transition={{ duration: 2 + i * 0.5, repeat: Infinity, delay: i * 0.8 }}
               exit={{ opacity: 0 }}>
               {e}

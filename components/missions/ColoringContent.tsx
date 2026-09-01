@@ -10,6 +10,7 @@ import ColoringStudio from "./ColoringStudio";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAppTheme } from "@/contexts/AppThemeProvider";
 import { getThemeAssets } from "@/lib/design-system/assetRegistry";
+import { useThemeMotion } from "@/hooks/useThemeMotion";
 
 interface ColoringContentProps {
   mission: Mission;
@@ -27,6 +28,7 @@ export default function ColoringContent({ mission, coloringPages, onComplete, co
   const { t } = useLanguage();
   const { themeId } = useAppTheme();
   const assets = getThemeAssets(themeId);
+  const m = useThemeMotion();
   const [showStudio, setShowStudio] = useState(false);
   const [hasColored, setHasColored] = useState(false);
 
@@ -47,7 +49,8 @@ export default function ColoringContent({ mission, coloringPages, onComplete, co
             key={i}
             className="pointer-events-none absolute top-0 w-3 rounded-b-sm"
             style={{ background: color, left: `${8 + i * 15}%`, height: 20 + (i % 3) * 6 }}
-            animate={{ y: [0, i % 2 === 0 ? 4 : -3, 0] }}
+            aria-hidden="true"
+            animate={m.reduced ? {} : { y: [0, i % 2 === 0 ? 4 : -3, 0] }}
             transition={{ duration: 1.6 + i * 0.25, repeat: Infinity, ease: "easeInOut" }}
           />
         ))}
@@ -56,7 +59,7 @@ export default function ColoringContent({ mission, coloringPages, onComplete, co
         <motion.img
           src={assets.nimiHappy}
           alt="NIMI"
-          animate={{ y: [0, -5, 0], rotate: [-3, 3, -3] }}
+          animate={m.reduced ? {} : { y: [0, -5, 0], rotate: [-3, 3, -3] }}
           transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
           className="relative z-10 mx-auto mb-3 mt-3 h-16 w-16 rounded-full border-4 object-cover shadow-lg"
           style={{ borderColor: "#FF9F45" }}
@@ -64,8 +67,8 @@ export default function ColoringContent({ mission, coloringPages, onComplete, co
 
         <div className="relative z-10 mb-2 flex items-center justify-center gap-1">
           {["🖌️", "🎨", "✏️"].map((e, i) => (
-            <motion.span key={i} className="select-none text-lg"
-              animate={{ rotate: [0, 10, -10, 0], scale: [1, 1.2, 1] }}
+            <motion.span key={i} className="select-none text-lg" aria-hidden="true"
+              animate={m.reduced ? {} : { rotate: [0, 10, -10, 0], scale: [1, 1.2, 1] }}
               transition={{ duration: 2, repeat: Infinity, delay: i * 0.4 }}>
               {e}
             </motion.span>
@@ -83,8 +86,8 @@ export default function ColoringContent({ mission, coloringPages, onComplete, co
         <div className="leaf-lg border border-orange-100 p-8 text-center bg-[var(--ds-surface-card)] shadow-sm">
           <div className="flex justify-center gap-2 mb-3">
             {["🖌️", "🎨", "✏️", "🖍️"].map((e, i) => (
-              <motion.span key={i} className="select-none text-3xl"
-                animate={{ y: [0, -8, 0] }}
+              <motion.span key={i} className="select-none text-3xl" aria-hidden="true"
+                animate={m.reduced ? {} : { y: [0, -8, 0] }}
                 transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.3 }}>
                 {e}
               </motion.span>

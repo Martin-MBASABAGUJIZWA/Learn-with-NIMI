@@ -343,6 +343,16 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
     setBoardingPassPreview(null);
   }, [selectedChild]);
 
+  // Close the Switch Child popover when the user presses Escape
+  useEffect(() => {
+    if (!showSwitchMenu) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setShowSwitchMenu(false);
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [showSwitchMenu]);
+
   const handleCancelSub = async (action: "cancel" | "reactivate") => {
     setCancellingSubscription(true);
     setCancelSubError(null);
@@ -400,8 +410,8 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
     return (
       <AppShell>
         <PageSurface className="items-center justify-center gap-4 px-4">
-          <span className="text-5xl">👶</span>
-          <p className="text-ds-text font-bold text-center text-base">No children profiles yet</p>
+          <span className="text-5xl" aria-hidden="true">👶</span>
+          <p className="text-ds-text font-bold text-center text-base">No learner profiles yet</p>
           <Link href="/home" className="text-white font-black px-6 py-3 shadow-lg text-sm" style={{ backgroundColor: 'var(--ds-brand-primary)', borderRadius: 'var(--leaf-r-sm)' }}>
             Create a Profile
           </Link>
@@ -442,8 +452,8 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
               key={i}
               className="absolute pointer-events-none select-none"
               style={{ top: d.top, left: (d as { left?: string }).left, right: (d as { right?: string }).right, fontSize: d.size }}
-              animate={{ opacity: [0.25, 0.9, 0.25], y: [0, -6, 0], scale: [0.8, 1.15, 0.8] }}
-              transition={{ duration: 2.6, repeat: Infinity, delay: d.delay }}
+              animate={m.reduced ? { opacity: 0.3 } : { opacity: [0.25, 0.9, 0.25], y: [0, -6, 0], scale: [0.8, 1.15, 0.8] }}
+              transition={m.reduced ? {} : { duration: 2.6, repeat: Infinity, delay: d.delay }}
               aria-hidden
             >
               {d.emoji}
@@ -456,8 +466,8 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
               {/* Glow ring */}
               <motion.div
                 className="absolute inset-0 rounded-full bg-[var(--ds-surface-card)]/30"
-                animate={{ scale: [1, 1.14, 1], opacity: [0.3, 0.6, 0.3] }}
-                transition={{ duration: 3, repeat: Infinity }}
+                animate={m.reduced ? { scale: 1, opacity: 0.3 } : { scale: [1, 1.14, 1], opacity: [0.3, 0.6, 0.3] }}
+                transition={m.reduced ? {} : { duration: 3, repeat: Infinity }}
               />
 
               {/* Avatar button */}
@@ -516,12 +526,13 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
               ) : (
                 <button
                   onClick={() => { setNameInput(parentName); setEditingName(true); setTimeout(() => nameInputRef.current?.focus(), 60); }}
+                  aria-label={`Edit name: ${parentName}`}
                   className="group flex items-center gap-2"
                 >
-                  <h1 className="font-baloo font-black text-white text-2xl sm:text-3.5xl leading-tight truncate">
+                  <p className="font-baloo font-black text-white text-2xl sm:text-3.5xl leading-tight truncate">
                     {parentName}
-                  </h1>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="opacity-0 group-hover:opacity-70 transition-opacity shrink-0">
+                  </p>
+                  <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="opacity-0 group-hover:opacity-70 transition-opacity shrink-0">
                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                   </svg>
                 </button>
@@ -538,21 +549,21 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
             {hasSubscription && !isTrial ? (
               <Link href="/pricing" className="shrink-0">
                 <div className="bg-[var(--ds-surface-card)]/20 border border-white/30 rounded-full px-3 py-1.5 flex items-center gap-1.5">
-                  <span className="text-sm">👑</span>
+                  <span aria-hidden="true" className="text-sm">👑</span>
                   <span className="text-white text-3xs font-black">CLUB</span>
                 </div>
               </Link>
             ) : isTrial ? (
               <Link href="/pricing" className="shrink-0">
                 <div className="bg-amber-400/90 border border-amber-300/60 rounded-full px-3 py-1.5 flex items-center gap-1.5 hover:bg-amber-400 transition">
-                  <span className="text-sm">⏳</span>
+                  <span aria-hidden="true" className="text-sm">⏳</span>
                   <span className="text-amber-900 text-3xs font-black">{trialDaysLeft}d LEFT</span>
                 </div>
               </Link>
             ) : (
               <Link href="/pricing" className="shrink-0">
                 <div className="bg-[var(--ds-surface-card)]/20 border border-white/30 rounded-full px-3 py-1.5 flex items-center gap-1.5 hover:bg-[var(--ds-surface-card)]/30 transition">
-                  <span className="text-sm">🚀</span>
+                  <span aria-hidden="true" className="text-sm">🚀</span>
                   <span className="text-white text-3xs font-black">UPGRADE</span>
                 </div>
               </Link>
@@ -570,7 +581,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
               exit={{ opacity: 0, y: -12 }}
               className="fixed top-20 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-4 py-2.5 rounded-full bg-[var(--ds-brand-primary)] text-[var(--ds-nav-bg)] text-sml font-black shadow-xl"
             >
-              {`🎮 Switched to ${childrenData.find(d => d.child.id === playingChildId)?.child.name ?? "kid"} — whole app updated!`}
+              {`🎮 Switched to ${childrenData.find(d => d.child.id === playingChildId)?.child.name ?? "learner"} — whole app updated!`}
             </motion.div>
           )}
         </AnimatePresence>
@@ -607,13 +618,14 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                   </div>
                 </div>
                 <div className="px-4 pb-4 border-t border-red-100 pt-3 flex gap-2">
-                  <a href="/pricing" className="flex-1 text-center py-2 text-xs font-black text-white rounded-xl transition"
-                    style={{ backgroundColor: "var(--ds-brand-primary)" }}>
+                  <a href="/pricing" className="flex-1 text-center py-2 text-xs font-black text-white transition"
+                    style={{ backgroundColor: "var(--ds-brand-primary)", borderRadius: "var(--leaf-r)" }}>
                     Resubscribe →
                   </a>
                   {subscription?.payment_provider === "cybersource" && (
                     <button onClick={() => setShowUpdateCard(true)}
-                      className="flex-1 py-2 text-xs font-black text-red-700 bg-[var(--ds-surface-card)] border border-red-200 rounded-xl hover:bg-red-50 transition">
+                      className="flex-1 py-2 text-xs font-black text-red-700 bg-[var(--ds-surface-card)] border border-red-200 hover:bg-red-50 transition"
+                      style={{ borderRadius: "var(--leaf-r)" }}>
                       Update card
                     </button>
                   )}
@@ -638,7 +650,12 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                       <p className="text-ds-club-text text-2xs font-bold">All premium stories unlocked ✓</p>
                     )}
                   </div>
-                  <button onClick={() => { setShowManageSub(s => !s); setConfirmCancel(false); }} className="text-ds-club hover:opacity-75 transition shrink-0">
+                  <button
+                    onClick={() => { setShowManageSub(s => !s); setConfirmCancel(false); }}
+                    aria-label={showManageSub ? "Hide subscription options" : "Show subscription options"}
+                    aria-expanded={showManageSub}
+                    className="text-ds-club hover:opacity-75 transition shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ds-brand-primary)] focus-visible:ring-offset-1 rounded"
+                  >
                     <ChevronRight className={`w-4 h-4 transition-transform ${showManageSub ? "rotate-90" : ""}`} />
                   </button>
                 </div>
@@ -653,7 +670,8 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                       <button
                         onClick={() => void handleCancelSub("reactivate")}
                         disabled={cancellingSubscription}
-                        className="w-full py-2 text-xs font-black text-ds-club-text bg-ds-club-subtle hover:opacity-90 rounded-xl transition flex items-center justify-center gap-2"
+                        className="w-full py-2 text-xs font-black text-ds-club-text bg-ds-club-subtle hover:opacity-90 transition flex items-center justify-center gap-2"
+                        style={{ borderRadius: "var(--leaf-r)" }}
                       >
                         {cancellingSubscription ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
                         Reactivate Subscription
@@ -661,17 +679,18 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                     ) : confirmCancel ? (
                       <div className="space-y-2">
                         {/* Retention offer */}
-                        <div className="bg-ds-warn-surface border border-ds-warn rounded-xl p-3 text-2xs">
+                        <div className="bg-ds-warn-surface border border-ds-warn p-3 text-2xs" style={{ borderRadius: "var(--leaf-r)" }}>
                           <p className="font-black text-ds-warn mb-1">💛 Before you go...</p>
                           <p className="text-ds-warn mb-2 opacity-90">Use code <strong>STAY20</strong> for 20% off your next renewal — keep everything you love.</p>
                           <a
                             href="/pricing?code=STAY20"
-                            className="block w-full text-center py-1.5 font-black text-2xs text-white bg-[var(--ds-warn-icon)] hover:opacity-90 rounded-lg transition"
+                            className="block w-full text-center py-1.5 font-black text-2xs text-white bg-[var(--ds-warn-icon)] hover:opacity-90 transition"
+                            style={{ borderRadius: "var(--leaf-r)" }}
                           >
                             Claim 20% Off →
                           </a>
                         </div>
-                        <div className="bg-ds-danger-surface border border-ds-danger rounded-xl p-3 text-2xs space-y-1.5">
+                        <div className="bg-ds-danger-surface border border-ds-danger p-3 text-2xs space-y-1.5" style={{ borderRadius: "var(--leaf-r)" }}>
                           <p className="font-black text-ds-danger">You&apos;ll lose access to:</p>
                           <ul className="text-ds-danger/80 space-y-0.5 list-none">
                             <li>📚 All premium stories (locked after period ends)</li>
@@ -682,7 +701,8 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                         </div>
                         <button
                           onClick={() => setConfirmCancel(false)}
-                          className="w-full py-2 text-xs font-black text-ds-club-text bg-ds-club-subtle hover:opacity-90 rounded-xl transition"
+                          className="w-full py-2 text-xs font-black text-ds-club-text bg-ds-club-subtle hover:opacity-90 transition"
+                          style={{ borderRadius: "var(--leaf-r)" }}
                         >
                           Keep Subscription
                         </button>
@@ -699,7 +719,8 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                       <button
                         onClick={() => setConfirmCancel(true)}
                         disabled={cancellingSubscription}
-                        className="w-full py-2 text-xs font-black text-red-600 bg-red-50 hover:bg-red-100 rounded-xl transition flex items-center justify-center gap-2"
+                        className="w-full py-2 text-xs font-black text-red-600 bg-red-50 hover:bg-red-100 transition flex items-center justify-center gap-2"
+                        style={{ borderRadius: "var(--leaf-r)" }}
                       >
                         Cancel at Period End
                       </button>
@@ -782,7 +803,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                   {!isPlaying && childrenData.length > 1 && (
                     <button
                       onClick={() => switchPlaying(d.child.id)}
-                      className="text-3xs font-black text-[var(--ds-brand-primary)] bg-[var(--ds-brand-subtle)] border border-[var(--ds-border-brand)]/40 px-2 py-1 text-center hover:bg-[var(--ds-brand-primary)] hover:text-white transition"
+                      className="text-3xs font-black text-[var(--ds-brand-primary)] bg-[var(--ds-brand-subtle)] border border-[var(--ds-border-brand)]/40 px-2 py-1 text-center hover:bg-[var(--ds-brand-primary)] hover:text-white transition min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ds-brand-primary)] focus-visible:ring-offset-1"
                       style={{ borderRadius: 'var(--leaf-r-sm)' }}
                     >
                       {t("switchToThisKid")}
@@ -818,13 +839,14 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                     </div>
                   </div>
                   <div className="px-3 pb-3 border-t border-red-100 pt-2 space-y-1.5">
-                    <a href="/pricing" className="block text-center py-1.5 text-2xs font-black text-white rounded-xl transition"
-                      style={{ backgroundColor: "var(--ds-brand-primary)" }}>
+                    <a href="/pricing" className="block text-center py-1.5 text-2xs font-black text-white transition"
+                      style={{ backgroundColor: "var(--ds-brand-primary)", borderRadius: "var(--leaf-r)" }}>
                       Resubscribe →
                     </a>
                     {subscription?.payment_provider === "cybersource" && (
                       <button onClick={() => setShowUpdateCard(true)}
-                        className="w-full py-1.5 text-2xs font-black text-red-700 bg-[var(--ds-surface-card)] border border-red-200 rounded-xl hover:bg-red-50 transition">
+                        className="w-full py-1.5 text-2xs font-black text-red-700 bg-[var(--ds-surface-card)] border border-red-200 hover:bg-red-50 transition"
+                        style={{ borderRadius: "var(--leaf-r)" }}>
                         Update card
                       </button>
                     )}
@@ -848,7 +870,12 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                         <p className="text-ds-club-text text-3xs font-bold">{t("allStoriesUnlocked")}</p>
                       )}
                     </div>
-                    <button onClick={() => { setShowManageSub(s => !s); setConfirmCancel(false); }} className="text-ds-club hover:opacity-75 transition shrink-0">
+                    <button
+                      onClick={() => { setShowManageSub(s => !s); setConfirmCancel(false); }}
+                      aria-label={showManageSub ? "Hide subscription options" : "Show subscription options"}
+                      aria-expanded={showManageSub}
+                      className="text-ds-club hover:opacity-75 transition shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ds-brand-primary)] focus-visible:ring-offset-1 rounded"
+                    >
                       <ChevronRight className={`w-4 h-4 transition-transform ${showManageSub ? "rotate-90" : ""}`} />
                     </button>
                   </div>
@@ -863,7 +890,8 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                         <button
                           onClick={() => void handleCancelSub("reactivate")}
                           disabled={cancellingSubscription}
-                          className="w-full py-1.5 text-2xs font-black text-ds-club-text bg-ds-club-subtle hover:opacity-90 rounded-xl transition flex items-center justify-center gap-1.5"
+                          className="w-full py-1.5 text-2xs font-black text-ds-club-text bg-ds-club-subtle hover:opacity-90 transition flex items-center justify-center gap-1.5"
+                          style={{ borderRadius: "var(--leaf-r)" }}
                         >
                           {cancellingSubscription ? <Loader2 className="w-3 h-3 animate-spin" /> : null}
                           Reactivate
@@ -871,17 +899,18 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                       ) : confirmCancel ? (
                         <div className="space-y-2">
                           {/* Retention offer */}
-                          <div className="bg-ds-warn-surface border border-ds-warn rounded-xl p-2.5 text-3xs">
+                          <div className="bg-ds-warn-surface border border-ds-warn p-2.5 text-3xs" style={{ borderRadius: "var(--leaf-r)" }}>
                             <p className="font-black text-ds-warn mb-1">💛 Before you go...</p>
                             <p className="text-ds-warn opacity-90 mb-1.5">Code <strong>STAY20</strong> = 20% off next renewal</p>
                             <a
                               href="/pricing?code=STAY20"
-                              className="block w-full text-center py-1 font-black text-3xs text-white bg-[var(--ds-warn-icon)] hover:opacity-90 rounded-lg transition"
+                              className="block w-full text-center py-1 font-black text-3xs text-white bg-[var(--ds-warn-icon)] hover:opacity-90 transition"
+                              style={{ borderRadius: "var(--leaf-r)" }}
                             >
                               Claim 20% Off →
                             </a>
                           </div>
-                          <div className="bg-ds-danger-surface border border-ds-danger rounded-xl p-2.5 text-3xs space-y-1">
+                          <div className="bg-ds-danger-surface border border-ds-danger p-2.5 text-3xs space-y-1" style={{ borderRadius: "var(--leaf-r)" }}>
                             <p className="font-black text-ds-danger">You&apos;ll lose:</p>
                             <ul className="text-ds-danger/80 space-y-0.5">
                               <li>📚 All premium stories</li>
@@ -892,7 +921,8 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                           </div>
                           <button
                             onClick={() => setConfirmCancel(false)}
-                            className="w-full py-1.5 text-2xs font-black text-ds-club-text bg-ds-club-subtle hover:opacity-90 rounded-xl transition"
+                            className="w-full py-1.5 text-2xs font-black text-ds-club-text bg-ds-club-subtle hover:opacity-90 transition"
+                            style={{ borderRadius: "var(--leaf-r)" }}
                           >
                             Keep Subscription
                           </button>
@@ -909,7 +939,8 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                         <button
                           onClick={() => setConfirmCancel(true)}
                           disabled={cancellingSubscription}
-                          className="w-full py-1.5 text-2xs font-black text-red-600 bg-red-50 hover:bg-red-100 rounded-xl transition flex items-center justify-center gap-1.5"
+                          className="w-full py-1.5 text-2xs font-black text-red-600 bg-red-50 hover:bg-red-100 transition flex items-center justify-center gap-1.5"
+                          style={{ borderRadius: "var(--leaf-r)" }}
                         >
                           Cancel at period end
                         </button>
@@ -966,11 +997,12 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                         <motion.button
                           initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.06 }}
                           onClick={() => { setSelectedChild(d.child.id); setParentTab("overview"); }}
-                          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-left ${
+                          className={`w-full flex items-center gap-3 px-3 py-2.5 transition-all text-left ${
                             isActive
                               ? "bg-[var(--ds-brand-subtle)] border border-[var(--ds-border-brand)]/40"
                               : "hover:bg-[var(--ds-surface-card-hover)] border border-transparent"
                           }`}
+                          style={{ borderRadius: "var(--leaf-r)" }}
                         >
                           <div className={`relative w-10 h-10 rounded-full overflow-visible shrink-0 flex items-center justify-center`}>
                             <div className={`w-10 h-10 rounded-full overflow-hidden ring-2 transition-all ${isActive ? "ring-[var(--ds-brand-primary)]/40" : "ring-gray-200"}`}>
@@ -1027,7 +1059,8 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                         {!isPlaying && childrenData.length > 1 && (
                           <button
                             onClick={() => switchPlaying(d.child.id)}
-                            className="w-full text-3xs font-black text-[var(--ds-brand-primary)] bg-[var(--ds-brand-subtle)] border border-[var(--ds-border-brand)]/30 px-3 py-1.5 rounded-lg hover:bg-[var(--ds-brand-primary)] hover:text-white transition text-center"
+                            className="w-full text-3xs font-black text-[var(--ds-brand-primary)] bg-[var(--ds-brand-subtle)] border border-[var(--ds-border-brand)]/30 px-3 py-1.5 hover:bg-[var(--ds-brand-primary)] hover:text-white transition text-center min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ds-brand-primary)] focus-visible:ring-offset-1"
+                            style={{ borderRadius: "var(--leaf-r)" }}
                           >
                             {t("switchToChild").replace("{name}", d.child.name)}
                           </button>
@@ -1039,7 +1072,8 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                 <div className="px-2 pb-3">
                   <button
                     onClick={handleAddKid}
-                    className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border-2 border-dashed border-[var(--ds-border-brand)]/40 text-[var(--ds-brand-primary)] font-black text-xs hover:bg-[var(--ds-brand-subtle)] transition"
+                    className="w-full flex items-center justify-center gap-2 py-2.5 border-2 border-dashed border-[var(--ds-border-brand)]/40 text-[var(--ds-brand-primary)] font-black text-xs hover:bg-[var(--ds-brand-subtle)] transition"
+                    style={{ borderRadius: "var(--leaf-r)" }}
                   >
                     {childrenData.length >= 1 && !hasSubscription ? <Lock className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
                     {t("addKid")}
@@ -1074,25 +1108,33 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
               </div>
 
               {/* ═══ TAB NAV ═══ */}
-              <div className="flex gap-2 mb-5 overflow-x-auto pb-1 scrollbar-hide">
+              <div
+                role="tablist"
+                aria-label="Parent hub navigation"
+                className="flex gap-1.5 mb-5 overflow-x-auto pb-1 scrollbar-hide"
+              >
                 {([
                   { id: "overview",     emoji: "📊", label: t("tabOverview"), badge: null },
                   { id: "stories",      emoji: "📚", label: t("tabStories"),  badge: totalStories > 0 ? `${storiesComplete}/${totalStories}` : null },
                   { id: "achievements", emoji: "🏆", label: t("tabWins"),     badge: (badges.length + certs.length) > 0 ? String(badges.length + certs.length) : null },
                   { id: "learning",     emoji: "🧠", label: "Learning",       badge: null },
-                  { id: "airways",      emoji: "✈️", label: "Airways",         badge: storiesComplete > 0 ? String(storiesComplete) : null },
+                  { id: "airways",      emoji: "✈️", label: "Journey",        badge: null },
                   { id: "settings",     emoji: "⚙️", label: t("tabSettings"), badge: null },
                 ] as { id: typeof parentTab; emoji: string; label: string; badge: string | null }[]).map(tab => (
                   <button
                     key={tab.id}
+                    id={`tab-${tab.id}`}
+                    role="tab"
+                    aria-selected={parentTab === tab.id}
+                    aria-controls={`tabpanel-${tab.id}`}
                     onClick={() => setParentTab(tab.id)}
-                    className={`relative flex items-center gap-1.5 px-4 py-2 rounded-full text-sml font-baloo font-black transition-all shrink-0 ${
+                    className={`relative flex items-center gap-1.5 px-3 py-2 rounded-full text-sml font-baloo font-black transition-all shrink-0 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ds-brand-primary)] focus-visible:ring-offset-2 ${
                       parentTab === tab.id
                         ? "bg-ds-action text-white shadow-sm"
                         : "bg-[var(--ds-surface-card)] border border-ds-border text-[var(--ds-text-secondary)] hover:text-ds-text hover:bg-[var(--ds-surface-card-hover)]"
                     }`}
                   >
-                    <span>{tab.emoji}</span>
+                    <span aria-hidden="true">{tab.emoji}</span>
                     {tab.label}
                     {tab.badge && (
                       <span className={`ml-0.5 text-4xs font-black px-1.5 py-0.5 rounded-full leading-none ${
@@ -1111,82 +1153,14 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                 {/* ── OVERVIEW TAB ── */}
                 {parentTab === "overview" && (
                   <motion.div key="overview"
+                    id="tabpanel-overview"
+                    role="tabpanel"
+                    aria-labelledby="tab-overview"
                     initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}
                     transition={{ duration: 0.2 }}
                     className="space-y-5"
                   >
-                    {/* Quick actions row */}
-                    <div className="flex flex-wrap gap-2">
-                      {[
-                        { emoji: "📖", label: "Go to Stories", href: "/stories", color: "bg-sky-50 border-sky-200 text-sky-700 hover:bg-sky-100" },
-                        { emoji: "🤖", label: "Talk to Nimi", href: "/talk-to-nimi", color: "bg-violet-50 border-violet-200 text-violet-700 hover:bg-violet-100" },
-                        { emoji: "🎯", label: "Challenges", href: "/treasure", color: "bg-amber-50 border-amber-200 text-amber-700 hover:bg-amber-100" },
-                      ].map((a, i) => (
-                        <motion.a
-                          key={a.label} href={a.href}
-                          initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: i * 0.06 }}
-                          className={`flex items-center gap-2 px-4 py-2.5 border font-baloo font-black text-xs shrink-0 transition ${a.color}`}
-                          style={{ borderRadius: "var(--leaf-r)" }}
-                        >
-                          <span className="text-base">{a.emoji}</span>
-                          {a.label}
-                        </motion.a>
-                      ))}
-                      {childrenData.length > 1 && (
-                        <div className="relative shrink-0">
-                          <motion.button
-                            initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.18 }}
-                            onClick={() => setShowSwitchMenu(v => !v)}
-                            className="flex items-center gap-2 px-4 py-2.5 border border-[var(--ds-border-brand)] bg-[var(--ds-brand-subtle)] text-[var(--ds-text-brand)] hover:bg-[var(--ds-brand-soft)] font-baloo font-black text-xs transition"
-                            style={{ borderRadius: "var(--leaf-r)" }}
-                          >
-                            <span className="text-base">🔄</span>
-                            Switch Child
-                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`transition-transform ${showSwitchMenu ? "rotate-180" : ""}`}><path d="M6 9l6 6 6-6"/></svg>
-                          </motion.button>
-
-                          <AnimatePresence>
-                            {showSwitchMenu && (
-                              <>
-                                {/* Backdrop */}
-                                <div className="fixed inset-0 z-40" onClick={() => setShowSwitchMenu(false)} />
-                                <motion.div
-                                  initial={{ opacity: 0, y: -6, scale: 0.96 }}
-                                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                                  exit={{ opacity: 0, y: -6, scale: 0.96 }}
-                                  transition={{ duration: 0.15 }}
-                                  className="absolute top-full left-0 mt-1.5 z-50 bg-[var(--ds-surface-card)] border border-ds-border shadow-xl rounded-2xl overflow-hidden min-w-[200px]"
-                                >
-                                  <p className="px-3 pt-2.5 pb-1 text-4xs font-black text-ds-muted uppercase tracking-widest">Switch playing to</p>
-                                  {childrenData
-                                    .filter(d => d.child.id !== playingChildId)
-                                    .map(d => (
-                                      <button
-                                        key={d.child.id}
-                                        onClick={() => { switchPlaying(d.child.id); setShowSwitchMenu(false); }}
-                                        className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-[var(--ds-brand-subtle)] transition text-left"
-                                      >
-                                        <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 bg-[var(--ds-surface-card-active)] flex items-center justify-center">
-                                          <ChildAvatar avatarUrl={d.child.avatar_url} name={d.child.name} size={32} />
-                                        </div>
-                                        <div className="min-w-0">
-                                          <p className="font-black text-ds-text text-sml leading-tight truncate">{d.child.name}</p>
-                                          <p className="text-ds-muted text-3xs font-semibold">{d.stories.filter(s => s.complete).length}/{d.stories.length} stories · {d.streak}🔥</p>
-                                        </div>
-                                      </button>
-                                    ))
-                                  }
-                                </motion.div>
-                              </>
-                            )}
-                          </AnimatePresence>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Family Children Snapshot — only when 2+ children */}
+                    {/* ── Family snapshot — top context, multi-child only ── */}
                     {childrenData.length > 1 && (
                       <div>
                         <p className="text-3xs font-black text-ds-muted uppercase tracking-widest mb-2">All Learners</p>
@@ -1236,27 +1210,47 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                       </div>
                     )}
 
-                    {/* Stat grid — 2×2 */}
-                    <div className="grid grid-cols-2 gap-3">
-                      {[
-                        { emoji: "⭐", label: "Stars Earned", value: active.totalStars, sub: "all time", color: "from-amber-400/15 to-yellow-400/10", border: "border-amber-200/60", text: "text-amber-700" },
-                        { emoji: "🔥", label: "Day Streak",   value: active.streak,      sub: "days in a row", color: "from-orange-400/15 to-red-400/10", border: "border-orange-200/60", text: "text-orange-700" },
-                        { emoji: "📚", label: "Stories",      value: `${storiesComplete}/${totalStories}`, sub: "completed", color: "from-sky-400/15 to-blue-400/10", border: "border-sky-200/60", text: "text-sky-700" },
-                        { emoji: "🏆", label: "Achievements", value: badges.length + certs.length, sub: `${badges.length} badges · ${certs.length} certs`, color: "from-violet-400/15 to-purple-400/10", border: "border-violet-200/60", text: "text-violet-700" },
-                      ].map((s, i) => (
-                        <motion.div key={s.label}
-                          initial={{ opacity: 0, y: 8, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }}
-                          transition={{ delay: i * 0.07, type: "spring", stiffness: 300, damping: 24 }}
-                          className={`bg-gradient-to-br ${s.color} border ${s.border} p-4 shadow-sm`}
-                          style={{ borderRadius: "var(--leaf-r-lg)" }}
-                        >
-                          <span className="text-2xl leading-none block mb-2">{s.emoji}</span>
-                          <p className={`font-baloo font-black text-3.5xl leading-none ${s.text}`}>{s.value}</p>
-                          <p className="font-baloo font-black text-ds-text text-2xs mt-1">{s.label}</p>
-                          <p className="text-ds-muted text-4xs font-semibold mt-0.5">{s.sub}</p>
-                        </motion.div>
-                      ))}
+                    {/* ── SECTION: TODAY'S SNAPSHOT ── */}
+                    <div className="flex items-center gap-3">
+                      <p className="text-3xs font-black text-ds-muted uppercase tracking-[0.16em] shrink-0">TODAY&apos;S SNAPSHOT</p>
+                      <div className="flex-1 h-px bg-[var(--ds-border-primary)]" />
                     </div>
+
+                    {/* Stat strip — calm, consistent */}
+                    <div className="bg-[var(--ds-surface-card)] border border-ds-border shadow-ds-card overflow-hidden" style={{ borderRadius: "var(--leaf-r-lg)" }}>
+                      <div className="grid grid-cols-2 sm:grid-cols-4">
+                        {[
+                          { emoji: "⭐", value: active.totalStars.toLocaleString(), label: "Stars", sub: "all time", numColor: "text-amber-600" },
+                          { emoji: "🔥", value: active.streak, label: "Day Streak", sub: active.streak === 1 ? "day in a row" : "days in a row", numColor: "text-orange-600" },
+                          { emoji: "📚", value: `${storiesComplete}/${totalStories}`, label: "Adventures", sub: "complete", numColor: "text-[var(--ds-brand-primary)]" },
+                          { emoji: "🏆", value: badges.length + certs.length, label: "Wins", sub: `${badges.length} badges · ${certs.length} certs`, numColor: "text-[var(--ds-brand-primary)]" },
+                        ].map((s, i) => (
+                          <motion.div key={s.label}
+                            initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: i * 0.06 }}
+                            className={`flex flex-col items-center justify-center text-center p-4 gap-0.5 border-[var(--ds-border-primary)] ${
+                              i % 2 !== 0 ? "border-l" : ""
+                            } ${i >= 2 ? "border-t sm:border-t-0" : ""} ${
+                              i > 0 ? "sm:border-l" : ""
+                            }`}
+                          >
+                            <span aria-hidden="true" className="text-xl leading-none">{s.emoji}</span>
+                            <p className={`font-baloo font-black text-3xl leading-none mt-1 ${s.numColor}`}>{s.value}</p>
+                            <p className="font-baloo font-bold text-ds-text text-2xs mt-0.5">{s.label}</p>
+                            <p className="text-ds-muted text-4xs font-semibold">{s.sub}</p>
+                          </motion.div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* ── SECTION: LEARNING PROGRESS ── */}
+                    <div className="flex items-center gap-3">
+                      <p className="text-3xs font-black text-ds-muted uppercase tracking-[0.16em] shrink-0">LEARNING PROGRESS</p>
+                      <div className="flex-1 h-px bg-[var(--ds-border-primary)]" />
+                    </div>
+
+                    {/* LEARNING PROGRESS — grouped container */}
+                    <div className="overflow-hidden border border-ds-border shadow-ds-card divide-y divide-[var(--ds-border-primary)]" style={{ borderRadius: "var(--leaf-r-lg)" }}>
 
                     {/* Weekly Performance Summary */}
                     {(() => {
@@ -1268,13 +1262,13 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                         : `${estMinutes}m`;
                       const perfStars = activeDays >= 5 ? 3 : activeDays >= 3 ? 2 : activeDays >= 1 ? 1 : 0;
                       const perfLabel = ["Not started 😴", "Getting going 🌱", "On track 📈", "On fire! 🔥"][perfStars];
-                      const perfColor = ["text-[var(--ds-text-tertiary)]", "text-blue-600", "text-amber-600", "text-orange-600"][perfStars];
-                      const perfBg = ["bg-[var(--ds-surface-card-hover)]", "bg-blue-50", "bg-amber-50", "bg-orange-50"][perfStars];
-                      const perfBorder = ["border-[var(--ds-border-primary)]", "border-blue-200", "border-amber-200", "border-orange-200"][perfStars];
+                      const perfColor = ["text-[var(--ds-text-tertiary)]", "text-[var(--ds-text-brand)]", "text-amber-600", "text-orange-600"][perfStars];
+                      const perfBg = ["bg-[var(--ds-surface-card-hover)]", "bg-[var(--ds-brand-subtle)]", "bg-amber-50", "bg-orange-50"][perfStars];
+                      const perfBorder = ["border-[var(--ds-border-primary)]", "border-[var(--ds-border-brand)]/40", "border-amber-200", "border-orange-200"][perfStars];
                       return (
-                        <div className={`${perfBg} border ${perfBorder} p-4 shadow-sm`} style={{ borderRadius: "var(--leaf-r-lg)" }}>
+                        <div className={`${perfBg} p-5`}>
                           <div className="flex items-center justify-between mb-3">
-                            <p className="font-baloo font-black text-ds-text text-mbase">📅 This Week&apos;s Report</p>
+                            <p className="font-baloo font-black text-ds-text text-mbase"><span aria-hidden="true">📅 </span>This Week&apos;s Report</p>
                             <div className="flex items-center gap-2">
                               <span className={`font-black text-xs ${perfColor}`}>{perfLabel}</span>
                               <button
@@ -1312,7 +1306,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                               { label: "Days active", value: `${activeDays}/7`,  icon: "📆" },
                             ].map(s => (
                               <div key={s.label} className="text-center">
-                                <p className="text-xl leading-none">{s.icon}</p>
+                                <p className="text-xl leading-none" aria-hidden="true">{s.icon}</p>
                                 <p className="font-baloo font-black text-ds-text text-lg mt-1 leading-none">{s.value}</p>
                                 <p className="text-ds-muted text-4xs font-semibold mt-0.5">{s.label}</p>
                               </div>
@@ -1365,10 +1359,10 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                       };
 
                       return (
-                        <div className="bg-[var(--ds-surface-card)] border border-ds-border p-5 shadow-ds-card" style={{ borderRadius: 'var(--leaf-r-lg)' }}>
+                        <div className="bg-[var(--ds-surface-card)] p-5">
                           <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center gap-2">
-                              <span className="text-xl">📚</span>
+                              <span aria-hidden="true" className="text-xl">📚</span>
                               <h2 className="font-black text-ds-text text-lg">Today&apos;s Learning</h2>
                             </div>
                             {todayActivity.length > 0 && (
@@ -1383,7 +1377,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
 
                           {todayActivity.length === 0 ? (
                             <div className="flex flex-col items-center gap-2 py-3 text-center">
-                              <span className="text-3xl">🌅</span>
+                              <span aria-hidden="true" className="text-3xl">🌅</span>
                               <p className="font-nunito text-ds-muted text-sml">
                                 Nothing yet today — open NIMIPIKO to start the adventure!
                               </p>
@@ -1395,7 +1389,8 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                                   key={m.mission_id}
                                   initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }}
                                   transition={{ delay: i * 0.06 }}
-                                  className="flex items-center gap-3 bg-[var(--ds-brand-subtle)] border border-[var(--ds-border-brand)]/20 px-3.5 py-2.5 rounded-xl"
+                                  className="flex items-center gap-3 bg-[var(--ds-brand-subtle)] border border-[var(--ds-border-brand)]/20 px-3.5 py-2.5"
+                                  style={{ borderRadius: "var(--leaf-r)" }}
                                 >
                                   <span className="text-1.5xl shrink-0">{CAT_EMOJI[m.category] ?? "⭐"}</span>
                                   <div className="flex-1 min-w-0">
@@ -1414,7 +1409,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                               ))}
                               <div className="flex items-center justify-between pt-1 px-0.5">
                                 <span className="font-nunito text-ds-muted text-xs">
-                                  {todayActivity.length} {todayActivity.length === 1 ? "mission" : "missions"} completed
+                                  {todayActivity.length} {todayActivity.length === 1 ? "activity" : "activities"} completed
                                 </span>
                                 <div className="flex items-center gap-1">
                                   <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
@@ -1437,16 +1432,16 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                       const done = todaySessions >= dailyGoal;
                       const C = 2 * Math.PI * 28; // r=28
                       return (
-                        <div className="bg-[var(--ds-surface-card)] border border-ds-border p-5 shadow-ds-card" style={{ borderRadius: "var(--leaf-r-lg)" }}>
+                        <div className="bg-[var(--ds-surface-card)] p-5">
                           <div className="flex items-center gap-4">
                             {/* Circular ring */}
                             <div className="relative shrink-0 w-[72px] h-[72px] flex items-center justify-center">
                               <svg className="absolute inset-0 w-full h-full" viewBox="0 0 72 72" style={{ transform: "rotate(-90deg)" }}>
-                                <circle cx="36" cy="36" r="28" fill="none" stroke="#e5e7eb" strokeWidth="6" />
+                                <circle cx="36" cy="36" r="28" fill="none" stroke="var(--ds-surface-card-active)" strokeWidth="6" />
                                 <motion.circle
                                   cx="36" cy="36" r="28"
                                   fill="none"
-                                  stroke={done ? "var(--ds-brand-primary)" : "#6366f1"}
+                                  stroke="var(--ds-brand-primary)"
                                   strokeWidth="6"
                                   strokeLinecap="round"
                                   strokeDasharray={`${C} ${C}`}
@@ -1456,7 +1451,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                                 />
                               </svg>
                               <div className="text-center z-10">
-                                <p className={`font-baloo font-black text-lg leading-none ${done ? "text-[var(--ds-brand-primary)]" : "text-indigo-600"}`}>
+                                <p className="font-baloo font-black text-[var(--ds-brand-primary)] text-lg leading-none">
                                   {todaySessions}
                                 </p>
                                 <p className="text-ds-muted text-4xs font-bold leading-none">/{dailyGoal}</p>
@@ -1474,7 +1469,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                               {!done && (
                                 <div className="mt-2 h-1.5 bg-[var(--ds-surface-card-active)] rounded-full overflow-hidden w-full">
                                   <motion.div
-                                    className="h-full rounded-full bg-gradient-to-r from-indigo-400 to-violet-500"
+                                    className="h-full rounded-full bg-gradient-to-r from-[#2D7A4F] to-[#C9A84C]"
                                     initial={{ width: 0 }}
                                     animate={{ width: `${pct * 100}%` }}
                                     transition={{ duration: 0.7, ease: "easeOut" }}
@@ -1487,15 +1482,99 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                       );
                     })()}
 
+                    </div>{/* end LEARNING PROGRESS grouped container */}
+
+                    {/* ── SECTION: CURRENT ADVENTURE ── */}
+                    <div className="flex items-center gap-3">
+                      <p className="text-3xs font-black text-ds-muted uppercase tracking-[0.16em] shrink-0">CURRENT ADVENTURE</p>
+                      <div className="flex-1 h-px bg-[var(--ds-border-primary)]" />
+                    </div>
+
+                    {/* Current Adventure */}
+                    <div className="bg-[var(--ds-surface-card)] border border-ds-border p-5 shadow-ds-card" style={{ borderRadius: 'var(--leaf-r-lg)' }}>
+                      {currentStory ? (
+                        <>
+                          {/* Journey header */}
+                          <div className="flex items-start justify-between gap-3 mb-4">
+                            <div className="flex-1 min-w-0">
+                              <p className="text-3xs font-black text-ds-muted uppercase tracking-[0.14em] mb-0.5">
+                                <span aria-hidden="true">✈️ </span>Adventure {(active?.stories.findIndex(s => s.unlocked && !s.complete) ?? 0) + 1} of {totalStories}
+                              </p>
+                              <h2 className="font-baloo font-black text-ds-text text-xl leading-tight">
+                                <span aria-hidden="true">{currentStory.theme_emoji} </span>{currentStory.title}
+                              </h2>
+                            </div>
+                            <div className="text-right shrink-0">
+                              <p className="font-baloo font-black text-[var(--ds-brand-primary)] text-2xl leading-none">{missionsComplete}<span className="text-ds-muted font-bold text-lg">/{totalMissions}</span></p>
+                              <p className="text-ds-muted text-3xs font-bold mt-0.5">stops done</p>
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4">
+                            {active.currentSlots.map(slot => {
+                              const iconMap: Record<string, string> = {
+                                flipflop_audio: "flipflop", story_pdf: "pdf", coloring: "coloring",
+                                move_explore: "move", sing_along: "sing", bonus_video: "video",
+                              };
+                              return (
+                                <div key={slot.slot_key}
+                                  className={`flex items-center gap-2.5 p-3 border-2 transition ${
+                                    slot.completed
+                                      ? "bg-[var(--ds-brand-subtle)] border-[var(--ds-border-brand)]/30"
+                                      : "bg-[var(--ds-surface-card-hover)] border-ds-border"
+                                  }`}
+                                  style={{ borderRadius: 'var(--leaf-r)' }}>
+                                  <Image src={`/assets/icon-${iconMap[slot.slot_key] ?? "flipflop"}.svg`}
+                                    alt="" width={32} height={32} className="w-8 h-8 rounded-lg shrink-0" />
+                                  <div className="flex-1 min-w-0">
+                                    <p className={`text-xs font-bold truncate ${slot.completed ? "text-ds-text" : "text-[var(--ds-text-tertiary)]"}`}>
+                                      {slot.title || slot.slot_key.replace(/_/g, " ")}
+                                    </p>
+                                  </div>
+                                  {slot.completed ? (
+                                    <CheckCircle2 className="w-5 h-5 text-[var(--ds-brand-primary)] shrink-0" />
+                                  ) : (
+                                    <div className="w-5 h-5 rounded-full border-2 border-ds-border shrink-0" />
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+                          <div className="bg-[var(--ds-surface-card-active)] rounded-full h-4 overflow-hidden">
+                            <motion.div
+                              className="bg-cta-gradient h-full rounded-full"
+                              initial={{ width: 0 }}
+                              animate={{ width: `${totalMissions > 0 ? (missionsComplete / totalMissions) * 100 : 0}%` }}
+                              transition={{ duration: DURATION.loopSpark }}
+                            />
+                          </div>
+                        </>
+                      ) : (
+                        <div className="text-center py-6">
+                          <p className="text-3xs font-black text-ds-muted uppercase tracking-[0.14em] mb-3">
+                            <span aria-hidden="true">✈️ </span>Journey Status
+                          </p>
+                          <span aria-hidden="true" className="text-4xl">🎉</span>
+                          <p className="text-ds-text font-black text-base mt-2">{t("allStoriesCompleted")}</p>
+                          <p className="text-[var(--ds-text-secondary)] text-xs">{t("amazingWorkBy").replace("{name}", active.child.name)}</p>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* ── SECTION: WEEKLY ACTIVITY ── */}
+                    <div className="flex items-center gap-3">
+                      <p className="text-3xs font-black text-ds-muted uppercase tracking-[0.16em] shrink-0">WEEKLY ACTIVITY</p>
+                      <div className="flex-1 h-px bg-[var(--ds-border-primary)]" />
+                    </div>
+
                     {/* This Week */}
                     <div className="bg-[var(--ds-surface-card)] border border-ds-border p-5 shadow-ds-card" style={{ borderRadius: 'var(--leaf-r-lg)' }}>
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-2">
-                          <span className="text-xl">📅</span>
+                          <span aria-hidden="true" className="text-xl">📅</span>
                           <h2 className="font-black text-ds-text text-lg">This Week</h2>
                         </div>
                         <div className="flex items-center gap-1.5 bg-orange-50 border border-orange-200 rounded-full px-3 py-1">
-                          <span className="text-orange-500">🔥</span>
+                          <span aria-hidden="true" className="text-orange-500">🔥</span>
                           <span className="font-black text-orange-700 text-sml">{active.streak}d streak</span>
                         </div>
                       </div>
@@ -1535,21 +1614,21 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                         const activeDays = active.weekActivity.filter(Boolean).length;
                         const totalSessions = active.weekActivity.reduce((a, b) => a + b, 0);
                         if (activeDays === 0) return (
-                          <div className="mt-3 flex items-center gap-2 p-3 bg-orange-50 border border-orange-200 rounded-xl">
-                            <span className="text-xl">🌅</span>
-                            <p className="text-orange-700 text-xs font-semibold">No activity yet this week — encourage {active.child.name} to start a story! 🚀</p>
+                          <div className="mt-3 flex items-center gap-2 p-3 bg-orange-50 border border-orange-200" style={{ borderRadius: "var(--leaf-r)" }}>
+                            <span aria-hidden="true" className="text-xl">🌅</span>
+                            <p className="text-orange-700 text-xs font-semibold">No activity yet this week — encourage {active.child.name} to start a story!</p>
                           </div>
                         );
                         if (activeDays >= 5) return (
-                          <div className="mt-3 flex items-center gap-2 p-3 bg-[var(--ds-brand-subtle)] border border-[var(--ds-border-brand)] rounded-xl">
-                            <span className="text-xl">🏆</span>
+                          <div className="mt-3 flex items-center gap-2 p-3 bg-[var(--ds-brand-subtle)] border border-[var(--ds-border-brand)]" style={{ borderRadius: "var(--leaf-r)" }}>
+                            <span aria-hidden="true" className="text-xl">🏆</span>
                             <p className="text-[var(--ds-text-brand)] text-xs font-semibold">{activeDays}/7 days active · {totalSessions} total sessions — incredible week!</p>
                           </div>
                         );
                         return (
-                          <div className="mt-3 flex items-center gap-2 p-3 bg-blue-50 border border-blue-200 rounded-xl">
-                            <span className="text-xl">📊</span>
-                            <p className="text-blue-700 text-xs font-semibold">{activeDays}/7 days active this week · {totalSessions} sessions completed</p>
+                          <div className="mt-3 flex items-center gap-2 p-3 bg-[var(--ds-surface-card)] border border-[var(--ds-border-primary)]" style={{ borderRadius: "var(--leaf-r)" }}>
+                            <span aria-hidden="true" className="text-xl">📊</span>
+                            <p className="text-[var(--ds-text-secondary)] text-xs font-semibold">{activeDays}/7 days active this week · {totalSessions} sessions completed</p>
                           </div>
                         );
                       })()}
@@ -1586,11 +1665,11 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                         <div className="bg-[var(--ds-surface-card)] border border-ds-border p-5 shadow-ds-card" style={{ borderRadius: "var(--leaf-r-lg)" }}>
                           <div className="flex items-center justify-between mb-3">
                             <div className="flex items-center gap-2">
-                              <span className="text-xl">🗓️</span>
+                              <span aria-hidden="true" className="text-xl">🗓️</span>
                               <h2 className="font-black text-ds-text text-lg">Activity Calendar</h2>
                             </div>
                             <span className="text-2xs font-black text-[var(--ds-brand-primary)] bg-[var(--ds-brand-subtle)] px-2.5 py-1 rounded-full border border-[var(--ds-border-brand)]/30">
-                              {totalActive} days active
+                              {totalActive} {totalActive === 1 ? "day" : "days"} active
                             </span>
                           </div>
                           {/* Grid */}
@@ -1652,42 +1731,73 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                       );
                     })()}
 
-                    {/* How They Felt — overview card (most recent 4) */}
-                    {feelings.length > 0 && (
-                      <div className="bg-[var(--ds-surface-card)] border border-ds-border p-5 shadow-ds-card" style={{ borderRadius: "var(--leaf-r-lg)" }}>
-                        <div className="flex items-center gap-2 mb-3">
-                          <span className="text-xl">💭</span>
-                          <h2 className="font-black text-ds-text text-lg">Emotional Snapshots</h2>
-                          <span className="ml-auto text-2xs text-ds-muted font-semibold">After stories</span>
-                        </div>
-                        <div className="grid grid-cols-2 gap-2">
-                          {feelings.slice(0, 4).map((f, i) => (
-                            <motion.div key={i}
-                              initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
-                              transition={{ delay: i * 0.06 }}
-                              className="flex items-center gap-3 bg-pink-50 border border-pink-100 px-3 py-2.5"
-                              style={{ borderRadius: "var(--leaf-r)" }}
-                            >
-                              <span className="text-2.5xl shrink-0 leading-none">{f.feeling}</span>
-                              <div className="min-w-0">
-                                <p className="font-black text-ds-text text-xs truncate leading-tight">{f.title}</p>
-                                <p className="text-pink-400 text-3xs font-semibold mt-0.5">
-                                  {new Date(f.felt_at).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
-                                </p>
-                              </div>
-                            </motion.div>
+                    {/* ── SECTION: ACHIEVEMENTS & WINS ── */}
+                    <div className="flex items-center gap-3">
+                      <p className="text-3xs font-black text-ds-muted uppercase tracking-[0.16em] shrink-0">ACHIEVEMENTS &amp; WINS</p>
+                      <div className="flex-1 h-px bg-[var(--ds-border-primary)]" />
+                    </div>
+                    <div className="bg-[var(--ds-surface-card)] border border-ds-border shadow-ds-card overflow-hidden" style={{ borderRadius: "var(--leaf-r-lg)" }}>
+                      {/* Recognition strip */}
+                      <div className="p-5">
+                        <p className="text-3xs font-black text-ds-muted uppercase tracking-[0.12em] mb-3">
+                          <span aria-hidden="true">🏆 </span>{active.child.name}&apos;s progress at a glance
+                        </p>
+                        <div className="flex items-center gap-0 divide-x divide-[var(--ds-border-primary)]">
+                          {[
+                            { emoji: "⭐", value: active.totalStars.toLocaleString(), label: "Stars" },
+                            { emoji: "🏅", value: badges.length, label: badges.length === 1 ? "Badge" : "Badges" },
+                            { emoji: "🎓", value: certs.length, label: certs.length === 1 ? "Certificate" : "Certificates" },
+                          ].map(item => (
+                            <div key={item.label} className="flex-1 flex flex-col items-center gap-1 py-1 text-center">
+                              <span aria-hidden="true" className="text-2xl leading-none">{item.emoji}</span>
+                              <p className="font-baloo font-black text-[var(--ds-brand-primary)] text-2xl leading-none">{item.value}</p>
+                              <p className="text-ds-muted text-3xs font-bold">{item.label}</p>
+                            </div>
                           ))}
                         </div>
-                        {feelings.length > 4 && (
-                          <button
-                            onClick={() => setParentTab("achievements")}
-                            className="mt-2.5 w-full text-2xs font-black text-[var(--ds-brand-primary)] hover:underline"
-                          >
-                            See all {feelings.length} reactions →
-                          </button>
-                        )}
+                        <button
+                          onClick={() => setParentTab("achievements")}
+                          className="mt-4 w-full text-2xs font-black text-[var(--ds-brand-primary)] bg-[var(--ds-brand-subtle)] border border-[var(--ds-border-brand)]/30 py-2 hover:bg-[var(--ds-brand-soft)] transition min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ds-brand-primary)] focus-visible:ring-offset-1"
+                          style={{ borderRadius: "var(--leaf-r)" }}
+                        >
+                          View all achievements →
+                        </button>
                       </div>
-                    )}
+                      {/* Feelings — only if available */}
+                      {feelings.length > 0 && (
+                        <div className="px-5 pb-5 border-t border-[var(--ds-border-primary)] pt-4">
+                          <div className="flex items-center gap-2 mb-3">
+                            <span aria-hidden="true" className="text-lg">💭</span>
+                            <p className="font-black text-ds-text text-sml">How {active.child.name} felt</p>
+                            <span className="ml-auto text-2xs text-ds-muted font-semibold">After each story</span>
+                          </div>
+                          <div className="grid grid-cols-2 gap-2">
+                            {feelings.slice(0, 4).map((f, i) => (
+                              <motion.div key={i}
+                                initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
+                                transition={{ delay: i * 0.06 }}
+                                className="flex items-center gap-3 bg-pink-50 border border-pink-100 px-3 py-2.5"
+                                style={{ borderRadius: "var(--leaf-r)" }}
+                              >
+                                <span className="text-2.5xl shrink-0 leading-none">{f.feeling}</span>
+                                <div className="min-w-0">
+                                  <p className="font-black text-ds-text text-xs truncate leading-tight">{f.title}</p>
+                                  <p className="text-pink-400 text-3xs font-semibold mt-0.5">
+                                    {new Date(f.felt_at).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+                                  </p>
+                                </div>
+                              </motion.div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* ── SECTION: FOR YOU TO DO ── */}
+                    <div className="flex items-center gap-3">
+                      <p className="text-3xs font-black text-ds-muted uppercase tracking-[0.16em] shrink-0">FOR YOU TO DO</p>
+                      <div className="flex-1 h-px bg-[var(--ds-border-primary)]" />
+                    </div>
 
                     {/* Smart Coaching Tip */}
                     {(() => {
@@ -1699,17 +1809,17 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                       if (todaySessions >= dailyGoal) {
                         tip = { emoji: "🎉", title: "Daily goal reached!", desc: `${active.child.name} completed all ${dailyGoal} sessions today. Celebrate this win!`, cta: "See achievements →", href: "#", bg: "bg-[var(--ds-brand-subtle)]", border: "border-[var(--ds-border-brand)]", text: "text-[var(--ds-text-brand)]" };
                       } else if (todaySessions === 0) {
-                        tip = { emoji: "⏰", title: "Start today's learning", desc: `${active.child.name} hasn't practiced yet. Even 10 minutes makes a big difference.`, cta: "Open Stories →", href: "/stories", bg: "bg-blue-50", border: "border-blue-200", text: "text-blue-700" };
+                        tip = { emoji: "⏰", title: "Start today's learning", desc: `${active.child.name} hasn't practiced yet. Even 10 minutes makes a big difference.`, cta: "Open Stories →", href: "/stories", bg: "bg-[var(--ds-surface-card)]", border: "border-ds-border", text: "text-ds-text" };
                       } else if (active.streak === 0) {
-                        tip = { emoji: "🔥", title: "Build a streak today!", desc: `Complete one more activity to start a learning streak — kids love seeing that flame grow.`, cta: "Continue learning →", href: "/stories", bg: "bg-orange-50", border: "border-orange-200", text: "text-orange-700" };
+                        tip = { emoji: "🔥", title: "Build a streak today!", desc: `Complete one more activity to start a learning streak — learners love seeing that flame grow.`, cta: "Continue learning →", href: "/stories", bg: "bg-orange-50", border: "border-orange-200", text: "text-orange-700" };
                       } else if (active.streak >= 7) {
                         tip = { emoji: "🌟", title: `${active.streak}-day streak — incredible!`, desc: `${active.child.name} has been consistent all week. Keep going — streaks build lifelong habits.`, cta: "Keep the streak →", href: "/stories", bg: "bg-amber-50", border: "border-amber-200", text: "text-amber-700" };
                       } else {
-                        tip = { emoji: "💡", title: `${active.child.name} is making progress!`, desc: `${storiesComplete} ${storiesComplete === 1 ? "story" : "stories"} completed · ${active.totalStars} stars earned. Keep encouraging daily reading.`, cta: "View stories →", href: "/stories", bg: "bg-violet-50", border: "border-violet-200", text: "text-violet-700" };
+                        tip = { emoji: "💡", title: `${active.child.name} is making progress!`, desc: `${storiesComplete} ${storiesComplete === 1 ? "story" : "stories"} completed · ${active.totalStars} stars earned. Keep encouraging daily reading.`, cta: "View stories →", href: "/stories", bg: "bg-[var(--ds-brand-subtle)]", border: "border-[var(--ds-border-brand)]", text: "text-[var(--ds-text-brand)]" };
                       }
                       return (
                         <div className={`${tip.bg} border ${tip.border} p-4 flex items-start gap-3`} style={{ borderRadius: "var(--leaf-r-lg)" }}>
-                          <span className="text-3.5xl leading-none shrink-0 mt-0.5">{tip.emoji}</span>
+                          <span aria-hidden="true" className="text-3.5xl leading-none shrink-0 mt-0.5">{tip.emoji}</span>
                           <div className="flex-1 min-w-0">
                             <p className={`font-baloo font-black text-mbase ${tip.text}`}>{tip.title}</p>
                             <p className="text-ds-muted text-xs font-semibold mt-0.5 leading-snug">{tip.desc}</p>
@@ -1723,67 +1833,72 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                       );
                     })()}
 
-                    {/* Current Story */}
-                    <div className="bg-[var(--ds-surface-card)] border border-ds-border p-5 shadow-ds-card" style={{ borderRadius: 'var(--leaf-r-lg)' }}>
-                      <div className="flex items-center gap-2 mb-4">
-                        <span className="text-xl">📖</span>
-                        <h2 className="font-black text-ds-text text-lg">Current Story</h2>
-                      </div>
-                      {currentStory ? (
-                        <>
-                          <div className="flex items-center justify-between mb-4">
-                            <div>
-                              <p className="font-black text-ds-text text-xl">{currentStory.theme_emoji} {currentStory.title}</p>
-                              <p className="text-[var(--ds-text-secondary)] text-xs mt-0.5">Story {currentStory.sort_order} of {totalStories}</p>
-                            </div>
-                            <div className="bg-yellow-50 border border-yellow-200 rounded-full px-4 py-2">
-                              <span className="text-yellow-700 font-black text-sm">{missionsComplete}/{totalMissions}</span>
-                            </div>
-                          </div>
-                          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4">
-                            {active.currentSlots.map(slot => {
-                              const iconMap: Record<string, string> = {
-                                flipflop_audio: "flipflop", story_pdf: "pdf", coloring: "coloring",
-                                move_explore: "move", sing_along: "sing", bonus_video: "video",
-                              };
-                              return (
-                                <div key={slot.slot_key}
-                                  className={`flex items-center gap-2.5 p-3 border-2 transition ${
-                                    slot.completed
-                                      ? "bg-[var(--ds-brand-subtle)] border-[var(--ds-border-brand)]/30"
-                                      : "bg-[var(--ds-surface-card-hover)] border-ds-border"
-                                  }`}
-                                  style={{ borderRadius: 'var(--leaf-r)' }}>
-                                  <Image src={`/assets/icon-${iconMap[slot.slot_key] ?? "flipflop"}.svg`}
-                                    alt="" width={32} height={32} className="w-8 h-8 rounded-lg shrink-0" />
-                                  <div className="flex-1 min-w-0">
-                                    <p className={`text-xs font-bold truncate ${slot.completed ? "text-ds-text" : "text-[var(--ds-text-tertiary)]"}`}>
-                                      {slot.title || slot.slot_key.replace(/_/g, " ")}
-                                    </p>
-                                  </div>
-                                  {slot.completed ? (
-                                    <CheckCircle2 className="w-5 h-5 text-[var(--ds-brand-primary)] shrink-0" />
-                                  ) : (
-                                    <div className="w-5 h-5 rounded-full border-2 border-ds-border shrink-0" />
-                                  )}
-                                </div>
-                              );
-                            })}
-                          </div>
-                          <div className="bg-[var(--ds-surface-card-active)] rounded-full h-4 overflow-hidden">
-                            <motion.div
-                              className="bg-cta-gradient h-full rounded-full"
-                              initial={{ width: 0 }}
-                              animate={{ width: `${totalMissions > 0 ? (missionsComplete / totalMissions) * 100 : 0}%` }}
-                              transition={{ duration: DURATION.loopSpark }}
-                            />
-                          </div>
-                        </>
-                      ) : (
-                        <div className="text-center py-4">
-                          <span className="text-4xl">🎉</span>
-                          <p className="text-ds-text font-black text-base mt-2">{t("allStoriesCompleted")}</p>
-                          <p className="text-[var(--ds-text-secondary)] text-xs">{t("amazingWorkBy").replace("{name}", active.child.name)}</p>
+                    {/* Quick actions */}
+                    <div className="flex flex-wrap gap-2">
+                      {[
+                        { emoji: "📖", label: "Go to Stories", href: "/stories", color: "bg-[var(--ds-surface-card)] border-ds-border text-ds-text hover:bg-[var(--ds-surface-card-hover)]" },
+                        { emoji: "🤖", label: "Talk to Nimi", href: "/talk-to-nimi", color: "bg-[var(--ds-brand-subtle)] border-[var(--ds-border-brand)] text-[var(--ds-text-brand)] hover:bg-[var(--ds-brand-soft)]" },
+                        { emoji: "🎯", label: "Challenges", href: "/treasure", color: "bg-amber-50 border-amber-200 text-amber-700 hover:bg-amber-100" },
+                      ].map((a, i) => (
+                        <motion.a
+                          key={a.label} href={a.href}
+                          initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: i * 0.06 }}
+                          className={`flex items-center gap-2 px-4 py-2.5 border font-baloo font-black text-xs shrink-0 transition min-h-[44px] ${a.color}`}
+                          style={{ borderRadius: "var(--leaf-r)" }}
+                        >
+                          <span aria-hidden="true" className="text-base">{a.emoji}</span>
+                          {a.label}
+                        </motion.a>
+                      ))}
+                      {childrenData.length > 1 && (
+                        <div className="relative shrink-0">
+                          <motion.button
+                            initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.18 }}
+                            onClick={() => setShowSwitchMenu(v => !v)}
+                            className="flex items-center gap-2 px-4 py-2.5 border border-[var(--ds-border-brand)] bg-[var(--ds-brand-subtle)] text-[var(--ds-text-brand)] hover:bg-[var(--ds-brand-soft)] font-baloo font-black text-xs transition min-h-[44px]"
+                            style={{ borderRadius: "var(--leaf-r)" }}
+                          >
+                            <span aria-hidden="true" className="text-base">🔄</span>
+                            Switch Learner
+                            <svg aria-hidden="true" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`transition-transform ${showSwitchMenu ? "rotate-180" : ""}`}><path d="M6 9l6 6 6-6"/></svg>
+                          </motion.button>
+                          <AnimatePresence>
+                            {showSwitchMenu && (
+                              <>
+                                <div className="fixed inset-0 z-40" onClick={() => setShowSwitchMenu(false)} />
+                                <motion.div
+                                  initial={{ opacity: 0, y: -6, scale: 0.96 }}
+                                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                                  exit={{ opacity: 0, y: -6, scale: 0.96 }}
+                                  transition={{ duration: 0.15 }}
+                                  className="absolute top-full left-0 mt-1.5 z-50 bg-[var(--ds-surface-card)] border border-ds-border shadow-xl overflow-hidden min-w-[200px]"
+                                  style={{ borderRadius: "var(--leaf-r-lg)" }}
+                                >
+                                  <p className="px-3 pt-2.5 pb-1 text-4xs font-black text-ds-muted uppercase tracking-widest">Switch learner to</p>
+                                  {childrenData
+                                    .filter(d => d.child.id !== playingChildId)
+                                    .map(d => (
+                                      <button
+                                        key={d.child.id}
+                                        onClick={() => { switchPlaying(d.child.id); setShowSwitchMenu(false); }}
+                                        className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-[var(--ds-brand-subtle)] transition text-left"
+                                      >
+                                        <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 bg-[var(--ds-surface-card-active)] flex items-center justify-center">
+                                          <ChildAvatar avatarUrl={d.child.avatar_url} name={d.child.name} size={32} />
+                                        </div>
+                                        <div className="min-w-0">
+                                          <p className="font-black text-ds-text text-sml leading-tight truncate">{d.child.name}</p>
+                                          <p className="text-ds-muted text-3xs font-semibold">{d.stories.filter(s => s.complete).length}/{d.stories.length} stories · {d.streak}🔥</p>
+                                        </div>
+                                      </button>
+                                    ))
+                                  }
+                                </motion.div>
+                              </>
+                            )}
+                          </AnimatePresence>
                         </div>
                       )}
                     </div>
@@ -1793,13 +1908,13 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                       <motion.div
                         initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.3 }}
-                        className="bg-gradient-to-r from-indigo-50 to-violet-50 border border-indigo-200 p-4 flex items-center gap-4"
+                        className="bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200/70 p-4 flex items-center gap-4"
                         style={{ borderRadius: "var(--leaf-r-lg)" }}
                       >
-                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-2xl shadow-md shrink-0">🎁</div>
+                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[var(--ds-brand-primary)] to-[#C9A84C] flex items-center justify-center text-2xl shadow-md shrink-0" aria-hidden="true">🎁</div>
                         <div className="flex-1 min-w-0">
                           <p className="font-baloo font-black text-ds-text text-mbase">Know another parent?</p>
-                          <p className="text-ds-muted text-xs font-semibold mt-0.5">Share your code <strong className="text-indigo-600">{referralCode}</strong> — you both get 1 free month when they subscribe!</p>
+                          <p className="text-ds-muted text-xs font-semibold mt-0.5">Share your code <strong className="text-[var(--ds-brand-primary)]">{referralCode}</strong> — you both get 1 free month when they subscribe!</p>
                         </div>
                         <button
                           onClick={async () => {
@@ -1809,7 +1924,8 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                               else { await navigator.clipboard.writeText(text); setShareToast(true); setTimeout(() => setShareToast(false), 2500); }
                             } catch { /* cancelled */ }
                           }}
-                          className="shrink-0 px-3 py-2 bg-indigo-600 text-white font-black text-2xs rounded-xl hover:bg-indigo-700 transition"
+                          className="shrink-0 px-3 py-2 min-h-[44px] bg-[var(--ds-brand-primary)] text-white font-black text-2xs hover:opacity-90 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ds-brand-primary)] focus-visible:ring-offset-1"
+                          style={{ borderRadius: "var(--leaf-r)" }}
                         >
                           {shareToast ? "✅ Copied!" : "Invite"}
                         </button>
@@ -1821,10 +1937,14 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                 {/* ── STORIES TAB ── */}
                 {parentTab === "stories" && (
                   <motion.div key="stories"
+                    id="tabpanel-stories"
+                    role="tabpanel"
+                    aria-labelledby="tab-stories"
                     initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}
                     transition={{ duration: 0.2 }}
+                    className="space-y-4"
                   >
-                    {/* Curriculum Progress Ring */}
+                    {/* Journey Progress Header */}
                     {(() => {
                       const pct = totalStories > 0 ? storiesComplete / totalStories : 0;
                       const C = 2 * Math.PI * 36;
@@ -1837,14 +1957,14 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                       ];
                       const nextMilestone = milestones.find(m => pct < m.at);
                       return (
-                        <div className="bg-gradient-to-br from-sky-50 to-blue-50 border border-sky-200 p-5 flex items-center gap-5 shadow-sm" style={{ borderRadius: "var(--leaf-r-lg)" }}>
+                        <div className="bg-[var(--ds-brand-subtle)] border border-[var(--ds-border-brand)]/40 p-5 flex items-center gap-5 shadow-sm" style={{ borderRadius: "var(--leaf-r-lg)" }}>
                           {/* Ring */}
                           <div className="relative shrink-0 w-[88px] h-[88px] flex items-center justify-center">
                             <svg className="absolute inset-0 w-full h-full" viewBox="0 0 88 88" style={{ transform: "rotate(-90deg)" }}>
-                              <circle cx="44" cy="44" r="36" fill="none" stroke="#e0f2fe" strokeWidth="7" />
+                              <circle cx="44" cy="44" r="36" fill="none" stroke="var(--ds-brand-soft)" strokeWidth="7" />
                               <motion.circle
                                 cx="44" cy="44" r="36"
-                                fill="none" stroke="#0ea5e9" strokeWidth="7" strokeLinecap="round"
+                                fill="none" stroke="var(--ds-brand-primary)" strokeWidth="7" strokeLinecap="round"
                                 strokeDasharray={`${C} ${C}`}
                                 initial={{ strokeDashoffset: C }}
                                 animate={{ strokeDashoffset: C * (1 - pct) }}
@@ -1852,8 +1972,8 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                               />
                             </svg>
                             <div className="text-center z-10">
-                              <p className="font-baloo font-black text-sky-700 text-xl leading-none">{Math.round(pct * 100)}%</p>
-                              <p className="text-sky-500 text-4xs font-bold leading-none mt-0.5">done</p>
+                              <p className="font-baloo font-black text-[var(--ds-brand-primary)] text-xl leading-none">{Math.round(pct * 100)}%</p>
+                              <p className="text-[var(--ds-text-brand)] text-4xs font-bold leading-none mt-0.5">done</p>
                             </div>
                           </div>
                           {/* Info */}
@@ -1861,26 +1981,26 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                             <p className="font-baloo font-black text-ds-text text-base leading-tight">
                               {active.child.name}&apos;s {langLabel} Journey
                             </p>
-                            <p className="text-sky-600 font-bold text-xs mt-0.5">
-                              {storiesComplete} of {totalStories} stories complete
+                            <p className="text-[var(--ds-text-brand)] font-bold text-xs mt-0.5">
+                              {storiesComplete} of {totalStories} {totalStories === 1 ? "adventure" : "adventures"} complete
                             </p>
                             {nextMilestone && pct < 1 && (
                               <div className="mt-2 flex items-center gap-1.5">
-                                <div className="flex-1 h-1.5 bg-sky-100 rounded-full overflow-hidden">
+                                <div className="flex-1 h-1.5 bg-[var(--ds-brand-soft)] rounded-full overflow-hidden">
                                   <motion.div
-                                    className="h-full rounded-full bg-sky-400"
+                                    className="h-full rounded-full bg-[var(--ds-brand-primary)]"
                                     initial={{ width: 0 }}
                                     animate={{ width: `${(pct / nextMilestone.at) * 100}%` }}
                                     transition={{ duration: 0.9, ease: "easeOut", delay: 0.4 }}
                                   />
                                 </div>
-                                <span className="text-3xs font-black text-sky-600 shrink-0">
-                                  {nextMilestone.emoji} {nextMilestone.label}
+                                <span className="text-3xs font-black text-[var(--ds-text-brand)] shrink-0">
+                                  {nextMilestone.emoji} Next: {nextMilestone.label}
                                 </span>
                               </div>
                             )}
                             {pct >= 1 && (
-                              <p className="mt-1 text-xs font-black text-[var(--ds-text-brand)]">👑 Curriculum complete!</p>
+                              <p className="mt-1 text-xs font-black text-[var(--ds-text-brand)]">👑 Full curriculum complete!</p>
                             )}
                           </div>
                         </div>
@@ -1892,48 +2012,62 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                       const inProgress  = active.stories.filter(s => s.unlocked && !s.complete);
                       const upcoming    = active.stories.filter(s => !s.unlocked);
 
-                      const StoryRow = ({ story, i }: { story: typeof active.stories[0]; i: number }) => (
-                        <motion.div key={story.sid}
-                          initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: i * 0.04 }}
-                          className={`flex items-center gap-3 p-3 border-2 ${
-                            story.complete
-                              ? "bg-[var(--ds-brand-subtle)] border-[var(--ds-border-brand)]/30"
-                              : story.unlocked
-                                ? "bg-yellow-50 border-yellow-200"
-                                : "bg-[var(--ds-surface-card-hover)] border-ds-border opacity-70"
-                          }`}
-                          style={{ borderRadius: "var(--leaf-r)" }}
-                        >
-                          <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-base font-black shadow-sm shrink-0 ${
-                            story.complete ? "bg-[var(--ds-brand-primary)] text-white" : story.unlocked ? "bg-yellow-500 text-white" : "bg-[var(--ds-border-primary)] text-[var(--ds-text-tertiary)]"
-                          }`}>
-                            {story.sort_order}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className={`font-black text-sml truncate ${story.unlocked ? "text-ds-text" : "text-[var(--ds-text-tertiary)]"}`}>
-                              {story.theme_emoji} {story.title}
-                            </p>
-                            {story.unlocked && !story.complete && (
-                              <div className="mt-1.5 flex items-center gap-2">
-                                <div className="flex-1 h-1.5 bg-[var(--ds-surface-card-active)] rounded-full overflow-hidden">
-                                  <div className="bg-yellow-400 h-full rounded-full" style={{ width: `${story.progress * 100}%` }} />
+                      const StoryRow = ({ story, i, isFirst }: { story: typeof active.stories[0]; i: number; isFirst?: boolean }) => {
+                        const approxDone = Math.round(story.progress * 6);
+                        const approxTotal = 6;
+                        return (
+                          <motion.div
+                            initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: i * 0.04 }}
+                            className={`flex items-center gap-3 p-3 border-2 ${
+                              story.complete
+                                ? "bg-[var(--ds-brand-subtle)] border-[var(--ds-border-brand)]/30"
+                                : story.unlocked
+                                  ? "bg-yellow-50 border-yellow-200"
+                                  : "bg-[var(--ds-surface-card-hover)] border-ds-border"
+                            }`}
+                            style={{ borderRadius: "var(--leaf-r)" }}
+                          >
+                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-base font-black shadow-sm shrink-0 ${
+                              story.complete ? "bg-[var(--ds-brand-primary)] text-white" : story.unlocked ? "bg-yellow-500 text-white" : "bg-[var(--ds-border-primary)] text-[var(--ds-text-tertiary)]"
+                            }`}>
+                              {story.sort_order}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className={`font-black text-sml truncate leading-tight ${story.unlocked ? "text-ds-text" : "text-[var(--ds-text-tertiary)]"}`}>
+                                <span aria-hidden="true">{story.theme_emoji} </span>{story.title}
+                              </p>
+                              {story.unlocked && !story.complete && (
+                                <div className="mt-1.5 space-y-1">
+                                  <div className="flex items-center gap-2">
+                                    <div className="flex-1 h-1.5 bg-[var(--ds-surface-card-active)] rounded-full overflow-hidden">
+                                      <div className="bg-yellow-400 h-full rounded-full" style={{ width: `${story.progress * 100}%` }} />
+                                    </div>
+                                    <span className="text-3xs font-black text-yellow-600 shrink-0">~{approxDone}/{approxTotal} activities</span>
+                                  </div>
                                 </div>
-                                <span className="text-3xs font-black text-yellow-600">{Math.round(story.progress * 100)}%</span>
+                              )}
+                              {!story.unlocked && isFirst && (
+                                <p className="text-3xs text-[var(--ds-text-tertiary)] mt-0.5">Unlocks after completing the previous adventure</p>
+                              )}
+                            </div>
+                            {story.complete && (
+                              <div className="flex flex-col items-end gap-0.5 shrink-0">
+                                <span className="text-[var(--ds-text-brand)] text-2xs font-black">✅ Complete</span>
                               </div>
                             )}
-                          </div>
-                          {story.complete && <span className="text-[var(--ds-text-brand)] text-2xs font-black shrink-0">✅ Done</span>}
-                          {!story.unlocked && <Lock className="w-3.5 h-3.5 text-[var(--ds-text-tertiary)] shrink-0" />}
-                        </motion.div>
-                      );
+                            {!story.unlocked && <Lock className="w-3.5 h-3.5 text-[var(--ds-text-tertiary)] shrink-0" aria-label="Locked" />}
+                          </motion.div>
+                        );
+                      };
 
-                      const Section = ({ label, emoji, color, children }: { label: string; emoji: string; color: string; children: React.ReactNode }) => (
-                        <div className="bg-[var(--ds-surface-card)] border border-ds-border p-5 shadow-ds-card space-y-2" style={{ borderRadius: "var(--leaf-r-lg)" }}>
-                          <p className={`font-baloo font-black text-sml uppercase tracking-wide flex items-center gap-1.5 mb-3 ${color}`}>
-                            <span>{emoji}</span>{label}
-                          </p>
-                          {children}
+                      const Section = ({ label, emoji, children }: { label: string; emoji: string; color?: string; children: React.ReactNode }) => (
+                        <div className="bg-[var(--ds-surface-card)] border border-ds-border shadow-ds-card overflow-hidden" style={{ borderRadius: "var(--leaf-r-lg)" }}>
+                          <div className="flex items-center gap-3 px-5 pt-4 pb-3 border-b border-[var(--ds-border-primary)]">
+                            <span aria-hidden="true" className="text-base leading-none">{emoji}</span>
+                            <p className="text-3xs font-black text-ds-muted uppercase tracking-[0.16em]">{label}</p>
+                          </div>
+                          <div className="p-4 space-y-2">{children}</div>
                         </div>
                       );
 
@@ -1951,14 +2085,14 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                           )}
                           {upcoming.length > 0 && (
                             <Section label={`Coming Up · ${upcoming.length}`} emoji="🔒" color="text-[var(--ds-text-secondary)]">
-                              {upcoming.map((s, i) => <StoryRow key={s.sid} story={s} i={i} />)}
+                              {upcoming.map((s, i) => <StoryRow key={s.sid} story={s} i={i} isFirst={i === 0} />)}
                             </Section>
                           )}
                           {active.stories.length === 0 && (
                             <div className="bg-[var(--ds-surface-card)] border border-ds-border p-8 text-center shadow-ds-card" style={{ borderRadius: "var(--leaf-r-lg)" }}>
-                              <p className="text-4xl mb-3">📚</p>
-                              <p className="font-black text-ds-text text-mbase">No stories yet</p>
-                              <p className="text-ds-muted text-xs mt-1">Stories will appear as {active.child.name} starts learning.</p>
+                              <p className="text-4xl mb-3" aria-hidden="true">📚</p>
+                              <p className="font-black text-ds-text text-mbase">No adventures yet</p>
+                              <p className="text-ds-muted text-xs mt-1">Adventures will appear as {active.child.name} starts learning.</p>
                             </div>
                           )}
                         </div>
@@ -1970,15 +2104,41 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                 {/* ── ACHIEVEMENTS TAB ── */}
                 {parentTab === "achievements" && (
                   <motion.div key="achievements"
+                    id="tabpanel-achievements"
+                    role="tabpanel"
+                    aria-labelledby="tab-achievements"
                     initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}
                     transition={{ duration: 0.2 }}
                     className="space-y-5"
                   >
+                    {/* ── Wins summary header ── */}
+                    <div className="bg-gradient-to-br from-amber-50 to-yellow-50 border border-amber-200/60 p-5 shadow-sm" style={{ borderRadius: "var(--leaf-r-lg)" }}>
+                      <p className="text-3xs font-black text-amber-700 uppercase tracking-[0.14em] mb-3">
+                        <span aria-hidden="true">🏆 </span>{active.child.name}&apos;s Achievements
+                      </p>
+                      <div className="flex items-center gap-6">
+                        <div className="text-center">
+                          <p className="font-baloo font-black text-2xl text-[var(--ds-brand-primary)] leading-none">{active.totalStars.toLocaleString()}</p>
+                          <p className="text-3xs font-bold text-amber-700 mt-0.5"><span aria-hidden="true">⭐</span> Stars</p>
+                        </div>
+                        <div className="w-px h-8 bg-amber-200" />
+                        <div className="text-center">
+                          <p className="font-baloo font-black text-2xl text-amber-600 leading-none">{badges.length}</p>
+                          <p className="text-3xs font-bold text-amber-700 mt-0.5"><span aria-hidden="true">🏅</span> {badges.length === 1 ? "Badge" : "Badges"}</p>
+                        </div>
+                        <div className="w-px h-8 bg-amber-200" />
+                        <div className="text-center">
+                          <p className="font-baloo font-black text-2xl text-amber-600 leading-none">{certs.length}</p>
+                          <p className="text-3xs font-bold text-amber-700 mt-0.5"><span aria-hidden="true">🎓</span> {certs.length === 1 ? "Certificate" : "Certificates"}</p>
+                        </div>
+                      </div>
+                    </div>
+
                     {/* ── Visual badge showcase ── */}
                     <div className="bg-[var(--ds-surface-card)] border border-ds-border p-5 shadow-ds-card" style={{ borderRadius: 'var(--leaf-r-lg)' }}>
                       <div className="flex items-center justify-between mb-1">
                         <div className="flex items-center gap-2">
-                          <span className="text-xl">🏅</span>
+                          <span aria-hidden="true" className="text-xl">🏅</span>
                           <h2 className="font-black text-ds-text text-lg">Badges Earned</h2>
                         </div>
                         <span className="text-xs font-bold text-ds-muted">{badges.length} badge{badges.length !== 1 ? "s" : ""}</span>
@@ -2005,11 +2165,11 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                                 className="flex flex-col items-center gap-2 text-center"
                               >
                                 <motion.div
-                                  animate={{ y: [0, -3, 0] }}
-                                  transition={{ duration: 2.8, repeat: Infinity, delay: i * 0.2 }}
+                                  animate={m.reduced ? {} : { y: [0, -3, 0] }}
+                                  transition={m.reduced ? {} : { duration: 2.8, repeat: Infinity, delay: i * 0.2 }}
                                   className="w-16 h-16 rounded-full flex items-center justify-center bg-gradient-to-b from-amber-300 to-yellow-500 ring-[3px] ring-amber-400 shadow-[0_6px_20px_rgba(251,191,36,0.45)] relative"
                                 >
-                                  <span className="text-3xl leading-none select-none">{meta.emoji}</span>
+                                  <span className="text-3xl leading-none select-none" aria-hidden="true">{meta.emoji}</span>
                                   <div className="absolute -top-1 -right-1 w-5 h-5 bg-[var(--ds-brand-primary)] rounded-full flex items-center justify-center shadow-sm">
                                     <span className="text-5xs text-white font-black">✓</span>
                                   </div>
@@ -2029,7 +2189,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                               className="flex flex-col items-center gap-2 text-center"
                             >
                               <div className="w-16 h-16 rounded-full flex items-center justify-center bg-[var(--ds-surface-card-active)] ring-[3px] ring-gray-200 ring-dashed opacity-60">
-                                <span className="text-2xl">🔒</span>
+                                <span className="text-2xl" aria-hidden="true">🔒</span>
                               </div>
                               <p className="font-nunito font-bold text-2xs text-ds-muted leading-tight">Next badge</p>
                               <p className="text-4xs text-ds-muted">Keep learning!</p>
@@ -2039,14 +2199,14 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                       ) : (
                         <div className="text-center py-8">
                           <motion.div
-                            animate={{ rotate: [0, -8, 8, 0] }}
-                            transition={{ duration: 2, repeat: Infinity, repeatDelay: 2 }}
+                            animate={m.reduced ? {} : { rotate: [0, -8, 8, 0] }}
+                            transition={m.reduced ? {} : { duration: 2, repeat: Infinity, repeatDelay: 2 }}
                           >
                             <Image src={assets.starMascot} alt="" width={64} height={64} className="w-16 h-16 mx-auto mb-3 opacity-40" />
                           </motion.div>
                           <p className="text-ds-text font-black text-mbase mb-1">No badges yet</p>
                           <p className="text-[var(--ds-text-tertiary)] text-xs font-nunito">
-                            Complete missions to earn the first badge!
+                            Complete adventures to earn the first badge!
                           </p>
                         </div>
                       )}
@@ -2056,7 +2216,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                     {certs.length > 0 && (
                       <div className="bg-[var(--ds-surface-card)] border border-ds-border p-5 shadow-ds-card" style={{ borderRadius: 'var(--leaf-r-lg)' }}>
                         <div className="flex items-center gap-2 mb-4">
-                          <span className="text-xl">🎓</span>
+                          <span aria-hidden="true" className="text-xl">🎓</span>
                           <h2 className="font-black text-ds-text text-lg">Certificates</h2>
                           <span className="ml-auto text-xs font-bold text-ds-muted">{certs.length} earned</span>
                         </div>
@@ -2095,7 +2255,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                     {feelings.length > 0 && (
                       <div className="bg-[var(--ds-surface-card)] border border-ds-border p-5 shadow-ds-card" style={{ borderRadius: 'var(--leaf-r-lg)' }}>
                         <div className="flex items-center gap-2 mb-4">
-                          <span className="text-xl">💭</span>
+                          <span aria-hidden="true" className="text-xl">💭</span>
                           <h2 className="font-black text-ds-text text-lg">How They Felt</h2>
                           <span className="text-[var(--ds-text-tertiary)] text-xs font-semibold ml-auto">After each story</span>
                         </div>
@@ -2117,71 +2277,131 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                       </div>
                     )}
 
-                    {/* ── Tips ── */}
-                    <div className="bg-[var(--ds-surface-card)] border border-ds-border p-5 shadow-ds-card" style={{ borderRadius: 'var(--leaf-r-lg)' }}>
-                      <div className="flex items-center gap-2 mb-4">
-                        <span className="text-xl">💡</span>
-                        <h2 className="font-black text-ds-text text-lg">Keep {active.child.name} Engaged</h2>
-                      </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        {[
-                          { emoji: "📖", title: "Read Together", desc: "Join story time and read the FlipFlop pages together. Kids love shared reading!", bg: "bg-blue-50", border: "border-blue-200" },
-                          { emoji: "🎵", title: "Sing Along", desc: "Play story songs during car rides or playtime. Repetition builds confidence.", bg: "bg-pink-50", border: "border-pink-200" },
-                          { emoji: "🎨", title: "Print & Color", desc: "Print coloring pages and let them create art from the story characters.", bg: "bg-orange-50", border: "border-orange-200" },
-                          { emoji: "🏆", title: "Celebrate Wins", desc: "When they complete a mission, make it a big deal! Clap, cheer, high-five.", bg: "bg-yellow-50", border: "border-yellow-200" },
-                        ].map(tip => (
-                          <motion.div key={tip.title} whileHover={{ scale: 1.02 }}
-                            className={`flex gap-3 p-4 ${tip.bg} border ${tip.border} cursor-default`}
-                            style={{ borderRadius: 'var(--leaf-r)' }}>
-                            <span className="text-3xl shrink-0">{tip.emoji}</span>
-                            <div>
-                              <p className="text-ds-text text-sm font-black">{tip.title}</p>
-                              <p className="text-[var(--ds-text-secondary)] text-2xs mt-1 leading-snug">{tip.desc}</p>
-                            </div>
-                          </motion.div>
-                        ))}
-                      </div>
-                    </div>
                   </motion.div>
                 )}
 
                 {/* ── LEARNING TAB ── */}
                 {parentTab === "learning" && (
-                  <LearningBrainTab
-                    childId={active.child.id}
-                    language={active.child.language}
-                    childName={active.child.name}
-                  />
+                  <div id="tabpanel-learning" role="tabpanel" aria-labelledby="tab-learning">
+                    <LearningBrainTab
+                      childId={active.child.id}
+                      language={active.child.language}
+                      childName={active.child.name}
+                    />
+                  </div>
                 )}
 
                 {/* ── AIRWAYS TAB ── */}
                 {parentTab === "airways" && (
                   <motion.div key="airways"
+                    id="tabpanel-airways"
+                    role="tabpanel"
+                    aria-labelledby="tab-airways"
                     initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}
                     transition={{ duration: 0.2 }}
                     className="space-y-4"
                   >
-                    {/* Header */}
-                    <div
-                      className="relative overflow-hidden rounded-2xl p-5"
-                      style={{ background: "linear-gradient(135deg, #0D1B30 0%, #1A3558 60%, #0D1B30 100%)" }}
-                    >
-                      {/* decorative runway lines */}
-                      <div className="absolute inset-0 opacity-10 pointer-events-none"
-                        style={{ backgroundImage: "repeating-linear-gradient(90deg, #C9A84C 0px, #C9A84C 2px, transparent 2px, transparent 40px)", backgroundSize: "40px 100%" }} />
-                      <div className="relative flex items-center gap-3">
-                        <div className="text-4xl">✈️</div>
-                        <div>
-                          <p className="text-[#C9A84C] text-4xs font-black tracking-widest uppercase">Nimipiko Airways</p>
-                          <p className="text-white font-black text-base leading-tight">{active.child.name}&apos;s Travel Documents</p>
-                          <p className="text-white/60 text-4xs mt-0.5">{storiesComplete} {storiesComplete === 1 ? "stamp" : "stamps"} collected · Champion Traveller</p>
+                    {/* ── Journey monitoring section ── */}
+                    {(() => {
+                      const completed  = active.stories.filter(s => s.complete);
+                      const current    = active.stories.find(s => s.unlocked && !s.complete);
+                      const next       = active.stories.find(s => !s.unlocked);
+                      const pct        = totalStories > 0 ? storiesComplete / totalStories : 0;
+                      const C          = 2 * Math.PI * 28;
+                      return (
+                        <div className="bg-[var(--ds-surface-card)] border border-ds-border p-5 shadow-ds-card" style={{ borderRadius: "var(--leaf-r-lg)" }}>
+                          <div className="flex items-center gap-3 mb-4">
+                            <div className="flex items-center gap-2">
+                              <span aria-hidden="true" className="text-xl">🗺️</span>
+                              <h2 className="font-baloo font-black text-ds-text text-base">{active.child.name}&apos;s Learning Journey</h2>
+                            </div>
+                            <div className="ml-auto flex items-center gap-1.5">
+                              <svg width="64" height="64" viewBox="0 0 64 64" style={{ transform: "rotate(-90deg)" }}>
+                                <circle cx="32" cy="32" r="28" fill="none" stroke="var(--ds-brand-soft)" strokeWidth="5" />
+                                <motion.circle cx="32" cy="32" r="28" fill="none" stroke="var(--ds-brand-primary)"
+                                  strokeWidth="5" strokeLinecap="round"
+                                  strokeDasharray={`${C} ${C}`}
+                                  initial={{ strokeDashoffset: C }}
+                                  animate={{ strokeDashoffset: C * (1 - pct) }}
+                                  transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
+                                />
+                              </svg>
+                              <div className="text-right" style={{ marginLeft: -44, zIndex: 1, position: "relative" }}>
+                                <p className="font-baloo font-black text-[var(--ds-brand-primary)] text-base leading-none">{Math.round(pct * 100)}%</p>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="space-y-3">
+                            {/* Completed */}
+                            <div className="flex items-start gap-3">
+                              <div className="w-8 h-8 rounded-full bg-[var(--ds-brand-subtle)] border-2 border-[var(--ds-border-brand)]/50 flex items-center justify-center shrink-0">
+                                <span aria-hidden="true" className="text-base">✅</span>
+                              </div>
+                              <div className="flex-1 min-w-0 pt-0.5">
+                                <p className="text-3xs font-black text-[var(--ds-text-brand)] uppercase tracking-[0.12em]">Completed</p>
+                                {completed.length > 0 ? (
+                                  <p className="text-sml font-bold text-ds-text mt-0.5">{completed.length} {completed.length === 1 ? "adventure" : "adventures"} done</p>
+                                ) : (
+                                  <p className="text-sml text-[var(--ds-text-tertiary)] mt-0.5">None yet</p>
+                                )}
+                              </div>
+                            </div>
+                            {/* Current */}
+                            <div className="flex items-start gap-3">
+                              <div className="w-8 h-8 rounded-full bg-yellow-100 border-2 border-yellow-400 flex items-center justify-center shrink-0">
+                                <span aria-hidden="true" className="text-base">📖</span>
+                              </div>
+                              <div className="flex-1 min-w-0 pt-0.5">
+                                <p className="text-3xs font-black text-yellow-700 uppercase tracking-[0.12em]">Current Adventure</p>
+                                {current ? (
+                                  <>
+                                    <p className="text-sml font-bold text-ds-text mt-0.5 truncate">
+                                      <span aria-hidden="true">{current.theme_emoji} </span>{current.title}
+                                    </p>
+                                    <div className="mt-1.5 flex items-center gap-2">
+                                      <div className="flex-1 h-1.5 bg-yellow-100 rounded-full overflow-hidden">
+                                        <div className="bg-yellow-400 h-full rounded-full" style={{ width: `${current.progress * 100}%` }} />
+                                      </div>
+                                      <span className="text-3xs font-black text-yellow-600 shrink-0">{Math.round(current.progress * 100)}%</span>
+                                    </div>
+                                  </>
+                                ) : (
+                                  <p className="text-sml text-[var(--ds-text-tertiary)] mt-0.5">No active adventure</p>
+                                )}
+                              </div>
+                            </div>
+                            {/* Next */}
+                            <div className="flex items-start gap-3">
+                              <div className="w-8 h-8 rounded-full bg-[var(--ds-surface-card-hover)] border-2 border-[var(--ds-border-primary)] flex items-center justify-center shrink-0 opacity-60">
+                                <span aria-hidden="true" className="text-base">🔒</span>
+                              </div>
+                              <div className="flex-1 min-w-0 pt-0.5">
+                                <p className="text-3xs font-black text-[var(--ds-text-tertiary)] uppercase tracking-[0.12em]">Up Next</p>
+                                {next ? (
+                                  <p className="text-sml font-bold text-[var(--ds-text-secondary)] mt-0.5 truncate opacity-70">
+                                    <span aria-hidden="true">{next.theme_emoji} </span>{next.title}
+                                  </p>
+                                ) : pct >= 1 ? (
+                                  <p className="text-sml font-black text-[var(--ds-text-brand)] mt-0.5"><span aria-hidden="true">👑 </span>All adventures complete!</p>
+                                ) : (
+                                  <p className="text-sml text-[var(--ds-text-tertiary)] mt-0.5">Nothing locked yet</p>
+                                )}
+                              </div>
+                            </div>
+                          </div>
                         </div>
-                      </div>
+                      );
+                    })()}
+
+                    {/* ── Travel Documents header ── */}
+                    <div className="flex items-center gap-3 mt-2">
+                      <p className="text-3xs font-black text-ds-muted uppercase tracking-[0.16em] shrink-0">Travel Documents</p>
+                      <div className="flex-1 h-px bg-[var(--ds-border-primary)]" />
                     </div>
 
                     {/* Boarding pass inline preview */}
                     {hasSubscription && (
-                      <div className="rounded-xl overflow-hidden border border-[var(--ds-border)] bg-[var(--ds-surface-card)]">
+                      <div className="overflow-hidden border border-[var(--ds-border-primary)] bg-[var(--ds-surface-card)]" style={{ borderRadius: "var(--leaf-r-lg)" }}>
                         <div className="px-4 py-2.5 flex items-center justify-between border-b border-[var(--ds-border)]">
                           <p className="font-black text-ds-text text-4xs uppercase tracking-widest">Boarding Pass Preview</p>
                           {boardingPassPreviewLoading && (
@@ -2201,7 +2421,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                           </div>
                         ) : (
                           <div className="h-40 flex flex-col items-center justify-center gap-2 text-[var(--ds-text-secondary)]">
-                            <span className="text-3xl">🎫</span>
+                            <span className="text-3xl" aria-hidden="true">🎫</span>
                             <p className="text-4xs">Boarding pass preview</p>
                           </div>
                         )}
@@ -2210,7 +2430,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
 
                     {/* Subscription gate notice */}
                     {!hasSubscription && (
-                      <div className="flex items-start gap-3 px-4 py-3 rounded-xl border border-amber-200 bg-amber-50">
+                      <div className="flex items-start gap-3 px-4 py-3 border border-amber-200 bg-amber-50" style={{ borderRadius: "var(--leaf-r-lg)" }}>
                         <Lock className="w-4 h-4 text-amber-600 mt-0.5 shrink-0" />
                         <div>
                           <p className="text-amber-800 font-black text-xs">Premium feature</p>
@@ -2249,9 +2469,9 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                         title:  "Stamp Collection",
                         desc:   `${storiesComplete} of ${totalStories} stamps earned`,
                         href:   `/api/airways/stamps?childId=${active.child.id}`,
-                        accent: "#7C3AED",
-                        bg:     "from-violet-500/10 to-purple-500/5",
-                        border: "border-violet-200/70",
+                        accent: "#1A3558",
+                        bg:     "from-[#1A3558]/10 to-[#06101F]/5",
+                        border: "border-[#1A3558]/30",
                         slow:   false,
                       },
                       {
@@ -2282,9 +2502,10 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                       const busy   = airwaysDownloading === doc.key;
                       return (
                         <div key={doc.key}
-                          className={`flex items-center gap-4 p-4 rounded-xl border bg-gradient-to-br ${doc.bg} ${doc.border}`}
+                          className={`flex items-center gap-4 p-4 border bg-gradient-to-br ${doc.bg} ${doc.border}`}
+                          style={{ borderRadius: "var(--leaf-r-lg)" }}
                         >
-                          <div className="text-3xl shrink-0">{doc.emoji}</div>
+                          <div className="text-3xl shrink-0" aria-hidden="true">{doc.emoji}</div>
                           <div className="flex-1 min-w-0">
                             <p className="font-black text-ds-text text-sml leading-none">{doc.title}</p>
                             <p className="text-[var(--ds-text-secondary)] text-4xs mt-0.5">{doc.desc}</p>
@@ -2333,47 +2554,43 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                                 setAirwaysDownloading(null);
                               }
                             }}
-                            className={`shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg text-white text-4xs font-black transition ${
+                            className={`shrink-0 flex items-center gap-1.5 px-3 py-2 min-h-[44px] text-white text-4xs font-black transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ds-brand-primary)] focus-visible:ring-offset-1 ${
                               locked ? "bg-gray-300 cursor-not-allowed opacity-60"
                               : busy  ? "opacity-70 cursor-wait"
                               : "hover:opacity-90 active:scale-95"
                             }`}
-                            style={locked ? {} : { background: doc.accent }}
+                            style={locked ? { borderRadius: "var(--leaf-r)" } : { background: doc.accent, borderRadius: "var(--leaf-r)" }}
                           >
                             {locked ? (
                               <><Lock className="w-3 h-3" /> Locked</>
                             ) : busy ? (
                               <><Loader2 className="w-3 h-3 animate-spin" /> Generating…</>
                             ) : (
-                              <>⬇ Download</>
+                              <><span aria-hidden="true">⬇</span> Download</>
                             )}
                           </button>
                         </div>
                       );
                     })}
 
-                    {/* Progress strip */}
-                    <div className="flex items-center gap-3 px-4 py-3 rounded-xl border border-[var(--ds-border)] bg-[var(--ds-surface-card)]">
-                      <div className="text-2xl">🗺️</div>
-                      <div className="flex-1">
-                        <p className="font-black text-ds-text text-sml leading-none">Journey Progress</p>
-                        <p className="text-[var(--ds-text-secondary)] text-4xs mt-0.5">{storiesComplete} of {totalStories} stories complete</p>
-                        <div className="mt-2 h-1.5 bg-[var(--ds-surface-card-active)] rounded-full overflow-hidden">
-                          <div className="h-full rounded-full bg-[var(--ds-brand-primary)] transition-all"
-                            style={{ width: `${totalStories > 0 ? (storiesComplete / totalStories) * 100 : 0}%` }} />
-                        </div>
-                      </div>
-                    </div>
                   </motion.div>
                 )}
 
                 {/* ── SETTINGS TAB ── */}
                 {parentTab === "settings" && (
                   <motion.div key="settings"
+                    id="tabpanel-settings"
+                    role="tabpanel"
+                    aria-labelledby="tab-settings"
                     initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}
                     transition={{ duration: 0.2 }}
                     className="space-y-5"
                   >
+                    {/* Section heading */}
+                    <div className="flex items-center gap-3">
+                      <p className="text-3xs font-black text-ds-muted uppercase tracking-[0.16em] shrink-0">Controls & Preferences</p>
+                      <div className="flex-1 h-px bg-[var(--ds-border-primary)]" />
+                    </div>
                     {/* Controls */}
                     <ParentControls
                       childId={active.child.id}

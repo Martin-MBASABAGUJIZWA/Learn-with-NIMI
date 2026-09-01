@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { ArrowLeft, CheckCircle2, Star } from "lucide-react";
+import { ArrowLeft, CheckCircle2 } from "lucide-react";
 import AppShell from "@/components/layout/AppShell";
 import { Bone } from "@/components/ui/Bone";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -32,6 +32,7 @@ import RewardBurst from "@/components/delight/RewardBurst";
 import AnimatedCheckmark from "@/components/delight/AnimatedCheckmark";
 import { CONFETTI_BURST } from "@/lib/design-system/delight";
 import { SPRING } from "@/lib/design-system/motion";
+import { useThemeMotion } from "@/hooks/useThemeMotion";
 import ShareAchievementFlow from "@/components/community/ShareAchievementFlow";
 import { Share2 } from "lucide-react";
 import NimiReaction from "@/components/missions/NimiReaction";
@@ -121,7 +122,34 @@ const MISSION_STYLES: Record<string, {
     emoji: "🎬", label: "Watch", friendlyLabel: "Let's Watch!",
     resultBg: "bg-gradient-to-br from-white via-indigo-50/70 to-blue-50/60",
   },
+  destination: {
+    headerBg: "bg-gradient-to-r from-[#06101F]/10 via-[#0d1e3a]/8 to-[#06101F]/10",
+    headerBorder: "border-[rgba(201,168,76,0.35)]",
+    badgeBg: "bg-[rgba(201,168,76,0.12)]", badgeText: "text-[#C9A84C]", badgeBorder: "border-[rgba(201,168,76,0.4)]",
+    emoji: "🌍", label: "Destination", friendlyLabel: "Arrival!",
+    resultBg: "bg-gradient-to-br from-white via-[rgba(201,168,76,0.06)] to-[rgba(6,16,31,0.04)]",
+  },
+  challenge: {
+    headerBg: "bg-gradient-to-r from-[#06101F]/10 via-[#0d1e3a]/8 to-[#06101F]/10",
+    headerBorder: "border-[rgba(201,168,76,0.35)]",
+    badgeBg: "bg-[rgba(201,168,76,0.12)]", badgeText: "text-[#C9A84C]", badgeBorder: "border-[rgba(201,168,76,0.4)]",
+    emoji: "🏆", label: "Challenge", friendlyLabel: "Family Challenge!",
+    resultBg: "bg-gradient-to-br from-white via-[rgba(201,168,76,0.06)] to-[rgba(6,16,31,0.04)]",
+  },
 };
+
+// Pre-activity Nimi intro messages — keyed by mission.type, shown before completion
+const INTRO_MESSAGES: Record<string, string> = {
+  story:       "Ready for a story stop? Let's discover it together! 📖✈️",
+  read:        "Ready to read, traveler? Let's explore these words! 📚",
+  color:       "Creative stop ahead! Let's make this picture shine! 🎨✨",
+  move:        "Ready to move? Let's bring this stop to life! 🕺✈️",
+  sing:        "Music stop ahead! Let's sing along together! 🎵",
+  watch:       "Eyes ready, traveler! Something fun is waiting! 🎬✨",
+  destination: "Your destination stop is ready! Something special ahead! ✨✈️",
+  challenge:   "Challenge stop ahead! Let's see what you can do! 🏆✈️",
+};
+const INTRO_FALLBACK = "Ready for your next flight stop? Let's do it together! ✈️";
 
 export default function StoryMissionPage() {
   const params = useParams();
@@ -131,6 +159,7 @@ export default function StoryMissionPage() {
   const { t, language } = useLanguage();
   const { themeId } = useAppTheme();
   const assets = getThemeAssets(themeId);
+  const m = useThemeMotion();
 
   const [loading, setLoading] = useState(true);
   const [pagesLoading, setPagesLoading] = useState(false);
@@ -254,13 +283,24 @@ export default function StoryMissionPage() {
 
   const isPreview = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('preview') === 'true';
 
-  const missionStyle = MISSION_STYLES[mission?.type ?? ""] ?? {
+  const isDestinationVideo = slotKey === "destination_video";
+  const isChallengeSlot = slotKey === "challenge_1" || slotKey === "challenge_2" || slotKey === "challenge_3";
+  const effectiveType = isDestinationVideo ? "destination" : mission?.type ?? "";
+
+  const missionStyle = MISSION_STYLES[effectiveType] ?? {
     headerBg: "bg-[var(--ds-brand-subtle)]",
     headerBorder: "border-[var(--ds-border-brand)]",
     badgeBg: "bg-[var(--ds-brand-subtle)]", badgeText: "text-[var(--ds-text-brand)]", badgeBorder: "border-[var(--ds-border-brand)]",
-    emoji: "⭐", label: "Tiny Mission",
+    emoji: "⭐", label: "Tiny Mission", friendlyLabel: "Let's Go!",
     resultBg: "bg-[var(--ds-brand-subtle)]",
   };
+
+  // Airways progress — airplane position derived from current slot index in the sorted list
+  const currentIdx = allSlots.findIndex(s => s.slot_key === slotKey);
+  const progressPercent = allSlots.length > 1 && currentIdx >= 0
+    ? 5 + (currentIdx / (allSlots.length - 1)) * 90
+    : 5;
+  const flightNumber = `NMP1${String(slot?.slot_order ?? 1).padStart(2, "0")}`;
 
   const handleComplete = useCallback(async () => {
     if (!childId || !slot?.mission_id || completed || saving) return;
@@ -321,7 +361,39 @@ export default function StoryMissionPage() {
     <AppShell>
       <PreviewBanner />
       <PageSurface className={isPreview ? "pt-10" : ""}>
-        <main className="max-w-4xl mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6 pb-24 flex-1 w-full">
+        <main className="max-w-4xl mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6 pb-24 flex-1 w-full relative overflow-hidden" style={{ isolation: 'isolate' }}>
+
+          {/* ── Airways atmosphere ─────────────────────────────────── */}
+          {/* Navy gradient behind all content; z:-1 stays in isolation stacking context */}
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              zIndex: -1,
+              background: 'linear-gradient(180deg, rgba(6,16,31,0.08) 0%, rgba(6,16,31,0.04) 45%, transparent 75%)',
+            }}
+          />
+
+          {/* In-flight ambient clouds — decorative, reduced-motion guarded */}
+          {!m.reduced && (
+            <div aria-hidden="true" className="absolute inset-0 pointer-events-none overflow-hidden" style={{ zIndex: -1 }}>
+              <motion.span
+                style={{ position: 'absolute', top: '3%', left: '8%', fontSize: 38, opacity: 0.07 }}
+                animate={{ x: [0, 20, 0] }}
+                transition={{ duration: 22, repeat: Infinity, ease: 'easeInOut' }}
+              >☁️</motion.span>
+              <motion.span
+                style={{ position: 'absolute', top: '18%', right: '10%', fontSize: 26, opacity: 0.05 }}
+                animate={{ x: [0, -14, 0] }}
+                transition={{ duration: 30, repeat: Infinity, ease: 'easeInOut', delay: 7 }}
+              >☁️</motion.span>
+              <motion.span
+                style={{ position: 'absolute', top: '36%', left: '52%', fontSize: 20, opacity: 0.04 }}
+                animate={{ x: [0, 10, 0] }}
+                transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut', delay: 13 }}
+              >⛅</motion.span>
+            </div>
+          )}
 
           {/* Airways header */}
           <div className={`mb-4 border ${missionStyle.headerBorder} ${missionStyle.headerBg} shadow-card-2xl overflow-hidden`} style={{ borderRadius: 'var(--leaf-r-lg)' }}>
@@ -360,24 +432,25 @@ export default function StoryMissionPage() {
                   {slot?.title || t(SLOT_T_KEYS[slotKey] ?? '') || slotKey}
                 </h1>
                 <p className="font-nunito text-[var(--ds-text-tertiary)] text-xs mt-0.5">
-                  Stop {slot?.slot_order ?? "?"} of {allSlots.length || 6}
+                  {flightNumber} · Stop {slot?.slot_order ?? "?"} of {allSlots.length || 6}
                   {slot?.subtitle ? ` · ${slot.subtitle}` : ""}
                 </p>
               </div>
 
-              {/* Nimi companion */}
+              {/* Nimi companion — flight guide indicator below avatar */}
               <div className="shrink-0 flex flex-col items-center gap-1 pt-0.5">
                 <Image
                   src={assets.nimiCircle}
                   alt="Nimi"
                   width={52}
                   height={52}
-                  className="w-[52px] h-[52px] rounded-full border-2 border-white/80 shadow-md object-cover"
+                  className="w-[52px] h-[52px] rounded-full border-2 shadow-md object-cover"
+                  style={{ borderColor: '#C9A84C' }}
                 />
                 {completed ? (
                   <CheckCircle2 className="w-4 h-4 text-[var(--ds-brand-primary)]" aria-hidden="true" />
                 ) : (
-                  <Star className="w-4 h-4 text-amber-400 fill-amber-400" aria-hidden="true" />
+                  <span aria-hidden="true" style={{ fontSize: 13, lineHeight: 1 }}>✈️</span>
                 )}
               </div>
             </div>
@@ -390,13 +463,12 @@ export default function StoryMissionPage() {
                 <span>✈️</span>
                 <span>Your Journey</span>
               </p>
-              {/* Track + nodes */}
-              <div className="relative flex items-center justify-between">
+              {/* Track + nodes + airplane */}
+              <div className="relative flex items-center justify-between" style={{ minHeight: 44 }}>
                 {/* Background track */}
                 <div className="absolute inset-x-5 top-1/2 -translate-y-1/2 h-[2px] bg-[var(--ds-surface-card-hover)] rounded-full" />
-                {/* Completed-segment overlay — scaleX from left so it covers exactly the same span as the track */}
+                {/* Completed-segment overlay — scaleX from left (currentIdx uses outer-scope var) */}
                 {(() => {
-                  const currentIdx = allSlots.findIndex(s => s.slot_key === slotKey);
                   const completedUpTo = allSlots.slice(0, currentIdx).filter(s => s.completed).length;
                   const ratio = allSlots.length > 1
                     ? completedUpTo / (allSlots.length - 1)
@@ -406,14 +478,28 @@ export default function StoryMissionPage() {
                       initial={{ scaleX: 0 }}
                       animate={{ scaleX: ratio }}
                       transition={{ duration: 0.55, ease: "easeOut" }}
-                      className="absolute inset-x-5 top-1/2 -translate-y-1/2 h-[2px] rounded-full origin-left" style={{ background: "linear-gradient(to right, var(--ds-brand-primary), var(--ds-brand-hover))" }}
+                      className="absolute inset-x-5 top-1/2 -translate-y-1/2 h-[2px] rounded-full origin-left"
+                      style={{ background: "linear-gradient(to right, #C9A84C, #F5C842)" }}
                     />
                   );
                 })()}
 
+                {/* ✈️ Airplane indicator — sits above track, moves to current stop position */}
+                <motion.div
+                  className="absolute z-20 pointer-events-none select-none"
+                  aria-hidden="true"
+                  style={{ fontSize: 16, lineHeight: 1, translateX: '-50%', translateY: '-180%' }}
+                  animate={{ left: `${progressPercent}%` }}
+                  initial={{ left: `${progressPercent}%` }}
+                  transition={m.reduced ? { duration: 0 } : SPRING.gentle}
+                >
+                  ✈️
+                </motion.div>
+
                 {allSlots.map((s) => {
                   const isCurrent = s.slot_key === slotKey;
                   const isDone = s.completed || (isCurrent && completed);
+                  const isLocked = !isDone && !isCurrent;
                   const emoji = SLOT_EMOJI[s.slot_key] ?? "⭐";
                   return (
                     <div key={s.slot_key} className="relative z-10 flex flex-col items-center gap-1">
@@ -421,15 +507,16 @@ export default function StoryMissionPage() {
                         initial={{ scale: 0.6, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         transition={{ type: "spring", stiffness: 300, damping: 22, delay: (s.slot_order ?? 0) * 0.06 }}
+                        aria-hidden="true"
                         className={`flex items-center justify-center rounded-full transition-all ${
                           isDone
                             ? "w-8 h-8 bg-[var(--ds-brand-primary)] shadow-[0_2px_8px_rgba(16,185,129,0.35)] text-[var(--ds-nav-bg)] text-sml font-black"
                             : isCurrent
                               ? `w-9 h-9 border-2 ${missionStyle.badgeBorder} ${missionStyle.badgeBg} text-lg shadow-md`
-                              : "w-7 h-7 bg-[var(--ds-surface-card)] border border-[var(--ds-border-primary)] text-sm opacity-40"
+                              : "w-6 h-6 bg-[var(--ds-surface-card)] border border-[var(--ds-border-primary)] text-sm opacity-50"
                         }`}
                       >
-                        {isDone ? "✓" : emoji}
+                        {isDone ? "✓" : isLocked ? "🔒" : emoji}
                       </motion.div>
                       {isCurrent && (
                         <motion.span
@@ -448,8 +535,53 @@ export default function StoryMissionPage() {
             </div>
           )}
 
+          {/* Pre-activity Nimi intro — shown before completion; suppressed for challenge slots (which show the redirect card instead) */}
+          {mission && !completed && !isChallengeSlot && (
+            <div
+              className="mb-3 border px-4 py-3"
+              style={{
+                borderRadius: 'var(--leaf-r)',
+                borderColor: 'rgba(201,168,76,0.4)',
+                background: 'rgba(6,16,31,0.05)',
+              }}
+            >
+              <p
+                className="font-nunito font-black text-3xs uppercase tracking-widest mb-1"
+                style={{ color: 'rgba(201,168,76,0.75)' }}
+                aria-hidden="true"
+              >
+                <span>✈️ </span>In-Flight Tip
+              </p>
+              <p className="font-baloo font-black text-sm text-[var(--ds-text-primary)] leading-snug">
+                {INTRO_MESSAGES[effectiveType] ?? INTRO_FALLBACK}
+              </p>
+            </div>
+          )}
+
+          {/* Challenge slots redirect to story page — family challenge CTA lives there */}
+          {isChallengeSlot && (
+            <div
+              className="mb-3 border px-5 py-4 text-center"
+              style={{
+                borderRadius: 'var(--leaf-r)',
+                borderColor: 'rgba(201,168,76,0.4)',
+                background: 'rgba(6,16,31,0.05)',
+              }}
+            >
+              <p className="font-baloo font-black text-lg text-[var(--ds-text-primary)] mb-1">🏆 Family Challenge</p>
+              <p className="font-nunito text-sm text-[var(--ds-text-secondary)] mb-3">Family challenges are played together from your flight page.</p>
+              <a
+                href={`/stories/${slug}`}
+                className="inline-flex items-center gap-2 font-baloo font-black text-sm rounded-full px-5 py-2.5 min-h-[44px]"
+                style={{ background: '#C9A84C', color: '#06101F' }}
+              >
+                ✈️ Return to My Flight
+              </a>
+            </div>
+          )}
+
           {/* Renderer */}
-          {mission && (
+          {mission && !isChallengeSlot && (
             <div className="bg-[var(--ds-surface-card)] border border-ds-border shadow-card-2xl overflow-hidden p-4 sm:p-5" style={{ borderRadius: 'var(--leaf-r)' }}>
               {mission.type === "story" && (
                 <StoryContent mission={mission} storyPages={storyPages} onComplete={handleComplete} completed={completed} saving={saving} pagesLoading={pagesLoading} storySlug={slug} />
@@ -466,7 +598,7 @@ export default function StoryMissionPage() {
               {mission.type === "sing" && (
                 <SingAlongContent mission={mission} onComplete={handleComplete} completed={completed} saving={saving} storySlug={slug} />
               )}
-              {mission.type === "watch" && (
+              {(mission.type === "watch" || isDestinationVideo) && (
                 <WatchContent mission={mission} onComplete={handleComplete} completed={completed} saving={saving} storySlug={slug} />
               )}
             </div>
@@ -492,7 +624,7 @@ export default function StoryMissionPage() {
             return (
               <div className="space-y-4 mt-4">
                 {/* 1. Nimi personal reaction */}
-                <NimiReaction missionType={mission.type} />
+                <NimiReaction missionType={effectiveType} />
 
                 {/* 2. Comprehension questions — cycle through all */}
                 {questions.length > 0 && questionIdx < questions.length && (
@@ -530,6 +662,7 @@ export default function StoryMissionPage() {
             return (
               <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
                 transition={SPRING.modal}
+                aria-live="polite"
                 className={`mt-5 relative overflow-hidden border ${missionStyle.badgeBorder} ${missionStyle.resultBg} p-6 text-center shadow-[0_20px_42px_rgba(15,23,42,0.12)]`}
                 style={{ borderRadius: 'var(--leaf-r)' }}>
                 <RewardBurst active config={CONFETTI_BURST} className="absolute inset-0" />
@@ -600,7 +733,7 @@ export default function StoryMissionPage() {
                     whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
                     onClick={() => router.push(`/stories/${slug}`)}
                     className="font-baloo font-black bg-cta-gradient text-white text-base rounded-full px-8 py-3.5 min-h-[48px] shadow-lg shadow-ds-cta transition hover:shadow-ds-hover">
-                    {res?.story_complete ? t("storyViewCert") : "📖 Back to My Adventure"}
+                    {res?.story_complete ? t("storyViewCert") : "✈️ Return to My Flight"}
                   </motion.button>
 
                   {/* Share row */}

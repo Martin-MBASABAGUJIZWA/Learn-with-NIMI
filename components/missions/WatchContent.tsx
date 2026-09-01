@@ -8,6 +8,7 @@ import type { Mission } from "@/lib/queries";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAppTheme } from "@/contexts/AppThemeProvider";
 import { getThemeAssets } from "@/lib/design-system/assetRegistry";
+import { useThemeMotion } from "@/hooks/useThemeMotion";
 import MissionCompleteBanner from "./MissionCompleteBanner";
 
 interface WatchContentProps {
@@ -22,6 +23,7 @@ export default function WatchContent({ mission, onComplete, completed, saving, s
   const { t } = useLanguage();
   const { themeId } = useAppTheme();
   const assets = getThemeAssets(themeId);
+  const m = useThemeMotion();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [watchProgress, setWatchProgress] = useState(0);
   const [videoEnded, setVideoEnded] = useState(false);
@@ -47,13 +49,13 @@ export default function WatchContent({ mission, onComplete, completed, saving, s
       {/* Cinema header */}
       <div className="relative overflow-hidden leaf border border-indigo-200/60 bg-gradient-to-br from-indigo-900 via-[#1e1b4b] to-blue-950 p-5 text-center shadow-[0_16px_34px_rgba(49,46,129,0.22)]">
         <div className="pointer-events-none absolute inset-0 opacity-[0.07] bg-[radial-gradient(circle_at_center,white_1px,transparent_1px)] bg-[length:10px_10px]" />
-        <motion.span className="absolute left-3 top-2 select-none text-2xl opacity-25"
-          animate={{ rotate: 360 }} transition={{ duration: 10, repeat: Infinity, ease: "linear" }}>🎞️</motion.span>
-        <motion.span className="absolute right-3 top-2 select-none text-2xl opacity-25"
-          animate={{ rotate: -360 }} transition={{ duration: 14, repeat: Infinity, ease: "linear" }}>🎬</motion.span>
+        <motion.span className="absolute left-3 top-2 select-none text-2xl opacity-25" aria-hidden="true"
+          animate={m.reduced ? {} : { rotate: 360 }} transition={{ duration: 10, repeat: Infinity, ease: "linear" }}>🎞️</motion.span>
+        <motion.span className="absolute right-3 top-2 select-none text-2xl opacity-25" aria-hidden="true"
+          animate={m.reduced ? {} : { rotate: -360 }} transition={{ duration: 14, repeat: Infinity, ease: "linear" }}>🎬</motion.span>
 
         <motion.img src={assets.nimiHappy} alt="NIMI"
-          animate={{ y: [0, -5, 0] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+          animate={m.reduced ? {} : { y: [0, -5, 0] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
           className="relative z-10 mx-auto mb-3 h-16 w-16 rounded-full border-4 border-yellow-400/60 object-cover shadow-[0_0_18px_rgba(251,191,36,0.30)]" />
 
         <div className="relative z-10 mb-2 flex items-center justify-center gap-2">
@@ -91,8 +93,8 @@ export default function WatchContent({ mission, onComplete, completed, saving, s
         </div>
       ) : (
         <div className="leaf border border-indigo-100 bg-gradient-to-br from-indigo-50 to-blue-50 p-10 text-center shadow-sm">
-          <motion.div animate={{ scale: [1, 1.12, 1] }} transition={{ duration: 2, repeat: Infinity }}
-            className="mb-3 text-5xl select-none">🎬</motion.div>
+          <motion.div animate={m.reduced ? {} : { scale: [1, 1.12, 1] }} transition={{ duration: 2, repeat: Infinity }}
+            className="mb-3 text-5xl select-none" aria-hidden="true">🎬</motion.div>
           <p className="font-baloo font-black text-ds-text text-lg">{t("videoComingSoon")}</p>
           <p className="font-nunito text-[var(--ds-text-secondary)] text-sml mt-1">{t("comingSoonTeacher")}</p>
         </div>

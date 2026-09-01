@@ -8,6 +8,7 @@ import type { Mission, StoryPage } from "@/lib/queries";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAppTheme } from "@/contexts/AppThemeProvider";
 import { getThemeAssets } from "@/lib/design-system/assetRegistry";
+import { useThemeMotion } from "@/hooks/useThemeMotion";
 import MissionCompleteBanner from "./MissionCompleteBanner";
 import type { StoryBookData, BookPage } from "../storybook/types";
 import "../storybook/storybook.css";
@@ -57,6 +58,7 @@ export default function StoryContent({ mission, storyPages, onComplete, complete
   const { t } = useLanguage();
   const { themeId } = useAppTheme();
   const assets = getThemeAssets(themeId);
+  const m = useThemeMotion();
 
   const storyData: StoryBookData = useMemo(() => {
     const pages: BookPage[] = storyPages.map(p => ({
@@ -91,7 +93,7 @@ export default function StoryContent({ mission, storyPages, onComplete, complete
         <motion.img
           src={assets.nimiHappy}
           alt="NIMI"
-          animate={{ y: [0, -5, 0] }}
+          animate={m.reduced ? {} : { y: [0, -5, 0] }}
           transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
           className="relative z-10 mx-auto mb-3 h-16 w-16 rounded-full border-4 border-yellow-300 object-cover shadow-md"
         />
@@ -114,8 +116,8 @@ export default function StoryContent({ mission, storyPages, onComplete, complete
         <BookSkeleton />
       ) : storyPages.length === 0 ? (
         <div className="leaf-lg border border-amber-100 bg-gradient-to-br from-amber-50/80 via-yellow-50/40 to-[#fffdf8] p-8 text-center shadow-card-2xl">
-          <motion.div animate={{ y: [0, -6, 0] }} transition={{ duration: 2.5, repeat: Infinity }}
-            className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--ds-surface-card)] shadow-sm text-2xl select-none">
+          <motion.div animate={m.reduced ? {} : { y: [0, -6, 0] }} transition={{ duration: 2.5, repeat: Infinity }}
+            className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--ds-surface-card)] shadow-sm text-2xl select-none" aria-hidden="true">
             📚
           </motion.div>
           <p className="font-baloo font-bold text-ds-text text-lg">{t("noPagesTitle")}</p>
