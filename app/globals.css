@@ -973,3 +973,10 @@ img, video, audio {
     size: A4 landscape;
   }
 }
+
+/* ── Airways theme: remap --nimi-green to brand token ──────────────────────
+   Cascades the gold brand color to all components using --nimi-green,
+   so they automatically switch without per-component changes. */
+[data-theme-id="airways"] {
+  --nimi-green: var(--ds-brand-primary);
+}

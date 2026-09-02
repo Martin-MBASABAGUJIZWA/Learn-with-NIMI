@@ -765,7 +765,7 @@ export default function StoryDetailPage() {
                     }}
                     className="w-full max-w-xs py-4 rounded-2xl font-black text-[15px] text-white shadow-lg transition-all active:scale-95"
                     style={{ background: "linear-gradient(135deg, #C9A84C 0%, #e4c06e 100%)" }}>
-                    ✨ Start My Adventure
+                    ✈️ Board My Flight
                   </button>
                 </div>
               </motion.div>
@@ -2733,7 +2733,7 @@ export default function StoryDetailPage() {
                       <motion.div whileTap={m.buttonPress} whileHover={{ scale: 1.02 }}
                         className="w-full font-baloo font-black text-mlg py-3.5 flex items-center justify-center gap-2 text-[#07111F] bg-gradient-to-r from-[#C9A84C] to-[#F5C842]"
                         style={{ borderRadius: "var(--leaf-r-lg)", boxShadow: "0 6px 20px rgba(201,168,76,0.30)" }}>
-                        👑 Unlock Next Adventure
+                        👑 Unlock Next Flight
                       </motion.div>
                     </Link>
                   ) : (

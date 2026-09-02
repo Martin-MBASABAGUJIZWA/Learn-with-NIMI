@@ -7,6 +7,7 @@ import { Volume2 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { getStorageUrl } from "@/lib/queries";
 import { SPRING } from "@/lib/design-system/motion";
+import { useThemeMotion } from "@/hooks/useThemeMotion";
 
 export interface VocabWord {
   word: string;
@@ -24,6 +25,7 @@ interface WordLearnedCardProps {
 
 export default function WordLearnedCard({ word, onNext, current, total }: WordLearnedCardProps) {
   const { t } = useLanguage();
+  const m = useThemeMotion();
   const [played, setPlayed] = useState(false);
 
   const playAudio = () => {
@@ -52,7 +54,7 @@ export default function WordLearnedCard({ word, onNext, current, total }: WordLe
       <div className="flex items-center gap-4">
         {/* Big emoji */}
         <motion.div
-          animate={{ rotate: [0, -8, 8, 0], scale: [1, 1.1, 1] }}
+          animate={m.reduced ? {} : { rotate: [0, -8, 8, 0], scale: [1, 1.1, 1] }}
           transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
           className="w-16 h-16 rounded-2xl bg-teal-100 flex items-center justify-center text-4xl select-none flex-shrink-0 shadow-sm"
         >
@@ -84,7 +86,7 @@ export default function WordLearnedCard({ word, onNext, current, total }: WordLe
         <div className="flex gap-1.5">
           {["🌟", "✨", "💫", "⭐", "🌟"].map((e, i) => (
             <motion.span key={i} aria-hidden="true" className="text-2xs select-none"
-              animate={{ y: [0, -4, 0], opacity: [0.5, 1, 0.5] }}
+              animate={m.reduced ? {} : { y: [0, -4, 0], opacity: [0.5, 1, 0.5] }}
               transition={{ duration: 1.5 + i * 0.2, repeat: Infinity, delay: i * 0.3 }}>
               {e}
             </motion.span>

@@ -412,7 +412,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
         <PageSurface className="items-center justify-center gap-4 px-4">
           <span className="text-5xl" aria-hidden="true">👶</span>
           <p className="text-ds-text font-bold text-center text-base">No learner profiles yet</p>
-          <Link href="/home" className="text-white font-black px-6 py-3 shadow-lg text-sm" style={{ backgroundColor: 'var(--ds-brand-primary)', borderRadius: 'var(--leaf-r-sm)' }}>
+          <Link href="/home" className="text-[var(--ds-nav-bg)] font-black px-6 py-3 shadow-lg text-sm" style={{ backgroundColor: 'var(--ds-brand-primary)', borderRadius: 'var(--leaf-r-sm)' }}>
             Create a Profile
           </Link>
         </PageSurface>
@@ -618,7 +618,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                   </div>
                 </div>
                 <div className="px-4 pb-4 border-t border-red-100 pt-3 flex gap-2">
-                  <a href="/pricing" className="flex-1 text-center py-2 text-xs font-black text-white transition"
+                  <a href="/pricing" className="flex-1 text-center py-2 text-xs font-black text-[var(--ds-nav-bg)] transition"
                     style={{ backgroundColor: "var(--ds-brand-primary)", borderRadius: "var(--leaf-r)" }}>
                     Resubscribe →
                   </a>
@@ -803,7 +803,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                   {!isPlaying && childrenData.length > 1 && (
                     <button
                       onClick={() => switchPlaying(d.child.id)}
-                      className="text-3xs font-black text-[var(--ds-brand-primary)] bg-[var(--ds-brand-subtle)] border border-[var(--ds-border-brand)]/40 px-2 py-1 text-center hover:bg-[var(--ds-brand-primary)] hover:text-white transition min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ds-brand-primary)] focus-visible:ring-offset-1"
+                      className="text-3xs font-black text-[var(--ds-brand-primary)] bg-[var(--ds-brand-subtle)] border border-[var(--ds-border-brand)]/40 px-2 py-1 text-center hover:bg-[var(--ds-brand-primary)] hover:text-[var(--ds-nav-bg)] transition min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ds-brand-primary)] focus-visible:ring-offset-1"
                       style={{ borderRadius: 'var(--leaf-r-sm)' }}
                     >
                       {t("switchToThisKid")}
@@ -839,7 +839,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                     </div>
                   </div>
                   <div className="px-3 pb-3 border-t border-red-100 pt-2 space-y-1.5">
-                    <a href="/pricing" className="block text-center py-1.5 text-2xs font-black text-white transition"
+                    <a href="/pricing" className="block text-center py-1.5 text-2xs font-black text-[var(--ds-nav-bg)] transition"
                       style={{ backgroundColor: "var(--ds-brand-primary)", borderRadius: "var(--leaf-r)" }}>
                       Resubscribe →
                     </a>
@@ -1059,7 +1059,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                         {!isPlaying && childrenData.length > 1 && (
                           <button
                             onClick={() => switchPlaying(d.child.id)}
-                            className="w-full text-3xs font-black text-[var(--ds-brand-primary)] bg-[var(--ds-brand-subtle)] border border-[var(--ds-border-brand)]/30 px-3 py-1.5 hover:bg-[var(--ds-brand-primary)] hover:text-white transition text-center min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ds-brand-primary)] focus-visible:ring-offset-1"
+                            className="w-full text-3xs font-black text-[var(--ds-brand-primary)] bg-[var(--ds-brand-subtle)] border border-[var(--ds-border-brand)]/30 px-3 py-1.5 hover:bg-[var(--ds-brand-primary)] hover:text-[var(--ds-nav-bg)] transition text-center min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ds-brand-primary)] focus-visible:ring-offset-1"
                             style={{ borderRadius: "var(--leaf-r)" }}
                           >
                             {t("switchToChild").replace("{name}", d.child.name)}
@@ -1130,7 +1130,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                     onClick={() => setParentTab(tab.id)}
                     className={`relative flex items-center gap-1.5 px-3 py-2 rounded-full text-sml font-baloo font-black transition-all shrink-0 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ds-brand-primary)] focus-visible:ring-offset-2 ${
                       parentTab === tab.id
-                        ? "bg-ds-action text-white shadow-sm"
+                        ? "bg-ds-action text-[var(--ds-nav-bg)] shadow-sm"
                         : "bg-[var(--ds-surface-card)] border border-ds-border text-[var(--ds-text-secondary)] hover:text-ds-text hover:bg-[var(--ds-surface-card-hover)]"
                     }`}
                   >
@@ -1138,7 +1138,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                     {tab.label}
                     {tab.badge && (
                       <span className={`ml-0.5 text-4xs font-black px-1.5 py-0.5 rounded-full leading-none ${
-                        parentTab === tab.id ? "bg-[var(--ds-surface-card)]/25 text-white" : "bg-[var(--ds-brand-primary)] text-white"
+                        parentTab === tab.id ? "bg-[var(--ds-surface-card)]/25 text-[var(--ds-nav-bg)]" : "bg-[var(--ds-brand-primary)] text-[var(--ds-nav-bg)]"
                       }`}>
                         {tab.badge}
                       </span>
@@ -1924,7 +1924,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                               else { await navigator.clipboard.writeText(text); setShareToast(true); setTimeout(() => setShareToast(false), 2500); }
                             } catch { /* cancelled */ }
                           }}
-                          className="shrink-0 px-3 py-2 min-h-[44px] bg-[var(--ds-brand-primary)] text-white font-black text-2xs hover:opacity-90 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ds-brand-primary)] focus-visible:ring-offset-1"
+                          className="shrink-0 px-3 py-2 min-h-[44px] bg-[var(--ds-brand-primary)] text-[var(--ds-nav-bg)] font-black text-2xs hover:opacity-90 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ds-brand-primary)] focus-visible:ring-offset-1"
                           style={{ borderRadius: "var(--leaf-r)" }}
                         >
                           {shareToast ? "✅ Copied!" : "Invite"}
@@ -2029,7 +2029,7 @@ export default function ParentsClient({ initialChildren, initialUserId }: Props 
                             style={{ borderRadius: "var(--leaf-r)" }}
                           >
                             <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-base font-black shadow-sm shrink-0 ${
-                              story.complete ? "bg-[var(--ds-brand-primary)] text-white" : story.unlocked ? "bg-yellow-500 text-white" : "bg-[var(--ds-border-primary)] text-[var(--ds-text-tertiary)]"
+                              story.complete ? "bg-[var(--ds-brand-primary)] text-[var(--ds-nav-bg)]" : story.unlocked ? "bg-yellow-500 text-white" : "bg-[var(--ds-border-primary)] text-[var(--ds-text-tertiary)]"
                             }`}>
                               {story.sort_order}
                             </div>

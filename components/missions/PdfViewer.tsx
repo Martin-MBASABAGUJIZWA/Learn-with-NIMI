@@ -6,6 +6,7 @@ import { Document, Page, pdfjs } from "react-pdf";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { useAppTheme } from "@/contexts/AppThemeProvider";
 import { getThemeAssets } from "@/lib/design-system/assetRegistry";
+import { useThemeMotion } from "@/hooks/useThemeMotion";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 
@@ -23,6 +24,7 @@ const MAX_DOTS = 16;
 export default function PdfViewer({ url, title, onClose, onLastPage }: PdfViewerProps) {
   const { themeId } = useAppTheme();
   const assets = getThemeAssets(themeId);
+  const m = useThemeMotion();
 
   const [numPages, setNumPages]   = useState(0);
   const [page, setPage]           = useState(1);
@@ -104,7 +106,7 @@ export default function PdfViewer({ url, title, onClose, onLastPage }: PdfViewer
           <motion.img
             src={assets.nimiCircle}
             alt=""
-            animate={{ y: [0, -3, 0] }}
+            animate={m.reduced ? {} : { y: [0, -3, 0] }}
             transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
             className="w-8 h-8 rounded-full border-2 border-yellow-300 shadow-sm flex-shrink-0"
           />
@@ -203,7 +205,7 @@ export default function PdfViewer({ url, title, onClose, onLastPage }: PdfViewer
                 <motion.img
                   src={assets.nimiHappy}
                   alt=""
-                  animate={{ y: [0, -10, 0] }}
+                  animate={m.reduced ? {} : { y: [0, -10, 0] }}
                   transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
                   className="w-20 h-20 rounded-full border-4 border-yellow-300 shadow-lg"
                 />

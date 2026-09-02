@@ -180,10 +180,10 @@ function CreativeStudioPage() {
                 onClick={() => setActiveTab(tab.id)}
                 className="shrink-0 flex items-center gap-1.5 px-4 py-2.5 rounded-2xl text-sml font-black transition-all"
                 style={{
-                  background: activeTab === tab.id ? "var(--nimi-green,#15803D)" : "var(--ds-surface-card,#fff)",
-                  color:      activeTab === tab.id ? "#fff" : "var(--ds-text-secondary,#6B7280)",
+                  background: activeTab === tab.id ? "var(--ds-brand-primary)" : "var(--ds-surface-card,#fff)",
+                  color:      activeTab === tab.id ? "var(--ds-nav-bg)" : "var(--ds-text-secondary,#6B7280)",
                   border:     `1px solid ${activeTab === tab.id ? "transparent" : "var(--ds-border-primary,#E5E7EB)"}`,
-                  boxShadow:  activeTab === tab.id ? "0 4px 12px rgba(21,128,61,0.3)" : "none",
+                  boxShadow:  activeTab === tab.id ? "0 4px 12px rgba(15,23,42,0.18)" : "none",
                 }}>
                 <span>{tab.emoji}</span> {tab.label}
               </button>

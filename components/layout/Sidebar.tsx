@@ -29,8 +29,8 @@ const NAV_ITEMS = [
     emoji: "🏠",
     activeBg: "bg-[var(--ds-brand-subtle)]",  activeText: "text-[var(--ds-text-brand)]",
     activeBorder: "border-[var(--ds-border-brand)]/60", activeBar: "bg-[var(--ds-brand-primary)]",
-    activeGrad: "linear-gradient(135deg,#DCFCE7,#F0FDF4)", activeColor: "#15803D", activeShadow: "rgba(21,128,61,0.20)",
-    hoverBg: "hover:bg-green-50 hover:text-green-700",
+    activeGrad: "linear-gradient(135deg,var(--ds-brand-subtle),var(--ds-brand-soft))", activeColor: "var(--ds-text-brand)", activeShadow: "rgba(15,23,42,0.14)",
+    hoverBg: "hover:bg-[var(--ds-brand-soft)] hover:text-[var(--ds-text-brand)]",
   },
   {
     label: "Stories",      href: "/stories",       match: (p: string) => p.startsWith("/stories"),
@@ -201,7 +201,9 @@ export default function Sidebar({ activeChild, isOpen, onClose, onLogoutClick }:
                       background: item.activeGrad,
                       color: item.activeColor,
                       boxShadow: `0 4px 14px ${item.activeShadow}`,
-                      border: `1.5px solid ${item.activeColor}33`,
+                      border: item.activeColor.startsWith("var(")
+                        ? "1.5px solid var(--ds-border-brand)"
+                        : `1.5px solid ${item.activeColor}33`,
                     }
                   : undefined
               }

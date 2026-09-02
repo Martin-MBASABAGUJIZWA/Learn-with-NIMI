@@ -171,7 +171,7 @@ function EarnedAchievementsCard({
           </p>
           <Link
             href="/stories"
-            className="mt-1 inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-white font-baloo font-black text-xs transition hover:-translate-y-0.5"
+            className="mt-1 inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-[var(--ds-nav-bg)] font-baloo font-black text-xs transition hover:-translate-y-0.5"
             style={{ background: "var(--ds-brand-primary)" }}
           >
             📖 Read a Story →

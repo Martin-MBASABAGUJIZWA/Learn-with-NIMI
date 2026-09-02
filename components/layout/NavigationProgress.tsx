@@ -83,11 +83,11 @@ export default function NavigationProgress() {
         style={{
           height: "100%",
           width: `${progress}%`,
-          backgroundColor: "var(--theme-accent, #15803D)",
+          backgroundColor: "var(--ds-brand-primary)",
           transition: progress === 100
             ? "width 0.15s ease-out"
             : "width 0.08s linear",
-          boxShadow: "0 0 8px var(--theme-accent, #15803D)",
+          boxShadow: "0 0 8px var(--ds-brand-primary)",
         }}
       />
     </div>

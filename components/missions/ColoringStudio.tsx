@@ -727,9 +727,9 @@ export default function ColoringStudio({ pages, childId, onClose, t }: ColoringS
           <AnimatePresence>
             {loading && (
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 pointer-events-none">
-                <motion.span className="text-4xl" animate={{ rotate: [0, 360] }}
+                <motion.span className="text-4xl" animate={themeM.reduced ? {} : { rotate: [0, 360] }}
                   transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                  exit={{ opacity: 0 }}>🎨</motion.span>
+                  exit={{ opacity: 0 }} aria-hidden="true">🎨</motion.span>
                 <p className="text-[var(--ds-text-secondary)] font-nunito font-bold text-sm">{t("storyColorPreparing")}</p>
               </div>
             )}

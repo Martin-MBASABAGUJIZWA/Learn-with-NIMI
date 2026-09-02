@@ -371,14 +371,14 @@ const airwaysVariant: ComponentVariant = {
     scrollFill:  "bg-[var(--ds-brand-primary)]",
     scrollTrack: "bg-[var(--ds-brand-subtle)]",
   },
-  // Zone and content gradients stay the same — these are content colours, not theme chrome
+  // Airways zone gradients — content areas use warm amber/gold; structural zones use Airways navy
   zoneGradients: {
     library:         "from-amber-500 via-yellow-400 to-amber-500",
     activityGrounds: "from-amber-500 via-orange-500 to-rose-500",
     communitySquare: "from-sky-400 via-cyan-400 to-teal-500",
     profile:         "from-yellow-400 via-amber-400 to-amber-500",
     treasureRoom:    "from-amber-400 via-yellow-500 to-orange-500",
-    familyHub:       "from-sky-500 via-blue-500 to-indigo-500",
+    familyHub:       "from-[#06101F] via-[#1A3558] to-[#0d2244]",
     achievement:     "from-yellow-400 via-amber-400 to-orange-400",
     nimiChat:        "from-violet-500 via-purple-500 to-indigo-500",
     creative:        "from-rose-400 via-pink-500 to-purple-500",

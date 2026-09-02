@@ -401,10 +401,10 @@ export default function StoryMissionPage() {
             {/* Top bar: back button + airways label */}
             <div className="flex items-center justify-between px-4 pt-3 pb-2.5 border-b border-[var(--ds-border-primary)]/20">
               <button onClick={() => router.push(`/stories/${slug}`)}
-                aria-label="Back to my adventure"
+                aria-label="Back to my flight"
                 className="flex items-center gap-1.5 min-h-[44px] px-3 bg-[var(--ds-surface-card)] border border-ds-border rounded-full text-[var(--ds-text-secondary)] hover:text-[var(--ds-text-brand)] hover:border-[var(--ds-border-brand)] transition shadow-sm font-nunito font-bold text-xs whitespace-nowrap">
                 <ArrowLeft className="w-4 h-4 shrink-0" aria-hidden="true" />
-                <span className="hidden sm:inline">My Adventure</span>
+                <span className="hidden sm:inline">My Flight</span>
               </button>
               <p aria-hidden="true" className="font-nunito font-black text-3xs uppercase tracking-widest text-[var(--ds-text-tertiary)] flex items-center gap-1">
                 <span>✈️</span>

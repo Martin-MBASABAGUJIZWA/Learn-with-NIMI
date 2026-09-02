@@ -576,7 +576,7 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
           </div>
         </>
       ) : (
-        <div className={`min-h-screen content-enter transition-opacity duration-300${refreshing ? " opacity-50 pointer-events-none" : ""}`} style={{ background: "linear-gradient(180deg, #f0f4f8 0%, #f2f7f2 50%, #eef6ee 100%)" }}>
+        <div className={`min-h-screen content-enter transition-opacity duration-300${refreshing ? " opacity-50 pointer-events-none" : ""}`} style={{ background: "linear-gradient(180deg, #f5f4f0 0%, #f2f0ec 50%, #eeede8 100%)" }}>
 
           {/* ════════════════════════════════ HERO ══════════════════════════ */}
           <motion.div
@@ -696,7 +696,7 @@ export default function HomeClient({ initialChildren, initialHasSubscription }: 
                         </div>
                         <div className="h-3 bg-[var(--ds-surface-card-active)] rounded-full overflow-hidden shadow-inner">
                           <motion.div key={`xp-${activeChild?.id}`} className="h-full rounded-full"
-                            style={{ background: "linear-gradient(90deg,#22c55e,#16a34a,#0ea5e9)" }}
+                            style={{ background: "linear-gradient(90deg,var(--ds-brand-primary),var(--ds-brand-hover))" }}
                             initial={{ width: 0 }} animate={{ width: `${xpPct}%` }}
                             transition={{ duration: 1.4, ease: "easeOut", delay: 0.5 }} />
                         </div>
